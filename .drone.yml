@@ -1,0 +1,193 @@
+kind: pipeline
+type: docker
+name: default
+
+steps:
+
+  - name: restore-cache
+    image: drillster/drone-volume-cache
+    volumes:
+      - name: drone-cache
+        path: /cache
+    settings:
+      restore: true
+      mount:
+        - ./node_modules
+        # We can only mount volume caches into the working directory, so all steps which use Gradle must have
+        # the GRADLE_USER_HOME environment variable pointing here.
+        - ./gradle_cache
+        - ./sonar_cache
+
+  - name: fetch-fds-submodule
+    image: alpine/git:v2.26.2
+    commands:
+      - echo "$${BITBUCKET_SSH_KEY}" > bitbucket_ssh_key
+      - chmod 600 bitbucket_ssh_key
+      - export GIT_SSH_COMMAND="ssh -i bitbucket_ssh_key -F /dev/null  -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+      - git submodule update --init --recursive
+    environment:
+      BITBUCKET_SSH_KEY:
+        from_secret: bitbucket_ssh_key
+
+  - name: build-frontend
+    image: node:10
+    commands:
+      - cd fivium-design-system-core && npm install && npx gulp build && cd ..
+      - npm install
+      - npx gulp buildAll
+
+  - name: build-backend
+    image: eclipse-temurin:17-jdk
+    environment:
+      SONAR_TOKEN:
+        from_secret: sonarcloud_token
+    commands:
+      - chmod +x gradlew
+      - ./gradlew checkstyleMain test bootJar sonarqube
+
+  - name: sync-reports
+    image: alpine:3.16.0
+    commands:
+      - mkdir -p /var/webfiles/${DRONE_BUILD_NUMBER}
+      - cp -r build/reports /var/webfiles/${DRONE_BUILD_NUMBER}
+    volumes:
+      - name: webfiles
+        path: /var/webfiles
+    when:
+      status: [ success, failure ]
+
+  - name: publish-docker-develop
+    image: plugins/docker:19.03.8
+    settings:
+      registry: quay.io
+      repo: quay.io/fivium/xyz-template
+      tags:
+        - develop
+      config:
+        from_secret: docker_config
+    when:
+      branch:
+        - develop
+      status:
+        - success
+
+  - name: publish-docker
+    image: plugins/docker:19.03.8
+    settings:
+      registry: quay.io
+      repo: quay.io/fivium/xyz-template
+      tags:
+        - ${DRONE_BRANCH/\//-}-${DRONE_BUILD_NUMBER}
+      config:
+        from_secret: docker_config
+    when:
+      branch:
+        - main
+        - hotfix/**
+        - release/**
+      status:
+        - success
+
+  - name: trivy-build-image
+    image: docker:20.10.9
+    volumes:
+      - name: docker-sock
+        path: /var/run/docker.sock
+    commands:
+      - docker build -t quay.io/fivium/xyz-template:trivy-scan-target .
+
+  - name: trivy-scan
+    image: aquasec/trivy:0.20.0
+    volumes:
+      - name: docker-sock
+        path: /var/run/docker.sock
+      - name: drone-trivy-cache
+        path: /root/trivy-cache
+      - name: webfiles
+        path: /var/webfiles
+    commands:
+      # timeout set as initial cache population can seemingly take a while sometimes
+      - trivy --format template --template "@contrib/html.tpl" -o /var/webfiles/${DRONE_BUILD_NUMBER}/trivy-scan.html image --timeout 30m --exit-code 1 quay.io/fivium/xyz-template:trivy-scan-target
+    when:
+      status:
+        - success
+
+  - name: deploy-dev-st
+    image: plugins/downstream:linux-amd64
+    settings:
+      server: https://drone.fivium.co.uk
+      token:
+        from_secret: drone_token
+      fork: true
+      repositories:
+        - fiviumuk/fivium-dev-app@master
+    when:
+      branch:
+        - develop
+      status:
+        - success
+
+  - name: rebuild-cache
+    image: drillster/drone-volume-cache
+    volumes:
+      - name: drone-cache
+        path: /cache
+    settings:
+      rebuild: true
+      mount:
+        - ./node_modules
+        - ./gradle_cache
+        - ./sonar_cache
+
+  - name: slack
+    image: plugins/slack
+    settings:
+      webhook: https://hooks.slack.com/services/UPDATE_WEBHOOK
+      channel: xyz-template-builds
+      template: "*{{build.status}}* <{{build.link}}|Commit {{truncate build.commit 7}} on {{build.branch}} by ${DRONE_COMMIT_AUTHOR_NAME}>\nReports published to: http://drone-assets.fivium.local:9090/xyz-template/{{build.number}}/"
+    when:
+      status: [ success, failure ]
+
+trigger:
+  event:
+    include:
+    - push
+
+volumes:
+  - name: webfiles
+    host:
+      path: /home/fivium/www/xyz-template
+
+  - name: drone-cache
+    host:
+      path: /home/fivium/drone-cache
+
+  - name: docker-sock
+    host:
+      path: /var/run/docker.sock
+
+  - name: drone-trivy-cache
+    host:
+      path: /root/.cache/
+
+---
+
+kind: secret
+name: docker_config
+data: BUILD_SECRET
+---
+
+kind: secret
+name: sonarcloud_token
+data: BUILD_SECRET
+
+---
+
+kind: secret
+name: bitbucket_ssh_key
+data: BUILD_SECRET
+---
+
+kind: secret
+name: drone_token
+data: BUILD_SECRET
