@@ -1,4 +1,4 @@
-package uk.co.nstauthority.xyztemplate.mvc;
+package uk.co.nstauthority.scap.mvc;
 
 import java.util.concurrent.TimeUnit;
 import org.springframework.context.annotation.Bean;

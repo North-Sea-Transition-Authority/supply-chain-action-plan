@@ -1,4 +1,4 @@
-package uk.co.nstauthority.xyztemplate.mvc;
+package uk.co.nstauthority.scap.mvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -11,10 +11,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-import uk.co.nstauthority.xyztemplate.AbstractControllerTest;
-import uk.co.nstauthority.xyztemplate.branding.CustomerConfigurationProperties;
-import uk.co.nstauthority.xyztemplate.branding.ServiceConfigurationProperties;
-import uk.co.nstauthority.xyztemplate.workarea.WorkAreaController;
+import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
+import uk.co.nstauthority.scap.branding.ServiceConfigurationProperties;
+import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @WebMvcTest
 @ContextConfiguration(classes = {

@@ -1,4 +1,4 @@
-package uk.co.nstauthority.xyztemplate.mvc;
+package uk.co.nstauthority.scap.mvc;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -9,8 +9,8 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import uk.co.nstauthority.xyztemplate.branding.ServiceBrandingConfigurationProperties;
-import uk.co.nstauthority.xyztemplate.workarea.WorkAreaController;
+import uk.co.nstauthority.scap.branding.ServiceBrandingConfigurationProperties;
+import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @ControllerAdvice
 class DefaultPageControllerAdvice {

@@ -1,4 +1,4 @@
-package uk.co.nstauthority.xyztemplate.branding;
+package uk.co.nstauthority.scap.branding;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

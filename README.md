@@ -6,7 +6,7 @@ This template project can be used to help start your new Digital project. This R
 Here are the steps required for you to configure this template into your specific project: 
 - Replace usages of the `XYZ-TEMPLATE`, `xyzt`, `XYZ Template` 
 - Update `https://hooks.slack.com/services/UPDATE_WEBHOOK` with the new slack webhook 
-- Rename the packages (currently it's `uk.co.nstauthority.xyztemplate`)
+- Rename the packages (currently it's `uk.co.nstauthority.scap`)
 - Rename the class `XyzTemplateApplication`
 - Build the secrets and add to `.drone.yml`
 - Rename the project : File > Project Structure > Project > Project Name
@@ -43,8 +43,8 @@ Note that this template uses a Postgres database, so make sure that the database
 
 | Environment Variable   | Description                                    |
 |------------------------|------------------------------------------------|
-| XYZT_DATABASE_URL      | The URL to the database the service connect to |
-| XYZT_DATABASE_PASSWORD | Database schema password for the `XYZT` user   |
+| SCAP_DATABASE_URL      | The URL to the database the service connect to |
+| SCAP_DATABASE_PASSWORD | Database schema password for the `XYZT` user   |
 
 ### 3. Initialise the Fivium Design System
 - `git submodule update --init --recursive`
@@ -57,7 +57,7 @@ Note that this template uses a Postgres database, so make sure that the database
 ### 5. Run the app
 Create a run configuration for the Spring app and start the application.
 
-The application will be running on `localhost:8080/xyzt/<endpoint>`
+The application will be running on `localhost:8080/SCAP/<endpoint>`
 
 ## Development setup
 

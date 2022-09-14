@@ -1,4 +1,4 @@
-package uk.co.nstauthority.xyztemplate.branding;
+package uk.co.nstauthority.scap.branding;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

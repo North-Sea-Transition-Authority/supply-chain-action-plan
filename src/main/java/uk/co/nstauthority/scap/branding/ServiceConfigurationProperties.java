@@ -1,12 +1,12 @@
-package uk.co.nstauthority.xyztemplate.branding;
+package uk.co.nstauthority.scap.branding;
 
 import javax.validation.constraints.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-@ConfigurationProperties(prefix = "branding.customer")
+@ConfigurationProperties(prefix = "branding.service")
 @Validated
-public record CustomerConfigurationProperties(
+public record ServiceConfigurationProperties(
     @NotNull String name,
     @NotNull String mnemonic
 ) {}

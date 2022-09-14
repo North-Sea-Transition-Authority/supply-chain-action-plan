@@ -1,4 +1,4 @@
-package uk.co.nstauthority.xyztemplate.mvc;
+package uk.co.nstauthority.scap.mvc;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

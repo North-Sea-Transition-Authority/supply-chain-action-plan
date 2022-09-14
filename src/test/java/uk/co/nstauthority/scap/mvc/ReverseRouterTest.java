@@ -1,4 +1,4 @@
-package uk.co.nstauthority.xyztemplate.mvc;
+package uk.co.nstauthority.scap.mvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -21,7 +21,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
-import uk.co.nstauthority.xyztemplate.AbstractControllerTest;
+import uk.co.nstauthority.scap.AbstractControllerTest;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest

@@ -1,4 +1,4 @@
-package uk.co.nstauthority.xyztemplate.workarea;
+package uk.co.nstauthority.scap.workarea;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +11,6 @@ public class WorkAreaController {
 
   @GetMapping
   public ModelAndView getWorkArea() {
-    return new ModelAndView("xyzt/workarea/workArea");
+    return new ModelAndView("scap/workarea/workArea");
   }
 }

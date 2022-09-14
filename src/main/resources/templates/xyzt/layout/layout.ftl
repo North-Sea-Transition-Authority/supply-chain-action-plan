@@ -1,8 +1,8 @@
 <#include '../../fds/layout.ftl'>
 <#import '_pageSizes.ftl' as PageSize>
 
-<#-- @ftlvariable name="serviceBranding" type="uk.co.nstauthority.xyztemplate.branding.ServiceConfigurationProperties" -->
-<#-- @ftlvariable name="customerBranding" type="uk.co.nstauthority.xyztemplate.branding.CustomerConfigurationProperties" -->
+<#-- @ftlvariable name="serviceBranding" type="uk.co.nstauthority.scap.branding.ServiceConfigurationProperties" -->
+<#-- @ftlvariable name="customerBranding" type="uk.co.nstauthority.scap.branding.CustomerConfigurationProperties" -->
 <#-- @ftlvariable name="serviceHomeUrl" type="String" -->
 
 <#macro defaultPage
