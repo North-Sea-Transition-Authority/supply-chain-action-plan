@@ -179,7 +179,7 @@ data: BUILD_SECRET
 
 kind: secret
 name: sonarcloud_token
-data: BUILD_SECRET
+data: Xl4S16Tgul+zX9m1HMzBm/gX8jcPxIePV1YBz78RKL5vlZYjAr1XPBpRNx9J94duGnhwVzlGx/nTWIzxeJU/HXcG4B4=
 
 ---
 
