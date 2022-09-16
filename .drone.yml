@@ -142,8 +142,8 @@ steps:
   - name: slack
     image: plugins/slack
     settings:
-      webhook: https://hooks.slack.com/services/UPDATE_WEBHOOK
-      channel: oga-scap-builds
+      webhook: https://hooks.slack.com/services/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
+      channel: scap-pipelines
       template: "*{{build.status}}* <{{build.link}}|Commit {{truncate build.commit 7}} on {{build.branch}} by ${DRONE_COMMIT_AUTHOR_NAME}>\nReports published to: http://drone-assets.fivium.local:9090/scap/{{build.number}}/"
     when:
       status: [ success, failure ]
@@ -174,7 +174,7 @@ volumes:
 
 kind: secret
 name: docker_config
-data: BUILD_SECRET
+data: XGrQ8hXFq+uF2WwDlBco3smp4vPLWUghhDqQYnaF9sbytfaC2kN9TnoYkGb23uxZH6wPW+5i8WBwil61x642Uz3h2RocPPC0lkVVvQKAaa1A90LomKqBZYa/FMPrFqMQx3d2sPlJr+28XNnr8YgnfkscDGbeo40FlyFxe89iOczXF8pqe3PWfqYUKCy7f9S9nJ5Gp+dxXyt5+76Bpwca2JnCqLH5mS9a8W/lHo9s8dyUUxyPkzIDKxdZU+r6XD8Agmz6Up7HS+8NdgvWpAmGYW6qgQG7eIkdECUOZHIC7yXqth4gbm5t2xHc/ClP0sOS2RJnvnHMd00JA1sVjM/dT2E3Qb54yNo2SptKsji5GSz/mcVyKAAYaJFFcokOyRW5IaPmWq3oteaBbRMJfAFmi7FzH0g3fFxXqa/m
 ---
 
 kind: secret
@@ -191,4 +191,4 @@ data: C3QRAm9k/eNQYEYoC0ODDnVx1KdhyZI8gdV6XdOLQhXYEBK7g+qLHeBXXqEplqhSoWV9UtmP4H
 
 kind: secret
 name: drone_token
-data: BUILD_SECRET
+data: CMXLCjcwlTl4vjml8cb6GTVUw5tbO9O6K/UMUDTTjbQ7MnJbsQPKEXc/mVUfYJs0KUaPA6Rfs1zOQV3D
