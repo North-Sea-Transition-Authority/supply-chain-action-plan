@@ -57,7 +57,7 @@ Note that this template uses a Postgres database, so make sure that the database
 ### 5. Run the app
 Create a run configuration for the Spring app and start the application.
 
-The application will be running on `localhost:8080/SCAP/<endpoint>`
+The application will be running on `localhost:8080/scap/<endpoint>`
 
 ## Development setup
 
