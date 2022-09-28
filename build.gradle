@@ -44,7 +44,7 @@ tasks {
 
 sonarqube {
 	properties {
-		property "sonar.projectKey", "Fivium_${rootProject.name}"
+		property "sonar.projectKey", "Fivium_supply-chain-action-plan"
 		property "sonar.organization", "fivium-gh"
 		property "sonar.host.url", "https://sonarcloud.io"
 		if (System.getenv("DRONE_PULL_REQUEST") != null) {
