@@ -10,6 +10,7 @@
   pageHeading=""
   phaseBanner=true
   pageSize=PageSize.TWO_THIRDS_COLUMN
+  backLinkUrl=""
 >
   <#local serviceName = serviceBranding.name() />
   <#local customerMnemonic = customerBranding.mnemonic() />
@@ -52,6 +53,8 @@
     twoThirdsColumn=twoThirdsColumn
     twoThirdsOneThirdColumn=twoThirdsOneThirdColumn
     oneQuarterColumn=oneQuarterColumn
+    backLink=backLinkUrl?has_content
+    backLinkUrl=springUrl(backLinkUrl)
   >
     <#nested />
   </@fdsDefaultPageTemplate>
