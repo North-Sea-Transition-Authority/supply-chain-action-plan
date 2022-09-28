@@ -144,6 +144,24 @@ steps:
         include:
           - pull_request
 
+  - name: code-analysis
+    image: repo1.dev.fivium.local:5000/sonarcloud-scan-java17:latest
+    environment:
+      SONARCLOUD_TOKEN:
+        from_secret: sonarcloud_token
+      #GRADLE_USER_HOME: /drone/src/gradle_cache
+      # This SONAR_USER_HOME is the cache path - not the actual user home
+      SONAR_USER_HOME: /drone/src/sonar_cache
+    commands:
+      - chmod +x gradlew
+      - ./gradlew sonarqube -info
+    when:
+      # The Pull Request Pipeline will run the Code Analysis on all other branches (once a PR is open)
+      branch:
+        - develop
+        - main
+        - drone/*
+
   - name: rebuild-cache
     image: drillster/drone-volume-cache
     volumes:
