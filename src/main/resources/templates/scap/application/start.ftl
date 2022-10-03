@@ -17,5 +17,9 @@ backLinkUrl=backLinkUrl
     Deal. The full guidance document can be found at
       <@fdsAction.link linkText=scapGuidanceDocumentUrl linkUrl=scapGuidanceDocumentUrl/>
   </p>
-  <@fdsAction.link linkText="Start now" start=true linkClass="govuk-!-margin-top-2" linkUrl=startScapRedirectUrl/>
+  <@fdsAction.link
+  linkText="Start now"
+  start=true
+  linkClass="govuk-!-margin-top-2"
+  linkUrl=springUrl(startScapRedirectUrl)/>
 </@defaultPage>

@@ -4,34 +4,33 @@ import java.time.Instant;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @Table(name = "scap_overviews")
 public class ScapOverview {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "scap_id")
-  private Long id;
+  private Integer id;
 
-  // TODO SCAP2022-119: Change this type to OrganisationGroup rather than Long
-  private Long operatorId;
+  private Integer organisationGroupId;
 
-  @CreatedDate
   private Instant createdTimestamp;
 
   public ScapOverview() {
 
   }
 
-  public ScapOverview(Long operatorId) {
-    this.operatorId = operatorId;
+  public ScapOverview(Integer organisationGroupId) {
+    this.organisationGroupId = organisationGroupId;
+    this.createdTimestamp = Instant.now();
   }
 
-  public Long getId() {
+  public Integer getId() {
     return id;
   }
 
@@ -39,11 +38,11 @@ public class ScapOverview {
     return createdTimestamp;
   }
 
-  public Long getOperatorId() {
-    return operatorId;
+  public Integer getOrganisationGroupId() {
+    return organisationGroupId;
   }
 
-  public void setOperatorId(Long operatorId) {
-    this.operatorId = operatorId;
+  public void setOrganisationGroupId(Integer organisationGroupId) {
+    this.organisationGroupId = organisationGroupId;
   }
 }

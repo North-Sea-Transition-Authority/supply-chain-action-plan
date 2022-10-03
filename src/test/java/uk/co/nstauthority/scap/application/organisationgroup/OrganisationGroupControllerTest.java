@@ -1,0 +1,186 @@
+package uk.co.nstauthority.scap.application.organisationgroup;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import static uk.co.nstauthority.scap.mvc.ReverseRouter.emptyBindingResult;
+
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
+import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.application.overview.ScapOverview;
+import uk.co.nstauthority.scap.application.overview.ScapOverviewService;
+import uk.co.nstauthority.scap.application.start.ScapStartController;
+import uk.co.nstauthority.scap.fds.ErrorItem;
+import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
+import uk.co.nstauthority.scap.workarea.WorkAreaController;
+
+@ExtendWith(MockitoExtension.class)
+@WebMvcTest(controllers = OrganisationGroupController.class)
+@WithMockUser
+public class OrganisationGroupControllerTest extends AbstractControllerTest {
+
+  @MockBean
+  ScapOverviewService scapOverviewService;
+
+  @MockBean
+  OrganisationGroupFormService organisationGroupFormService;
+
+  @MockBean
+  ValidationErrorOrderingService validationErrorOrderingService;
+
+  @MockBean
+  OrganisationGroupService organisationGroupService;
+
+  @Test
+  public void renderNewScapOrganisationGroupForm() throws Exception {
+    mockMvc.perform(
+        get(
+            ReverseRouter.route(on(OrganisationGroupController.class).renderNewScapOrganisationGroupForm(null))))
+        .andExpect(status().isOk())
+        .andExpect(view().name("scap/application/organisationGroup"))
+        .andExpect(model().attribute("backLinkUrl",
+            ReverseRouter.route(on(ScapStartController.class).renderStartNewScap())))
+        .andExpect(model().attribute("submitPostUrl",
+            ReverseRouter.route(on(OrganisationGroupController.class).saveNewScapOrganisationGroup(null, emptyBindingResult()))))
+        .andExpect(model().attribute("organisationGroupSearchRestUrl",
+            ReverseRouter.route(on(OrganisationGroupRestController.class).getOrganisationGroupSearchResults(null))))
+        .andExpect(model().attributeExists("form"));
+  }
+
+  @Test
+  public void saveNewScapOrganisationGroup_valid() throws Exception {
+    var postUrl = ReverseRouter.route(on(OrganisationGroupController.class)
+        .saveNewScapOrganisationGroup(null, emptyBindingResult()));
+    var expectedRedirectUrl = ReverseRouter.route(on(OrganisationGroupController.class)
+        .renderNewScapOrganisationGroupForm(null));
+    var form = new OrganisationGroupForm();
+
+    when(organisationGroupFormService.validate(any(OrganisationGroupForm.class), any(BindingResult.class)))
+        .thenReturn(new BeanPropertyBindingResult(form, "form"));
+
+    mockMvc.perform(
+        post(postUrl).param("organisationGroupId", "1664")
+            .with(csrf()))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
+
+    verify(scapOverviewService, times(1)).createScapOverview(1664);
+  }
+
+  @Test
+  public void saveNewScapOrganisationGroup_invalid() throws Exception {
+    var postUrl = ReverseRouter.route(on(OrganisationGroupController.class)
+        .saveNewScapOrganisationGroup(null, emptyBindingResult()));
+    var form = new OrganisationGroupForm();
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
+    var errorItems = List.of(new ErrorItem(
+        1, "organisationGroupId", "Select who the operator is for this SCAP"));
+
+    when(organisationGroupFormService.validate(any(), any())).thenReturn(bindingResult);
+    when(validationErrorOrderingService.getErrorItemsFromBindingResult(any(), any())).thenReturn(errorItems);
+
+    mockMvc.perform(
+        post(postUrl).param("organisationGroupId", "")
+            .with(csrf()))
+        .andExpect(status().isOk())
+        .andExpect(view().name("scap/application/organisationGroup"))
+        .andExpect(model().attribute("errorItems", errorItems));
+
+    verify(scapOverviewService, never()).createScapOverview(any());
+  }
+
+  @Test
+  public void renderExistingScapOrganisationGroupForm() throws Exception {
+    var scapOverview = new ScapOverview(322);
+    var organisationGroup = new OrganisationGroup(322, "CENTRICA", null, null, null, null);
+    when(scapOverviewService.getScapOverviewById(1)).thenReturn(scapOverview);
+    when(organisationGroupService.getOrganisationGroupById(322, "Get name of current SCAP operator"))
+        .thenReturn(Optional.of(organisationGroup));
+    when(organisationGroupFormService.getForm(scapOverview)).thenReturn(new OrganisationGroupForm());
+
+    mockMvc.perform(
+        get(
+            ReverseRouter.route(on(OrganisationGroupController.class).renderExistingScapOrganisationGroupForm(1))))
+        .andExpect(status().isOk())
+        .andExpect(view().name("scap/application/organisationGroup"))
+        .andExpect(model().attribute("backLinkUrl",
+            ReverseRouter.route(on(WorkAreaController.class).getWorkArea())))
+        .andExpect(model().attribute("submitPostUrl",
+            ReverseRouter.route(on(OrganisationGroupController.class).saveExistingScapOrganisationGroup(null, 1, emptyBindingResult()))))
+        .andExpect(model().attribute("organisationGroupSearchRestUrl",
+            ReverseRouter.route(on(OrganisationGroupRestController.class).getOrganisationGroupSearchResults(null))))
+        .andExpect(model().attributeExists("form"));
+  }
+
+  @Test
+  public void saveExistingScapOrganisationGroup_valid() throws Exception {
+    var postUrl = ReverseRouter.route(on(OrganisationGroupController.class)
+        .saveExistingScapOrganisationGroup(null, 1, emptyBindingResult()));
+    var expectedRedirectUrl = ReverseRouter.route(on(OrganisationGroupController.class)
+        .renderExistingScapOrganisationGroupForm(1));
+    var form = new OrganisationGroupForm();
+    var scapOverview = new ScapOverview(322);
+
+    when(scapOverviewService.getScapOverviewById(1)).thenReturn(scapOverview);
+    when(organisationGroupFormService.validate(any(OrganisationGroupForm.class), any(BindingResult.class)))
+        .thenReturn(new BeanPropertyBindingResult(form, "form"));
+
+    mockMvc.perform(
+        post(postUrl)
+            .param("organisationGroupId", "1664")
+            .with(csrf()))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
+
+    verify(scapOverviewService, times(1))
+        .updateScapOverviewOrganisationGroup(scapOverview, 1664);
+  }
+
+  @Test
+  public void saveExistingScapOrganisationGroup_invalid() throws Exception {
+    var postUrl = ReverseRouter.route(on(OrganisationGroupController.class)
+        .saveExistingScapOrganisationGroup(null, 1, emptyBindingResult()));
+    var form = new OrganisationGroupForm();
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
+    var errorItems = List.of(new ErrorItem(
+        1, "organisationGroupId", "Select who the operator is for this SCAP"));
+    var scapOverview = new ScapOverview(322);
+
+    when(scapOverviewService.getScapOverviewById(1)).thenReturn(scapOverview);
+    when(organisationGroupFormService.validate(any(), any())).thenReturn(bindingResult);
+    when(validationErrorOrderingService.getErrorItemsFromBindingResult(any(), any())).thenReturn(errorItems);
+
+    mockMvc.perform(
+        post(postUrl).param("organisationGroupId", "")
+            .with(csrf()))
+        .andExpect(status().isOk())
+        .andExpect(view().name("scap/application/organisationGroup"))
+        .andExpect(model().attribute("errorItems", errorItems));
+
+    verify(scapOverviewService, never()).updateScapOverviewOrganisationGroup(any(), any());
+  }
+
+}
