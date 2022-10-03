@@ -27,12 +27,15 @@ dependencies {
   implementation 'com.google.guava:guava:31.1-jre'
 
   implementation 'org.apache.commons:commons-lang3:3.12.0'
-	implementation 'org.springframework.boot:spring-boot-starter-freemarker'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.flywaydb:flyway-core'
+  implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'org.springframework.boot:spring-boot-starter-validation'
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-security'
+  implementation 'org.springframework.security:spring-security-saml2-service-provider'
+  implementation 'org.springframework.session:spring-session-core'
+  implementation 'org.flywaydb:flyway-core'
 
   implementation 'uk.co.fivium.digitalformlibrary:digital-form-library:develop-SNAPSHOT'
 
@@ -41,6 +44,7 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	// Using H2 for the tests as a temporary measure until a final decision is made on which database is being used.
 	testImplementation 'com.h2database:h2:2.1.214'
+  testImplementation 'org.springframework.security:spring-security-test'
 
 }
 
@@ -57,7 +61,7 @@ tasks {
 
 sonarqube {
   properties {
-    property 'sonar.projectKey', 'Fivium_supply_chain_action_plan'
+    property 'sonar.projectKey', 'Fivium_supply-chain-action-plan'
     property 'sonar.organization', 'fivium-gh'
     property 'sonar.host.url', 'https://sonarcloud.io'
     property 'sonar.login', System.getenv('SONARCLOUD_TOKEN')

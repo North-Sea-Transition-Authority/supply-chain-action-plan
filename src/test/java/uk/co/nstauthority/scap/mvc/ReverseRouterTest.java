@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +26,7 @@ import uk.co.nstauthority.scap.AbstractControllerTest;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest
+@WithMockUser
 class ReverseRouterTest extends AbstractControllerTest {
 
   @BeforeEach

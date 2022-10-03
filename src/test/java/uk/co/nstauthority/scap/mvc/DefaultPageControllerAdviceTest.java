@@ -7,6 +7,8 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,10 +19,12 @@ import uk.co.nstauthority.scap.branding.ServiceConfigurationProperties;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @WebMvcTest
+@ActiveProfiles("test")
 @ContextConfiguration(classes = {
     DefaultPageControllerAdviceTest.TestController.class,
     DefaultPageControllerAdvice.class
 })
+@WithMockUser
 class DefaultPageControllerAdviceTest extends AbstractControllerTest {
 
   @Test
