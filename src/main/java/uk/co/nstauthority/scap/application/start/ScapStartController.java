@@ -14,14 +14,14 @@ import uk.co.nstauthority.scap.workarea.WorkAreaController;
 @RequestMapping("/new")
 public class ScapStartController {
 
-  private final String WORK_AREA_URL = ReverseRouter.route(on(WorkAreaController.class).getWorkArea());
-  private final String START_REDIRECT_URL = ReverseRouter.route(on(OrganisationGroupController.class)
+  private final String workAreaUrl = ReverseRouter.route(on(WorkAreaController.class).getWorkArea());
+  private final String startRedirectUrl = ReverseRouter.route(on(OrganisationGroupController.class)
       .renderNewScapOrganisationGroupForm(null));
 
   @GetMapping
   public ModelAndView renderStartNewScap() {
     return new ModelAndView("scap/application/start")
-        .addObject("startScapRedirectUrl", START_REDIRECT_URL)
-        .addObject("backLinkUrl", WORK_AREA_URL);
+        .addObject("startScapRedirectUrl", startRedirectUrl)
+        .addObject("backLinkUrl", workAreaUrl);
   }
 }

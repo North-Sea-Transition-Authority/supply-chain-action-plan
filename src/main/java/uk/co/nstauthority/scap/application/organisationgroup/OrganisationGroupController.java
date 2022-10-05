@@ -22,14 +22,14 @@ import uk.co.nstauthority.scap.workarea.WorkAreaController;
 @Controller
 public class OrganisationGroupController {
 
-  private final String NEW_SCAP_BACK_LINK_URL =
+  private final String newScapBackLinkUrl =
       ReverseRouter.route(on(ScapStartController.class).renderStartNewScap());
-  private final String NEW_SCAP_POST_URL =
+  private final String newScapPostUrl =
       ReverseRouter.route(on(OrganisationGroupController.class).saveNewScapOrganisationGroup(null, emptyBindingResult()));
   // TODO SCAP2022-29: Replace work area link with link to task list for this SCAP
-  private final String EXISTING_SCAP_BACK_LINK_URL =
+  private final String existingScapBackLinkUrl =
       ReverseRouter.route(on(WorkAreaController.class).getWorkArea());
-  private final String ORGANISATION_GROUP_SEARCH_REST_URL =
+  private final String organisationGroupSearchRestUrl =
       ReverseRouter.route(on(OrganisationGroupRestController.class).getOrganisationGroupSearchResults(null));
 
   private final ScapOverviewService scapOverviewService;
@@ -51,7 +51,7 @@ public class OrganisationGroupController {
 
   @GetMapping("/new/organisation-group")
   public ModelAndView renderNewScapOrganisationGroupForm(@ModelAttribute("form") OrganisationGroupForm form) {
-    return organisationGroupFormModelAndView(NEW_SCAP_BACK_LINK_URL, NEW_SCAP_POST_URL);
+    return organisationGroupFormModelAndView(newScapBackLinkUrl, newScapPostUrl);
   }
 
   @PostMapping("/new/organisation-group")
@@ -59,7 +59,7 @@ public class OrganisationGroupController {
                                                    BindingResult bindingResult) {
     bindingResult = organisationGroupFormService.validate(form, bindingResult);
     if (bindingResult.hasErrors()) {
-      return organisationGroupFormModelAndView(NEW_SCAP_BACK_LINK_URL, NEW_SCAP_POST_URL)
+      return organisationGroupFormModelAndView(newScapBackLinkUrl, newScapPostUrl)
           .addObject("errorItems", validationErrorOrderingService.getErrorItemsFromBindingResult(form, bindingResult));
     }
 
@@ -79,7 +79,7 @@ public class OrganisationGroupController {
             .map(organisationGroup -> Map.of(organisationGroup.getOrganisationGroupId(), organisationGroup.getName()))
             .orElse(Collections.emptyMap());
 
-    return organisationGroupFormModelAndView(EXISTING_SCAP_BACK_LINK_URL, postUrl, preselectedItems)
+    return organisationGroupFormModelAndView(existingScapBackLinkUrl, postUrl, preselectedItems)
         .addObject("form", form);
   }
 
@@ -92,7 +92,7 @@ public class OrganisationGroupController {
     if (bindingResult.hasErrors()) {
       var postUrl = ReverseRouter.route(on(OrganisationGroupController.class)
           .saveExistingScapOrganisationGroup(null, scapOverviewId, emptyBindingResult()));
-      return organisationGroupFormModelAndView(EXISTING_SCAP_BACK_LINK_URL, postUrl)
+      return organisationGroupFormModelAndView(existingScapBackLinkUrl, postUrl)
           .addObject("errorItems", validationErrorOrderingService.getErrorItemsFromBindingResult(form, bindingResult));
     }
 
@@ -113,7 +113,7 @@ public class OrganisationGroupController {
     return new ModelAndView("scap/application/organisationGroup")
         .addObject("backLinkUrl", backLinkUrl)
         .addObject("submitPostUrl", postUrl)
-        .addObject("organisationGroupSearchRestUrl", ORGANISATION_GROUP_SEARCH_REST_URL)
+        .addObject("organisationGroupSearchRestUrl", organisationGroupSearchRestUrl)
         .addObject("preselectedItems", preselectedItems);
   }
 }
