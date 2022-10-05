@@ -22,14 +22,14 @@ import uk.co.nstauthority.scap.workarea.WorkAreaController;
 @Controller
 public class OrganisationGroupController {
 
-  private static final String NEW_SCAP_BACK_LINK_URL =
+  private final String NEW_SCAP_BACK_LINK_URL =
       ReverseRouter.route(on(ScapStartController.class).renderStartNewScap());
-  private static final String NEW_SCAP_POST_URL =
+  private final String NEW_SCAP_POST_URL =
       ReverseRouter.route(on(OrganisationGroupController.class).saveNewScapOrganisationGroup(null, emptyBindingResult()));
   // TODO SCAP2022-29: Replace work area link with link to task list for this SCAP
-  private static final String EXISTING_SCAP_BACK_LINK_URL =
+  private final String EXISTING_SCAP_BACK_LINK_URL =
       ReverseRouter.route(on(WorkAreaController.class).getWorkArea());
-  private static final String ORGANISATION_GROUP_SEARCH_REST_URL =
+  private final String ORGANISATION_GROUP_SEARCH_REST_URL =
       ReverseRouter.route(on(OrganisationGroupRestController.class).getOrganisationGroupSearchResults(null));
 
   private final ScapOverviewService scapOverviewService;

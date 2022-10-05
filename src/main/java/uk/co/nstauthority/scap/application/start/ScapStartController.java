@@ -14,8 +14,8 @@ import uk.co.nstauthority.scap.workarea.WorkAreaController;
 @RequestMapping("/new")
 public class ScapStartController {
 
-  private static final String WORK_AREA_URL = ReverseRouter.route(on(WorkAreaController.class).getWorkArea());
-  private static final String START_REDIRECT_URL = ReverseRouter.route(on(OrganisationGroupController.class)
+  private final String WORK_AREA_URL = ReverseRouter.route(on(WorkAreaController.class).getWorkArea());
+  private final String START_REDIRECT_URL = ReverseRouter.route(on(OrganisationGroupController.class)
       .renderNewScapOrganisationGroupForm(null));
 
   @GetMapping
