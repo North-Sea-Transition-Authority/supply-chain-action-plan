@@ -1,21 +1,27 @@
-CVE-2022-30065
-CVE-2022-31197
-CVE-2022-25857
-CVE-2022-38749
-CVE-2022-38752
-CVE-2022-38750
-CVE-2022-38751
-CVE-2022-42003
-CVE-2022-42004
-CVE-2022-3171
+#Transient Vulnerability from spring-boot-starter-web
+  CVE-2022-42003
+  CVE-2022-42004
 
-# Transient vulnerability from energy portal API
-CVE-2022-37734
+#Transient Vulnerability from spring-boot-starter-actuator
+  CVE-2022-25857
+  CVE-2022-38749
+  CVE-2022-38750
+  CVE-2022-38751
+  CVE-2022-38752
 
-#Transient Vunerabilities from Authorisation libraries
-CVE-2015-7501
-CVE-2015-6420
-CVE-2021-40690
-CVE-2019-12400
-CVE-2020-13936
-CVE-2020-15522
+# Transient Vulnerability from energy portal API
+  CVE-2022-37734
+
+#Transient Vulnerability from energy-portal-api
+  #Transient Vulnerability from graphql-dgs-platform-dependencies
+    CVE-2022-3171
+  #Transient Vulnerability from graphql-dgs-codegen-client-core
+    CVE-2022-31197
+
+#Transient Vulnerability from spring-security-saml2-service-provider
+  CVE-2015-7501
+  CVE-2015-6420
+  CVE-2021-40690
+  CVE-2019-12400
+  CVE-2020-13936
+  CVE-2020-15522
