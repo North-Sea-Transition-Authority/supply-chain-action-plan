@@ -39,7 +39,7 @@ dependencies {
   implementation 'org.flywaydb:flyway-core'
 
   implementation 'uk.co.fivium.digitalformlibrary:digital-form-library:develop-SNAPSHOT'
-  implementation 'uk.co.fivium.energyportalapi:client:insecure-mode-SNAPSHOT'
+  implementation ('uk.co.fivium.energyportalapi:client:develop-SNAPSHOT') {changing(true)}
 
 	runtimeOnly 'org.postgresql:postgresql'
 

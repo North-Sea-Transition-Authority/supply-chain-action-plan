@@ -28,7 +28,7 @@ public class OrganisationGroupFormValidatorTest {
 
   @Test
   void supports_organisationGroupForm_assertTrue() {
-    var supportedClass=  OrganisationGroupForm.class;
+    var supportedClass = OrganisationGroupForm.class;
 
     assertTrue(organisationGroupFormValidator.supports(supportedClass));
   }

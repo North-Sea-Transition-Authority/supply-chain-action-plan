@@ -27,5 +27,7 @@ public class ValidatorTestingUtil {
 
   }
 
-  public static class NonSupportedClass {}
+  public static class NonSupportedClass {
+
+  }
 }

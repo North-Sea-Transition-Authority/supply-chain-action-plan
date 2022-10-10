@@ -122,15 +122,18 @@ public class OrganisationGroupControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
         get(
-            ReverseRouter.route(on(OrganisationGroupController.class).renderExistingScapOrganisationGroupForm(1))))
+            ReverseRouter.route(on(OrganisationGroupController.class)
+                .renderExistingScapOrganisationGroupForm(1))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/application/organisationGroup"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(WorkAreaController.class).getWorkArea())))
         .andExpect(model().attribute("submitPostUrl",
-            ReverseRouter.route(on(OrganisationGroupController.class).saveExistingScapOrganisationGroup(null, 1, emptyBindingResult()))))
+            ReverseRouter.route(on(OrganisationGroupController.class)
+                .saveExistingScapOrganisationGroup(null, 1, emptyBindingResult()))))
         .andExpect(model().attribute("organisationGroupSearchRestUrl",
-            ReverseRouter.route(on(OrganisationGroupRestController.class).getOrganisationGroupSearchResults(null))))
+            ReverseRouter.route(on(OrganisationGroupRestController.class)
+                .getOrganisationGroupSearchResults(null))))
         .andExpect(model().attributeExists("form"));
   }
 

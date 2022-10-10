@@ -21,7 +21,7 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 public class WorkAreaControllerTest extends AbstractControllerTest {
 
   @Test
-  public void getWorkArea() throws Exception{
+  public void getWorkArea() throws Exception {
 
     mockMvc.perform(
         get(ReverseRouter.route(on(WorkAreaController.class).getWorkArea())))

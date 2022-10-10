@@ -126,6 +126,9 @@ steps:
         - develop
       status:
         - success
+      event:
+        exclude:
+          - pull_request
 
   # This is in the PR pipeline as only PR events get the necessary information for proper github integration
   - name: code-analysis-pr

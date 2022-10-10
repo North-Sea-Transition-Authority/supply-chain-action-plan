@@ -51,7 +51,8 @@ public class OrganisationGroupServiceTest {
         eq("Test (getting companies who include 'company')")))
         .thenReturn(groupList);
 
-    var organisationGroups = organisationGroupService.getOrganisationGroupsByName("company", "Test (getting companies who include 'company')");
+    var organisationGroups =
+        organisationGroupService.getOrganisationGroupsByName("company", "Test (getting companies who include 'company')");
 
     var argumentCaptor = ArgumentCaptor.forClass(OrganisationGroupsByNameProjectionRoot.class);
 
