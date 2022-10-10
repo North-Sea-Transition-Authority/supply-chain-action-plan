@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.application.overview.ScapOverviewService;
 import uk.co.nstauthority.scap.application.start.ScapStartController;
+import uk.co.nstauthority.scap.application.tasklist.TaskListController;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
-import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @Controller
 public class OrganisationGroupController {
@@ -26,9 +26,6 @@ public class OrganisationGroupController {
       ReverseRouter.route(on(ScapStartController.class).renderStartNewScap());
   private final String newScapPostUrl =
       ReverseRouter.route(on(OrganisationGroupController.class).saveNewScapOrganisationGroup(null, emptyBindingResult()));
-  // TODO SCAP2022-29: Replace work area link with link to task list for this SCAP
-  private final String existingScapBackLinkUrl =
-      ReverseRouter.route(on(WorkAreaController.class).getWorkArea());
   private final String organisationGroupSearchRestUrl =
       ReverseRouter.route(on(OrganisationGroupRestController.class).getOrganisationGroupSearchResults(null));
 
@@ -63,9 +60,8 @@ public class OrganisationGroupController {
           .addObject("errorItems", validationErrorOrderingService.getErrorItemsFromBindingResult(form, bindingResult));
     }
 
-    scapOverviewService.createScapOverview(Integer.valueOf(form.getOrganisationGroupId().getInputValue()));
-    // TODO SCAP2022-29: Redirect to task list on save
-    return ReverseRouter.redirect(on(OrganisationGroupController.class).renderNewScapOrganisationGroupForm(null));
+    var scap = scapOverviewService.createScapOverview(Integer.valueOf(form.getOrganisationGroupId().getInputValue()));
+    return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scap.getId()));
   }
 
   @GetMapping("/{scapOverviewId}/organisation-group")
@@ -78,6 +74,7 @@ public class OrganisationGroupController {
         scapOverview.getOrganisationGroupId(), "Get name of current SCAP operator")
             .map(organisationGroup -> Map.of(organisationGroup.getOrganisationGroupId(), organisationGroup.getName()))
             .orElse(Collections.emptyMap());
+    var existingScapBackLinkUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scapOverviewId));
 
     return organisationGroupFormModelAndView(existingScapBackLinkUrl, postUrl, preselectedItems)
         .addObject("form", form);
@@ -92,15 +89,14 @@ public class OrganisationGroupController {
     if (bindingResult.hasErrors()) {
       var postUrl = ReverseRouter.route(on(OrganisationGroupController.class)
           .saveExistingScapOrganisationGroup(null, scapOverviewId, emptyBindingResult()));
+      var existingScapBackLinkUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scapOverviewId));
       return organisationGroupFormModelAndView(existingScapBackLinkUrl, postUrl)
           .addObject("errorItems", validationErrorOrderingService.getErrorItemsFromBindingResult(form, bindingResult));
     }
 
     scapOverviewService.updateScapOverviewOrganisationGroup(scapOverview,
         Integer.valueOf(form.getOrganisationGroupId().getInputValue()));
-    // TODO SCAP2022-29: Redirect to task list on save
-    return ReverseRouter.redirect(on(OrganisationGroupController.class)
-        .renderExistingScapOrganisationGroupForm(scapOverviewId));
+    return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapOverviewId));
   }
 
   private ModelAndView organisationGroupFormModelAndView(String backLinkUrl, String postUrl) {

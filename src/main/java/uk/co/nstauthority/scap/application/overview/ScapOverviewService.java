@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.application.overview;
 
+import java.time.Instant;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,9 +17,10 @@ public class ScapOverviewService {
   }
 
   @Transactional
-  public void createScapOverview(Integer organisationGroupId) {
-    var scapOverview = new ScapOverview(organisationGroupId);
+  public ScapOverview createScapOverview(Integer organisationGroupId) {
+    var scapOverview = new ScapOverview(organisationGroupId, Instant.now());
     scapOverviewRepository.save(scapOverview);
+    return scapOverview;
   }
 
   public ScapOverview getScapOverviewById(Integer id) {

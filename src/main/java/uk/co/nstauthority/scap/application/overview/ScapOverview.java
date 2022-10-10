@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.application.overview;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,9 +26,14 @@ public class ScapOverview {
 
   }
 
-  public ScapOverview(Integer organisationGroupId) {
+  public ScapOverview(Integer organisationGroupId, Instant createdTimestamp) {
     this.organisationGroupId = organisationGroupId;
-    this.createdTimestamp = Instant.now();
+    this.createdTimestamp = createdTimestamp;
+  }
+
+  @VisibleForTesting
+  public ScapOverview(Integer id) {
+    this.id = id;
   }
 
   public Integer getId() {
