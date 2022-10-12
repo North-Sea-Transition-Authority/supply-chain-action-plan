@@ -1,5 +1,5 @@
 FROM eclipse-temurin:17-alpine
-COPY ./build/libs/scap.jar app.jar
+COPY ./build/libs/supply-chain-action-plan.jar app.jar
 
 RUN apk update && apk upgrade && apk add curl && rm -rf /var/cache/apk/*
 
