@@ -4,7 +4,7 @@ import java.time.Instant;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.co.nstauthority.scap.exception.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.error.ScapEntityNotFoundException;
 
 @Service
 public class ScapOverviewService {

@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.exception;
+package uk.co.nstauthority.scap.error;
 
 import javax.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;

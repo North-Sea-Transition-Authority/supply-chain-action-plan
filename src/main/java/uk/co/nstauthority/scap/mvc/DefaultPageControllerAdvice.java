@@ -10,22 +10,27 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import uk.co.nstauthority.scap.branding.ServiceBrandingConfigurationProperties;
+import uk.co.nstauthority.scap.technicalsupport.TechnicalSupportConfiguration;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @ControllerAdvice
 class DefaultPageControllerAdvice {
 
   private final ServiceBrandingConfigurationProperties serviceBrandingConfigurationProperties;
+  private final TechnicalSupportConfiguration technicalSupportConfiguration;
 
   @Autowired
-  DefaultPageControllerAdvice(ServiceBrandingConfigurationProperties serviceBrandingConfigurationProperties) {
+  DefaultPageControllerAdvice(ServiceBrandingConfigurationProperties serviceBrandingConfigurationProperties,
+                              TechnicalSupportConfiguration technicalSupportConfiguration) {
     this.serviceBrandingConfigurationProperties = serviceBrandingConfigurationProperties;
+    this.technicalSupportConfiguration = technicalSupportConfiguration;
   }
 
   @ModelAttribute
   void addDefaultModelAttributes(Model model) {
     addBrandingAttributes(model);
     addCommonUrls(model);
+    addTechnicalSupportContactInfo(model);
   }
 
   @InitBinder
@@ -47,5 +52,9 @@ class DefaultPageControllerAdvice {
 
   private void addCommonUrls(Model model) {
     model.addAttribute("serviceHomeUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea()));
+  }
+
+  private void addTechnicalSupportContactInfo(Model model) {
+    model.addAttribute("technicalSupport", technicalSupportConfiguration.getTechnicalSupportConfigurationProperties());
   }
 }

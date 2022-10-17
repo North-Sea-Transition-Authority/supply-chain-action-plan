@@ -16,6 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
 import uk.co.nstauthority.scap.branding.ServiceConfigurationProperties;
+import uk.co.nstauthority.scap.technicalsupport.TechnicalSupportConfigurationProperties;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @WebMvcTest
@@ -45,11 +46,14 @@ class DefaultPageControllerAdviceTest extends AbstractControllerTest {
         "org.springframework.validation.BindingResult.customerBranding",
         "serviceBranding",
         "org.springframework.validation.BindingResult.serviceBranding",
+        "technicalSupport",
+        "org.springframework.validation.BindingResult.technicalSupport",
         "serviceHomeUrl"
     );
 
     assertThat((CustomerConfigurationProperties) modelMap.get("customerBranding")).hasNoNullFieldsOrProperties();
     assertThat((ServiceConfigurationProperties) modelMap.get("serviceBranding")).hasNoNullFieldsOrProperties();
+    assertThat((TechnicalSupportConfigurationProperties) modelMap.get("technicalSupport")).hasNoNullFieldsOrProperties();
     assertThat(modelMap.get("serviceHomeUrl")).isEqualTo(
         ReverseRouter.route(on(WorkAreaController.class).getWorkArea())
     );
