@@ -34,7 +34,7 @@ public class OperatorTaskListItemTest {
     var scap = new ScapOverview(894327);
     var form = new OrganisationGroupForm();
 
-    when(scapOverviewService.getScapOverviewById(119)).thenReturn(scap);
+    when(scapOverviewService.getScapById(119)).thenReturn(scap);
     when(organisationGroupFormService.getForm(scap)).thenReturn(form);
     when(organisationGroupFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(new BeanPropertyBindingResult(form, "form"));

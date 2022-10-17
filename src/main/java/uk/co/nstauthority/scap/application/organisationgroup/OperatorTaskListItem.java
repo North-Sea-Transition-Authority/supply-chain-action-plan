@@ -43,7 +43,7 @@ public class OperatorTaskListItem implements ScapTaskListItem {
 
   @Override
   public boolean isValid(Integer target) {
-    var scap = scapOverviewService.getScapOverviewById(target);
+    var scap = scapOverviewService.getScapById(target);
     var form = organisationGroupFormService.getForm(scap);
     var bindingResult = organisationGroupFormService.validate(form, new BeanPropertyBindingResult(form, "form"));
     return !bindingResult.hasErrors();

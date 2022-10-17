@@ -28,27 +28,28 @@ public class ScapOverviewServiceTest {
   void createScapOverview() {
     var argumentCaptor = ArgumentCaptor.forClass(ScapOverview.class);
 
-    scapOverviewService.createScapOverview(1);
+    var scap = scapOverviewService.createScapOverview(1);
 
     verify(scapOverviewRepository, times(1)).save(argumentCaptor.capture());
 
-    assertThat(argumentCaptor.getValue().getOrganisationGroupId()).isEqualTo(1);
+    assertThat(argumentCaptor.getValue()).isEqualTo(scap);
+    assertThat(scap.getOrganisationGroupId()).isEqualTo(1);
   }
 
   @Test
-  void getScapOverviewById_exists() {
+  void getScapById_exists() {
     var scapOverview = new ScapOverview(22);
 
     when(scapOverviewRepository.findById(22)).thenReturn(Optional.of(scapOverview));
 
-    var returnedOverview = scapOverviewService.getScapOverviewById(22);
+    var returnedOverview = scapOverviewService.getScapById(22);
 
     assertThat(returnedOverview).isEqualTo(scapOverview);
   }
 
   @Test
-  void getScapOverviewById_doesNotExist() {
-    assertThatThrownBy(() -> scapOverviewService.getScapOverviewById(119))
+  void getScapById_doesNotExist() {
+    assertThatThrownBy(() -> scapOverviewService.getScapById(119))
         .isInstanceOf(ScapEntityNotFoundException.class);
   }
 

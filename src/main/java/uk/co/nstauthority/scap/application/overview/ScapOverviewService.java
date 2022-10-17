@@ -23,7 +23,7 @@ public class ScapOverviewService {
     return scapOverview;
   }
 
-  public ScapOverview getScapOverviewById(Integer id) {
+  public ScapOverview getScapById(Integer id) {
     return scapOverviewRepository.findById(id)
         .orElseThrow(() ->
             new ScapEntityNotFoundException(String.format("Could not find SCAP overview with id [%d]", id)));

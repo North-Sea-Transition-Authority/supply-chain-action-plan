@@ -27,6 +27,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.application.detail.ScapDetailService;
 import uk.co.nstauthority.scap.application.overview.ScapOverview;
 import uk.co.nstauthority.scap.application.overview.ScapOverviewService;
 import uk.co.nstauthority.scap.application.start.ScapStartController;
@@ -44,6 +45,9 @@ public class OrganisationGroupControllerTest extends AbstractControllerTest {
   ScapOverviewService scapOverviewService;
 
   @MockBean
+  ScapDetailService scapDetailService;
+
+  @MockBean
   OrganisationGroupFormService organisationGroupFormService;
 
   @MockBean
@@ -51,6 +55,8 @@ public class OrganisationGroupControllerTest extends AbstractControllerTest {
 
   @MockBean
   OrganisationGroupService organisationGroupService;
+
+  static final Integer ORGANISATION_GROUP_ID = 1664;
 
   @Test
   public void renderNewScapOrganisationGroupForm() throws Exception {
@@ -69,25 +75,28 @@ public class OrganisationGroupControllerTest extends AbstractControllerTest {
   }
 
   @Test
-  public void saveNewScapOrganisationGroup_valid() throws Exception {
+  public void saveNewScapOrganisationGroup_valid_verifyCreatesEntities() throws Exception {
     var postUrl = ReverseRouter.route(on(OrganisationGroupController.class)
         .saveNewScapOrganisationGroup(null, emptyBindingResult()));
     var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(234));
     var form = new OrganisationGroupForm();
     var scap = new ScapOverview(234);
-    scap.setOrganisationGroupId(1664);
+    scap.setOrganisationGroupId(ORGANISATION_GROUP_ID);
 
+    when(scapOverviewService.createScapOverview(ORGANISATION_GROUP_ID))
+        .thenReturn(scap);
     when(organisationGroupFormService.validate(any(OrganisationGroupForm.class), any(BindingResult.class)))
         .thenReturn(new BeanPropertyBindingResult(form, "form"));
-    when(scapOverviewService.createScapOverview(1664)).thenReturn(scap);
+    when(scapOverviewService.createScapOverview(ORGANISATION_GROUP_ID)).thenReturn(scap);
 
     mockMvc.perform(
-        post(postUrl).param("organisationGroupId", "1664")
+        post(postUrl).param("organisationGroupId", String.valueOf(ORGANISATION_GROUP_ID))
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
 
-    verify(scapOverviewService, times(1)).createScapOverview(1664);
+    verify(scapOverviewService, times(1)).createScapOverview(ORGANISATION_GROUP_ID);
+    verify(scapDetailService, times(1)).createDraftScapDetail(scap);
   }
 
   @Test
@@ -117,7 +126,7 @@ public class OrganisationGroupControllerTest extends AbstractControllerTest {
   public void renderExistingScapOrganisationGroupForm() throws Exception {
     var scapOverview = new ScapOverview(322);
     var organisationGroup = new OrganisationGroup(322, "CENTRICA", null, null, null, null);
-    when(scapOverviewService.getScapOverviewById(1)).thenReturn(scapOverview);
+    when(scapOverviewService.getScapById(1)).thenReturn(scapOverview);
     when(organisationGroupService.getOrganisationGroupById(322, "Get name of current SCAP operator"))
         .thenReturn(Optional.of(organisationGroup));
     when(organisationGroupFormService.getForm(scapOverview)).thenReturn(new OrganisationGroupForm());
@@ -147,19 +156,19 @@ public class OrganisationGroupControllerTest extends AbstractControllerTest {
     var form = new OrganisationGroupForm();
     var scapOverview = new ScapOverview(322);
 
-    when(scapOverviewService.getScapOverviewById(1)).thenReturn(scapOverview);
+    when(scapOverviewService.getScapById(1)).thenReturn(scapOverview);
     when(organisationGroupFormService.validate(any(OrganisationGroupForm.class), any(BindingResult.class)))
         .thenReturn(new BeanPropertyBindingResult(form, "form"));
 
     mockMvc.perform(
         post(postUrl)
-            .param("organisationGroupId", "1664")
+            .param("organisationGroupId", String.valueOf(ORGANISATION_GROUP_ID))
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
 
     verify(scapOverviewService, times(1))
-        .updateScapOverviewOrganisationGroup(scapOverview, 1664);
+        .updateScapOverviewOrganisationGroup(scapOverview, ORGANISATION_GROUP_ID);
   }
 
   @Test
@@ -173,7 +182,7 @@ public class OrganisationGroupControllerTest extends AbstractControllerTest {
         1, "organisationGroupId", "Select who the operator is for this SCAP"));
     var scapOverview = new ScapOverview(322);
 
-    when(scapOverviewService.getScapOverviewById(1)).thenReturn(scapOverview);
+    when(scapOverviewService.getScapById(1)).thenReturn(scapOverview);
     when(organisationGroupFormService.validate(any(), any())).thenReturn(bindingResult);
     when(validationErrorOrderingService.getErrorItemsFromBindingResult(any(), any())).thenReturn(errorItems);
 

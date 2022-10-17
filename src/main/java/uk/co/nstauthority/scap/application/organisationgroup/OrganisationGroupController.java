@@ -5,6 +5,7 @@ import static uk.co.nstauthority.scap.mvc.ReverseRouter.emptyBindingResult;
 
 import java.util.Collections;
 import java.util.Map;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.nstauthority.scap.application.detail.ScapDetailService;
+import uk.co.nstauthority.scap.application.overview.ScapOverview;
 import uk.co.nstauthority.scap.application.overview.ScapOverviewService;
 import uk.co.nstauthority.scap.application.start.ScapStartController;
 import uk.co.nstauthority.scap.application.tasklist.TaskListController;
@@ -32,18 +35,20 @@ public class OrganisationGroupController {
   private final ScapOverviewService scapOverviewService;
   private final OrganisationGroupFormService organisationGroupFormService;
   private final ValidationErrorOrderingService validationErrorOrderingService;
-
   private final OrganisationGroupService organisationGroupService;
+  private final ScapDetailService scapDetailService;
 
   @Autowired
   public OrganisationGroupController(ScapOverviewService scapOverviewService,
                                      OrganisationGroupFormService organisationGroupFormService,
                                      ValidationErrorOrderingService validationErrorOrderingService,
-                                     OrganisationGroupService organisationGroupService) {
+                                     OrganisationGroupService organisationGroupService,
+                                     ScapDetailService scapDetailService) {
     this.scapOverviewService = scapOverviewService;
     this.organisationGroupFormService = organisationGroupFormService;
     this.validationErrorOrderingService = validationErrorOrderingService;
     this.organisationGroupService = organisationGroupService;
+    this.scapDetailService = scapDetailService;
   }
 
   @GetMapping("/new/organisation-group")
@@ -60,21 +65,21 @@ public class OrganisationGroupController {
           .addObject("errorItems", validationErrorOrderingService.getErrorItemsFromBindingResult(form, bindingResult));
     }
 
-    var scap = scapOverviewService.createScapOverview(Integer.valueOf(form.getOrganisationGroupId().getInputValue()));
+    var scap = createScap(Integer.valueOf(form.getOrganisationGroupId().getInputValue()));
     return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scap.getId()));
   }
 
   @GetMapping("/{scapOverviewId}/organisation-group")
-  public ModelAndView renderExistingScapOrganisationGroupForm(@PathVariable("scapOverviewId") Integer scapOverviewId) {
-    var scapOverview = scapOverviewService.getScapOverviewById(scapOverviewId);
+  public ModelAndView renderExistingScapOrganisationGroupForm(@PathVariable("scapOverviewId") Integer scapId) {
+    var scapOverview = scapOverviewService.getScapById(scapId);
     var form = organisationGroupFormService.getForm(scapOverview);
     var postUrl = ReverseRouter.route(on(OrganisationGroupController.class)
-        .saveExistingScapOrganisationGroup(null, scapOverviewId, emptyBindingResult()));
+        .saveExistingScapOrganisationGroup(null, scapId, emptyBindingResult()));
     var preselectedItems = organisationGroupService.getOrganisationGroupById(
         scapOverview.getOrganisationGroupId(), "Get name of current SCAP operator")
             .map(organisationGroup -> Map.of(organisationGroup.getOrganisationGroupId(), organisationGroup.getName()))
             .orElse(Collections.emptyMap());
-    var existingScapBackLinkUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scapOverviewId));
+    var existingScapBackLinkUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId));
 
     return organisationGroupFormModelAndView(existingScapBackLinkUrl, postUrl, preselectedItems)
         .addObject("form", form);
@@ -82,21 +87,28 @@ public class OrganisationGroupController {
 
   @PostMapping("/{scapOverviewId}/organisation-group")
   public ModelAndView saveExistingScapOrganisationGroup(@ModelAttribute("form") OrganisationGroupForm form,
-                                                        @PathVariable("scapOverviewId") Integer scapOverviewId,
+                                                        @PathVariable("scapOverviewId") Integer scapId,
                                                         BindingResult bindingResult) {
-    var scapOverview = scapOverviewService.getScapOverviewById(scapOverviewId);
+    var scapOverview = scapOverviewService.getScapById(scapId);
     bindingResult = organisationGroupFormService.validate(form, bindingResult);
     if (bindingResult.hasErrors()) {
       var postUrl = ReverseRouter.route(on(OrganisationGroupController.class)
-          .saveExistingScapOrganisationGroup(null, scapOverviewId, emptyBindingResult()));
-      var existingScapBackLinkUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scapOverviewId));
+          .saveExistingScapOrganisationGroup(null, scapId, emptyBindingResult()));
+      var existingScapBackLinkUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId));
       return organisationGroupFormModelAndView(existingScapBackLinkUrl, postUrl)
           .addObject("errorItems", validationErrorOrderingService.getErrorItemsFromBindingResult(form, bindingResult));
     }
 
     scapOverviewService.updateScapOverviewOrganisationGroup(scapOverview,
         Integer.valueOf(form.getOrganisationGroupId().getInputValue()));
-    return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapOverviewId));
+    return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
+  }
+
+  @Transactional
+  ScapOverview createScap(Integer organisationGroupId) {
+    var scap = scapOverviewService.createScapOverview(organisationGroupId);
+    scapDetailService.createDraftScapDetail(scap);
+    return scap;
   }
 
   private ModelAndView organisationGroupFormModelAndView(String backLinkUrl, String postUrl) {
