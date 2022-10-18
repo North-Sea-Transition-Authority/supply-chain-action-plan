@@ -50,6 +50,9 @@ Note that this template uses a Postgres database, so make sure that the database
 - `git submodule update --init --recursive`
 - `cd fivium-design-system-core && npm install && npx gulp build && cd ..`
 
+#### 3.1. Update the Fivium Design System
+If FDS is not on the latest version, follow the instructions to update it [here](https://confluence.fivium.co.uk/display/FDS/Releases)
+
 ### 4. Build frontend components
 - `npm install`
 - `npx gulp buildAll`
