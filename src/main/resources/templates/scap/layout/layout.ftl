@@ -9,6 +9,7 @@
   htmlTitle
   pageHeading=""
   phaseBanner=true
+  errorItems=[]
   pageSize=PageSize.TWO_THIRDS_COLUMN
   backLinkUrl=""
   caption=""
@@ -57,6 +58,7 @@
     backLink=backLinkUrl?has_content
     backLinkUrl=backLinkUrl
     caption=caption
+    errorItems=errorItems
   >
     <#nested />
   </@fdsDefaultPageTemplate>

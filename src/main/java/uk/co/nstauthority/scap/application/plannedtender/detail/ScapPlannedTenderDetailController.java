@@ -19,9 +19,10 @@ import uk.co.nstauthority.scap.application.plannedtender.ScapPlannedTenderContro
 import uk.co.nstauthority.scap.application.plannedtender.ScapPlannedTenderService;
 import uk.co.nstauthority.scap.application.plannedtender.hasplannedtender.ScapHasPlannedTenderController;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 
 @Controller
-@RequestMapping("{scapId}/planned-tender/detail")
+@RequestMapping("{scapId}/planned-tender/activity")
 public class ScapPlannedTenderDetailController {
 
   private final ScapOverviewService scapOverviewService;
@@ -29,17 +30,20 @@ public class ScapPlannedTenderDetailController {
   private final ScapPlannedTenderService scapPlannedTenderService;
   private final ScapPlannedTenderDetailService scapPlannedTenderDetailService;
   private final ScapPlannedTenderDetailFormService scapPlannedTenderDetailFormService;
+  private final ValidationErrorOrderingService validationErrorOrderingService;
 
   @Autowired
   public ScapPlannedTenderDetailController(ScapOverviewService scapOverviewService, ScapDetailService scapDetailService,
                                            ScapPlannedTenderService scapPlannedTenderService,
                                            ScapPlannedTenderDetailService scapPlannedTenderDetailService,
-                                           ScapPlannedTenderDetailFormService scapPlannedTenderDetailFormService) {
+                                           ScapPlannedTenderDetailFormService scapPlannedTenderDetailFormService,
+                                           ValidationErrorOrderingService validationErrorOrderingService) {
     this.scapOverviewService = scapOverviewService;
     this.scapDetailService = scapDetailService;
     this.scapPlannedTenderService = scapPlannedTenderService;
     this.scapPlannedTenderDetailService = scapPlannedTenderDetailService;
     this.scapPlannedTenderDetailFormService = scapPlannedTenderDetailFormService;
+    this.validationErrorOrderingService = validationErrorOrderingService;
   }
 
   @GetMapping
@@ -62,7 +66,8 @@ public class ScapPlannedTenderDetailController {
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
     var scapPlannedTender = scapPlannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail);
     if (bindingResult.hasErrors()) {
-      return plannedTenderDetailFormModelAndView(scapId, getBackLinkUrl(scapId, scapPlannedTender));
+      return plannedTenderDetailFormModelAndView(scapId, getBackLinkUrl(scapId, scapPlannedTender))
+          .addObject("errorItems", validationErrorOrderingService.getErrorItemsFromBindingResult(form, bindingResult));
     }
 
     scapPlannedTenderDetailService.createPlannedTenderDetail(scapPlannedTender, form);
@@ -78,7 +83,7 @@ public class ScapPlannedTenderDetailController {
   }
 
   private ModelAndView plannedTenderDetailFormModelAndView(Integer scapId, String backLinkUrl) {
-    return new ModelAndView("scap/application/plannedTender/detail")
+    return new ModelAndView("scap/application/plannedTender/plannedTenderActivityDetail")
         .addObject("backLinkUrl", backLinkUrl)
         .addObject("submitPostUrl",
             ReverseRouter.route(on(ScapPlannedTenderDetailController.class)

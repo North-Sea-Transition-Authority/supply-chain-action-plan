@@ -3,10 +3,11 @@
 <#assign pageTitle = "Planned tender activity"/>
 
 <@defaultPage
-htmlTitle=pageTitle
-pageHeading=pageTitle
-pageSize=PageSize.TWO_THIRDS_COLUMN
-backLinkUrl=springUrl(backLinkUrl)
+  htmlTitle=pageTitle
+  pageHeading=pageTitle
+  pageSize=PageSize.TWO_THIRDS_COLUMN
+  errorItems=errorItems
+  backLinkUrl=springUrl(backLinkUrl)
 >
   <@fdsForm.htmlForm actionUrl=springUrl(submitPostUrl)>
     <@fdsTextarea.textarea path="form.scopeDescription.inputValue" labelText="Scope description"/>

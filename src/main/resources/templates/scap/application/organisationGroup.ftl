@@ -1,12 +1,15 @@
 <#include '../layout/layout.ftl'>
 
+<#-- @ftlvariable name="errorItems" type="java.util.List<uk.co.nstauthority.scap.fds.ErrorItem>" -->
+
 <#assign pageTitle = "Who is the operator for this SCAP?" />
 
 <@defaultPage
-htmlTitle=pageTitle
-pageHeading=""
-pageSize=PageSize.TWO_THIRDS_COLUMN
->
+  htmlTitle=pageTitle
+  pageHeading=""
+  pageSize=PageSize.TWO_THIRDS_COLUMN
+  errorItems=errorItems
+  >
   <@fdsForm.htmlForm actionUrl=springUrl(submitPostUrl)>
     <@fdsSearchSelector.searchSelectorRest path="form.organisationGroupId.inputValue"
     restUrl=springUrl(organisationGroupSearchRestUrl)

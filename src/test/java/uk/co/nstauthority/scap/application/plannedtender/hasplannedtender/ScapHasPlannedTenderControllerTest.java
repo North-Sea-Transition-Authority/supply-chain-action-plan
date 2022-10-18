@@ -41,6 +41,7 @@ import uk.co.nstauthority.scap.application.tasklist.TaskListController;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.utils.EntityTestingUtil;
+import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(controllers = ScapHasPlannedTenderController.class)
@@ -61,6 +62,9 @@ public class ScapHasPlannedTenderControllerTest extends AbstractControllerTest {
 
   @MockBean
   ScapHasPlannedTenderFormService scapHasPlannedTenderFormService;
+
+  @MockBean
+  ValidationErrorOrderingService validationErrorOrderingService;
 
   private ScapOverview scap;
   private ScapDetail scapDetail;
@@ -83,7 +87,7 @@ public class ScapHasPlannedTenderControllerTest extends AbstractControllerTest {
     mockMvc.perform(
         get(ReverseRouter.route(on(ScapHasPlannedTenderController.class).renderHasPlannedTenderActivityForm(22))))
         .andExpect(status().isOk())
-        .andExpect(view().name("/scap/application/plannedTender/hasPlannedTender"))
+        .andExpect(view().name("scap/application/plannedTender/hasPlannedTender"))
         .andExpect(model().attribute("form", form))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(22))))
@@ -169,7 +173,8 @@ public class ScapHasPlannedTenderControllerTest extends AbstractControllerTest {
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().isOk())
-        .andExpect(view().name("/scap/application/plannedTender/hasPlannedTender"))
+        .andExpect(view().name("scap/application/plannedTender/hasPlannedTender"))
+        .andExpect(model().attributeExists("errorItems"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(22))))
         .andExpect(model().attributeExists("hasPlannedTender"))

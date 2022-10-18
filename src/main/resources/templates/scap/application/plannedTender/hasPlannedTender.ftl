@@ -6,6 +6,7 @@
 htmlTitle=pageTitle
 pageHeading=""
 pageSize=PageSize.TWO_THIRDS_COLUMN
+errorItems=errorItems
 backLinkUrl=springUrl(backLinkUrl)
 >
   <@fdsForm.htmlForm actionUrl=springUrl(submitPostUrl)>

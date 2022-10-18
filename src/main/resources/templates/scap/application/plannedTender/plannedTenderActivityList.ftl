@@ -1,17 +1,19 @@
 <#include '../../layout/layout.ftl'>
-<#import 'plannedTenderActivitiy.ftl' as plannedTenderActivity>
+<#import 'plannedTenderActivity.ftl' as plannedTenderActivity>
 
-<#assign pageTitle = "Planned tender activity" />
+<#assign pageTitle = "Planned tender activities" />
 
 <@defaultPage
-htmlTitle=pageTitle
-pageHeading=pageTitle
-pageSize=PageSize.TWO_THIRDS_COLUMN
-backLinkUrl=springUrl(backLinkUrl)
->
+  htmlTitle=pageTitle
+  pageHeading=pageTitle
+  pageSize=PageSize.TWO_THIRDS_COLUMN
+  errorItems=errorItems
+  backLinkUrl=springUrl(backLinkUrl)>
+
   <#list plannedTenderDetailsList as listItem>
     <@plannedTenderListItem listItem=listItem listId=listItem?index/>
   </#list>
+
 </@defaultPage>
 
 

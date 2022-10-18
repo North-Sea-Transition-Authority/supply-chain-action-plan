@@ -48,7 +48,7 @@ public class DeletePlannedTenderDetailController {
   }
 
   private ModelAndView plannedTenderRemovalModelAndView(Integer scapId, ScapPlannedTenderDetail plannedTenderDetail) {
-    return new ModelAndView("scap/application/plannedTender/delete")
+    return new ModelAndView("scap/application/plannedTender/plannedTenderActivityDelete")
         .addObject("backLinkUrl",
             ReverseRouter.route(on(ScapPlannedTenderController.class).renderPlannedTenderActivities(scapId)))
         .addObject("plannedTenderDetail", plannedTenderDetail)

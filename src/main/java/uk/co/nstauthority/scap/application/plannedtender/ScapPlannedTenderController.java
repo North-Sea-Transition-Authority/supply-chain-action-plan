@@ -15,7 +15,7 @@ import uk.co.nstauthority.scap.application.tasklist.TaskListController;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 
 @Controller
-@RequestMapping("{scapId}/planned-tender/list")
+@RequestMapping("{scapId}/planned-tender/activity-summary")
 public class ScapPlannedTenderController {
 
   private final ScapOverviewService scapOverviewService;
@@ -42,7 +42,7 @@ public class ScapPlannedTenderController {
     var plannedTender = scapPlannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail);
     var existingTenderDetails = scapPlannedTenderDetailService.getTenderDetailsByPlannedTender(plannedTender);
 
-    return new ModelAndView("scap/application/plannedTender/list")
+    return new ModelAndView("scap/application/plannedTender/plannedTenderActivityList")
         .addObject("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
         .addObject("plannedTenderDetailsList",

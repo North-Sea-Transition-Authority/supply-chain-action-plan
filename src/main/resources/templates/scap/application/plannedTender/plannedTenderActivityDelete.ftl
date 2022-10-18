@@ -1,5 +1,5 @@
 <#include '../../layout/layout.ftl'>
-<#import 'plannedTenderActivitiy.ftl' as plannedTenderActivity>
+<#import 'plannedTenderActivity.ftl' as plannedTenderActivity>
 
 <#assign pageTitle = "Are you sure you want to delete this planned tender activity?"/>
 

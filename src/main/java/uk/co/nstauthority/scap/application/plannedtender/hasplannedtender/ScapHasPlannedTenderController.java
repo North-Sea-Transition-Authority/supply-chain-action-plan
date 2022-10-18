@@ -21,6 +21,7 @@ import uk.co.nstauthority.scap.application.plannedtender.detail.ScapPlannedTende
 import uk.co.nstauthority.scap.application.tasklist.TaskListController;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 
 @Controller
 @RequestMapping("{scapId}/planned-tender")
@@ -31,18 +32,21 @@ public class ScapHasPlannedTenderController {
   private final ScapPlannedTenderService scapPlannedTenderService;
   private final ScapHasPlannedTenderFormService scapHasPlannedTenderFormService;
   private final ScapPlannedTenderDetailService scapPlannedTenderDetailService;
+  private final ValidationErrorOrderingService validationErrorOrderingService;
 
   @Autowired
   public ScapHasPlannedTenderController(ScapOverviewService scapOverviewService,
                                         ScapDetailService scapDetailService,
                                         ScapPlannedTenderService scapPlannedTenderService,
                                         ScapHasPlannedTenderFormService scapHasPlannedTenderFormService,
-                                        ScapPlannedTenderDetailService scapPlannedTenderDetailService) {
+                                        ScapPlannedTenderDetailService scapPlannedTenderDetailService,
+                                        ValidationErrorOrderingService validationErrorOrderingService) {
     this.scapOverviewService = scapOverviewService;
     this.scapDetailService = scapDetailService;
     this.scapPlannedTenderService = scapPlannedTenderService;
     this.scapHasPlannedTenderFormService = scapHasPlannedTenderFormService;
     this.scapPlannedTenderDetailService = scapPlannedTenderDetailService;
+    this.validationErrorOrderingService = validationErrorOrderingService;
   }
 
   @GetMapping
@@ -71,7 +75,8 @@ public class ScapHasPlannedTenderController {
 
     bindingResult = scapHasPlannedTenderFormService.validate(form, bindingResult);
     if (bindingResult.hasErrors()) {
-      return hasPlannedTenderActivityModelAndView(scapId, form);
+      return hasPlannedTenderActivityModelAndView(scapId, form)
+          .addObject("errorItems", validationErrorOrderingService.getErrorItemsFromBindingResult(form, bindingResult));
     }
 
     var plannedTender = existingPlannedTender
@@ -86,7 +91,7 @@ public class ScapHasPlannedTenderController {
   }
 
   private ModelAndView hasPlannedTenderActivityModelAndView(Integer scapId, ScapHasPlannedTenderForm form) {
-    return new ModelAndView("/scap/application/plannedTender/hasPlannedTender")
+    return new ModelAndView("scap/application/plannedTender/hasPlannedTender")
         .addObject("backLinkUrl", ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
         .addObject("hasPlannedTender", YesNo.getHasPlannedTender())
         .addObject("form", form)

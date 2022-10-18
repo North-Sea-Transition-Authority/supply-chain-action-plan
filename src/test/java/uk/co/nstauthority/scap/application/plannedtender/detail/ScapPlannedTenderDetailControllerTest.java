@@ -38,6 +38,7 @@ import uk.co.nstauthority.scap.application.plannedtender.hasplannedtender.ScapHa
 import uk.co.nstauthority.scap.error.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.utils.EntityTestingUtil;
+import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(controllers = ScapPlannedTenderDetailController.class)
@@ -59,6 +60,9 @@ public class ScapPlannedTenderDetailControllerTest extends AbstractControllerTes
 
   @MockBean
   ScapPlannedTenderDetailFormService scapPlannedTenderDetailFormService;
+
+  @MockBean
+  ValidationErrorOrderingService validationErrorOrderingService;
 
   private ScapOverview scap;
   private ScapDetail scapDetail;
@@ -82,7 +86,7 @@ public class ScapPlannedTenderDetailControllerTest extends AbstractControllerTes
         get(ReverseRouter.route(on(ScapPlannedTenderDetailController.class)
             .renderPlannedTenderDetailForm(32, null))))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/plannedTender/detail"))
+        .andExpect(view().name("scap/application/plannedTender/plannedTenderActivityDetail"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(ScapHasPlannedTenderController.class).renderHasPlannedTenderActivityForm(32))))
         .andExpect(model().attribute("submitPostUrl",
@@ -158,7 +162,8 @@ public class ScapPlannedTenderDetailControllerTest extends AbstractControllerTes
                 .with(csrf())
                 .flashAttr("form", form))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/plannedTender/detail"))
+        .andExpect(view().name("scap/application/plannedTender/plannedTenderActivityDetail"))
+        .andExpect(model().attributeExists("errorItems"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(ScapHasPlannedTenderController.class).renderHasPlannedTenderActivityForm(35))))
         .andExpect(model().attribute("submitPostUrl",

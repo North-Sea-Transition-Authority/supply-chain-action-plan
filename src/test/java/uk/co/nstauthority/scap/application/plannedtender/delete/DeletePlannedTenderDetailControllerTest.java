@@ -88,7 +88,7 @@ class DeletePlannedTenderDetailControllerTest extends AbstractControllerTest {
         ReverseRouter.route(on(DeletePlannedTenderDetailController.class)
             .renderPlannedTenderRemoval(32, 100))))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/plannedTender/delete"))
+        .andExpect(view().name("scap/application/plannedTender/plannedTenderActivityDelete"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(ScapPlannedTenderController.class).renderPlannedTenderActivities(32))))
         .andExpect(model().attribute("plannedTenderDetail", scapPlannedTenderDetail))

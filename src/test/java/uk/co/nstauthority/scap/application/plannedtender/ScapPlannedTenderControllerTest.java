@@ -83,7 +83,7 @@ public class ScapPlannedTenderControllerTest extends AbstractControllerTest {
     mockMvc.perform(
         get(ReverseRouter.route(on(ScapPlannedTenderController.class).renderPlannedTenderActivities(22))))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/plannedTender/list"))
+        .andExpect(view().name("scap/application/plannedTender/plannedTenderActivityList"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(22))))
         .andExpect(model().attribute("plannedTenderDetailsList", listItems));
