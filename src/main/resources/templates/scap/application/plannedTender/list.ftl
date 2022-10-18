@@ -1,4 +1,5 @@
 <#include '../../layout/layout.ftl'>
+<#import 'plannedTenderActivitiy.ftl' as plannedTenderActivity>
 
 <#assign pageTitle = "Planned tender activity" />
 
@@ -23,9 +24,9 @@ backLinkUrl=springUrl(backLinkUrl)
         itemScreenReaderText="Change this planned tender activity"
       />
       <@fdsSummaryList.summaryListCardActionItem
-        itemUrl=listItem.deleteLinkUrl()
-        itemText="Remove"
-        itemScreenReaderText="Change this planned tender activity"
+        itemUrl=springUrl(listItem.deleteLinkUrl())
+        itemText="Delete"
+        itemScreenReaderText="Delete this planned tender activity"
       />
     </@fdsSummaryList.summaryListCardActionList>
   </#assign>
@@ -35,34 +36,7 @@ backLinkUrl=springUrl(backLinkUrl)
     headingText="Planned tender activity"
       cardActionsContent=cardActionsContent
   >
-    <@fdsSummaryList.summaryListRowNoAction keyText="Scope description">
-      <#if listItem.detail().scopeDescription?has_content>
-        ${listItem.detail().scopeDescription}
-      <#else>
-        No scope description
-      </#if>
-    </@fdsSummaryList.summaryListRowNoAction>
-    <@fdsSummaryList.summaryListRowNoAction keyText="Estimated value">
-      <#if listItem.detail().estimatedValue?has_content>
-        £${listItem.detail().estimatedValue} million
-      <#else>
-        No estimated value
-      </#if>
-    </@fdsSummaryList.summaryListRowNoAction>
-    <@fdsSummaryList.summaryListRowNoAction keyText="Remuneration model">
-      <#if listItem.detail().remunerationModel.displayName?has_content>
-        ${listItem.detail().remunerationModel.displayName}
-      <#else>
-        No remuneration model
-      </#if>
-    </@fdsSummaryList.summaryListRowNoAction>
-    <@fdsSummaryList.summaryListRowNoAction keyText="Award rationale">
-      <#if listItem.detail().awardRationale?has_content>
-        ${listItem.detail().awardRationale}
-      <#else>
-        No award rationale
-      </#if>
-    </@fdsSummaryList.summaryListRowNoAction>
+    <@plannedTenderActivity.plannedTenderActivityRows plannedTenderDetail=listItem.detail()/>
 
   </@fdsSummaryList.summaryListCard>
 </#macro>

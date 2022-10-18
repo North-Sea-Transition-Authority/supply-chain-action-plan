@@ -77,7 +77,7 @@ public class ScapPlannedTenderControllerTest extends AbstractControllerTest {
         .thenReturn(plannedTender);
     when(scapPlannedTenderDetailService.getTenderDetailsByPlannedTender(plannedTender))
         .thenReturn(existingTenderDetails);
-    when(plannedTenderDetailListService.plannedTenderDetailsToListItems(existingTenderDetails))
+    when(plannedTenderDetailListService.plannedTenderDetailsToListItems(22, existingTenderDetails))
         .thenReturn(listItems);
 
     mockMvc.perform(

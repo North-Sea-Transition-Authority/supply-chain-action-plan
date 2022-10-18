@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.application.plannedtender.detail;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.math.BigDecimal;
 import java.time.Instant;
 import javax.persistence.Entity;
@@ -38,6 +39,11 @@ public class ScapPlannedTenderDetail {
   private Instant createdTimestamp;
 
   public ScapPlannedTenderDetail() {
+  }
+
+  @VisibleForTesting
+  public ScapPlannedTenderDetail(Integer id) {
+    this.id = id;
   }
 
   public ScapPlannedTenderDetail(ScapPlannedTender plannedTender, String scopeDescription, BigDecimal estimatedValue,

@@ -46,6 +46,6 @@ public class ScapPlannedTenderController {
         .addObject("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
         .addObject("plannedTenderDetailsList",
-            plannedTenderDetailListService.plannedTenderDetailsToListItems(existingTenderDetails));
+            plannedTenderDetailListService.plannedTenderDetailsToListItems(scapId, existingTenderDetails));
   }
 }

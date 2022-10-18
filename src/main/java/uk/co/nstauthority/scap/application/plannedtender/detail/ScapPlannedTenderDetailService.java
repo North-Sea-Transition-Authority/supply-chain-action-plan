@@ -6,6 +6,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.application.plannedtender.ScapPlannedTender;
+import uk.co.nstauthority.scap.error.ScapEntityNotFoundException;
 
 @Service
 public class ScapPlannedTenderDetailService {
@@ -38,5 +39,17 @@ public class ScapPlannedTenderDetailService {
 
   public Boolean hasExistingTenderDetails(ScapPlannedTender scapPlannedTender) {
     return !getTenderDetailsByPlannedTender(scapPlannedTender).isEmpty();
+  }
+
+  public ScapPlannedTenderDetail getPlannedTenderDetailById(Integer id) {
+    return scapPlannedTenderDetailRepository.findById(id)
+        .orElseThrow(() -> new ScapEntityNotFoundException(
+            String.format("Could not find Planned Tender Detail with id %d", id)
+        ));
+  }
+
+  @Transactional
+  public void deletePlannedTenderDetail(ScapPlannedTenderDetail detail) {
+    scapPlannedTenderDetailRepository.delete(detail);
   }
 }

@@ -8,5 +8,4 @@ public interface ScapPlannedTenderDetailRepository extends CrudRepository<ScapPl
 
   List<ScapPlannedTenderDetail> findAllByPlannedTender(ScapPlannedTender scapPlannedTender);
 
-  Integer countAllByPlannedTender(ScapPlannedTender scapPlannedTender);
 }
