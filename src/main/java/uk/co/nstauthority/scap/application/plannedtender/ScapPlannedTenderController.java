@@ -10,6 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.application.detail.ScapDetailService;
 import uk.co.nstauthority.scap.application.overview.ScapOverviewService;
 import uk.co.nstauthority.scap.application.plannedtender.detail.ScapPlannedTenderDetailService;
+import uk.co.nstauthority.scap.application.plannedtender.list.PlannedTenderDetailListService;
 import uk.co.nstauthority.scap.application.tasklist.TaskListController;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 
@@ -21,14 +22,17 @@ public class ScapPlannedTenderController {
   private final ScapDetailService scapDetailService;
   private final ScapPlannedTenderService scapPlannedTenderService;
   private final ScapPlannedTenderDetailService scapPlannedTenderDetailService;
+  private final PlannedTenderDetailListService plannedTenderDetailListService;
 
   public ScapPlannedTenderController(ScapOverviewService scapOverviewService, ScapDetailService scapDetailService,
                                      ScapPlannedTenderService scapPlannedTenderService,
-                                     ScapPlannedTenderDetailService scapPlannedTenderDetailService) {
+                                     ScapPlannedTenderDetailService scapPlannedTenderDetailService,
+                                     PlannedTenderDetailListService plannedTenderDetailListService) {
     this.scapOverviewService = scapOverviewService;
     this.scapDetailService = scapDetailService;
     this.scapPlannedTenderService = scapPlannedTenderService;
     this.scapPlannedTenderDetailService = scapPlannedTenderDetailService;
+    this.plannedTenderDetailListService = plannedTenderDetailListService;
   }
 
   @GetMapping
@@ -38,11 +42,10 @@ public class ScapPlannedTenderController {
     var plannedTender = scapPlannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail);
     var existingTenderDetails = scapPlannedTenderDetailService.getTenderDetailsByPlannedTender(plannedTender);
 
-    // TODO: SCAP2022-37 show each planned tender activity added
-
     return new ModelAndView("scap/application/plannedTender/list")
         .addObject("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
-        .addObject("plannedTenderDetailsList", existingTenderDetails);
+        .addObject("plannedTenderDetailsList",
+            plannedTenderDetailListService.plannedTenderDetailsToListItems(existingTenderDetails));
   }
 }

@@ -24,6 +24,8 @@ import uk.co.nstauthority.scap.application.overview.ScapOverviewService;
 import uk.co.nstauthority.scap.application.plannedtender.detail.RemunerationModel;
 import uk.co.nstauthority.scap.application.plannedtender.detail.ScapPlannedTenderDetail;
 import uk.co.nstauthority.scap.application.plannedtender.detail.ScapPlannedTenderDetailService;
+import uk.co.nstauthority.scap.application.plannedtender.list.PlannedTenderDetailListItem;
+import uk.co.nstauthority.scap.application.plannedtender.list.PlannedTenderDetailListService;
 import uk.co.nstauthority.scap.application.tasklist.TaskListController;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.utils.EntityTestingUtil;
@@ -45,20 +47,28 @@ public class ScapPlannedTenderControllerTest extends AbstractControllerTest {
   @MockBean
   ScapPlannedTenderDetailService scapPlannedTenderDetailService;
 
+  @MockBean
+  PlannedTenderDetailListService plannedTenderDetailListService;
+
   @Test
   public void renderPlannedTenderActivities() throws Exception {
     var scap = new ScapOverview(1664);
     var scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, EntityTestingUtil.dateToInstant(2000, 4, 23),
         1);
     var plannedTender = new ScapPlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 4, 23));
-    var existingTenderDetail = new ScapPlannedTenderDetail(
-        plannedTender,
-        "scope description",
-        BigDecimal.valueOf(1.0),
-        RemunerationModel.LUMP_SUM,
-        null,
-        "award rationale",
-        EntityTestingUtil.dateToInstant(2000, 4, 23)
+    var existingTenderDetails = List.of(
+        new ScapPlannedTenderDetail(
+            plannedTender,
+            "scope description",
+            BigDecimal.valueOf(1.0),
+            RemunerationModel.LUMP_SUM,
+            null,
+            "award rationale",
+            EntityTestingUtil.dateToInstant(2000, 4, 23)
+        )
+    );
+    var listItems = List.of(
+        new PlannedTenderDetailListItem(existingTenderDetails.get(0), "#", "#")
     );
 
     when(scapOverviewService.getScapById(22)).thenReturn(scap);
@@ -66,7 +76,9 @@ public class ScapPlannedTenderControllerTest extends AbstractControllerTest {
     when(scapPlannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
         .thenReturn(plannedTender);
     when(scapPlannedTenderDetailService.getTenderDetailsByPlannedTender(plannedTender))
-        .thenReturn(List.of(existingTenderDetail));
+        .thenReturn(existingTenderDetails);
+    when(plannedTenderDetailListService.plannedTenderDetailsToListItems(existingTenderDetails))
+        .thenReturn(listItems);
 
     mockMvc.perform(
         get(ReverseRouter.route(on(ScapPlannedTenderController.class).renderPlannedTenderActivities(22))))
@@ -74,7 +86,6 @@ public class ScapPlannedTenderControllerTest extends AbstractControllerTest {
         .andExpect(view().name("scap/application/plannedTender/list"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(22))))
-        .andExpect(model().attribute("plannedTenderDetailsList",
-            List.of(existingTenderDetail)));
+        .andExpect(model().attribute("plannedTenderDetailsList", listItems));
   }
 }
