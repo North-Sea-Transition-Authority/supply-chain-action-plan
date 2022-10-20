@@ -7,7 +7,7 @@
 htmlTitle=pageTitle
 pageHeading=pageTitle
 pageSize=PageSize.TWO_THIRDS_COLUMN
-backLinkUrl=backLinkUrl
+backLinkUrl=springUrl(backLinkUrl)
 >
   <p class="govuk-body">The purpose of supply chain action plans (SCAPs) is to assist operators in demonstrating their
     contract strategies and concepts are comprehensive and well-positioned to deliver ‘best value’ in accordance with

@@ -22,9 +22,6 @@ backLinkUrl=springUrl(backLinkUrl)
         <#assign firstItem=false/>
       </#list>
     </@fdsRadio.radioGroup>
-    <@fdsAction.submitButtons
-      primaryButtonText="Save and continue"
-      secondaryButtonText="Cancel"
-      secondaryLinkText=springUrl(backLinkUrl)/>
+    <@fdsAction.button buttonText="Save and continue"/>
   </@fdsForm.htmlForm>
 </@defaultPage>

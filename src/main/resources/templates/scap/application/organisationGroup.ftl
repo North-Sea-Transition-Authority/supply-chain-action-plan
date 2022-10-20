@@ -9,6 +9,7 @@
   pageHeading=""
   pageSize=PageSize.TWO_THIRDS_COLUMN
   errorItems=errorItems
+  backLinkUrl=springUrl(backLinkUrl)
   >
   <@fdsForm.htmlForm actionUrl=springUrl(submitPostUrl)>
     <@fdsSearchSelector.searchSelectorRest path="form.organisationGroupId.inputValue"
@@ -22,11 +23,7 @@
     <@fdsDetails.summaryDetails summaryTitle="The operator I want to create a SCAP for is not listed">
       If the operator you want to create a SCAP for is not shown in the list then you must contact the access manager for the operator to provide you with access to their organisation.
     </@fdsDetails.summaryDetails>
-    <@fdsAction.submitButtons
-    primaryButtonText="Save and continue"
-    linkSecondaryAction=true
-    linkSecondaryActionUrl=springUrl(backLinkUrl)
-    secondaryLinkText="Cancel"/>
+    <@fdsAction.button buttonText="Save and continue"/>
   </@fdsForm.htmlForm>
 
 </@defaultPage>

@@ -38,10 +38,6 @@
 
       <@fdsTextarea.textarea path="form.awardRationale.inputValue" labelText="Award rationale"/>
 
-      <@fdsAction.submitButtons
-        primaryButtonText="Save and continue"
-        secondaryLinkText="Cancel"
-        linkSecondaryAction=true
-        linkSecondaryActionUrl=springUrl(backLinkUrl)/>
+      <@fdsAction.button buttonText="Save and continue"/>
   </@fdsForm.htmlForm>
 </@defaultPage>
