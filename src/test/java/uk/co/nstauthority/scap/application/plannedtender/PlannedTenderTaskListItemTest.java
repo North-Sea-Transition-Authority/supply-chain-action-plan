@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +20,7 @@ import uk.co.nstauthority.scap.application.plannedtender.detail.ScapPlannedTende
 import uk.co.nstauthority.scap.utils.EntityTestingUtil;
 
 @ExtendWith(MockitoExtension.class)
-public class PlannedTenderTaskListItemTest {
+class PlannedTenderTaskListItemTest {
 
   @Mock
   private ScapOverviewService scapOverviewService;
@@ -37,65 +38,79 @@ public class PlannedTenderTaskListItemTest {
   private PlannedTenderTaskListItem plannedTenderTaskListItem;
 
   @Test
-  public void isValid_noPlannedTenderEntity_assertFalse() {
+  void isValid_noPlannedTenderEntity_assertFalse() {
     var scap = new ScapOverview(119);
     var scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT,
         EntityTestingUtil.dateToInstant(2000, 4, 23), 1);
 
-    when(scapOverviewService.getScapById(119)).thenReturn(scap);
+    when(scapOverviewService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(scapPlannedTenderService.getScapPlannedTenderByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
-    assertFalse(plannedTenderTaskListItem.isValid(119));
+    assertFalse(plannedTenderTaskListItem.isValid(scap.getId()));
   }
 
   @Test
-  public void isValid_hasPlannedTendersIsFalse_assertTrue() {
+  void isValid_hasPlannedTenders_noMoreActivityPlanned_assertTrue() {
     var scap = new ScapOverview(119);
     var scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT,
         EntityTestingUtil.dateToInstant(2000, 4, 23), 1);
-    var scapPlannedTender = new ScapPlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 4, 23));
+    var scapPlannedTender = new ScapPlannedTender(scapDetail, Instant.ofEpochSecond(1665566343));
+    scapPlannedTender.setHasPlannedTenders(true);
+    scapPlannedTender.setHasMorePlannedTenderActivities(HasMorePlannedTenderActivities.NO);
+
+    when(scapOverviewService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapPlannedTenderService.getScapPlannedTenderByScapDetail(scapDetail))
+        .thenReturn(Optional.of(scapPlannedTender));
+
+    assertTrue(plannedTenderTaskListItem.isValid(scap.getId()));
+  }
+
+  @Test
+  void isValid_hasPlannedTenders_nullMoreActivityPlanned_assertFalse() {
+    var scap = new ScapOverview(119);
+    var scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT,
+        EntityTestingUtil.dateToInstant(2000, 4, 23), 1);
+    var scapPlannedTender = new ScapPlannedTender(scapDetail, Instant.ofEpochSecond(1665566343));
+    scapPlannedTender.setHasPlannedTenders(true);
+
+    when(scapOverviewService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapPlannedTenderService.getScapPlannedTenderByScapDetail(scapDetail))
+        .thenReturn(Optional.of(scapPlannedTender));
+
+    assertFalse(plannedTenderTaskListItem.isValid(scap.getId()));
+  }
+
+  @Test
+  void isValid_hasNoPlannedTenders_assertTrue() {
+    var scap = new ScapOverview(119);
+    var scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT,
+        EntityTestingUtil.dateToInstant(2000, 4, 23), 1);
+    var scapPlannedTender = new ScapPlannedTender(scapDetail, Instant.ofEpochSecond(1665566343));
     scapPlannedTender.setHasPlannedTenders(false);
 
-    when(scapOverviewService.getScapById(119)).thenReturn(scap);
+    when(scapOverviewService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(scapPlannedTenderService.getScapPlannedTenderByScapDetail(scapDetail))
         .thenReturn(Optional.of(scapPlannedTender));
 
-    assertTrue(plannedTenderTaskListItem.isValid(119));
+    assertTrue(plannedTenderTaskListItem.isValid(scap.getId()));
   }
 
   @Test
-  public void isValid_hasPlannedTendersIsTrue_noDetailsFound_assertFalse() {
+  void isValid_hasPlannedTendersIsNull_assertFalse() {
     var scap = new ScapOverview(119);
     var scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT,
         EntityTestingUtil.dateToInstant(2000, 4, 23), 1);
-    var scapPlannedTender = new ScapPlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 4, 23));
-    scapPlannedTender.setHasPlannedTenders(true);
+    var scapPlannedTender = new ScapPlannedTender(scapDetail, Instant.ofEpochSecond(1665566343));
 
-    when(scapOverviewService.getScapById(119)).thenReturn(scap);
+    when(scapOverviewService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(scapPlannedTenderService.getScapPlannedTenderByScapDetail(scapDetail))
         .thenReturn(Optional.of(scapPlannedTender));
-    when(scapPlannedTenderDetailService.hasExistingTenderDetails(scapPlannedTender)).thenReturn(false);
 
-    assertFalse(plannedTenderTaskListItem.isValid(119));
-  }
-
-  @Test
-  public void isValid_hasPlannedTendersIsTrue_detailsFound_assertTrue() {
-    var scap = new ScapOverview(119);
-    var scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT,
-        EntityTestingUtil.dateToInstant(2000, 4, 23), 1);
-    var scapPlannedTender = new ScapPlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 4, 23));
-    scapPlannedTender.setHasPlannedTenders(true);
-
-    when(scapOverviewService.getScapById(119)).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
-    when(scapPlannedTenderService.getScapPlannedTenderByScapDetail(scapDetail))
-        .thenReturn(Optional.of(scapPlannedTender));
-    when(scapPlannedTenderDetailService.hasExistingTenderDetails(scapPlannedTender)).thenReturn(true);
-
-    assertTrue(plannedTenderTaskListItem.isValid(119));
+    assertFalse(plannedTenderTaskListItem.isValid(scap.getId()));
   }
 }

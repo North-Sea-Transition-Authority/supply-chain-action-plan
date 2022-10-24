@@ -7,12 +7,20 @@
   htmlTitle=pageTitle
   pageHeading=pageTitle
   pageSize=PageSize.TWO_THIRDS_COLUMN
-  errorItems=errorItems
+  errorItems=errorList
   backLinkUrl=springUrl(backLinkUrl)>
 
   <#list plannedTenderDetailsList as listItem>
     <@plannedTenderListItem listItem=listItem listId=listItem?index/>
   </#list>
+
+  <@fdsForm.htmlForm>
+    <@fdsRadio.radio
+      radioItems=radioItems
+      path="form.hasMorePlannedTenderActivities"
+      labelText="Do you want to add another planned tender activity?"/>
+    <@fdsAction.button buttonText="Save and continue"/>
+  </@fdsForm.htmlForm>
 
 </@defaultPage>
 

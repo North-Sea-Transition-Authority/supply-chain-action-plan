@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.application.plannedtender;
 
 import java.time.Instant;
 import java.util.Optional;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.application.detail.ScapDetail;
@@ -28,15 +29,24 @@ public class ScapPlannedTenderService {
         ));
   }
 
+  @Transactional
   public ScapPlannedTender createPlannedTenderForScapDetail(ScapDetail scapDetail) {
     var plannedTender = new ScapPlannedTender(scapDetail, Instant.now());
     scapPlannedTenderRepository.save(plannedTender);
     return plannedTender;
   }
 
+  @Transactional
   public void updatePlannedTenderHasPlannedTenders(ScapPlannedTender plannedTender,
                                                    Boolean status) {
     plannedTender.setHasPlannedTenders(status);
+    scapPlannedTenderRepository.save(plannedTender);
+  }
+
+  @Transactional
+  public void updatePlannedTenderHasMorePlannedTenders(ScapPlannedTender plannedTender,
+                                                       HasMorePlannedTenderActivities hasMorePlannedTenderActivities) {
+    plannedTender.setHasMorePlannedTenderActivities(hasMorePlannedTenderActivities);
     scapPlannedTenderRepository.save(plannedTender);
   }
 }

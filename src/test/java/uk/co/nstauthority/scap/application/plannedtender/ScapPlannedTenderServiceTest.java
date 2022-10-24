@@ -20,7 +20,7 @@ import uk.co.nstauthority.scap.error.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.utils.EntityTestingUtil;
 
 @ExtendWith(MockitoExtension.class)
-public class ScapPlannedTenderServiceTest {
+class ScapPlannedTenderServiceTest {
 
   @Mock
   ScapPlannedTenderRepository scapPlannedTenderRepository;
@@ -31,12 +31,12 @@ public class ScapPlannedTenderServiceTest {
   private ScapDetail scapDetail;
 
   @BeforeEach
-  private void setup() {
+  void setup() {
     scapDetail = new ScapDetail(null, 1, true, ScapDetailStatus.DRAFT, EntityTestingUtil.dateToInstant(2000, 4, 23), 1);
   }
 
   @Test
-  public void createPlannedTenderForScapDetail_verifySaves() {
+  void createPlannedTenderForScapDetail_verifySaves() {
     var argumentCaptor = ArgumentCaptor.forClass(ScapPlannedTender.class);
 
     scapPlannedTenderService.createPlannedTenderForScapDetail(scapDetail);
@@ -55,7 +55,7 @@ public class ScapPlannedTenderServiceTest {
   }
 
   @Test
-  public void updatePlannedTenderCompletionStatus_verifySaves() {
+  void updatePlannedTenderCompletionStatus_verifySaves() {
     var plannedTender = new ScapPlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 4, 23));
     var argumentCaptor=  ArgumentCaptor.forClass(ScapPlannedTender.class);
 
@@ -71,7 +71,7 @@ public class ScapPlannedTenderServiceTest {
   }
 
   @Test
-  public void getScapPlannedTenderByScapDetail_assertCorrectReturn() {
+  void getScapPlannedTenderByScapDetail_assertCorrectReturn() {
     var plannedTender = new ScapPlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 4, 23));
 
     when(scapPlannedTenderRepository.findByScapDetail(scapDetail)).thenReturn(Optional.of(plannedTender));
@@ -83,10 +83,24 @@ public class ScapPlannedTenderServiceTest {
   }
 
   @Test
-  public void getScapPlannedTenderByScapDetailOrThrow_assertThrows() {
+  void getScapPlannedTenderByScapDetailOrThrow_assertThrows() {
     when(scapPlannedTenderRepository.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> scapPlannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
         .isInstanceOf(ScapEntityNotFoundException.class);
+  }
+
+  @Test
+  void updatePlannedTenderHasMorePlannedTenders() {
+    var plannedTender = new ScapPlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 12, 30));
+    plannedTender.setHasMorePlannedTenderActivities(HasMorePlannedTenderActivities.YES_LATER);
+    var hasMorePlannedTenderActivities = HasMorePlannedTenderActivities.NO;
+    var argumentCaptor = ArgumentCaptor.forClass(ScapPlannedTender.class);
+
+    scapPlannedTenderService.updatePlannedTenderHasMorePlannedTenders(plannedTender, hasMorePlannedTenderActivities);
+
+    verify(scapPlannedTenderRepository, times(1)).save(argumentCaptor.capture());
+
+    assertThat(argumentCaptor.getValue().getHasMorePlannedTenderActivities()).isEqualTo(hasMorePlannedTenderActivities);
   }
 }

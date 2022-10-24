@@ -2,6 +2,8 @@ package uk.co.nstauthority.scap.application.plannedtender;
 
 import java.time.Instant;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -25,6 +27,9 @@ public class ScapPlannedTender {
   private Boolean hasPlannedTenders;
 
   private Instant createdTimestamp;
+
+  @Enumerated(EnumType.STRING)
+  private HasMorePlannedTenderActivities hasMorePlannedTenderActivities;
 
   public ScapPlannedTender() {
   }
@@ -60,5 +65,13 @@ public class ScapPlannedTender {
 
   public void setCreatedTimestamp(Instant createdTimestamp) {
     this.createdTimestamp = createdTimestamp;
+  }
+
+  public HasMorePlannedTenderActivities getHasMorePlannedTenderActivities() {
+    return hasMorePlannedTenderActivities;
+  }
+
+  public void setHasMorePlannedTenderActivities(HasMorePlannedTenderActivities hasMorePlannedTenderActivities) {
+    this.hasMorePlannedTenderActivities = hasMorePlannedTenderActivities;
   }
 }

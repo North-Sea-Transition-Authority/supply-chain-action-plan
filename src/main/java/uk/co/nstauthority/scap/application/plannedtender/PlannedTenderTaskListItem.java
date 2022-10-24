@@ -2,13 +2,11 @@ package uk.co.nstauthority.scap.application.plannedtender;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
-import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.co.nstauthority.scap.application.detail.ScapDetailService;
 import uk.co.nstauthority.scap.application.overview.ScapOverviewService;
 import uk.co.nstauthority.scap.application.overview.ScapOverviewTaskListSection;
-import uk.co.nstauthority.scap.application.plannedtender.detail.ScapPlannedTenderDetailService;
 import uk.co.nstauthority.scap.application.plannedtender.hasplannedtender.ScapHasPlannedTenderController;
 import uk.co.nstauthority.scap.application.tasklist.ScapTaskListItem;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
@@ -21,16 +19,13 @@ public class PlannedTenderTaskListItem implements ScapTaskListItem {
   private final ScapOverviewService scapOverviewService;
   private final ScapDetailService scapDetailService;
   private final ScapPlannedTenderService scapPlannedTenderService;
-  private final ScapPlannedTenderDetailService scapPlannedTenderDetailService;
 
   @Autowired
   public PlannedTenderTaskListItem(ScapOverviewService scapOverviewService, ScapDetailService scapDetailService,
-                                   ScapPlannedTenderService scapPlannedTenderService,
-                                   ScapPlannedTenderDetailService scapPlannedTenderDetailService) {
+                                   ScapPlannedTenderService scapPlannedTenderService) {
     this.scapOverviewService = scapOverviewService;
     this.scapDetailService = scapDetailService;
     this.scapPlannedTenderService = scapPlannedTenderService;
-    this.scapPlannedTenderDetailService = scapPlannedTenderDetailService;
   }
 
   @Override
@@ -55,12 +50,11 @@ public class PlannedTenderTaskListItem implements ScapTaskListItem {
     var scapPlannedTender = scapPlannedTenderService.getScapPlannedTenderByScapDetail(scapDetail);
 
     return scapPlannedTender.map(plannedTender -> {
-      if (Objects.isNull(plannedTender.getHasPlannedTenders())) {
-        return false;
+      if (Boolean.TRUE.equals(plannedTender.getHasPlannedTenders())) {
+        return HasMorePlannedTenderActivities.NO.equals(plannedTender.getHasMorePlannedTenderActivities());
       }
-      return !plannedTender.getHasPlannedTenders() || scapPlannedTenderDetailService.hasExistingTenderDetails(plannedTender);
-    })
-        .orElse(false);
+      return Boolean.FALSE.equals(plannedTender.getHasPlannedTenders());
+    }).orElse(false);
   }
 
   @Override
