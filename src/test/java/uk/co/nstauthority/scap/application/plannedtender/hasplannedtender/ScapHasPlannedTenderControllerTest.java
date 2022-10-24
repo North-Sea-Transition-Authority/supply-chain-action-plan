@@ -76,7 +76,7 @@ public class ScapHasPlannedTenderControllerTest extends AbstractControllerTest {
   }
 
   @Test
-  public void renderHasPlannedTenderActivityForm_noExistingEntity() throws Exception {
+  void renderHasPlannedTenderActivityForm_noExistingEntity() throws Exception {
     var form = new ScapHasPlannedTenderForm();
 
     when(scapOverviewService.getScapById(22)).thenReturn(scap);
@@ -87,7 +87,7 @@ public class ScapHasPlannedTenderControllerTest extends AbstractControllerTest {
     mockMvc.perform(
         get(ReverseRouter.route(on(ScapHasPlannedTenderController.class).renderHasPlannedTenderActivityForm(22))))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/plannedTender/hasPlannedTender"))
+        .andExpect(view().name("scap/application/plannedtender/hasPlannedTender"))
         .andExpect(model().attribute("form", form))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(22))))
@@ -98,7 +98,7 @@ public class ScapHasPlannedTenderControllerTest extends AbstractControllerTest {
   }
 
   @Test
-  public void saveHasPlannedTenderActivity_yesPlannedTender_verifySave() throws Exception {
+  void saveHasPlannedTenderActivity_yesPlannedTender_verifySave() throws Exception {
     var expectedRedirectUrl = ReverseRouter.route(on(ScapPlannedTenderDetailController.class)
         .renderPlannedTenderDetailForm(22, null));
     var form = new ScapHasPlannedTenderForm();
@@ -127,7 +127,7 @@ public class ScapHasPlannedTenderControllerTest extends AbstractControllerTest {
   }
 
   @Test
-  public void saveHasPlannedTenderActivity_noPlannedTender_verifySaveAndUpdate() throws Exception {
+  void saveHasPlannedTenderActivity_noPlannedTender_verifySaveAndUpdate() throws Exception {
     var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(22));
     var form = new ScapHasPlannedTenderForm();
     form.setHasPlannedTender(YesNo.NO);
@@ -155,7 +155,7 @@ public class ScapHasPlannedTenderControllerTest extends AbstractControllerTest {
   }
 
   @Test
-  public void saveHasPlannedTenderActivity_invalidForm_verifyNoSave() throws Exception {
+  void saveHasPlannedTenderActivity_invalidForm_verifyNoSave() throws Exception {
     var form = new ScapHasPlannedTenderForm();
     form.setHasPlannedTender(null);
     var bindingResult = new BeanPropertyBindingResult(form, "form");
@@ -173,7 +173,7 @@ public class ScapHasPlannedTenderControllerTest extends AbstractControllerTest {
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/plannedTender/hasPlannedTender"))
+        .andExpect(view().name("scap/application/plannedtender/hasPlannedTender"))
         .andExpect(model().attributeExists("errorItems"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(22))))
@@ -187,7 +187,7 @@ public class ScapHasPlannedTenderControllerTest extends AbstractControllerTest {
   }
 
   @Test
-  public void saveHasPlannedTenderActivity_existingPlannedTenders_expectRedirect() throws Exception {
+  void saveHasPlannedTenderActivity_existingPlannedTenders_expectRedirect() throws Exception {
     var form = new ScapHasPlannedTenderForm();
     form.setHasPlannedTender(null);
     var existingPlannedTender = new ScapPlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 4, 23));

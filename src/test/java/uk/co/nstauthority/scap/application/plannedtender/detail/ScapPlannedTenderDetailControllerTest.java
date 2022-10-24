@@ -43,7 +43,7 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(controllers = ScapPlannedTenderDetailController.class)
 @WithMockUser
-public class ScapPlannedTenderDetailControllerTest extends AbstractControllerTest {
+class ScapPlannedTenderDetailControllerTest extends AbstractControllerTest {
 
 
   @MockBean
@@ -76,7 +76,7 @@ public class ScapPlannedTenderDetailControllerTest extends AbstractControllerTes
   }
 
   @Test
-  public void renderPlannedTenderDetailForm() throws Exception {
+  void renderPlannedTenderDetailForm() throws Exception {
     when(scapOverviewService.getScapById(32)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(scapPlannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail)).thenReturn(scapPlannedTender);
@@ -86,7 +86,7 @@ public class ScapPlannedTenderDetailControllerTest extends AbstractControllerTes
         get(ReverseRouter.route(on(ScapPlannedTenderDetailController.class)
             .renderPlannedTenderDetailForm(32, null))))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/plannedTender/plannedTenderActivityDetail"))
+        .andExpect(view().name("scap/application/plannedtender/plannedTenderActivityDetail"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(ScapHasPlannedTenderController.class).renderHasPlannedTenderActivityForm(32))))
         .andExpect(model().attribute("submitPostUrl",
@@ -96,7 +96,7 @@ public class ScapPlannedTenderDetailControllerTest extends AbstractControllerTes
   }
 
   @Test
-  public void renderPlannedTenderDetailForm_noScapDetail_expectNotFound() throws Exception {
+  void renderPlannedTenderDetailForm_noScapDetail_expectNotFound() throws Exception {
     when(scapOverviewService.getScapById(33)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap))
         .thenThrow(new ScapEntityNotFoundException("No scap detail found for SCAP with ID [33]"));
@@ -108,7 +108,7 @@ public class ScapPlannedTenderDetailControllerTest extends AbstractControllerTes
   }
 
   @Test
-  public void renderPlannedTenderDetailForm_noScapPlannedTender_expectNotFound() throws Exception {
+  void renderPlannedTenderDetailForm_noScapPlannedTender_expectNotFound() throws Exception {
     when(scapOverviewService.getScapById(34)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(scapPlannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
@@ -121,7 +121,7 @@ public class ScapPlannedTenderDetailControllerTest extends AbstractControllerTes
   }
 
   @Test
-  public void savePlannedTenderDetailForm_valid_verifySaves() throws Exception {
+  void savePlannedTenderDetailForm_valid_verifySaves() throws Exception {
     var form = new ScapPlannedTenderDetailForm();
     var expectedRedirectUrl = ReverseRouter.route(on(ScapPlannedTenderController.class)
         .renderPlannedTenderActivities(34));
@@ -145,7 +145,7 @@ public class ScapPlannedTenderDetailControllerTest extends AbstractControllerTes
   }
 
   @Test
-  public void savePlannedTenderDetailForm_invalid_verifyNeverSaves() throws Exception {
+  void savePlannedTenderDetailForm_invalid_verifyNeverSaves() throws Exception {
     var form = new ScapPlannedTenderDetailForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("form", "scopeDescription.inputValue", "Required"));
@@ -162,7 +162,7 @@ public class ScapPlannedTenderDetailControllerTest extends AbstractControllerTes
                 .with(csrf())
                 .flashAttr("form", form))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/plannedTender/plannedTenderActivityDetail"))
+        .andExpect(view().name("scap/application/plannedtender/plannedTenderActivityDetail"))
         .andExpect(model().attributeExists("errorItems"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(ScapHasPlannedTenderController.class).renderHasPlannedTenderActivityForm(35))))
@@ -175,7 +175,7 @@ public class ScapPlannedTenderDetailControllerTest extends AbstractControllerTes
   }
 
   @Test
-  public void savePlannedTenderDetailForm_noScapDetail_expectNotFound() throws Exception {
+  void savePlannedTenderDetailForm_noScapDetail_expectNotFound() throws Exception {
     var form = new ScapPlannedTenderDetailForm();
 
     when(scapOverviewService.getScapById(36)).thenReturn(scap);
@@ -193,7 +193,7 @@ public class ScapPlannedTenderDetailControllerTest extends AbstractControllerTes
   }
 
   @Test
-  public void savePlannedTenderDetailForm_noPlannedTender_expectNotFound() throws Exception {
+  void savePlannedTenderDetailForm_noPlannedTender_expectNotFound() throws Exception {
     var form = new ScapPlannedTenderDetailForm();
 
     when(scapOverviewService.getScapById(37)).thenReturn(scap);

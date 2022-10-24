@@ -21,7 +21,7 @@
   <#assign cardActionsContent>
     <@fdsSummaryList.summaryListCardActionList>
       <@fdsSummaryList.summaryListCardActionItem
-        itemUrl=listItem.changeLinkUrl()
+        itemUrl=springUrl(listItem.changeLinkUrl())
         itemText="Change"
         itemScreenReaderText="Change this planned tender activity"
       />

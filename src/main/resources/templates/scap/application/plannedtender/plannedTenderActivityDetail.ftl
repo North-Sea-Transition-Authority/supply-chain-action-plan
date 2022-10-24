@@ -9,7 +9,7 @@
   errorItems=errorItems
   backLinkUrl=springUrl(backLinkUrl)
 >
-  <@fdsForm.htmlForm actionUrl=springUrl(submitPostUrl)>
+  <@fdsForm.htmlForm>
     <@fdsTextarea.textarea path="form.scopeDescription.inputValue" labelText="Scope description"/>
 
     <@fdsTextInput.textInput

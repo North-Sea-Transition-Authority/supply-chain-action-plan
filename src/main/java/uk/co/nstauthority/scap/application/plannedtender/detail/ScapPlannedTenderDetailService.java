@@ -52,4 +52,19 @@ public class ScapPlannedTenderDetailService {
   public void deletePlannedTenderDetail(ScapPlannedTenderDetail detail) {
     scapPlannedTenderDetailRepository.delete(detail);
   }
+
+  @Transactional
+  public void updatePlannedTenderDetail(ScapPlannedTenderDetail plannedTenderDetail, ScapPlannedTenderDetailForm form) {
+    var estimatedValue = form.getEstimatedValue().getInputValueAsBigDecimal().orElseThrow(() ->
+        new ClassCastException(
+            String.format("Could not update planned tender detail with ID %d, as estimatedValue is not a BigDecimal",
+                plannedTenderDetail.getId())));
+
+    plannedTenderDetail.setAwardRationale(form.getAwardRationale().getInputValue());
+    plannedTenderDetail.setEstimatedValue(estimatedValue);
+    plannedTenderDetail.setRemunerationModel(form.getRemunerationModel());
+    plannedTenderDetail.setRemunerationModelName(form.getRemunerationModelName().getInputValue());
+    plannedTenderDetail.setScopeDescription(form.getScopeDescription().getInputValue());
+    scapPlannedTenderDetailRepository.save(plannedTenderDetail);
+  }
 }

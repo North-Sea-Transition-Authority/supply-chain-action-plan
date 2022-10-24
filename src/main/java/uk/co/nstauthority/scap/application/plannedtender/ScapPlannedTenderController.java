@@ -10,6 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.application.detail.ScapDetailService;
 import uk.co.nstauthority.scap.application.overview.ScapOverviewService;
 import uk.co.nstauthority.scap.application.plannedtender.detail.ScapPlannedTenderDetailService;
+import uk.co.nstauthority.scap.application.plannedtender.hasplannedtender.ScapHasPlannedTenderController;
 import uk.co.nstauthority.scap.application.plannedtender.list.PlannedTenderDetailListService;
 import uk.co.nstauthority.scap.application.tasklist.TaskListController;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
@@ -42,7 +43,11 @@ public class ScapPlannedTenderController {
     var plannedTender = scapPlannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail);
     var existingTenderDetails = scapPlannedTenderDetailService.getTenderDetailsByPlannedTender(plannedTender);
 
-    return new ModelAndView("scap/application/plannedTender/plannedTenderActivityList")
+    if (existingTenderDetails.isEmpty()) {
+      return ReverseRouter.redirect(on(ScapHasPlannedTenderController.class).renderHasPlannedTenderActivityForm(scapId));
+    }
+
+    return new ModelAndView("scap/application/plannedtender/plannedTenderActivityList")
         .addObject("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
         .addObject("plannedTenderDetailsList",

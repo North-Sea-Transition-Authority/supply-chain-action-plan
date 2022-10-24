@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -121,11 +123,57 @@ class ScapPlannedTenderDetailServiceTest {
   }
 
   @Test
-  void deletePlannedTenderDetail_verifyCallsRepository() {
+  void deletePlannedTenderDetail_verifyDeletes() {
     var detail = new ScapPlannedTenderDetail(24);
 
     scapPlannedTenderDetailService.deletePlannedTenderDetail(detail);
 
     verify(scapPlannedTenderDetailRepository, times(1)).delete(detail);
+  }
+
+  @Test
+  void updatePlannedTenderDetail_verifySaves() {
+    var detail = new ScapPlannedTenderDetail(19);
+    var form = new ScapPlannedTenderDetailForm();
+    form.setAwardRationale("Some award rationale");
+    form.setEstimatedValue("2.32");
+    form.setRemunerationModel(RemunerationModel.OTHER);
+    form.setRemunerationModelName("Some remuneration model");
+    form.setScopeDescription("Some scope description");
+    var argumentCaptor = ArgumentCaptor.forClass(ScapPlannedTenderDetail.class);
+
+    scapPlannedTenderDetailService.updatePlannedTenderDetail(detail, form);
+
+    verify(scapPlannedTenderDetailRepository, times(1)).save(argumentCaptor.capture());
+
+    assertThat(argumentCaptor.getValue()).extracting(
+        ScapPlannedTenderDetail::getAwardRationale,
+        ScapPlannedTenderDetail::getEstimatedValue,
+        ScapPlannedTenderDetail::getRemunerationModel,
+        ScapPlannedTenderDetail::getRemunerationModelName,
+        ScapPlannedTenderDetail::getScopeDescription
+    ).containsExactly(
+        form.getAwardRationale().getInputValue(),
+        form.getEstimatedValue().getInputValueAsBigDecimal().get(),
+        form.getRemunerationModel(),
+        form.getRemunerationModelName().getInputValue(),
+        form.getScopeDescription().getInputValue()
+    );
+  }
+
+  @Test
+  void updatePlannedTenderDetail_invalidEstimatedValue_verifyNeverSaves() {
+    var detail = new ScapPlannedTenderDetail(19);
+    var form = new ScapPlannedTenderDetailForm();
+    form.setAwardRationale("Some award rationale");
+    form.setEstimatedValue("not a number");
+    form.setRemunerationModel(RemunerationModel.OTHER);
+    form.setRemunerationModelName("Some remuneration model");
+    form.setScopeDescription("Some scope description");
+
+    assertThatThrownBy(() -> scapPlannedTenderDetailService.updatePlannedTenderDetail(detail, form))
+        .isInstanceOf(ClassCastException.class);
+
+    verify(scapPlannedTenderDetailRepository, never()).save(any());
   }
 }

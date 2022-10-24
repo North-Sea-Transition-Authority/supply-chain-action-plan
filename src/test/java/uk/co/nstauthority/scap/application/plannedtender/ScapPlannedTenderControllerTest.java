@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +25,7 @@ import uk.co.nstauthority.scap.application.overview.ScapOverviewService;
 import uk.co.nstauthority.scap.application.plannedtender.detail.RemunerationModel;
 import uk.co.nstauthority.scap.application.plannedtender.detail.ScapPlannedTenderDetail;
 import uk.co.nstauthority.scap.application.plannedtender.detail.ScapPlannedTenderDetailService;
+import uk.co.nstauthority.scap.application.plannedtender.hasplannedtender.ScapHasPlannedTenderController;
 import uk.co.nstauthority.scap.application.plannedtender.list.PlannedTenderDetailListItem;
 import uk.co.nstauthority.scap.application.plannedtender.list.PlannedTenderDetailListService;
 import uk.co.nstauthority.scap.application.tasklist.TaskListController;
@@ -33,7 +35,7 @@ import uk.co.nstauthority.scap.utils.EntityTestingUtil;
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(controllers = ScapPlannedTenderController.class)
 @WithMockUser
-public class ScapPlannedTenderControllerTest extends AbstractControllerTest {
+class ScapPlannedTenderControllerTest extends AbstractControllerTest {
 
   @MockBean
   ScapOverviewService scapOverviewService;
@@ -51,8 +53,8 @@ public class ScapPlannedTenderControllerTest extends AbstractControllerTest {
   PlannedTenderDetailListService plannedTenderDetailListService;
 
   @Test
-  public void renderPlannedTenderActivities() throws Exception {
-    var scap = new ScapOverview(1664);
+  void renderPlannedTenderActivities() throws Exception {
+    var scap = new ScapOverview(22);
     var scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, EntityTestingUtil.dateToInstant(2000, 4, 23),
         1);
     var plannedTender = new ScapPlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 4, 23));
@@ -71,21 +73,43 @@ public class ScapPlannedTenderControllerTest extends AbstractControllerTest {
         new PlannedTenderDetailListItem(existingTenderDetails.get(0), "#", "#")
     );
 
-    when(scapOverviewService.getScapById(22)).thenReturn(scap);
+    when(scapOverviewService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(scapPlannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
         .thenReturn(plannedTender);
     when(scapPlannedTenderDetailService.getTenderDetailsByPlannedTender(plannedTender))
         .thenReturn(existingTenderDetails);
-    when(plannedTenderDetailListService.plannedTenderDetailsToListItems(22, existingTenderDetails))
+    when(plannedTenderDetailListService.plannedTenderDetailsToListItems(scap.getId(), existingTenderDetails))
         .thenReturn(listItems);
 
     mockMvc.perform(
-        get(ReverseRouter.route(on(ScapPlannedTenderController.class).renderPlannedTenderActivities(22))))
+        get(ReverseRouter.route(on(ScapPlannedTenderController.class).renderPlannedTenderActivities(scap.getId()))))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/plannedTender/plannedTenderActivityList"))
+        .andExpect(view().name("scap/application/plannedtender/plannedTenderActivityList"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(22))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
         .andExpect(model().attribute("plannedTenderDetailsList", listItems));
+  }
+
+  @Test
+  void renderPlannedTenderActivities_noActivityDetails_expectRedirection() throws Exception {
+    var scap = new ScapOverview(22);
+    var scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, EntityTestingUtil.dateToInstant(2000, 4, 23),
+        1);
+    var plannedTender = new ScapPlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 4, 23));
+    var expectedRedirectUrl = ReverseRouter.route(on(ScapHasPlannedTenderController.class)
+        .renderHasPlannedTenderActivityForm(scap.getId()));
+
+    when(scapOverviewService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapPlannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
+        .thenReturn(plannedTender);
+    when(scapPlannedTenderDetailService.getTenderDetailsByPlannedTender(plannedTender))
+        .thenReturn(Collections.emptyList());
+
+    mockMvc.perform(
+            get(ReverseRouter.route(on(ScapPlannedTenderController.class).renderPlannedTenderActivities(scap.getId()))))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
   }
 }

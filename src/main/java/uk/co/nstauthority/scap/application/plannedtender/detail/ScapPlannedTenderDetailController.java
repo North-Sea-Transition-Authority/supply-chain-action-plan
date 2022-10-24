@@ -83,7 +83,7 @@ public class ScapPlannedTenderDetailController {
   }
 
   private ModelAndView plannedTenderDetailFormModelAndView(Integer scapId, String backLinkUrl) {
-    return new ModelAndView("scap/application/plannedTender/plannedTenderActivityDetail")
+    return new ModelAndView("scap/application/plannedtender/plannedTenderActivityDetail")
         .addObject("backLinkUrl", backLinkUrl)
         .addObject("submitPostUrl",
             ReverseRouter.route(on(ScapPlannedTenderDetailController.class)

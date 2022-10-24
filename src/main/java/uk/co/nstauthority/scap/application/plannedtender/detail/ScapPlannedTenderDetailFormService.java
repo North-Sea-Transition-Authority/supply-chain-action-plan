@@ -18,4 +18,14 @@ public class ScapPlannedTenderDetailFormService {
     validator.validate(form, bindingResult);
     return bindingResult;
   }
+
+  public ScapPlannedTenderDetailForm getForm(ScapPlannedTenderDetail plannedTenderDetail) {
+    var form = new ScapPlannedTenderDetailForm();
+    form.setAwardRationale(plannedTenderDetail.getAwardRationale());
+    form.setRemunerationModelName(plannedTenderDetail.getRemunerationModelName());
+    form.setRemunerationModel(plannedTenderDetail.getRemunerationModel());
+    form.setScopeDescription(plannedTenderDetail.getScopeDescription());
+    form.setEstimatedValue(String.valueOf(plannedTenderDetail.getEstimatedValue()));
+    return form;
+  }
 }
