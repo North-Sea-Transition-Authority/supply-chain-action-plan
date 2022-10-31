@@ -154,7 +154,7 @@ class ScapPlannedTenderDetailServiceTest {
         ScapPlannedTenderDetail::getScopeDescription
     ).containsExactly(
         form.getAwardRationale().getInputValue(),
-        form.getEstimatedValue().getInputValueAsBigDecimal().get(),
+        form.getEstimatedValue().getAsBigDecimal().get(),
         form.getRemunerationModel(),
         form.getRemunerationModelName().getInputValue(),
         form.getScopeDescription().getInputValue()

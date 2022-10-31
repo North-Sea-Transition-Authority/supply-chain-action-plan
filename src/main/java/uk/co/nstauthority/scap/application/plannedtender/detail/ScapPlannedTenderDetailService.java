@@ -23,7 +23,7 @@ public class ScapPlannedTenderDetailService {
     var detail = new ScapPlannedTenderDetail(
         scapPlannedTender,
         form.getScopeDescription().getInputValue(),
-        form.getEstimatedValue().getInputValueAsBigDecimal()
+        form.getEstimatedValue().getAsBigDecimal()
             .orElseThrow(() -> new ClassCastException("Could not cast this forms estimatedValue to BigDecimal")),
         form.getRemunerationModel(),
         form.getRemunerationModelName().getInputValue(),
@@ -55,7 +55,7 @@ public class ScapPlannedTenderDetailService {
 
   @Transactional
   public void updatePlannedTenderDetail(ScapPlannedTenderDetail plannedTenderDetail, ScapPlannedTenderDetailForm form) {
-    var estimatedValue = form.getEstimatedValue().getInputValueAsBigDecimal().orElseThrow(() ->
+    var estimatedValue = form.getEstimatedValue().getAsBigDecimal().orElseThrow(() ->
         new ClassCastException(
             String.format("Could not update planned tender detail with ID %d, as estimatedValue is not a BigDecimal",
                 plannedTenderDetail.getId())));

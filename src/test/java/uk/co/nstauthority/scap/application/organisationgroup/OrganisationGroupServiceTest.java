@@ -22,7 +22,7 @@ import uk.co.fivium.energyportalapi.client.organisation.OrganisationApi;
 import uk.co.fivium.energyportalapi.generated.client.OrganisationGroupByIdProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.client.OrganisationGroupsByNameProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
-import uk.co.nstauthority.scap.fds.searchselector.RestSearchSingleResult;
+import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
 
 @ExtendWith(MockitoExtension.class)
 public class OrganisationGroupServiceTest {
@@ -84,8 +84,8 @@ public class OrganisationGroupServiceTest {
 
     assertThat(searchResults.getResults().get(0))
         .extracting(
-            RestSearchSingleResult::id,
-            RestSearchSingleResult::text
+            RestSearchItem::id,
+            RestSearchItem::text
         ).containsExactly(
             "1",
             "Royal Dutch Shell"

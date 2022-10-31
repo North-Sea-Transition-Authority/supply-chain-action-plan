@@ -2,16 +2,17 @@ package uk.co.nstauthority.scap.fds.searchselector;
 
 import java.util.List;
 
+/**
+ * A RestSearchResult is used as response for producing options within a search selector.
+ */
 public class RestSearchResult {
+  List<RestSearchItem> results;
 
-  private final List<RestSearchSingleResult> results;
-
-  public RestSearchResult(List<RestSearchSingleResult> results) {
+  public RestSearchResult(List<RestSearchItem> results) {
     this.results = results;
   }
 
-  public List<RestSearchSingleResult> getResults() {
+  public List<RestSearchItem> getResults() {
     return results;
   }
-
 }

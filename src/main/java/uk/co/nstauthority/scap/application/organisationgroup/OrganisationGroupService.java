@@ -9,8 +9,8 @@ import uk.co.fivium.energyportalapi.client.organisation.OrganisationApi;
 import uk.co.fivium.energyportalapi.generated.client.OrganisationGroupByIdProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.client.OrganisationGroupsByNameProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
+import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
 import uk.co.nstauthority.scap.fds.searchselector.RestSearchResult;
-import uk.co.nstauthority.scap.fds.searchselector.RestSearchSingleResult;
 
 @Service
 public class OrganisationGroupService {
@@ -31,7 +31,7 @@ public class OrganisationGroupService {
 
   public RestSearchResult organisationGroupsToSearchResult(List<OrganisationGroup> queryResults) {
     return new RestSearchResult(queryResults.stream()
-        .map(organisationGroup -> new RestSearchSingleResult(
+        .map(organisationGroup -> new RestSearchItem(
             organisationGroup.getOrganisationGroupId().toString(),
             organisationGroup.getName()))
         .collect(Collectors.toList()));

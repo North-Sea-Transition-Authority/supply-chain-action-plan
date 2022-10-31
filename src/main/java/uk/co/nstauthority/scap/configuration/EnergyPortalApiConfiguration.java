@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
 import uk.co.fivium.energyportalapi.client.EnergyPortal;
 import uk.co.fivium.energyportalapi.client.countries.CountryApi;
+import uk.co.fivium.energyportalapi.client.field.FieldApi;
 import uk.co.fivium.energyportalapi.client.organisation.OrganisationApi;
 
 @Configuration
@@ -30,6 +31,11 @@ public class EnergyPortalApiConfiguration {
   @Bean
   public CountryApi countryApi(EnergyPortal energyPortal) {
     return new CountryApi(energyPortal);
+  }
+
+  @Bean
+  public FieldApi fieldApi(EnergyPortal energyPortal) {
+    return new FieldApi(energyPortal);
   }
 
   public String getUrl() {

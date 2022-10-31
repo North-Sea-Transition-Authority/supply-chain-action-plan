@@ -16,8 +16,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
 import uk.co.nstauthority.scap.fds.searchselector.RestSearchResult;
-import uk.co.nstauthority.scap.fds.searchselector.RestSearchSingleResult;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,8 +40,8 @@ public class OrganisationGroupRestControllerTest extends AbstractControllerTest 
         .thenReturn(groupList);
     when(organisationGroupService.organisationGroupsToSearchResult(groupList))
         .thenReturn(new RestSearchResult(List.of(
-            new RestSearchSingleResult("1", "Royal Dutch Shell"),
-            new RestSearchSingleResult("2", "Shell")
+            new RestSearchItem("1", "Royal Dutch Shell"),
+            new RestSearchItem("2", "Shell")
         )));
 
     var response = mockMvc.perform(

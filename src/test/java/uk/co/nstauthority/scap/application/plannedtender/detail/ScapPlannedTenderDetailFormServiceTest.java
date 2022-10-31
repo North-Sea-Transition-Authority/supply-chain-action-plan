@@ -48,7 +48,7 @@ class ScapPlannedTenderDetailFormServiceTest {
 
     assertThat(form.getAwardRationale().getInputValue()).isEqualTo(plannedTenderDetail.getAwardRationale());
     assertThat(form.getScopeDescription().getInputValue()).isEqualTo(plannedTenderDetail.getScopeDescription());
-    assertThat(form.getEstimatedValue().getInputValueAsBigDecimal()).contains(plannedTenderDetail.getEstimatedValue());
+    assertThat(form.getEstimatedValue().getAsBigDecimal()).contains(plannedTenderDetail.getEstimatedValue());
     assertThat(form.getRemunerationModel()).isEqualTo(plannedTenderDetail.getRemunerationModel());
     assertThat(form.getRemunerationModelName().getInputValue()).isEqualTo(plannedTenderDetail.getRemunerationModelName());
   }
