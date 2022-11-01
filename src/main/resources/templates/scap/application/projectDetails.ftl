@@ -52,6 +52,7 @@
       restUrl=springUrl(fieldSearchRestUrl)
       labelText="Field"
       inputClass="govuk-!-width-one-half"
+      preselectedItems=preselectedField!{}
     />
     <@fdsDateInput.dateInput
       formId="startDate"
@@ -69,6 +70,6 @@
       labelText="Indicative planned commissioning or completion date"
       hintText="For example, 31 3 2024"
       />
-    <@fdsAction.button buttonText="Save and continue"/>
+    <@fdsAction.button buttonText="Save and complete"/>
   </@fdsForm.htmlForm>
 </@defaultPage>

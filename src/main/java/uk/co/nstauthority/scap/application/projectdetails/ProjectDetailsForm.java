@@ -1,6 +1,6 @@
 package uk.co.nstauthority.scap.application.projectdetails;
 
-import java.util.List;
+import java.util.Set;
 import uk.co.fivium.formlibrary.input.DecimalInput;
 import uk.co.fivium.formlibrary.input.IntegerInput;
 import uk.co.fivium.formlibrary.input.StringInput;
@@ -9,7 +9,7 @@ import uk.co.fivium.formlibrary.input.ThreeFieldDateInput;
 class ProjectDetailsForm {
 
   private final StringInput projectName;
-  private List<ProjectType> projectTypes;
+  private Set<ProjectType> projectTypes;
   private final DecimalInput projectCostEstimate;
   private final DecimalInput estimatedValueLocalContent;
   private final IntegerInput fieldId;
@@ -58,11 +58,11 @@ class ProjectDetailsForm {
     this.projectName.setInputValue(projectName);
   }
 
-  public List<ProjectType> getProjectTypes() {
+  public Set<ProjectType> getProjectTypes() {
     return projectTypes;
   }
 
-  public void setProjectTypes(List<ProjectType> projectTypes) {
+  public void setProjectTypes(Set<ProjectType> projectTypes) {
     this.projectTypes = projectTypes;
   }
 

@@ -3,31 +3,97 @@ package uk.co.nstauthority.scap.application.projectdetails;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.time.Instant;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import uk.co.nstauthority.scap.application.detail.ScapDetail;
+import uk.co.nstauthority.scap.application.detail.ScapDetailService;
+import uk.co.nstauthority.scap.application.detail.ScapDetailStatus;
+import uk.co.nstauthority.scap.application.overview.ScapOverview;
+import uk.co.nstauthority.scap.application.overview.ScapOverviewService;
 import uk.co.nstauthority.scap.application.overview.ScapOverviewTaskListSection;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 
 @ExtendWith(MockitoExtension.class)
 class ProjectDetailsTaskListItemTest {
 
+  @Mock
+  ScapOverviewService scapOverviewService;
+
+  @Mock
+  ScapDetailService scapDetailService;
+
+  @Mock
+  ProjectDetailsService projectDetailsService;
+
+  @Mock
+  ProjectDetailsFormService projectDetailsFormService;
+
+  @InjectMocks
   ProjectDetailsTaskListItem projectDetailsTaskListItem;
 
   private Integer scapId;
+  private ScapOverview scap;
+  private ScapDetail scapDetail;
 
   @BeforeEach
   void setup() {
-    projectDetailsTaskListItem = new ProjectDetailsTaskListItem();
     scapId = 34;
+    scap = new ScapOverview(scapId);
+    scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, Instant.now(), 1);
   }
 
   @Test
-  void isValid() {
-    assertFalse(projectDetailsTaskListItem.isValid(scapId));
+  void isValid_noProjectDetails_assertFalse() {
+    when(scapOverviewService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(projectDetailsService.getProjectDetailsByScapDetail(scapDetail)).thenReturn(Optional.empty());
+
+    assertFalse(projectDetailsTaskListItem.isValid(scap.getId()));
+  }
+
+  @Test
+  void isValid_invalidProjectDetails_assertFalse() {
+    var projectDetails = new ProjectDetails(scapDetail, Instant.now());
+    var form = new ProjectDetailsForm();
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult.addError(new FieldError("form", "testField", "Test field must not be blank"));
+
+    when(scapOverviewService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(projectDetailsService.getProjectDetailsByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
+    when(projectDetailsFormService.getForm(projectDetails)).thenReturn(form);
+    when(projectDetailsFormService.validate(eq(form), any(BindingResult.class))).thenReturn(bindingResult);
+
+    assertFalse(projectDetailsTaskListItem.isValid(scap.getId()));
+  }
+
+  @Test
+  void isValid_validProjectDetails_assertTrue() {
+    var projectDetails = new ProjectDetails(scapDetail, Instant.now());
+    var form = new ProjectDetailsForm();
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+
+    when(scapOverviewService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(projectDetailsService.getProjectDetailsByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
+    when(projectDetailsFormService.getForm(projectDetails)).thenReturn(form);
+    when(projectDetailsFormService.validate(eq(form), any(BindingResult.class))).thenReturn(bindingResult);
+
+    assertTrue(projectDetailsTaskListItem.isValid(scap.getId()));
   }
 
   @Test
@@ -38,7 +104,7 @@ class ProjectDetailsTaskListItemTest {
   @Test
   void getActionUrl() {
     assertThat(projectDetailsTaskListItem.getActionUrl(scapId)).isEqualTo(
-        ReverseRouter.route(on(ProjectDetailsController.class).renderProjectDetailsForm(scapId, null)));
+        ReverseRouter.route(on(ProjectDetailsController.class).renderProjectDetailsForm(scapId)));
   }
 
   @Test

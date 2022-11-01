@@ -73,6 +73,28 @@ class FieldServiceTest {
   }
 
   @Test
+  void getFieldById() {
+    var requestedFieldId = 34;
+    var requestPurpose = "Test request purpose";
+    var field = new Field(requestedFieldId, "Test field name", null, null, null, null);
+    var argumentCaptor = ArgumentCaptor.forClass(FieldProjectionRoot.class);
+
+    when(fieldApi.findFieldById(eq(requestedFieldId), any(FieldProjectionRoot.class), eq(requestPurpose)))
+        .thenReturn(Optional.of(field));
+
+    var returnedField = fieldService.getFieldById(requestedFieldId, requestPurpose);
+
+    verify(fieldApi, times(1))
+        .findFieldById(eq(requestedFieldId), argumentCaptor.capture(), eq(requestPurpose));
+    var requestedParams = argumentCaptor.getValue().getFields();
+    assertThat(requestedParams).containsExactly(
+        entry("fieldId", null),
+        entry("fieldName", null)
+    );
+    assertThat(returnedField).contains(field);
+  }
+
+  @Test
   void doesFieldExist_doesExist_assertTrue() {
     var existingFieldId = 1;
     var purpose = "Validate that Field exists for SCAP project details";

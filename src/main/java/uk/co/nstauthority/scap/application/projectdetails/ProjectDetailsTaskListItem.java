@@ -3,6 +3,9 @@ package uk.co.nstauthority.scap.application.projectdetails;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.nstauthority.scap.application.detail.ScapDetailService;
+import uk.co.nstauthority.scap.application.overview.ScapOverviewService;
 import uk.co.nstauthority.scap.application.overview.ScapOverviewTaskListSection;
 import uk.co.nstauthority.scap.application.tasklist.ScapTaskListItem;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
@@ -13,6 +16,20 @@ class ProjectDetailsTaskListItem implements ScapTaskListItem {
   private static final String DISPLAY_NAME = "Project details";
   private static final Integer DISPLAY_ORDER = 20;
 
+  private final ScapOverviewService scapOverviewService;
+  private final ScapDetailService scapDetailService;
+  private final ProjectDetailsService projectDetailsService;
+  private final ProjectDetailsFormService projectDetailsFormService;
+
+  ProjectDetailsTaskListItem(ScapOverviewService scapOverviewService, ScapDetailService scapDetailService,
+                             ProjectDetailsService projectDetailsService,
+                             ProjectDetailsFormService projectDetailsFormService) {
+    this.scapOverviewService = scapOverviewService;
+    this.scapDetailService = scapDetailService;
+    this.projectDetailsService = projectDetailsService;
+    this.projectDetailsFormService = projectDetailsFormService;
+  }
+
   @Override
   public String getItemDisplayText() {
     return DISPLAY_NAME;
@@ -20,7 +37,7 @@ class ProjectDetailsTaskListItem implements ScapTaskListItem {
 
   @Override
   public String getActionUrl(Integer target) {
-    return ReverseRouter.route(on(ProjectDetailsController.class).renderProjectDetailsForm(target, null));
+    return ReverseRouter.route(on(ProjectDetailsController.class).renderProjectDetailsForm(target));
   }
 
   @Override
@@ -30,7 +47,14 @@ class ProjectDetailsTaskListItem implements ScapTaskListItem {
 
   @Override
   public boolean isValid(Integer target) {
-    return false;
+    var scap = scapOverviewService.getScapById(target);
+    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    return projectDetailsService.getProjectDetailsByScapDetail(scapDetail)
+        .map(projectDetails -> {
+          var form = projectDetailsFormService.getForm(projectDetails);
+          var bindingResult = new BeanPropertyBindingResult(form, "form");
+          return !projectDetailsFormService.validate(form, bindingResult).hasErrors();
+        }).orElse(false);
   }
 
   @Override

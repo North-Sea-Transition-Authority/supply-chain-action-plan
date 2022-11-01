@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.energyportal;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.fivium.energyportalapi.client.field.FieldApi;
@@ -28,6 +29,11 @@ public class FieldService {
         .fieldId()
         .fieldName();
     return fieldApi.searchFields(term, statuses, requestedFields, purpose);
+  }
+
+  public Optional<Field> getFieldById(Integer id, String requestPurpose) {
+    var requestedFields = new FieldProjectionRoot().fieldId().fieldName();
+    return fieldApi.findFieldById(id, requestedFields, requestPurpose);
   }
 
   public boolean doesFieldExist(Integer id) {

@@ -1,0 +1,91 @@
+package uk.co.nstauthority.scap.application.projectdetails;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import uk.co.nstauthority.scap.application.detail.ScapDetail;
+import uk.co.nstauthority.scap.energyportal.FieldService;
+
+@Service
+@Transactional
+class ProjectDetailsService {
+
+  private final ProjectDetailsRepository projectDetailsRepository;
+  private final ProjectDetailTypeRepository projectDetailTypeRepository;
+  private final Clock clock;
+  private final FieldService fieldService;
+
+  @Autowired
+  ProjectDetailsService(ProjectDetailsRepository projectDetailsRepository,
+                        ProjectDetailTypeRepository projectDetailTypeRepository, Clock clock, FieldService fieldService) {
+    this.projectDetailsRepository = projectDetailsRepository;
+    this.projectDetailTypeRepository = projectDetailTypeRepository;
+    this.clock = clock;
+    this.fieldService = fieldService;
+  }
+
+  Set<ProjectType> getProjectTypesByProjectDetails(ProjectDetails projectDetails) {
+    return projectDetailTypeRepository.findAllByProjectDetails(projectDetails).stream()
+        .map(ProjectDetailType::getProjectType)
+        .collect(Collectors.toSet());
+  }
+
+  Optional<ProjectDetails> getProjectDetailsByScapDetail(ScapDetail scapDetail) {
+    return projectDetailsRepository.findByScapDetail(scapDetail);
+  }
+
+  void saveProjectDetails(ScapDetail scapDetail, ProjectDetailsForm form) {
+    var createdTimestamp = clock.instant();
+    var projectDetails = projectDetailsRepository.findByScapDetail(scapDetail)
+        .orElse(new ProjectDetails(scapDetail, createdTimestamp));
+
+    updateProjectDetails(projectDetails, form);
+    updateProjectDetailTypes(projectDetails, form.getProjectTypes(), createdTimestamp);
+  }
+
+  private void saveProjectDetailType(ProjectDetails projectDetails, ProjectType projectType, Instant createdTimestamp) {
+    var projectDetailType = new ProjectDetailType(projectDetails, createdTimestamp);
+    projectDetailType.setProjectType(projectType);
+    projectDetailTypeRepository.save(projectDetailType);
+  }
+
+  private void updateProjectDetailTypes(ProjectDetails projectDetails, Set<ProjectType> projectTypes, Instant createdTimestamp) {
+    var existingProjectDetailTypes = projectDetailTypeRepository.findAllByProjectDetails(projectDetails);
+    var existingProjectTypes = existingProjectDetailTypes.stream()
+        .map(ProjectDetailType::getProjectType)
+        .collect(Collectors.toSet());
+
+    existingProjectDetailTypes.stream()
+        .filter(existingProjectDetailType -> !projectTypes.contains(existingProjectDetailType.getProjectType()))
+        .forEach(projectDetailTypeRepository::delete);
+
+    projectTypes.stream()
+        .filter(projectType -> !existingProjectTypes.contains(projectType))
+        .forEach(projectType -> saveProjectDetailType(projectDetails, projectType, createdTimestamp));
+  }
+
+  private void updateProjectDetails(ProjectDetails projectDetails, ProjectDetailsForm form) {
+    projectDetails.setProjectName(form.getProjectName().getInputValue());
+    projectDetails.setProjectCostEstimate(form.getProjectCostEstimate().getAsBigDecimal().orElse(null));
+    projectDetails.setEstimatedValueLocalContent(form.getEstimatedValueLocalContent().getAsBigDecimal().orElse(null));
+    form.getFieldId().getAsInteger().ifPresent(fieldId -> {
+      var field = fieldService.getFieldById(fieldId, "Get field name to save SCAP project details");
+      field.ifPresent(actualField -> {
+        projectDetails.setFieldId(fieldId);
+        projectDetails.setFieldName(actualField.getFieldName());
+      });
+    });
+    var startDate = form.getExpectedStartDate()
+        .getAsLocalDate().orElse(null);
+    var endDate = form.getExpectedEndDate()
+        .getAsLocalDate().orElse(null);
+    projectDetails.setPlannedExecutionStartDate(startDate);
+    projectDetails.setPlannedCompletionDate(endDate);
+    projectDetailsRepository.save(projectDetails);
+  }
+}
