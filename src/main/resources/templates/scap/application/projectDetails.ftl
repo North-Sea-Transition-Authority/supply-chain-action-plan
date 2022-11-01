@@ -1,6 +1,6 @@
 <#include '../layout/layout.ftl'>
 
-<#-- @ftlvariable name="errorItems" type="java.util.List<uk.co.nstauthority.scap.fds.ErrorItem>" -->
+<#-- @ftlvariable name="errorList" type="java.util.List<uk.co.nstauthority.scap.fds.ErrorItem>" -->
 
 <#assign pageTitle = "Project details" />
 
@@ -8,9 +8,8 @@
   htmlTitle=pageTitle
   pageHeading=pageTitle
   pageSize=PageSize.TWO_THIRDS_COLUMN
-  errorItems=errorItems
+  errorItems=errorList
   backLinkUrl=springUrl(backLinkUrl)
-  errorItems=errorItems
 >
   <@fdsForm.htmlForm>
     <@fdsTextInput.textInput
