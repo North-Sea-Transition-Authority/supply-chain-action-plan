@@ -93,7 +93,7 @@ public class ScapHasPlannedTenderController {
   private ModelAndView hasPlannedTenderActivityModelAndView(Integer scapId, ScapHasPlannedTenderForm form) {
     return new ModelAndView("scap/application/plannedtender/hasPlannedTender")
         .addObject("backLinkUrl", ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
-        .addObject("hasPlannedTender", YesNo.getHasPlannedTender())
+        .addObject("hasPlannedTender", YesNo.getRadioOptions())
         .addObject("form", form)
         .addObject("submitPostUrl",
             ReverseRouter.route(on(ScapHasPlannedTenderController.class)

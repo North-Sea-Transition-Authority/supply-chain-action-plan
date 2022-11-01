@@ -14,7 +14,7 @@ public enum YesNo implements Displayable {
     this.displayOrder = displayOrder;
   }
 
-  public static Map<String, String> getHasPlannedTender() {
+  public static Map<String, String> getRadioOptions() {
     return DisplayableEnumOptionUtil.getDisplayableOptions(YesNo.class);
   }
 
