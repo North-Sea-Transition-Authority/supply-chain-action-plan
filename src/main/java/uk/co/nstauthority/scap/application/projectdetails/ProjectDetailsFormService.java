@@ -1,19 +1,25 @@
 package uk.co.nstauthority.scap.application.projectdetails;
 
+import java.util.Map;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
+import uk.co.nstauthority.scap.energyportal.FieldService;
 
 @Service
 class ProjectDetailsFormService {
 
   private final ProjectDetailsFormValidator validator;
   private final ProjectDetailsService projectDetailsService;
+  private final FieldService fieldService;
 
   @Autowired
-  ProjectDetailsFormService(ProjectDetailsFormValidator validator, ProjectDetailsService projectDetailsService) {
+  ProjectDetailsFormService(ProjectDetailsFormValidator validator, ProjectDetailsService projectDetailsService,
+                            FieldService fieldService) {
     this.validator = validator;
     this.projectDetailsService = projectDetailsService;
+    this.fieldService = fieldService;
   }
 
   BindingResult validate(ProjectDetailsForm form, BindingResult bindingResult) {
@@ -38,5 +44,10 @@ class ProjectDetailsFormService {
     form.setEndMonth(String.valueOf(endDate.getMonthValue()));
     form.setEndYear(String.valueOf(endDate.getYear()));
     return form;
+  }
+
+  Optional<Map<String, String>> getPreselectedField(Integer fieldId) {
+    var fieldOptional = fieldService.getFieldById(fieldId, "Get preselected field for project details form");
+    return fieldOptional.map(field -> Map.of(String.valueOf(fieldId), field.getFieldName()));
   }
 }

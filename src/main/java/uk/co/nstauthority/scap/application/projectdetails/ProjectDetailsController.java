@@ -45,12 +45,11 @@ class ProjectDetailsController {
   ModelAndView renderProjectDetailsForm(@PathVariable("scapId") Integer scapId) {
     var scap = scapOverviewService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
-    var projectDetails = projectDetailsService.getProjectDetailsByScapDetail(scapDetail);
     var form = projectDetailsService.getProjectDetailsByScapDetail(scapDetail)
         .map(projectDetailsFormService::getForm)
         .orElse(new ProjectDetailsForm());
-    var preselectedField = projectDetails
-        .map(this::getPreselectedField)
+    var preselectedField = form.getFieldId().getAsInteger()
+        .flatMap(projectDetailsFormService::getPreselectedField)
         .orElse(null);
     return projectDetailsFormModelAndView(scapId, form, preselectedField);
   }
@@ -61,9 +60,8 @@ class ProjectDetailsController {
                                       BindingResult bindingResult) {
     var scap = scapOverviewService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
-    var projectDetails = projectDetailsService.getProjectDetailsByScapDetail(scapDetail);
-    var preselectedField = projectDetails
-        .map(this::getPreselectedField)
+    var preselectedField = form.getFieldId().getAsInteger()
+        .flatMap(projectDetailsFormService::getPreselectedField)
         .orElse(null);
     bindingResult = projectDetailsFormService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
@@ -87,9 +85,5 @@ class ProjectDetailsController {
         .addObject("projectTypesMap", ProjectType.getCheckboxItems())
         .addObject("form", form)
         .addObject("preselectedField", preselectedField);
-  }
-
-  private Map<String, String> getPreselectedField(ProjectDetails projectDetails) {
-    return Map.of(String.valueOf(projectDetails.getFieldId()), projectDetails.getFieldName());
   }
 }

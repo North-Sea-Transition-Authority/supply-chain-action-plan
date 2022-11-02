@@ -110,6 +110,7 @@ class ProjectDetailsControllerTest extends AbstractControllerTest {
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(projectDetailsService.getProjectDetailsByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
     when(projectDetailsFormService.getForm(projectDetails)).thenReturn(form);
+    when(projectDetailsFormService.getPreselectedField(field.getFieldId())).thenReturn(Optional.of(preselectedItem));
 
     mockMvc.perform(
         get(ReverseRouter.route(on(ProjectDetailsController.class)

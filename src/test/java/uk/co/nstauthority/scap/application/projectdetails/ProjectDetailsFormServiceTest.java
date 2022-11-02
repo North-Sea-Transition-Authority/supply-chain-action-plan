@@ -7,6 +7,8 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +16,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.fivium.energyportalapi.generated.types.Field;
+import uk.co.nstauthority.scap.energyportal.FieldService;
 
 @ExtendWith(MockitoExtension.class)
 class ProjectDetailsFormServiceTest {
@@ -23,6 +27,9 @@ class ProjectDetailsFormServiceTest {
 
   @Mock
   ProjectDetailsService projectDetailsService;
+
+  @Mock
+  FieldService fieldService;
 
   @InjectMocks
   ProjectDetailsFormService projectDetailsFormService;
@@ -85,5 +92,27 @@ class ProjectDetailsFormServiceTest {
         String.valueOf(endDate.getYear())
     );
 
+  }
+
+  @Test
+  void getPreselectedField_existingField() {
+    var field = new Field(22, "Test field", null, null, null, null);
+    var requestPurpose = "Get preselected field for project details form";
+    when(fieldService.getFieldById(field.getFieldId(), requestPurpose)).thenReturn(Optional.of(field));
+
+    var preselectedField = projectDetailsFormService.getPreselectedField(field.getFieldId());
+
+    assertThat(preselectedField).contains(Map.of(String.valueOf(field.getFieldId()), field.getFieldName()));
+  }
+
+  @Test
+  void getPreselectedField_nonExistentField_assertEmpty() {
+    var fieldId = 22;
+    var requestPurpose = "Get preselected field for project details form";
+    when(fieldService.getFieldById(fieldId, requestPurpose)).thenReturn(Optional.empty());
+
+    var preselectedField = projectDetailsFormService.getPreselectedField(fieldId);
+
+    assertThat(preselectedField).isEmpty();
   }
 }
