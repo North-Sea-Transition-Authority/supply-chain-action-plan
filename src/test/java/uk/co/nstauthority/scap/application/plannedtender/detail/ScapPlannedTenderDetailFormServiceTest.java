@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.nstauthority.scap.application.RemunerationModel;
 
 @ExtendWith(MockitoExtension.class)
 class ScapPlannedTenderDetailFormServiceTest {

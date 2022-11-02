@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.application.plannedtender.detail;
+package uk.co.nstauthority.scap.application;
 
 import java.util.Map;
 import uk.co.nstauthority.scap.enumutil.Displayable;

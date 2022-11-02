@@ -21,6 +21,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.nstauthority.scap.application.RemunerationModel;
 import uk.co.nstauthority.scap.application.plannedtender.ScapPlannedTender;
 import uk.co.nstauthority.scap.error.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.utils.EntityTestingUtil;

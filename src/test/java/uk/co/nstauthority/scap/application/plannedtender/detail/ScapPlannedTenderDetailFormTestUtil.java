@@ -1,5 +1,7 @@
 package uk.co.nstauthority.scap.application.plannedtender.detail;
 
+import uk.co.nstauthority.scap.application.RemunerationModel;
+
 class ScapPlannedTenderDetailFormTestUtil {
 
   static ScapPlannedTenderDetailForm getValidPlannedTenderDetailForm() {

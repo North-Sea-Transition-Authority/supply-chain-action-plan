@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.nstauthority.scap.application.actualtender.ActualTenderService;
+import uk.co.nstauthority.scap.application.detail.ScapDetailService;
 import uk.co.nstauthority.scap.application.overview.ScapOverviewService;
 import uk.co.nstauthority.scap.application.tasklist.TaskListController;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
@@ -22,21 +24,30 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 public class HasActualTenderController {
 
   private final ScapOverviewService scapOverviewService;
+  private final ScapDetailService scapDetailService;
+  private final ActualTenderService actualTenderService;
   private final ControllerHelperService controllerHelperService;
   private final HasActualTenderFormService hasActualTenderFormService;
 
   @Autowired
-  HasActualTenderController(ScapOverviewService scapOverviewService, ControllerHelperService controllerHelperService,
+  HasActualTenderController(ScapOverviewService scapOverviewService, ScapDetailService scapDetailService,
+                            ActualTenderService actualTenderService, ControllerHelperService controllerHelperService,
                             HasActualTenderFormService hasActualTenderFormService) {
     this.scapOverviewService = scapOverviewService;
+    this.scapDetailService = scapDetailService;
+    this.actualTenderService = actualTenderService;
     this.controllerHelperService = controllerHelperService;
     this.hasActualTenderFormService = hasActualTenderFormService;
   }
 
   @GetMapping
   public ModelAndView renderHasActualTenderForm(@PathVariable("scapId") Integer scapId) {
-    scapOverviewService.getScapById(scapId);
-    var form = hasActualTenderFormService.getForm();
+    var scap = scapOverviewService.getScapById(scapId);
+    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var actualTender = actualTenderService.getByScapDetail(scapDetail);
+    var form = actualTender
+        .map(hasActualTenderFormService::getForm)
+        .orElse(new HasActualTenderForm());
 
     return hasActualTenderFormModelAndView(scapId, form);
   }
@@ -45,15 +56,22 @@ public class HasActualTenderController {
   ModelAndView saveHasActualTenderForm(@PathVariable("scapId") Integer scapId,
                                        @ModelAttribute("form") HasActualTenderForm form,
                                        BindingResult bindingResult) {
-    scapOverviewService.getScapById(scapId);
+    var scap = scapOverviewService.getScapById(scapId);
+    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var actualTender = actualTenderService.getByScapDetail(scapDetail);
     bindingResult = hasActualTenderFormService.validate(form, bindingResult);
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
         hasActualTenderFormModelAndView(scapId, form),
         form,
-        () -> ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId))
-    );
+        () -> {
+          actualTender.ifPresentOrElse(
+              existingActualTender -> actualTenderService.updateHasActualTenders(existingActualTender, form.getHasActualTender()),
+              () -> actualTenderService.createActualTender(scapDetail, form.getHasActualTender())
+          );
+          return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
+        });
   }
 
   private ModelAndView hasActualTenderFormModelAndView(Integer scapId, HasActualTenderForm form) {

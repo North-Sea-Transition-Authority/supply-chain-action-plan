@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.application.plannedtender.detail;
 
 import uk.co.fivium.formlibrary.input.DecimalInput;
 import uk.co.fivium.formlibrary.input.StringInput;
+import uk.co.nstauthority.scap.application.RemunerationModel;
 
 public class ScapPlannedTenderDetailForm {
 

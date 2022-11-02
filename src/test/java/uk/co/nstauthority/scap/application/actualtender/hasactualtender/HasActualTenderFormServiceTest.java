@@ -10,6 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.nstauthority.scap.application.actualtender.ActualTender;
+import uk.co.nstauthority.scap.enumutil.YesNo;
 
 @ExtendWith(MockitoExtension.class)
 class HasActualTenderFormServiceTest {
@@ -32,7 +34,25 @@ class HasActualTenderFormServiceTest {
   }
 
   @Test
-  void getForm_assertReturnsForm() {
-    assertThat(hasActualTenderFormService.getForm()).isInstanceOf(HasActualTenderForm.class);
+  void getForm_nullHasPlannedTenders_assertEmptyForm() {
+    var actualTender = new ActualTender();
+
+    assertThat(hasActualTenderFormService.getForm(actualTender).getHasActualTender()).isNull();
+  }
+
+  @Test
+  void getForm_yesHasPlannedTenders_assertFilledForm() {
+    var actualTender = new ActualTender();
+    actualTender.setHasActualTenders(true);
+
+    assertThat(hasActualTenderFormService.getForm(actualTender).getHasActualTender()).isEqualTo(YesNo.YES);
+  }
+
+  @Test
+  void getForm_noHasPlannedTenders_assertFilledForm() {
+    var actualTender = new ActualTender();
+    actualTender.setHasActualTenders(false);
+
+    assertThat(hasActualTenderFormService.getForm(actualTender).getHasActualTender()).isEqualTo(YesNo.NO);
   }
 }

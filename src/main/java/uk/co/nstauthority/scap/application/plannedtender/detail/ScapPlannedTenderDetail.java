@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import uk.co.nstauthority.scap.application.RemunerationModel;
 import uk.co.nstauthority.scap.application.plannedtender.ScapPlannedTender;
 
 @Entity
