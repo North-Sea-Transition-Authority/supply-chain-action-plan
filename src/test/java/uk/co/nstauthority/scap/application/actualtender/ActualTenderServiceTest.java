@@ -1,6 +1,7 @@
 package uk.co.nstauthority.scap.application.actualtender;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.application.detail.ScapDetail;
 import uk.co.nstauthority.scap.enumutil.YesNo;
+import uk.co.nstauthority.scap.error.ScapEntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class ActualTenderServiceTest {
@@ -42,6 +44,25 @@ class ActualTenderServiceTest {
     var returnedValue = actualTenderService.getByScapDetail(scapDetail);
 
     assertThat(returnedValue).contains(actualTender);
+  }
+
+  @Test
+  void getByScapDetailOrThrow_isPresent_assertReturns() {
+    var actualTender = new ActualTender(scapDetail, Instant.now());
+
+    when(actualTenderRepository.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
+
+    var returnedValue = actualTenderService.getByScapDetailOrThrow(scapDetail);
+
+    assertThat(returnedValue).isEqualTo(actualTender);
+  }
+
+  @Test
+  void getByScapDetailOrThrow_isNotPresent_assertThrows() {
+    when(actualTenderRepository.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> actualTenderService.getByScapDetailOrThrow(scapDetail))
+        .isInstanceOf(ScapEntityNotFoundException.class);
   }
 
   @Test

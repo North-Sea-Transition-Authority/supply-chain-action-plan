@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.application.detail.ScapDetail;
 import uk.co.nstauthority.scap.enumutil.YesNo;
+import uk.co.nstauthority.scap.error.ScapEntityNotFoundException;
 
 @Service
 public class ActualTenderService {
@@ -20,6 +21,12 @@ public class ActualTenderService {
 
   public Optional<ActualTender> getByScapDetail(ScapDetail scapDetail) {
     return actualTenderRepository.findByScapDetail(scapDetail);
+  }
+
+  public ActualTender getByScapDetailOrThrow(ScapDetail scapDetail) {
+    return getByScapDetail(scapDetail)
+        .orElseThrow(() -> new ScapEntityNotFoundException(
+            String.format("Could not find actual tender for ScapDetail with ID [%d]", scapDetail.getId())));
   }
 
   @Transactional

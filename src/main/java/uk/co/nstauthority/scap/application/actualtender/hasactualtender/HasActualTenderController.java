@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.application.actualtender.ActualTenderService;
+import uk.co.nstauthority.scap.application.actualtender.detail.ActualTenderDetailController;
 import uk.co.nstauthority.scap.application.detail.ScapDetailService;
 import uk.co.nstauthority.scap.application.overview.ScapOverviewService;
 import uk.co.nstauthority.scap.application.tasklist.TaskListController;
@@ -70,6 +71,10 @@ public class HasActualTenderController {
               existingActualTender -> actualTenderService.updateHasActualTenders(existingActualTender, form.getHasActualTender()),
               () -> actualTenderService.createActualTender(scapDetail, form.getHasActualTender())
           );
+          if (YesNo.YES.equals(form.getHasActualTender())) {
+            return ReverseRouter.redirect(on(ActualTenderDetailController.class)
+                .renderActualTenderDetailForm(scapId, null));
+          }
           return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
         });
   }
