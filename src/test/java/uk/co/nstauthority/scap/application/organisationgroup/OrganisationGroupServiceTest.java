@@ -18,9 +18,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.fivium.energyportalapi.client.LogCorrelationId;
+import uk.co.fivium.energyportalapi.client.RequestPurpose;
 import uk.co.fivium.energyportalapi.client.organisation.OrganisationApi;
-import uk.co.fivium.energyportalapi.generated.client.OrganisationGroupByIdProjectionRoot;
-import uk.co.fivium.energyportalapi.generated.client.OrganisationGroupsByNameProjectionRoot;
+import uk.co.fivium.energyportalapi.generated.client.OrganisationGroupProjectionRoot;
+import uk.co.fivium.energyportalapi.generated.client.OrganisationGroupsProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
 
@@ -45,21 +47,25 @@ public class OrganisationGroupServiceTest {
 
   @Test
   void getOrganisationGroupsByName() {
-    when(organisationApi.searchOrganisationGroupsByName(
-        eq("company"),
-        any(),
-        eq("Test (getting companies who include 'company')")))
-        .thenReturn(groupList);
+    var searchTerm = "company";
+
+    when(organisationApi.searchOrganisationGroups(
+        eq(searchTerm),
+        any(OrganisationGroupsProjectionRoot.class),
+        any(RequestPurpose.class),
+        any(LogCorrelationId.class)
+    )).thenReturn(groupList);
 
     var organisationGroups =
-        organisationGroupService.getOrganisationGroupsByName("company", "Test (getting companies who include 'company')");
+        organisationGroupService.getOrganisationGroupsByName(searchTerm, "Test (getting companies who include 'company')");
 
-    var argumentCaptor = ArgumentCaptor.forClass(OrganisationGroupsByNameProjectionRoot.class);
+    var argumentCaptor = ArgumentCaptor.forClass(OrganisationGroupsProjectionRoot.class);
 
-    verify(organisationApi, times(1)).searchOrganisationGroupsByName(
-        eq("company"),
+    verify(organisationApi, times(1)).searchOrganisationGroups(
+        eq(searchTerm),
         argumentCaptor.capture(),
-        eq("Test (getting companies who include 'company')")
+        any(RequestPurpose.class),
+        any(LogCorrelationId.class)
     );
 
     assertThat(organisationGroups).isEqualTo(groupList);
@@ -96,7 +102,7 @@ public class OrganisationGroupServiceTest {
   void getOrganisationGroupById_verifyCallsApiWithCorrectParameters() {
     var purpose = "TEST: get organisation group by ID";
     var argumentCaptor = ArgumentCaptor
-        .forClass(OrganisationGroupByIdProjectionRoot.class);
+        .forClass(OrganisationGroupProjectionRoot.class);
     var organisationGroup = new OrganisationGroup(
         1,
         "Royal Dutch Shell",
@@ -105,15 +111,20 @@ public class OrganisationGroupServiceTest {
         "ACTIVE",
         Collections.emptyList());
 
-    when(organisationApi.searchOrganisationGroupById(eq(1), any(), eq(purpose)))
+    when(organisationApi.findOrganisationGroup(
+        eq(1),
+        any(OrganisationGroupProjectionRoot.class),
+        any(RequestPurpose.class),
+        any(LogCorrelationId.class)))
         .thenReturn(Optional.of(organisationGroup));
 
     var returnedOrganisation = organisationGroupService.getOrganisationGroupById(1, purpose);
 
-    verify(organisationApi, times(1)).searchOrganisationGroupById(
+    verify(organisationApi).findOrganisationGroup(
         eq(1),
         argumentCaptor.capture(),
-        eq(purpose));
+        any(RequestPurpose.class),
+        any(LogCorrelationId.class));
 
     assertThat(returnedOrganisation.get()).isEqualTo(organisationGroup);
     assertThat(argumentCaptor.getValue().getFields())
