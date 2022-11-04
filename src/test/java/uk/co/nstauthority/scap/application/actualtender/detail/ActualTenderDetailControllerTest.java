@@ -2,6 +2,8 @@ package uk.co.nstauthority.scap.application.actualtender.detail;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -53,6 +55,9 @@ class ActualTenderDetailControllerTest extends AbstractControllerTest {
   @MockBean
   ActualTenderDetailFormService actualTenderDetailFormService;
 
+  @MockBean
+  ActualTenderDetailService actualTenderDetailService;
+
   private ScapOverview scap;
   private ScapDetail scapDetail;
   private ActualTender actualTender;
@@ -101,7 +106,7 @@ class ActualTenderDetailControllerTest extends AbstractControllerTest {
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
 
-    //TODO SCAP2022-42: When adding data-related stuff, verify that this saves the correct thing
+    verify(actualTenderDetailService).createActualTenderDetail(actualTender, form);
   }
 
   @Test
@@ -129,6 +134,6 @@ class ActualTenderDetailControllerTest extends AbstractControllerTest {
         .andExpect(model().attribute("contractStages", ContractStage.getContractStages()))
         .andExpect(model().attributeExists("errorList"));
 
-    //TODO SCAP2022-42: When adding data-related stuff, verify that this does *not* save anything
+    verify(actualTenderDetailService, never()).createActualTenderDetail(any(), any());
   }
 }

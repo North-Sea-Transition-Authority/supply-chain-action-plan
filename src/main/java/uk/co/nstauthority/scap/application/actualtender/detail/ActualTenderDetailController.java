@@ -28,16 +28,19 @@ public class ActualTenderDetailController {
   private final ActualTenderService actualTenderService;
   private final ControllerHelperService controllerHelperService;
   private final ActualTenderDetailFormService actualTenderDetailFormService;
+  private final ActualTenderDetailService actualTenderDetailService;
 
   public ActualTenderDetailController(ScapOverviewService scapOverviewService, ScapDetailService scapDetailService,
                                       ActualTenderService actualTenderService,
                                       ControllerHelperService controllerHelperService,
-                                      ActualTenderDetailFormService actualTenderDetailFormService) {
+                                      ActualTenderDetailFormService actualTenderDetailFormService,
+                                      ActualTenderDetailService actualTenderDetailService) {
     this.scapOverviewService = scapOverviewService;
     this.scapDetailService = scapDetailService;
     this.actualTenderService = actualTenderService;
     this.controllerHelperService = controllerHelperService;
     this.actualTenderDetailFormService = actualTenderDetailFormService;
+    this.actualTenderDetailService = actualTenderDetailService;
   }
 
   @GetMapping
@@ -56,7 +59,7 @@ public class ActualTenderDetailController {
                                                  BindingResult bindingResult) {
     var scap = scapOverviewService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
-    actualTenderService.getByScapDetailOrThrow(scapDetail);
+    var actualTender = actualTenderService.getByScapDetailOrThrow(scapDetail);
 
     bindingResult = actualTenderDetailFormService.validate(form, bindingResult);
 
@@ -65,7 +68,10 @@ public class ActualTenderDetailController {
         actualTenderDetailFormModelAndView(scapId),
         form,
         // TODO SCAP2022-43: Update this to redirect to actual tendering activity summary
-        () -> ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId))
+        () -> {
+          actualTenderDetailService.createActualTenderDetail(actualTender, form);
+          return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
+        }
     );
   }
 

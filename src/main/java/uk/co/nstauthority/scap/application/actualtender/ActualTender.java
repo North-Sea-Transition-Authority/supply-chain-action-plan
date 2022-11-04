@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.application.actualtender;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,6 +30,11 @@ public class ActualTender {
   private Instant createdTimestamp;
 
   public ActualTender() {
+  }
+
+  @VisibleForTesting
+  public ActualTender(Integer id) {
+    this.id = id;
   }
 
   public ActualTender(ScapDetail scapDetail, Instant createdTimestamp) {
