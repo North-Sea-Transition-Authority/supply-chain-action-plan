@@ -104,7 +104,7 @@ class ProjectDetailsServiceTest {
 
     projectDetailsService.saveProjectDetails(scapDetail, form);
 
-    verify(projectDetailsRepository, times(1)).save(projectDetailsArgumentCaptor.capture());
+    verify(projectDetailsRepository).save(projectDetailsArgumentCaptor.capture());
     verify(projectDetailTypeRepository, times(2)).save(projectDetailTypesArgumentCaptor.capture());
 
     var savedProjectDetails = projectDetailsArgumentCaptor.getValue();
@@ -177,9 +177,9 @@ class ProjectDetailsServiceTest {
 
     projectDetailsService.saveProjectDetails(scapDetail, form);
 
-    verify(projectDetailsRepository, times(1)).save(projectDetailsArgumentCaptor.capture());
-    verify(projectDetailTypeRepository, times(1)).save(projectDetailTypesArgumentCaptor.capture());
-    verify(projectDetailTypeRepository, times(1)).delete(existingProjectDetailType2);
+    verify(projectDetailsRepository).save(projectDetailsArgumentCaptor.capture());
+    verify(projectDetailTypeRepository).save(projectDetailTypesArgumentCaptor.capture());
+    verify(projectDetailTypeRepository).delete(existingProjectDetailType2);
     verify(projectDetailTypeRepository, never()).delete(existingProjectDetailType1);
 
     var savedProjectDetails = projectDetailsArgumentCaptor.getValue();

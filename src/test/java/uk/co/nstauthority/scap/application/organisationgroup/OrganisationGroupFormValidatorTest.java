@@ -48,7 +48,7 @@ class OrganisationGroupFormValidatorTest {
     var requestPurpose = "Check organisation group exists when saving scap overview";
     var organisationGroup = new OrganisationGroup(1, null, null, null, null, null);
 
-    when(organisationGroupService.getOrganisationGroupById(1, requestPurpose))
+    when(organisationGroupService.getOrganisationGroupById(organisationGroup.getOrganisationGroupId(), requestPurpose))
         .thenReturn(Optional.of(organisationGroup));
     organisationGroupFormValidator.validate(form, bindingResult);
 

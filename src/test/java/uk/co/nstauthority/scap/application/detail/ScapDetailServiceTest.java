@@ -3,7 +3,6 @@ package uk.co.nstauthority.scap.application.detail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -48,7 +47,7 @@ class ScapDetailServiceTest {
 
     var argumentCaptor = ArgumentCaptor.forClass(ScapDetail.class);
 
-    verify(scapDetailRepository, times(1)).save(argumentCaptor.capture());
+    verify(scapDetailRepository).save(argumentCaptor.capture());
 
     var scapDetail = argumentCaptor.getValue();
 

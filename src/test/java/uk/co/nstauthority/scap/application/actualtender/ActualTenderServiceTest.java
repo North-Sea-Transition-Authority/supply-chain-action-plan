@@ -2,7 +2,6 @@ package uk.co.nstauthority.scap.application.actualtender;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -76,7 +75,7 @@ class ActualTenderServiceTest {
 
     actualTenderService.createActualTender(scapDetail, YesNo.YES);
 
-    verify(actualTenderRepository, times(1)).save(argumentCaptor.capture());
+    verify(actualTenderRepository).save(argumentCaptor.capture());
     assertThat(argumentCaptor.getValue()).extracting(ActualTender::getHasActualTenders, ActualTender::getScapDetail)
         .containsExactly(true, scapDetail);
   }
@@ -89,7 +88,7 @@ class ActualTenderServiceTest {
 
     actualTenderService.updateHasActualTenders(existingActualTender, YesNo.NO);
 
-    verify(actualTenderRepository, times(1)).save(argumentCaptor.capture());
+    verify(actualTenderRepository).save(argumentCaptor.capture());
     assertThat(argumentCaptor.getValue()).extracting(
         ActualTender::getHasActualTenders,
         ActualTender::getScapDetail,

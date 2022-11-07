@@ -2,7 +2,6 @@ package uk.co.nstauthority.scap.application.plannedtender;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,7 +46,7 @@ class ScapPlannedTenderServiceTest {
 
     scapPlannedTenderService.createPlannedTenderForScapDetail(scapDetail);
 
-    verify(scapPlannedTenderRepository, times(1))
+    verify(scapPlannedTenderRepository)
         .save(argumentCaptor.capture());
 
     var scapPlannedTender = argumentCaptor.getValue();
@@ -70,7 +69,7 @@ class ScapPlannedTenderServiceTest {
         true
     );
 
-    verify(scapPlannedTenderRepository, times(1)).save(argumentCaptor.capture());
+    verify(scapPlannedTenderRepository).save(argumentCaptor.capture());
 
     var savedPlannedTender = argumentCaptor.getValue();
     assertThat(savedPlannedTender.getHasPlannedTenders()).isEqualTo(true);
@@ -105,7 +104,7 @@ class ScapPlannedTenderServiceTest {
 
     scapPlannedTenderService.updatePlannedTenderHasMorePlannedTenders(plannedTender, hasMorePlannedTenderActivities);
 
-    verify(scapPlannedTenderRepository, times(1)).save(argumentCaptor.capture());
+    verify(scapPlannedTenderRepository).save(argumentCaptor.capture());
 
     assertThat(argumentCaptor.getValue().getHasMorePlannedTenderActivities()).isEqualTo(hasMorePlannedTenderActivities);
   }

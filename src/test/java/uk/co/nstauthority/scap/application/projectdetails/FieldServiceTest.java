@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -60,7 +59,7 @@ class FieldServiceTest {
 
     var queryResults = fieldService.getFieldsByName(searchTerm, purpose);
 
-    verify(fieldApi, times(1))
+    verify(fieldApi)
         .searchFields(eq(searchTerm), eq(statuses), argumentCaptor.capture(), eq(purpose));
 
     var requestedParams = argumentCaptor.getValue().getFields();
@@ -84,7 +83,7 @@ class FieldServiceTest {
 
     var returnedField = fieldService.getFieldById(requestedFieldId, requestPurpose);
 
-    verify(fieldApi, times(1))
+    verify(fieldApi)
         .findFieldById(eq(requestedFieldId), argumentCaptor.capture(), eq(requestPurpose));
     var requestedParams = argumentCaptor.getValue().getFields();
     assertThat(requestedParams).containsExactly(

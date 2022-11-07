@@ -1,7 +1,6 @@
 package uk.co.nstauthority.scap.application.plannedtender.hasplannedtender;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -50,7 +49,7 @@ class ScapHasPlannedTenderFormServiceTest {
 
     scapHasPlannedTenderFormService.validate(form, bindingResult);
 
-    verify(scapHasPlannedTenderFormValidator, times(1)).validate(form, bindingResult);
+    verify(scapHasPlannedTenderFormValidator).validate(form, bindingResult);
   }
 
   @Test

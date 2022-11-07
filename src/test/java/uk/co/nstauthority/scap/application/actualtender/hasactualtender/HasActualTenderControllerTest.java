@@ -3,7 +3,6 @@ package uk.co.nstauthority.scap.application.actualtender.hasactualtender;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -129,7 +128,7 @@ class HasActualTenderControllerTest extends AbstractControllerTest {
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
 
-    verify(actualTenderService, times(1)).createActualTender(scapDetail, form.getHasActualTender());
+    verify(actualTenderService).createActualTender(scapDetail, form.getHasActualTender());
   }
 
   @Test
@@ -153,7 +152,7 @@ class HasActualTenderControllerTest extends AbstractControllerTest {
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
 
-    verify(actualTenderService, times(1)).updateHasActualTenders(existingActualTender, form.getHasActualTender());
+    verify(actualTenderService).updateHasActualTenders(existingActualTender, form.getHasActualTender());
   }
 
   @Test

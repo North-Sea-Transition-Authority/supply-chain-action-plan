@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -62,8 +61,8 @@ class ActualTenderDetailServiceTest {
 
     actualTenderDetailService.createActualTenderDetail(actualTender, form);
 
-    verify(actualTenderDetailRepository, times(1)).save(actualTenderDetailArgumentCaptor.capture());
-    verify(invitationToTenderParticipantRepository, times(1)).saveAll(invitationToTenderParticipantCaptor.capture());
+    verify(actualTenderDetailRepository).save(actualTenderDetailArgumentCaptor.capture());
+    verify(invitationToTenderParticipantRepository).saveAll(invitationToTenderParticipantCaptor.capture());
     verify(invitationToTenderParticipantRepository, never()).deleteAll(any());
 
     assertThat(actualTenderDetailArgumentCaptor.getValue()).extracting(

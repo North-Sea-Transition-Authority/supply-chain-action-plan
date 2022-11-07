@@ -1,7 +1,6 @@
 package uk.co.nstauthority.scap.application.actualtender.detail;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
@@ -27,7 +26,7 @@ class ActualTenderDetailFormServiceTest {
 
     var returnedBindingResult = actualTenderDetailFormService.validate(form, bindingResult);
 
-    verify(actualTenderDetailFormValidator, times(1)).validate(form, bindingResult);
+    verify(actualTenderDetailFormValidator).validate(form, bindingResult);
     assertThat(returnedBindingResult).isEqualTo(bindingResult);
   }
 }

@@ -2,7 +2,6 @@ package uk.co.nstauthority.scap.application.plannedtender.delete;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -141,6 +140,6 @@ class DeletePlannedTenderDetailControllerTest extends AbstractControllerTest {
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
 
-    verify(scapPlannedTenderDetailService, times(1)).deletePlannedTenderDetail(scapPlannedTenderDetail);
+    verify(scapPlannedTenderDetailService).deletePlannedTenderDetail(scapPlannedTenderDetail);
   }
 }

@@ -2,7 +2,6 @@ package uk.co.nstauthority.scap.application.overview;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,7 +35,7 @@ public class ScapOverviewServiceTest {
 
     var scap = scapOverviewService.createScapOverview(1);
 
-    verify(scapOverviewRepository, times(1)).save(argumentCaptor.capture());
+    verify(scapOverviewRepository).save(argumentCaptor.capture());
 
     assertThat(argumentCaptor.getValue()).isEqualTo(scap);
     assertThat(scap.getOrganisationGroupId()).isEqualTo(1);
@@ -46,9 +45,9 @@ public class ScapOverviewServiceTest {
   void getScapById_exists() {
     var scapOverview = new ScapOverview(22);
 
-    when(scapOverviewRepository.findById(22)).thenReturn(Optional.of(scapOverview));
+    when(scapOverviewRepository.findById(scapOverview.getId())).thenReturn(Optional.of(scapOverview));
 
-    var returnedOverview = scapOverviewService.getScapById(22);
+    var returnedOverview = scapOverviewService.getScapById(scapOverview.getId());
 
     assertThat(returnedOverview).isEqualTo(scapOverview);
   }
@@ -63,11 +62,12 @@ public class ScapOverviewServiceTest {
   void updateScapOverviewOrganisationGroup() {
     var scapOverview = new ScapOverview(22);
     var argumentCaptor = ArgumentCaptor.forClass(ScapOverview.class);
+    var organisationGroupId = 119;
 
-    scapOverviewService.updateScapOverviewOrganisationGroup(scapOverview, 119);
+    scapOverviewService.updateScapOverviewOrganisationGroup(scapOverview, organisationGroupId);
 
-    verify(scapOverviewRepository, times(1)).save(argumentCaptor.capture());
+    verify(scapOverviewRepository).save(argumentCaptor.capture());
 
-    assertThat(argumentCaptor.getValue().getOrganisationGroupId()).isEqualTo(119);
+    assertThat(argumentCaptor.getValue().getOrganisationGroupId()).isEqualTo(organisationGroupId);
   }
 }

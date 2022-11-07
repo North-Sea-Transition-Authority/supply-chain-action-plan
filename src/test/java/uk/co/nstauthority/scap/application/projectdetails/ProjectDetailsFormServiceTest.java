@@ -1,7 +1,6 @@
 package uk.co.nstauthority.scap.application.projectdetails;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +39,7 @@ class ProjectDetailsFormServiceTest {
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     var returnedBindingResult = projectDetailsFormService.validate(form, bindingResult);
 
-    verify(projectDetailsFormValidator, times(1)).validate(form, bindingResult);
+    verify(projectDetailsFormValidator).validate(form, bindingResult);
     assertThat(returnedBindingResult).isEqualTo(bindingResult);
   }
 

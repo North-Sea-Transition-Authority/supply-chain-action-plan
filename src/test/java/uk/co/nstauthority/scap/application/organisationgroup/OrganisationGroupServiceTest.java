@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -61,7 +60,7 @@ class OrganisationGroupServiceTest {
 
     var argumentCaptor = ArgumentCaptor.forClass(OrganisationGroupsProjectionRoot.class);
 
-    verify(organisationApi, times(1)).searchOrganisationGroups(
+    verify(organisationApi).searchOrganisationGroups(
         eq(searchTerm),
         argumentCaptor.capture(),
         any(RequestPurpose.class),
@@ -74,14 +73,14 @@ class OrganisationGroupServiceTest {
 
   @Test
   void organisationGroupsToSearchResults() {
-    var queryResults = List.of(
-        new OrganisationGroup(
-            1,
-            "Royal Dutch Shell",
-            "Shell",
-            "shell.com",
-            "ACTIVE",
-            Collections.emptyList()));
+    var organisationGroup = new OrganisationGroup(
+        1,
+        "Royal Dutch Shell",
+        "Shell",
+        "shell.com",
+        "ACTIVE",
+        Collections.emptyList());
+    var queryResults = List.of(organisationGroup);
 
     var searchResults = organisationGroupService
         .organisationGroupsToSearchResult(queryResults);
@@ -93,8 +92,8 @@ class OrganisationGroupServiceTest {
             RestSearchItem::id,
             RestSearchItem::text
         ).containsExactly(
-            "1",
-            "Royal Dutch Shell"
+            String.valueOf(organisationGroup.getOrganisationGroupId()),
+            organisationGroup.getName()
         );
   }
 
@@ -112,7 +111,7 @@ class OrganisationGroupServiceTest {
         Collections.emptyList());
 
     when(organisationApi.findOrganisationGroup(
-        eq(1),
+        eq(organisationGroup.getOrganisationGroupId()),
         any(OrganisationGroupProjectionRoot.class),
         any(RequestPurpose.class),
         any(LogCorrelationId.class)))
@@ -121,7 +120,7 @@ class OrganisationGroupServiceTest {
     var returnedOrganisation = organisationGroupService.getOrganisationGroupById(1, purpose);
 
     verify(organisationApi).findOrganisationGroup(
-        eq(1),
+        eq(organisationGroup.getOrganisationGroupId()),
         argumentCaptor.capture(),
         any(RequestPurpose.class),
         any(LogCorrelationId.class));

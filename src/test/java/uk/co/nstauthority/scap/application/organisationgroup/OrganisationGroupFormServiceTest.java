@@ -1,6 +1,5 @@
 package uk.co.nstauthority.scap.application.organisationgroup;
 
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
@@ -27,7 +26,7 @@ class OrganisationGroupFormServiceTest {
 
     organisationGroupFormService.validate(form, bindingResult);
 
-    verify(organisationGroupFormValidator, times(1)).validate(form, bindingResult);
+    verify(organisationGroupFormValidator).validate(form, bindingResult);
   }
 
 }

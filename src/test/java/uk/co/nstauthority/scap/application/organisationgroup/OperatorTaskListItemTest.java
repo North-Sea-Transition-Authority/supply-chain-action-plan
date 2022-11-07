@@ -3,7 +3,6 @@ package uk.co.nstauthority.scap.application.organisationgroup;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -33,16 +32,17 @@ public class OperatorTaskListItemTest {
   public void isValid_verifyCallsValidator() {
     var scap = new ScapOverview(894327);
     var form = new OrganisationGroupForm();
+    var scapId = 119;
 
-    when(scapOverviewService.getScapById(119)).thenReturn(scap);
+    when(scapOverviewService.getScapById(scapId)).thenReturn(scap);
     when(organisationGroupFormService.getForm(scap)).thenReturn(form);
     when(organisationGroupFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(new BeanPropertyBindingResult(form, "form"));
 
-    var isValid = operatorTaskListItem.isValid(119);
+    var isValid = operatorTaskListItem.isValid(scapId);
 
     assertTrue(isValid);
-    assertTrue(operatorTaskListItem.isVisible(0));
-    verify(organisationGroupFormService, times(1)).validate(eq(form), any(BindingResult.class));
+    assertTrue(operatorTaskListItem.isVisible(scapId));
+    verify(organisationGroupFormService).validate(eq(form), any(BindingResult.class));
   }
 }

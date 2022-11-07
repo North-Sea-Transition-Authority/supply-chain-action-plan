@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -60,7 +59,7 @@ class ScapPlannedTenderDetailServiceTest {
 
     scapPlannedTenderDetailService.createPlannedTenderDetail(scapPlannedTender, form);
 
-    verify(scapPlannedTenderDetailRepository, times(1)).save(argumentCaptor.capture());
+    verify(scapPlannedTenderDetailRepository).save(argumentCaptor.capture());
 
     var savedDetail = argumentCaptor.getValue();
 
@@ -135,7 +134,7 @@ class ScapPlannedTenderDetailServiceTest {
 
     scapPlannedTenderDetailService.deletePlannedTenderDetail(detail);
 
-    verify(scapPlannedTenderDetailRepository, times(1)).delete(detail);
+    verify(scapPlannedTenderDetailRepository).delete(detail);
   }
 
   @Test
@@ -151,7 +150,7 @@ class ScapPlannedTenderDetailServiceTest {
 
     scapPlannedTenderDetailService.updatePlannedTenderDetail(detail, form);
 
-    verify(scapPlannedTenderDetailRepository, times(1)).save(argumentCaptor.capture());
+    verify(scapPlannedTenderDetailRepository).save(argumentCaptor.capture());
 
     assertThat(argumentCaptor.getValue()).extracting(
         ScapPlannedTenderDetail::getAwardRationale,

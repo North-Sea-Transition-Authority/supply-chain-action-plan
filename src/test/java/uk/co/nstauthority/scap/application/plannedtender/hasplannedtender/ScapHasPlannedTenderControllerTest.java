@@ -3,7 +3,6 @@ package uk.co.nstauthority.scap.application.plannedtender.hasplannedtender;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -121,8 +120,8 @@ class ScapHasPlannedTenderControllerTest extends AbstractControllerTest {
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
 
-    verify(scapPlannedTenderService, times(1)).createPlannedTenderForScapDetail(scapDetail);
-    verify(scapPlannedTenderService, times(1))
+    verify(scapPlannedTenderService).createPlannedTenderForScapDetail(scapDetail);
+    verify(scapPlannedTenderService)
         .updatePlannedTenderHasPlannedTenders(createdPlannedTender, true);
   }
 
@@ -149,8 +148,8 @@ class ScapHasPlannedTenderControllerTest extends AbstractControllerTest {
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
 
-    verify(scapPlannedTenderService, times(1)).createPlannedTenderForScapDetail(scapDetail);
-    verify(scapPlannedTenderService, times(1))
+    verify(scapPlannedTenderService).createPlannedTenderForScapDetail(scapDetail);
+    verify(scapPlannedTenderService)
         .updatePlannedTenderHasPlannedTenders(createdPlannedTender, false);
   }
 

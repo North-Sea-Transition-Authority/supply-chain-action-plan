@@ -1,7 +1,6 @@
 package uk.co.nstauthority.scap.application.plannedtender.detail;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
@@ -36,7 +35,7 @@ class ScapPlannedTenderDetailFormServiceTest {
     var returnedBindingResult = scapPlannedTenderDetailFormService.validate(bindingResult, form);
 
     assertThat(returnedBindingResult).isEqualTo(bindingResult);
-    verify(validator, times(1)).validate(form, bindingResult);
+    verify(validator).validate(form, bindingResult);
   }
 
   @Test
