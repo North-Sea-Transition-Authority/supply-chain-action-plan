@@ -34,7 +34,7 @@ public class ScapHasPlannedTenderFormService {
 
   private ScapHasPlannedTenderForm scapPlannedTenderToForm(ScapPlannedTender scapPlannedTender) {
     var form = new ScapHasPlannedTenderForm();
-    if (scapPlannedTender.getHasPlannedTenders()) {
+    if (Boolean.TRUE.equals(scapPlannedTender.getHasPlannedTenders())) {
       form.setHasPlannedTender(YesNo.YES);
     } else {
       form.setHasPlannedTender(YesNo.NO);

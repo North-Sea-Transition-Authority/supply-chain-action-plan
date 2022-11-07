@@ -40,7 +40,7 @@ public class ScapPlannedTenderDetailService {
     return scapPlannedTenderDetailRepository.findAllByPlannedTender(scapPlannedTender);
   }
 
-  public Boolean hasExistingTenderDetails(ScapPlannedTender scapPlannedTender) {
+  public boolean hasExistingTenderDetails(ScapPlannedTender scapPlannedTender) {
     return !getTenderDetailsByPlannedTender(scapPlannedTender).isEmpty();
   }
 

@@ -67,7 +67,7 @@ class ScapDetailServiceTest {
 
     var scapDetail = scapDetailService.getLatestScapDetailByScap(scap);
 
-    assertThat(scapDetail.get()).isEqualTo(scapDetailList.get(1));
+    assertThat(scapDetail).contains(scapDetailList.get(1));
   }
 
   @Test

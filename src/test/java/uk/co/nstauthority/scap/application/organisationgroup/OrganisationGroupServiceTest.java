@@ -85,7 +85,7 @@ class OrganisationGroupServiceTest {
     var searchResults = organisationGroupService
         .organisationGroupsToSearchResult(queryResults);
 
-    assertThat(searchResults.getResults().size()).isEqualTo(1);
+    assertThat(searchResults.getResults()).hasSize(1);
 
     assertThat(searchResults.getResults().get(0))
         .extracting(
@@ -125,7 +125,7 @@ class OrganisationGroupServiceTest {
         any(RequestPurpose.class),
         any(LogCorrelationId.class));
 
-    assertThat(returnedOrganisation.get()).isEqualTo(organisationGroup);
+    assertThat(returnedOrganisation).contains(organisationGroup);
     assertThat(argumentCaptor.getValue().getFields())
         .containsOnly(
             entry("organisationGroupId", null),

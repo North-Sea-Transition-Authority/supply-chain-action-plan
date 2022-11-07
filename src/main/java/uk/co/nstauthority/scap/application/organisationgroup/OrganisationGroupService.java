@@ -3,7 +3,6 @@ package uk.co.nstauthority.scap.application.organisationgroup;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.fivium.energyportalapi.client.LogCorrelationId;
@@ -38,7 +37,7 @@ public class OrganisationGroupService {
         .map(organisationGroup -> new RestSearchItem(
             organisationGroup.getOrganisationGroupId().toString(),
             organisationGroup.getName()))
-        .collect(Collectors.toList()));
+        .toList());
   }
 
   public Optional<OrganisationGroup> getOrganisationGroupById(Integer id, String purpose) {
