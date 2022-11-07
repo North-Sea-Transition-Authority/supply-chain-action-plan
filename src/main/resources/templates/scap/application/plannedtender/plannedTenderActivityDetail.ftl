@@ -18,14 +18,15 @@
       prefix="£"
       suffix="million"
       suffixScreenReaderPrompt="in millions"
-      inputClass="govuk-!-width-one-third"/>
+      inputClass="govuk-input--width-7"
+    />
 
       <@fdsRadio.radioGroup path="form.remunerationModel" labelText="Remuneration model" hiddenContent=true>
         <#assign firstItem=true/>
         <#list remunerationModels as key, value>
           <@fdsRadio.radioItem path="form.remunerationModel" itemMap={key : value} isFirstItem=firstItem>
             <#if key == "OTHER">
-              <@fdsTextInput.textInput
+              <@fdsTextarea.textarea
                 path="form.remunerationModelName.inputValue"
                 labelText="Provide the remuneration model"
                 nestingPath="form.remunerationModel"
