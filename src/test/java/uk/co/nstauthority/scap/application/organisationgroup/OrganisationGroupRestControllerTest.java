@@ -23,13 +23,13 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(controllers = OrganisationGroupRestController.class)
 @WithMockUser
-public class OrganisationGroupRestControllerTest extends AbstractControllerTest {
+class OrganisationGroupRestControllerTest extends AbstractControllerTest {
 
   @MockBean
   private OrganisationGroupService organisationGroupService;
 
   @Test
-  public void getOrganisationGroupSearchResults() throws Exception {
+  void getOrganisationGroupSearchResults() throws Exception {
     var groupList = List.of(
         new OrganisationGroup(1, "Royal Dutch Shell", null, null, null, Collections.emptyList()),
         new OrganisationGroup(2, "Shell", null, null, null, Collections.emptyList())

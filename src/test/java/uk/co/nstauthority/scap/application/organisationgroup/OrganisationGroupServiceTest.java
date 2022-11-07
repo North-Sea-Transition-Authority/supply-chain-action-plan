@@ -27,7 +27,7 @@ import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
 
 @ExtendWith(MockitoExtension.class)
-public class OrganisationGroupServiceTest {
+class OrganisationGroupServiceTest {
 
   @Mock
   private OrganisationApi organisationApi;

@@ -21,7 +21,7 @@ import uk.co.nstauthority.scap.error.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.utils.EntityTestingUtil;
 
 @ExtendWith(MockitoExtension.class)
-public class ScapDetailServiceTest {
+class ScapDetailServiceTest {
 
   @Mock
   ScapDetailRepository scapDetailRepository;
@@ -32,12 +32,12 @@ public class ScapDetailServiceTest {
   private ScapOverview scap;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     scap = new ScapOverview(1664);
   }
 
   @Test
-  public void createDraftScapDetail_verifySaves() {
+  void createDraftScapDetail_verifySaves() {
     scapDetailService.createDraftScapDetail(scap);
 
     var argumentCaptor = ArgumentCaptor.forClass(ScapDetail.class);
@@ -53,7 +53,7 @@ public class ScapDetailServiceTest {
   }
 
   @Test
-  public void getLatestScapDetailByScap_verifyCalls() {
+  void getLatestScapDetailByScap_verifyCalls() {
     var scapDetailList = List.of(
         new ScapDetail(scap, 1, false, ScapDetailStatus.DRAFT, EntityTestingUtil.dateToInstant(2000, 4, 23), 1),
         new ScapDetail(scap, 2, true, ScapDetailStatus.DRAFT, EntityTestingUtil.dateToInstant(2000, 4, 23), 1)
@@ -66,7 +66,7 @@ public class ScapDetailServiceTest {
   }
 
   @Test
-  public void getLatestScapDetailByScapOrThrow_assertThrows() {
+  void getLatestScapDetailByScapOrThrow_assertThrows() {
     when(scapDetailRepository.findAllByScap(scap)).thenReturn(Collections.emptyList());
 
     assertThatThrownBy(() -> scapDetailService.getLatestScapDetailByScapOrThrow(scap))

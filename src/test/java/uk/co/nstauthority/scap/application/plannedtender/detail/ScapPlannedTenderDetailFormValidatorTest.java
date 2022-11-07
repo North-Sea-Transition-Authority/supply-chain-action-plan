@@ -16,7 +16,7 @@ import uk.co.nstauthority.scap.application.RemunerationModel;
 import uk.co.nstauthority.scap.utils.ValidatorTestingUtil;
 
 @ExtendWith(MockitoExtension.class)
-public class ScapPlannedTenderDetailFormValidatorTest {
+class ScapPlannedTenderDetailFormValidatorTest {
 
   private ScapPlannedTenderDetailFormValidator validator;
   private ScapPlannedTenderDetailForm form;
@@ -30,26 +30,26 @@ public class ScapPlannedTenderDetailFormValidatorTest {
   }
 
   @Test
-  public void supports_hasPlannedTenderForm_assertTrue() {
+  void supports_hasPlannedTenderForm_assertTrue() {
     var formClass = ScapPlannedTenderDetailForm.class;
     assertTrue(validator.supports(formClass));
   }
 
   @Test
-  public void supports_notSupportedClass_assertFalse() {
+  void supports_notSupportedClass_assertFalse() {
     var notSupportedClass = ValidatorTestingUtil.NonSupportedClass.class;
     assertFalse(validator.supports(notSupportedClass));
   }
 
   @Test
-  public void validate_simpleValidForm_assertNoErrors() {
+  void validate_simpleValidForm_assertNoErrors() {
     validator.validate(form, bindingResult);
 
     assertFalse(bindingResult.hasErrors());
   }
 
   @Test
-  public void validate_emptyForm_assertPresenceErrors() {
+  void validate_emptyForm_assertPresenceErrors() {
     var emptyForm = new ScapPlannedTenderDetailForm();
     var emptyFormBindingResult = new BeanPropertyBindingResult(emptyForm, "form");
     validator.validate(emptyForm, emptyFormBindingResult);
@@ -64,7 +64,7 @@ public class ScapPlannedTenderDetailFormValidatorTest {
   }
 
   @Test
-  public void validate_estimatedValueTooSmall_assertError() {
+  void validate_estimatedValueTooSmall_assertError() {
     form.setEstimatedValue("0");
 
     validator.validate(form, bindingResult);
@@ -76,7 +76,7 @@ public class ScapPlannedTenderDetailFormValidatorTest {
   }
 
   @Test
-  public void validate_estimatedValueTooManyDecimalPlaces_assertError() {
+  void validate_estimatedValueTooManyDecimalPlaces_assertError() {
     form.setEstimatedValue("0.1234");
 
     validator.validate(form, bindingResult);
@@ -88,7 +88,7 @@ public class ScapPlannedTenderDetailFormValidatorTest {
   }
 
   @Test
-  public void validate_validOtherRemunerationModel_assertNoErrors() {
+  void validate_validOtherRemunerationModel_assertNoErrors() {
     form.setRemunerationModel(RemunerationModel.OTHER);
     form.setRemunerationModelName("Test other remuneration model");
 
@@ -98,7 +98,7 @@ public class ScapPlannedTenderDetailFormValidatorTest {
   }
 
   @Test
-  public void validate_missingRemunerationModelName_assertPresenceError() {
+  void validate_missingRemunerationModelName_assertPresenceError() {
     form.setRemunerationModel(RemunerationModel.OTHER);
 
     validator.validate(form, bindingResult);

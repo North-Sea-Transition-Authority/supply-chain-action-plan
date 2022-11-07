@@ -18,7 +18,7 @@ import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.utils.ValidatorTestingUtil;
 
 @ExtendWith(MockitoExtension.class)
-public class OrganisationGroupFormValidatorTest {
+class OrganisationGroupFormValidatorTest {
 
   @Mock
   OrganisationGroupService organisationGroupService;

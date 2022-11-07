@@ -18,10 +18,10 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(controllers = WorkAreaController.class)
 @WithMockUser
-public class WorkAreaControllerTest extends AbstractControllerTest {
+class WorkAreaControllerTest extends AbstractControllerTest {
 
   @Test
-  public void getWorkArea() throws Exception {
+  void getWorkArea() throws Exception {
 
     mockMvc.perform(
         get(ReverseRouter.route(on(WorkAreaController.class).getWorkArea())))

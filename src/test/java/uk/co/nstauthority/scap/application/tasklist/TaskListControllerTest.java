@@ -21,7 +21,7 @@ import uk.co.nstauthority.scap.workarea.WorkAreaController;
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(controllers = TaskListController.class)
 @WithMockUser
-public class TaskListControllerTest extends AbstractControllerTest {
+class TaskListControllerTest extends AbstractControllerTest {
 
   @MockBean
   private List<ScapTaskListSection> scapTaskListSections;
@@ -30,7 +30,7 @@ public class TaskListControllerTest extends AbstractControllerTest {
   private List<ScapTaskListItem> scapTaskListItems;
 
   @Test
-  public void renderTaskList() throws Exception {
+  void renderTaskList() throws Exception {
     mockMvc.perform(
         get(ReverseRouter.route(on(TaskListController.class).renderTaskList(22))))
         .andExpect(status().isOk())

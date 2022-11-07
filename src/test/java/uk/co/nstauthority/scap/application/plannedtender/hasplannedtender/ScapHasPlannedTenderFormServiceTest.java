@@ -22,7 +22,7 @@ import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.utils.EntityTestingUtil;
 
 @ExtendWith(MockitoExtension.class)
-public class ScapHasPlannedTenderFormServiceTest {
+class ScapHasPlannedTenderFormServiceTest {
 
   @Mock
   ScapHasPlannedTenderFormValidator scapHasPlannedTenderFormValidator;
@@ -44,7 +44,7 @@ public class ScapHasPlannedTenderFormServiceTest {
   }
 
   @Test
-  public void validate_verifyCallsValidator() {
+  void validate_verifyCallsValidator() {
     var form = new ScapHasPlannedTenderForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
@@ -54,7 +54,7 @@ public class ScapHasPlannedTenderFormServiceTest {
   }
 
   @Test
-  public void getForm_noExistingPlannedTender() {
+  void getForm_noExistingPlannedTender() {
     when(scapPlannedTenderService.getScapPlannedTenderByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
     var form = scapHasPlannedTenderFormService.getForm(scapDetail);
@@ -63,7 +63,7 @@ public class ScapHasPlannedTenderFormServiceTest {
   }
 
   @Test
-  public void getForm_existingPlannedTender_yesPlannedActivity() {
+  void getForm_existingPlannedTender_yesPlannedActivity() {
     var existingPlannedTender = new ScapPlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 4, 23));
     existingPlannedTender.setHasPlannedTenders(true);
 
@@ -76,7 +76,7 @@ public class ScapHasPlannedTenderFormServiceTest {
   }
 
   @Test
-  public void getForm_existingPlannedTender_noPlannedActivity() {
+  void getForm_existingPlannedTender_noPlannedActivity() {
     var existingPlannedTender = new ScapPlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 4, 23));
     existingPlannedTender.setHasPlannedTenders(false);
 

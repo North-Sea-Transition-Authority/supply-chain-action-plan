@@ -19,10 +19,10 @@ import uk.co.nstauthority.scap.workarea.WorkAreaController;
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(controllers = ScapStartController.class)
 @WithMockUser
-public class ScapStartControllerTest extends AbstractControllerTest {
+class ScapStartControllerTest extends AbstractControllerTest {
 
   @Test
-  public void renderStartNewScap() throws Exception {
+  void renderStartNewScap() throws Exception {
     mockMvc.perform(get(
         ReverseRouter.route(on(ScapStartController.class).renderStartNewScap())))
         .andExpect(status().isOk())

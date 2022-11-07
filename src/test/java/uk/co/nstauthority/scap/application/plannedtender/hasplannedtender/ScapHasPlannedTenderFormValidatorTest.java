@@ -16,7 +16,7 @@ import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.utils.ValidatorTestingUtil;
 
 @ExtendWith(MockitoExtension.class)
-public class ScapHasPlannedTenderFormValidatorTest {
+class ScapHasPlannedTenderFormValidatorTest {
 
   private ScapHasPlannedTenderFormValidator scapHasPlannedTenderFormValidator;
   private ScapHasPlannedTenderForm scapHasPlannedTenderForm;
@@ -30,19 +30,19 @@ public class ScapHasPlannedTenderFormValidatorTest {
   }
 
   @Test
-  public void supports_hasPlannedTenderForm_assertTrue() {
+  void supports_hasPlannedTenderForm_assertTrue() {
     var formClass = ScapHasPlannedTenderForm.class;
     assertTrue(scapHasPlannedTenderFormValidator.supports(formClass));
   }
 
   @Test
-  public void supports_notSupportedClass_assertFalse() {
+  void supports_notSupportedClass_assertFalse() {
     var notSupportedClass = ValidatorTestingUtil.NonSupportedClass.class;
     assertFalse(scapHasPlannedTenderFormValidator.supports(notSupportedClass));
   }
 
   @Test
-  public void validate_nullHasPlannedTender_assertPresenceError() {
+  void validate_nullHasPlannedTender_assertPresenceError() {
     scapHasPlannedTenderForm.setHasPlannedTender(null);
 
     scapHasPlannedTenderFormValidator.validate(scapHasPlannedTenderForm, bindingResult);
@@ -55,7 +55,7 @@ public class ScapHasPlannedTenderFormValidatorTest {
   }
 
   @Test
-  public void validate_validHasPlannedTender_assertHasNoErrors() {
+  void validate_validHasPlannedTender_assertHasNoErrors() {
     scapHasPlannedTenderForm.setHasPlannedTender(YesNo.YES);
 
     scapHasPlannedTenderFormValidator.validate(scapHasPlannedTenderForm, bindingResult);

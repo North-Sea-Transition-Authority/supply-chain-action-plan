@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 
 @ExtendWith(MockitoExtension.class)
-public class OrganisationGroupFormServiceTest {
+class OrganisationGroupFormServiceTest {
 
   @Mock
   private OrganisationGroupFormValidator organisationGroupFormValidator;
@@ -21,7 +21,7 @@ public class OrganisationGroupFormServiceTest {
 
 
   @Test
-  public void validate_verifyMethodCall() {
+  void validate_verifyMethodCall() {
     var form = new OrganisationGroupForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 

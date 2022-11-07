@@ -46,7 +46,7 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(controllers = ScapHasPlannedTenderController.class)
 @WithMockUser
-public class ScapHasPlannedTenderControllerTest extends AbstractControllerTest {
+class ScapHasPlannedTenderControllerTest extends AbstractControllerTest {
 
   @MockBean
   ScapOverviewService scapOverviewService;
