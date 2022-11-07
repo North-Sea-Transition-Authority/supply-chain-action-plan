@@ -11,9 +11,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
@@ -21,7 +21,7 @@ import uk.co.nstauthority.scap.fds.searchselector.RestSearchResult;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 
 @ExtendWith(MockitoExtension.class)
-@WebMvcTest(controllers = OrganisationGroupRestController.class)
+@ContextConfiguration(classes = OrganisationGroupRestController.class)
 @WithMockUser
 class OrganisationGroupRestControllerTest extends AbstractControllerTest {
 

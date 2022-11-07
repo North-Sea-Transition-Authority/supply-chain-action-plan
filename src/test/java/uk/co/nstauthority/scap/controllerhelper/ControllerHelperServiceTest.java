@@ -8,16 +8,12 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.fds.ErrorItem;
-import uk.co.nstauthority.scap.mvc.WithDefaultPageControllerAdvice;
 import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 
-@WithDefaultPageControllerAdvice
-@WebMvcTest
 class ControllerHelperServiceTest extends AbstractControllerTest {
 
   @Autowired

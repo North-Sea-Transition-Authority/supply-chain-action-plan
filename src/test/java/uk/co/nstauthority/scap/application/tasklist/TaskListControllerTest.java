@@ -11,15 +11,15 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @ExtendWith(MockitoExtension.class)
-@WebMvcTest(controllers = TaskListController.class)
+@ContextConfiguration(classes = TaskListController.class)
 @WithMockUser
 class TaskListControllerTest extends AbstractControllerTest {
 

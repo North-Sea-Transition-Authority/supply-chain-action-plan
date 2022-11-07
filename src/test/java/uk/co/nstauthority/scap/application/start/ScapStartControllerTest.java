@@ -9,15 +9,15 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.application.organisationgroup.OrganisationGroupController;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @ExtendWith(MockitoExtension.class)
-@WebMvcTest(controllers = ScapStartController.class)
+@ContextConfiguration(classes = ScapStartController.class)
 @WithMockUser
 class ScapStartControllerTest extends AbstractControllerTest {
 

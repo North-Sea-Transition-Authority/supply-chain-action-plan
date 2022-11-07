@@ -21,9 +21,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -41,7 +41,7 @@ import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 
 @ExtendWith(MockitoExtension.class)
-@WebMvcTest(HasActualTenderController.class)
+@ContextConfiguration(classes = HasActualTenderController.class)
 @WithMockUser
 class HasActualTenderControllerTest extends AbstractControllerTest {
 
