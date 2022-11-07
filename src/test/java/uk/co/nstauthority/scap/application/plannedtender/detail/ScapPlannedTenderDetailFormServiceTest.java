@@ -5,7 +5,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,6 +21,9 @@ class ScapPlannedTenderDetailFormServiceTest {
 
   @Mock
   ScapPlannedTenderDetailFormValidator validator;
+
+  @Mock
+  Clock clock = Clock.fixed(Instant.ofEpochSecond(1667576106), ZoneId.systemDefault());
 
   @InjectMocks
   ScapPlannedTenderDetailFormService scapPlannedTenderDetailFormService;
@@ -43,7 +48,7 @@ class ScapPlannedTenderDetailFormServiceTest {
         RemunerationModel.OTHER,
         "some remuneration model name",
         "some award rationale",
-        Instant.now());
+        clock.instant());
 
     var form = scapPlannedTenderDetailFormService.getForm(plannedTenderDetail);
 

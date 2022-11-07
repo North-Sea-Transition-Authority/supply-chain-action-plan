@@ -14,11 +14,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.mvc.ReverseRouter.emptyBindingResult;
 
-import java.time.Instant;
+import java.time.Clock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -43,6 +44,9 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 @WithMockUser
 class ActualTenderDetailControllerTest extends AbstractControllerTest {
 
+  @Autowired
+  Clock clock;
+
   @MockBean
   ScapOverviewService scapOverviewService;
 
@@ -65,8 +69,8 @@ class ActualTenderDetailControllerTest extends AbstractControllerTest {
   @BeforeEach
   void setup() {
     scap = new ScapOverview(72);
-    scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, Instant.now(), 1);
-    actualTender = new ActualTender(scapDetail, Instant.now());
+    scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, clock.instant(), 1);
+    actualTender = new ActualTender(scapDetail, clock.instant());
   }
 
   @Test

@@ -1,6 +1,6 @@
 package uk.co.nstauthority.scap.application.plannedtender.detail;
 
-import java.time.Instant;
+import java.time.Clock;
 import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +12,13 @@ import uk.co.nstauthority.scap.error.ScapEntityNotFoundException;
 public class ScapPlannedTenderDetailService {
 
   private final ScapPlannedTenderDetailRepository scapPlannedTenderDetailRepository;
+  private final Clock clock;
 
   @Autowired
-  public ScapPlannedTenderDetailService(ScapPlannedTenderDetailRepository scapPlannedTenderDetailRepository) {
+  public ScapPlannedTenderDetailService(ScapPlannedTenderDetailRepository scapPlannedTenderDetailRepository,
+                                        Clock clock) {
     this.scapPlannedTenderDetailRepository = scapPlannedTenderDetailRepository;
+    this.clock = clock;
   }
 
   @Transactional
@@ -28,7 +31,7 @@ public class ScapPlannedTenderDetailService {
         form.getRemunerationModel(),
         form.getRemunerationModelName().getInputValue(),
         form.getAwardRationale().getInputValue(),
-        Instant.now()
+        clock.instant()
     );
     scapPlannedTenderDetailRepository.save(detail);
   }

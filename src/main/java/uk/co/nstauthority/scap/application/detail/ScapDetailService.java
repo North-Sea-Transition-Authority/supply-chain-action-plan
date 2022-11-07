@@ -1,6 +1,6 @@
 package uk.co.nstauthority.scap.application.detail;
 
-import java.time.Instant;
+import java.time.Clock;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,17 +12,19 @@ import uk.co.nstauthority.scap.error.ScapEntityNotFoundException;
 public class ScapDetailService {
 
   private final ScapDetailRepository scapDetailRepository;
+  private final Clock clock;
 
   @Autowired
-  public ScapDetailService(ScapDetailRepository scapDetailRepository) {
+  public ScapDetailService(ScapDetailRepository scapDetailRepository, Clock clock) {
     this.scapDetailRepository = scapDetailRepository;
+    this.clock = clock;
   }
 
   @Transactional
   public void createDraftScapDetail(ScapOverview scap) {
     var isLatestScapDetail = true;
     // TODO SCAP2022-148: replace with actual createdByUserId (1) with actual user ID
-    var scapDetail = new ScapDetail(scap, 1, isLatestScapDetail, ScapDetailStatus.DRAFT, Instant.now(), 1);
+    var scapDetail = new ScapDetail(scap, 1, isLatestScapDetail, ScapDetailStatus.DRAFT, clock.instant(), 1);
     scapDetailRepository.save(scapDetail);
   }
 

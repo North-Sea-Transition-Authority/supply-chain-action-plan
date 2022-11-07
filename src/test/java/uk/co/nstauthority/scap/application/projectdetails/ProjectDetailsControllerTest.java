@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
-import java.time.Instant;
+import java.time.Clock;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,6 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -46,6 +47,9 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 @WebMvcTest(ProjectDetailsController.class)
 @WithMockUser
 class ProjectDetailsControllerTest extends AbstractControllerTest {
+
+  @Autowired
+  Clock clock;
 
   @MockBean
   ProjectDetailsFormService projectDetailsFormService;
@@ -71,7 +75,7 @@ class ProjectDetailsControllerTest extends AbstractControllerTest {
   @BeforeEach
   void setup() {
     scap = new ScapOverview(19);
-    scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, Instant.now(), 1);
+    scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, clock.instant(), 1);
   }
 
   @Test
@@ -99,7 +103,7 @@ class ProjectDetailsControllerTest extends AbstractControllerTest {
   @Test
   void renderProjectDetailsForm_existingProjectDetails_assertCorrectResponse() throws Exception {
     var field = new Field(22, "Test field", null, null, null, null);
-    var projectDetails = new ProjectDetails(scapDetail, Instant.now());
+    var projectDetails = new ProjectDetails(scapDetail, clock.instant());
     projectDetails.setFieldId(field.getFieldId());
     projectDetails.setFieldName(field.getFieldName());
     var form = new ProjectDetailsForm();

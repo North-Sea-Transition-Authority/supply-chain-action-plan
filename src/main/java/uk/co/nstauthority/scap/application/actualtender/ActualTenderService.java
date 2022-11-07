@@ -1,6 +1,6 @@
 package uk.co.nstauthority.scap.application.actualtender;
 
-import java.time.Instant;
+import java.time.Clock;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +13,12 @@ import uk.co.nstauthority.scap.error.ScapEntityNotFoundException;
 public class ActualTenderService {
 
   private final ActualTenderRepository actualTenderRepository;
+  private final Clock clock;
 
   @Autowired
-  ActualTenderService(ActualTenderRepository actualTenderRepository) {
+  ActualTenderService(ActualTenderRepository actualTenderRepository, Clock clock) {
     this.actualTenderRepository = actualTenderRepository;
+    this.clock = clock;
   }
 
   public Optional<ActualTender> getByScapDetail(ScapDetail scapDetail) {
@@ -31,7 +33,7 @@ public class ActualTenderService {
 
   @Transactional
   public void createActualTender(ScapDetail scapDetail, YesNo hasActualTenders) {
-    var actualTender = new ActualTender(scapDetail, Instant.now());
+    var actualTender = new ActualTender(scapDetail, clock.instant());
     updateHasActualTenders(actualTender, hasActualTenders);
   }
 

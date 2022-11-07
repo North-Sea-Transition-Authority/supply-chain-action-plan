@@ -6,7 +6,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,9 @@ class ActualTenderServiceTest {
   @Mock
   ActualTenderRepository actualTenderRepository;
 
+  @Mock
+  Clock clock = Clock.fixed(Instant.ofEpochSecond(1667576106), ZoneId.systemDefault());
+
   @InjectMocks
   ActualTenderService actualTenderService;
 
@@ -37,7 +42,7 @@ class ActualTenderServiceTest {
 
   @Test
   void getByScapDetail() {
-    var actualTender = new ActualTender(scapDetail, Instant.now());
+    var actualTender = new ActualTender(scapDetail, clock.instant());
 
     when(actualTenderRepository.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
 
@@ -48,7 +53,7 @@ class ActualTenderServiceTest {
 
   @Test
   void getByScapDetailOrThrow_isPresent_assertReturns() {
-    var actualTender = new ActualTender(scapDetail, Instant.now());
+    var actualTender = new ActualTender(scapDetail, clock.instant());
 
     when(actualTenderRepository.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
 

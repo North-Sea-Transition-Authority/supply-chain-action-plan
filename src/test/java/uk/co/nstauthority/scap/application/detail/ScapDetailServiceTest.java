@@ -7,6 +7,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +28,9 @@ class ScapDetailServiceTest {
 
   @Mock
   ScapDetailRepository scapDetailRepository;
+
+  @Mock
+  Clock clock = Clock.fixed(Instant.ofEpochSecond(1667576106), ZoneId.systemDefault());
 
   @InjectMocks
   ScapDetailService scapDetailService;

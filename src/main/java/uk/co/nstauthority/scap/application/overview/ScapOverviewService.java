@@ -1,6 +1,6 @@
 package uk.co.nstauthority.scap.application.overview;
 
-import java.time.Instant;
+import java.time.Clock;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,15 +10,17 @@ import uk.co.nstauthority.scap.error.ScapEntityNotFoundException;
 public class ScapOverviewService {
 
   private final ScapOverviewRepository scapOverviewRepository;
+  private final Clock clock;
 
   @Autowired
-  public ScapOverviewService(ScapOverviewRepository scapOverviewRepository) {
+  public ScapOverviewService(ScapOverviewRepository scapOverviewRepository, Clock clock) {
     this.scapOverviewRepository = scapOverviewRepository;
+    this.clock = clock;
   }
 
   @Transactional
   public ScapOverview createScapOverview(Integer organisationGroupId) {
-    var scapOverview = new ScapOverview(organisationGroupId, Instant.now());
+    var scapOverview = new ScapOverview(organisationGroupId, clock.instant());
     scapOverviewRepository.save(scapOverview);
     return scapOverview;
   }

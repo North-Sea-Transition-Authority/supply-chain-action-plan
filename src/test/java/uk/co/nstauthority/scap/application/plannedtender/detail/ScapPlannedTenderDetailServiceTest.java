@@ -11,6 +11,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +34,9 @@ class ScapPlannedTenderDetailServiceTest {
 
   @Mock
   ScapPlannedTenderDetailRepository scapPlannedTenderDetailRepository;
+
+  @Mock
+  Clock clock = Clock.fixed(Instant.ofEpochSecond(1667576106), ZoneId.systemDefault());
 
   @InjectMocks
   ScapPlannedTenderDetailService scapPlannedTenderDetailService;

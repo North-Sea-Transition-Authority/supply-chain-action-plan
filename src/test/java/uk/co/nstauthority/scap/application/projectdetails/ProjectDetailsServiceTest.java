@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +34,7 @@ class ProjectDetailsServiceTest {
   ProjectDetailTypeRepository projectDetailTypeRepository;
 
   @Mock
-  Clock clock;
+  Clock clock = Clock.fixed(Instant.ofEpochSecond(1667576106), ZoneId.systemDefault());
 
   @Mock
   FieldService fieldService;
@@ -50,10 +51,10 @@ class ProjectDetailsServiceTest {
 
   @Test
   void getProjectTypesByProjectDetails() {
-    var projectDetails = new ProjectDetails(scapDetail, Instant.now());
-    var type1 = new ProjectDetailType(projectDetails, Instant.now());
+    var projectDetails = new ProjectDetails(scapDetail, clock.instant());
+    var type1 = new ProjectDetailType(projectDetails, clock.instant());
     type1.setProjectType(ProjectType.CARBON_STORAGE_PERMIT);
-    var type2 = new ProjectDetailType(projectDetails, Instant.now());
+    var type2 = new ProjectDetailType(projectDetails, clock.instant());
     type2.setProjectType(ProjectType.DECOMMISSIONING_PROGRAMME);
     var projectDetailTypes = Set.of(type1, type2);
 
@@ -69,7 +70,7 @@ class ProjectDetailsServiceTest {
 
   @Test
   void getProjectDetailsByScapDetail() {
-    var projectDetails = new ProjectDetails(scapDetail, Instant.now());
+    var projectDetails = new ProjectDetails(scapDetail, clock.instant());
 
     when(projectDetailsRepository.findByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
 

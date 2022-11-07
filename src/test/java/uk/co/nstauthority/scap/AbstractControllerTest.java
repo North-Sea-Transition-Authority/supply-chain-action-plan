@@ -1,5 +1,8 @@
 package uk.co.nstauthority.scap;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -40,6 +43,11 @@ public abstract class AbstractControllerTest {
       messageSource.setBasename("messages");
       messageSource.setDefaultEncoding("UTF-8");
       return messageSource;
+    }
+
+    @Bean
+    public Clock clock() {
+      return Clock.fixed(Instant.ofEpochSecond(1667576106), ZoneId.systemDefault());
     }
   }
 }

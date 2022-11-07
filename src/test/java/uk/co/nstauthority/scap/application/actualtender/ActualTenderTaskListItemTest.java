@@ -6,7 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +37,9 @@ class ActualTenderTaskListItemTest {
   @Mock
   ActualTenderService actualTenderService;
 
+  @Mock
+  Clock clock = Clock.fixed(Instant.ofEpochSecond(1667576106), ZoneId.systemDefault());
+
   @InjectMocks
   ActualTenderTaskListItem actualTenderTaskListItem;
 
@@ -46,7 +51,7 @@ class ActualTenderTaskListItemTest {
   void setup() {
     scapId = 42;
     scap = new ScapOverview(scapId);
-    scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, Instant.now(), 1);
+    scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, clock.instant(), 1);
   }
 
   @Test
@@ -79,7 +84,7 @@ class ActualTenderTaskListItemTest {
 
   @Test
   void isValid_existingActualTender_hasNoTenders_assertTrue() {
-    var existingActualTender = new ActualTender(scapDetail, Instant.now());
+    var existingActualTender = new ActualTender(scapDetail, clock.instant());
     existingActualTender.setHasActualTenders(false);
 
     when(scapOverviewService.getScapById(scapId)).thenReturn(scap);
@@ -91,7 +96,7 @@ class ActualTenderTaskListItemTest {
 
   @Test
   void isValid_existingActualTender_allActualTendersAdded_assertTrue() {
-    var existingActualTender = new ActualTender(scapDetail, Instant.now());
+    var existingActualTender = new ActualTender(scapDetail, clock.instant());
     existingActualTender.setHasActualTenders(true);
     existingActualTender.setAllActualTendersAdded(true);
 
@@ -104,7 +109,7 @@ class ActualTenderTaskListItemTest {
 
   @Test
   void isValid_existingActualTender_notAllActualTendersAdded_assertFalse() {
-    var existingActualTender = new ActualTender(scapDetail, Instant.now());
+    var existingActualTender = new ActualTender(scapDetail, clock.instant());
     existingActualTender.setHasActualTenders(true);
     existingActualTender.setAllActualTendersAdded(false);
 
