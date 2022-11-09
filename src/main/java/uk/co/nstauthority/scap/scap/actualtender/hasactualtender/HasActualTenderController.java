@@ -80,7 +80,7 @@ public class HasActualTenderController {
   }
 
   private ModelAndView hasActualTenderFormModelAndView(Integer scapId, HasActualTenderForm form) {
-    return new ModelAndView("scap/application/actualtender/hasActualTender")
+    return new ModelAndView("scap/scap/actualtender/hasActualTender")
         .addObject("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
         .addObject("hasActualTender", YesNo.getRadioOptions())

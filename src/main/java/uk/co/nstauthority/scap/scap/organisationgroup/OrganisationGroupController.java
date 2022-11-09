@@ -118,7 +118,7 @@ public class OrganisationGroupController {
   private ModelAndView organisationGroupFormModelAndView(String backLinkUrl,
                                                          String postUrl,
                                                          Map<Integer, String> preselectedItems) {
-    return new ModelAndView("scap/application/organisationGroup")
+    return new ModelAndView("scap/scap/organisationGroup")
         .addObject("backLinkUrl", backLinkUrl)
         .addObject("submitPostUrl", postUrl)
         .addObject("organisationGroupSearchRestUrl", organisationGroupSearchRestUrl)

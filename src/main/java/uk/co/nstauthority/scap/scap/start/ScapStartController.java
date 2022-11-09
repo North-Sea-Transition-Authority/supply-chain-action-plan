@@ -20,7 +20,7 @@ public class ScapStartController {
 
   @GetMapping
   public ModelAndView renderStartNewScap() {
-    return new ModelAndView("scap/application/start")
+    return new ModelAndView("scap/scap/start")
         .addObject("startScapRedirectUrl", startRedirectUrl)
         .addObject("backLinkUrl", workAreaUrl);
   }

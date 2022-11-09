@@ -79,7 +79,7 @@ class HasActualTenderControllerTest extends AbstractControllerTest {
     mockMvc.perform(
         get(ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scap.getId()))))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/actualtender/hasActualTender"))
+        .andExpect(view().name("scap/scap/actualtender/hasActualTender"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
         .andExpect(model().attribute("hasActualTender", YesNo.getRadioOptions()))
@@ -100,7 +100,7 @@ class HasActualTenderControllerTest extends AbstractControllerTest {
     mockMvc.perform(
             get(ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scap.getId()))))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/actualtender/hasActualTender"))
+        .andExpect(view().name("scap/scap/actualtender/hasActualTender"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
         .andExpect(model().attribute("hasActualTender", YesNo.getRadioOptions()))
@@ -172,7 +172,7 @@ class HasActualTenderControllerTest extends AbstractControllerTest {
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/actualtender/hasActualTender"))
+        .andExpect(view().name("scap/scap/actualtender/hasActualTender"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
         .andExpect(model().attribute("hasActualTender", YesNo.getRadioOptions()))

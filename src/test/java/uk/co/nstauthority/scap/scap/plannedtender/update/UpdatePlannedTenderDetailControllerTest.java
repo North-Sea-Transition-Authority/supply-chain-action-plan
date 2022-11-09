@@ -73,7 +73,7 @@ class UpdatePlannedTenderDetailControllerTest extends AbstractControllerTest {
         get(ReverseRouter.route(on(UpdatePlannedTenderDetailController.class)
             .renderUpdatePlannedTenderDetail(scap.getId(), plannedTenderDetail.getId()))))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/plannedtender/plannedTenderActivityDetail"))
+        .andExpect(view().name("scap/scap/plannedtender/plannedTenderActivityDetails"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(PlannedTenderController.class)
                 .renderPlannedTenderActivities(scap.getId()))))
@@ -152,7 +152,7 @@ class UpdatePlannedTenderDetailControllerTest extends AbstractControllerTest {
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/plannedtender/plannedTenderActivityDetail"))
+        .andExpect(view().name("scap/scap/plannedtender/plannedTenderActivityDetails"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(PlannedTenderController.class)
                 .renderPlannedTenderActivities(scap.getId()))))

@@ -76,7 +76,7 @@ class ProjectDetailsController {
 
   private ModelAndView projectDetailsFormModelAndView(Integer scapId, ProjectDetailsForm form,
                                                       @Nullable Map<String, String> preselectedField) {
-    return new ModelAndView("scap/application/projectDetails")
+    return new ModelAndView("scap/scap/projectDetails")
         .addObject("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
         .addObject("fieldSearchRestUrl",

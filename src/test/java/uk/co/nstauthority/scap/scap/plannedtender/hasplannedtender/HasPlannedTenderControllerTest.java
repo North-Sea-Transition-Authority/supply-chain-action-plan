@@ -86,7 +86,7 @@ class HasPlannedTenderControllerTest extends AbstractControllerTest {
     mockMvc.perform(
         get(ReverseRouter.route(on(HasPlannedTenderController.class).renderHasPlannedTenderActivityForm(22))))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/plannedtender/hasPlannedTender"))
+        .andExpect(view().name("scap/scap/plannedtender/hasPlannedTender"))
         .andExpect(model().attribute("form", form))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(22))))
@@ -172,7 +172,7 @@ class HasPlannedTenderControllerTest extends AbstractControllerTest {
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/plannedtender/hasPlannedTender"))
+        .andExpect(view().name("scap/scap/plannedtender/hasPlannedTender"))
         .andExpect(model().attributeExists("errorItems"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(22))))

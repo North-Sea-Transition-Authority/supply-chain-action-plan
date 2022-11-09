@@ -68,7 +68,7 @@ public class UpdatePlannedTenderDetailController {
 
 
   private ModelAndView plannedTenderDetailFormModelAndView(Integer scapId, PlannedTenderActivityForm form) {
-    return new ModelAndView("scap/application/plannedtender/plannedTenderActivityDetail")
+    return new ModelAndView("scap/scap/plannedtender/plannedTenderActivityDetails")
         .addObject("backLinkUrl",
             ReverseRouter.route(on(PlannedTenderController.class).renderPlannedTenderActivities(scapId)))
         .addObject("remunerationModels", RemunerationModel.getRemunerationModels())

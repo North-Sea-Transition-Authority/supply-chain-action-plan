@@ -26,7 +26,7 @@ class ScapStartControllerTest extends AbstractControllerTest {
     mockMvc.perform(get(
         ReverseRouter.route(on(ScapStartController.class).renderStartNewScap())))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/start"))
+        .andExpect(view().name("scap/scap/start"))
         .andExpect(model().attribute("startScapRedirectUrl",
             ReverseRouter.route(on(OrganisationGroupController.class).renderNewScapOrganisationGroupForm(null))))
         .andExpect(model().attribute("backLinkUrl",

@@ -63,7 +63,7 @@ class OrganisationGroupControllerTest extends AbstractControllerTest {
         get(
             ReverseRouter.route(on(OrganisationGroupController.class).renderNewScapOrganisationGroupForm(null))))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/organisationGroup"))
+        .andExpect(view().name("scap/scap/organisationGroup"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(ScapStartController.class).renderStartNewScap())))
         .andExpect(model().attribute("submitPostUrl",
@@ -116,7 +116,7 @@ class OrganisationGroupControllerTest extends AbstractControllerTest {
         post(postUrl).param("organisationGroupId", "")
             .with(csrf()))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/organisationGroup"))
+        .andExpect(view().name("scap/scap/organisationGroup"))
         .andExpect(model().attribute("errorItems", errorItems));
 
     verify(scapService, never()).createScapOverview(any());
@@ -139,7 +139,7 @@ class OrganisationGroupControllerTest extends AbstractControllerTest {
             ReverseRouter.route(on(OrganisationGroupController.class)
                 .renderExistingScapOrganisationGroupForm(scapId))))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/organisationGroup"))
+        .andExpect(view().name("scap/scap/organisationGroup"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(1))))
         .andExpect(model().attribute("submitPostUrl",
@@ -195,7 +195,7 @@ class OrganisationGroupControllerTest extends AbstractControllerTest {
         post(postUrl).param("organisationGroupId", "")
             .with(csrf()))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/organisationGroup"))
+        .andExpect(view().name("scap/scap/organisationGroup"))
         .andExpect(model().attribute("errorItems", errorItems));
 
     verify(scapService, never()).updateScapOverviewOrganisationGroup(any(), any());

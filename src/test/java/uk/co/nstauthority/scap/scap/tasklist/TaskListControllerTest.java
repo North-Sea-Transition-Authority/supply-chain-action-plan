@@ -34,7 +34,7 @@ class TaskListControllerTest extends AbstractControllerTest {
     mockMvc.perform(
         get(ReverseRouter.route(on(TaskListController.class).renderTaskList(22))))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/taskList"))
+        .andExpect(view().name("scap/scap/taskList"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(WorkAreaController.class).getWorkArea())))
         .andExpect(model().attribute("taskListSections", Collections.emptyList()));

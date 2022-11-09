@@ -76,7 +76,7 @@ public class ActualTenderActivityController {
   }
 
   private ModelAndView actualTenderDetailFormModelAndView(Integer scapId) {
-    return new ModelAndView("scap/application/actualtender/actualTenderActivityDetail")
+    return new ModelAndView("scap/scap/actualtender/actualTenderActivityDetails")
         .addObject("backLinkUrl", ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scapId)))
         .addObject("remunerationModels", RemunerationModel.getRemunerationModels())
         .addObject("contractStages", ContractStage.getContractStages());

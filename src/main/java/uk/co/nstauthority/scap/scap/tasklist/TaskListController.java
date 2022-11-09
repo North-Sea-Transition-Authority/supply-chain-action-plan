@@ -29,7 +29,7 @@ public class TaskListController {
   @GetMapping
   public ModelAndView renderTaskList(@PathVariable("scapOverviewId") Integer scapId) {
 
-    return new ModelAndView("scap/application/taskList")
+    return new ModelAndView("scap/scap/taskList")
         .addObject("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea()))
         .addObject("taskListSections", TaskListSectionUtil.createSectionViews(scapTaskListSections, scapTaskListItems, scapId));
   }

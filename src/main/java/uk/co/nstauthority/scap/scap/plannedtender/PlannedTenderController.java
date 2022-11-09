@@ -94,7 +94,7 @@ public class PlannedTenderController {
   private ModelAndView plannedTenderActivitySummaryModelAndView(Integer scapId,
                                                                 List<PlannedTenderActivity> existingTenderDetails,
                                                                 PlannedTenderForm form) {
-    return new ModelAndView("scap/application/plannedtender/plannedTenderActivityList")
+    return new ModelAndView("scap/scap/plannedtender/plannedTenderActivityList")
         .addObject("form", form)
         .addObject("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))

@@ -87,7 +87,7 @@ class ProjectDetailsControllerTest extends AbstractControllerTest {
         get(ReverseRouter.route(on(ProjectDetailsController.class)
             .renderProjectDetailsForm(scap.getId()))))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/projectDetails"))
+        .andExpect(view().name("scap/scap/projectDetails"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
         .andExpect(model().attribute("fieldSearchRestUrl",
@@ -119,7 +119,7 @@ class ProjectDetailsControllerTest extends AbstractControllerTest {
         get(ReverseRouter.route(on(ProjectDetailsController.class)
             .renderProjectDetailsForm(scap.getId()))))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/projectDetails"))
+        .andExpect(view().name("scap/scap/projectDetails"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
         .andExpect(model().attribute("fieldSearchRestUrl",
@@ -156,7 +156,7 @@ class ProjectDetailsControllerTest extends AbstractControllerTest {
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/application/projectDetails"))
+        .andExpect(view().name("scap/scap/projectDetails"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
         .andExpect(model().attribute("fieldSearchRestUrl",
