@@ -110,7 +110,7 @@ class HasActualTenderControllerTest extends AbstractControllerTest {
   @Test
   void saveHasActualTenderForm_validForm_verifySaves() throws Exception {
     var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderActivityController.class)
-        .renderActualTenderDetailForm(scap.getId(), null));
+        .renderActualTenderActivityForm(scap.getId(), null));
     var form = new HasActualTenderForm();
     form.setHasActualTender(YesNo.YES);
     var bindingResult = new BeanPropertyBindingResult(form, "form");

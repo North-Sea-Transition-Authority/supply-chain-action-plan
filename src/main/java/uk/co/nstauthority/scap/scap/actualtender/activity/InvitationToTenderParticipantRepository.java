@@ -6,4 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 interface InvitationToTenderParticipantRepository extends CrudRepository<InvitationToTenderParticipant, Integer> {
 
   List<InvitationToTenderParticipant> findAllByActualTenderActivity(ActualTenderActivity actualTenderActivity);
+
+  List<InvitationToTenderParticipant> findAllByIdInAndActualTenderActivityIs(List<Integer> ids,
+                                                                             ActualTenderActivity actualTenderDetail);
 }

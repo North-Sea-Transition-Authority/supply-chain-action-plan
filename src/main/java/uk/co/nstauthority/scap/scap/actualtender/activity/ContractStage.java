@@ -4,7 +4,7 @@ import java.util.Map;
 import uk.co.nstauthority.scap.enumutil.Displayable;
 import uk.co.nstauthority.scap.enumutil.DisplayableEnumOptionUtil;
 
-enum ContractStage implements Displayable {
+public enum ContractStage implements Displayable {
   REQUEST_FOR_INFORMATION("Request for information", 10),
   INVITATION_TO_TENDER("Invitation to tender", 20),
   CONTRACT_AWARDED("Contract has been awarded", 30);

@@ -30,10 +30,10 @@ class ScapServiceTest {
   ScapService scapService;
 
   @Test
-  void createScapOverview() {
+  void createScap() {
     var argumentCaptor = ArgumentCaptor.forClass(Scap.class);
 
-    var scap = scapService.createScapOverview(1);
+    var scap = scapService.createScap(1);
 
     verify(scapRepository).save(argumentCaptor.capture());
 
@@ -59,12 +59,12 @@ class ScapServiceTest {
   }
 
   @Test
-  void updateScapOverviewOrganisationGroup() {
+  void updateScapOrganisationGroup() {
     var scapOverview = new Scap(22);
     var argumentCaptor = ArgumentCaptor.forClass(Scap.class);
     var organisationGroupId = 119;
 
-    scapService.updateScapOverviewOrganisationGroup(scapOverview, organisationGroupId);
+    scapService.updateScapOrganisationGroup(scapOverview, organisationGroupId);
 
     verify(scapRepository).save(argumentCaptor.capture());
 

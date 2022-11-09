@@ -1,6 +1,7 @@
 package uk.co.nstauthority.scap.scap.actualtender.activity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -11,6 +12,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +20,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.nstauthority.scap.error.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 
@@ -56,10 +59,32 @@ class ActualTenderActivityServiceTest {
   }
 
   @Test
-  void createActualTenderDetail_assertSaves() {
+  void getById_exists() {
+    var existingActualTenderActivity = new ActualTenderActivity(37);
+    when(actualTenderActivityRepository.findById(existingActualTenderActivity.getId()))
+        .thenReturn(Optional.of(existingActualTenderActivity));
+
+    var returnedActualTenderActivity = actualTenderActivityService.getById(existingActualTenderActivity.getId());
+
+    assertThat(returnedActualTenderActivity).isEqualTo(existingActualTenderActivity);
+  }
+
+  @Test
+  void getById_DoesNotExist_AssertThrows() {
+    var nonExistentId = 9;
+
+    when(actualTenderActivityRepository.findById(nonExistentId))
+        .thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> actualTenderActivityService.getById(nonExistentId))
+        .isInstanceOf(ScapEntityNotFoundException.class);
+  }
+
+  @Test
+  void createActualTenderActivity_assertSaves() {
     var actualTenderDetailArgumentCaptor = ArgumentCaptor.forClass(ActualTenderActivity.class);
 
-    actualTenderActivityService.createActualTenderDetail(actualTender, form);
+    actualTenderActivityService.createActualTenderActivity(actualTender, form);
 
     verify(actualTenderActivityRepository).save(actualTenderDetailArgumentCaptor.capture());
     verify(invitationToTenderParticipantRepository).saveAll(invitationToTenderParticipantCaptor.capture());
@@ -90,7 +115,7 @@ class ActualTenderActivityServiceTest {
   }
 
   @Test
-  void updateActualTenderDetail_assertSaves() {
+  void updateActualTenderActivity_assertSaves() {
     var actualTenderDetailArgumentCaptor = ArgumentCaptor.forClass(ActualTenderActivity.class);
     var actualTenderDetail = new ActualTenderActivity(actualTender, clock.instant());
     var existingInvitationToTenderParticipants = List.of(
@@ -100,7 +125,7 @@ class ActualTenderActivityServiceTest {
     when(invitationToTenderParticipantRepository.findAllByActualTenderActivity(actualTenderDetail))
         .thenReturn(existingInvitationToTenderParticipants);
 
-    actualTenderActivityService.updateActualTenderDetail(actualTenderDetail, form);
+    actualTenderActivityService.updateActualTenderActivity(actualTenderDetail, form);
 
     verify(actualTenderActivityRepository).save(actualTenderDetailArgumentCaptor.capture());
     verify(invitationToTenderParticipantRepository).saveAll(invitationToTenderParticipantCaptor.capture());

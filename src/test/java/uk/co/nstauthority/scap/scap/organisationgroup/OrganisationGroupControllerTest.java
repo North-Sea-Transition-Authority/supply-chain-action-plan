@@ -83,11 +83,11 @@ class OrganisationGroupControllerTest extends AbstractControllerTest {
     var scap = new Scap(scapId);
     scap.setOrganisationGroupId(ORGANISATION_GROUP_ID);
 
-    when(scapService.createScapOverview(ORGANISATION_GROUP_ID))
+    when(scapService.createScap(ORGANISATION_GROUP_ID))
         .thenReturn(scap);
     when(organisationGroupFormService.validate(any(OrganisationGroupForm.class), any(BindingResult.class)))
         .thenReturn(new BeanPropertyBindingResult(form, "form"));
-    when(scapService.createScapOverview(ORGANISATION_GROUP_ID)).thenReturn(scap);
+    when(scapService.createScap(ORGANISATION_GROUP_ID)).thenReturn(scap);
 
     mockMvc.perform(
         post(postUrl).param("organisationGroupId", String.valueOf(ORGANISATION_GROUP_ID))
@@ -95,7 +95,7 @@ class OrganisationGroupControllerTest extends AbstractControllerTest {
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
 
-    verify(scapService).createScapOverview(ORGANISATION_GROUP_ID);
+    verify(scapService).createScap(ORGANISATION_GROUP_ID);
     verify(scapDetailService).createDraftScapDetail(scap);
   }
 
@@ -119,7 +119,7 @@ class OrganisationGroupControllerTest extends AbstractControllerTest {
         .andExpect(view().name("scap/scap/organisationGroup"))
         .andExpect(model().attribute("errorItems", errorItems));
 
-    verify(scapService, never()).createScapOverview(any());
+    verify(scapService, never()).createScap(any());
   }
 
   @Test
@@ -172,7 +172,7 @@ class OrganisationGroupControllerTest extends AbstractControllerTest {
         .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
 
     verify(scapService)
-        .updateScapOverviewOrganisationGroup(scapOverview, ORGANISATION_GROUP_ID);
+        .updateScapOrganisationGroup(scapOverview, ORGANISATION_GROUP_ID);
   }
 
   @Test
@@ -198,7 +198,7 @@ class OrganisationGroupControllerTest extends AbstractControllerTest {
         .andExpect(view().name("scap/scap/organisationGroup"))
         .andExpect(model().attribute("errorItems", errorItems));
 
-    verify(scapService, never()).updateScapOverviewOrganisationGroup(any(), any());
+    verify(scapService, never()).updateScapOrganisationGroup(any(), any());
   }
 
 }

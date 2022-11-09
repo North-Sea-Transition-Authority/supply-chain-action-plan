@@ -19,7 +19,7 @@ public class ScapService {
   }
 
   @Transactional
-  public Scap createScapOverview(Integer organisationGroupId) {
+  public Scap createScap(Integer organisationGroupId) {
     var scapOverview = new Scap(organisationGroupId, clock.instant());
     scapRepository.save(scapOverview);
     return scapOverview;
@@ -32,7 +32,7 @@ public class ScapService {
   }
 
   @Transactional
-  public void updateScapOverviewOrganisationGroup(Scap scap, Integer organisationGroupId) {
+  public void updateScapOrganisationGroup(Scap scap, Integer organisationGroupId) {
     scap.setOrganisationGroupId(organisationGroupId);
     scapRepository.save(scap);
   }

@@ -73,7 +73,7 @@ public class HasActualTenderController {
           );
           if (YesNo.YES.equals(form.getHasActualTender())) {
             return ReverseRouter.redirect(on(ActualTenderActivityController.class)
-                .renderActualTenderDetailForm(scapId, null));
+                .renderActualTenderActivityForm(scapId, null));
           }
           return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
         });

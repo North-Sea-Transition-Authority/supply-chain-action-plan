@@ -5,10 +5,11 @@ import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.nstauthority.scap.error.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 
 @Service
-class ActualTenderActivityService {
+public class ActualTenderActivityService {
 
   private final ActualTenderActivityRepository actualTenderActivityRepository;
   private final InvitationToTenderParticipantRepository invitationToTenderParticipantRepository;
@@ -23,24 +24,32 @@ class ActualTenderActivityService {
     this.clock = clock;
   }
 
-  @Transactional
-  void createActualTenderDetail(ActualTender actualTender, ActualTenderActivityForm form) {
-    var actualTenderDetail = new ActualTenderActivity(actualTender, clock.instant());
-    saveActualTenderDetail(actualTenderDetail, form);
+  public ActualTenderActivity getById(Integer id) {
+    return actualTenderActivityRepository.findById(id).orElseThrow(
+        () -> new ScapEntityNotFoundException(
+            String.format("Could not find actual tendering activity with ID [%s]", id))
+    );
   }
 
   @Transactional
-  void updateActualTenderDetail(ActualTenderActivity actualTenderActivity, ActualTenderActivityForm form) {
+  ActualTenderActivity createActualTenderActivity(ActualTender actualTender, ActualTenderActivityForm form) {
+    var actualTenderActivity = new ActualTenderActivity(actualTender, clock.instant());
+    saveActualTenderActivity(actualTenderActivity, form);
+    return actualTenderActivity;
+  }
+
+  @Transactional
+  void updateActualTenderActivity(ActualTenderActivity actualTenderActivity, ActualTenderActivityForm form) {
     //TODO SCAP2022-41: when adding multiple companies, only delete those which have been removed from ITT,
     // and only add those that do not already exist
     var existingInvitationToTenderParticipants = invitationToTenderParticipantRepository
         .findAllByActualTenderActivity(actualTenderActivity);
     invitationToTenderParticipantRepository.deleteAll(existingInvitationToTenderParticipants);
-    saveActualTenderDetail(actualTenderActivity, form);
+    saveActualTenderActivity(actualTenderActivity, form);
   }
 
   @Transactional
-  void saveActualTenderDetail(ActualTenderActivity actualTenderActivity, ActualTenderActivityForm form) {
+  void saveActualTenderActivity(ActualTenderActivity actualTenderActivity, ActualTenderActivityForm form) {
     actualTenderActivity.setScopeTitle(form.getScopeTitle().getInputValue());
     actualTenderActivity.setScopeDescription(form.getScopeDescription().getInputValue());
     actualTenderActivity.setRemunerationModel(form.getRemunerationModel());

@@ -23,7 +23,7 @@ public class PlannedTenderActivityService {
 
   @Transactional
   public void createPlannedTenderDetail(PlannedTender plannedTender, PlannedTenderActivityForm form) {
-    var detail = new PlannedTenderActivity(
+    var activity = new PlannedTenderActivity(
         plannedTender,
         form.getScopeDescription().getInputValue(),
         form.getEstimatedValue().getAsBigDecimal()
@@ -33,7 +33,7 @@ public class PlannedTenderActivityService {
         form.getAwardRationale().getInputValue(),
         clock.instant()
     );
-    plannedTenderActivityRepository.save(detail);
+    plannedTenderActivityRepository.save(activity);
   }
 
   public List<PlannedTenderActivity> getTenderDetailsByPlannedTender(PlannedTender plannedTender) {

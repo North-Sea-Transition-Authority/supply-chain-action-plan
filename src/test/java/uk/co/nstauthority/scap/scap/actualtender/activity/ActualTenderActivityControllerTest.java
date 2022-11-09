@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -30,7 +31,9 @@ import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
+import uk.co.nstauthority.scap.scap.actualtender.ActualTenderControllerRedirectionServiceTestConfig;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
+import uk.co.nstauthority.scap.scap.actualtender.activity.bidparticipants.BidParticipantsController;
 import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTenderController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
@@ -42,6 +45,7 @@ import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = ActualTenderActivityController.class)
 @WithMockUser
+@Import(ActualTenderControllerRedirectionServiceTestConfig.class)
 class ActualTenderActivityControllerTest extends AbstractControllerTest {
 
   @Autowired
@@ -74,14 +78,14 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
   }
 
   @Test
-  void renderActualTenderDetailForm() throws Exception {
+  void renderActualTenderActivityForm() throws Exception {
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
 
     mockMvc.perform(
         get(ReverseRouter.route(on(ActualTenderActivityController.class)
-            .renderActualTenderDetailForm(scap.getId(), null))))
+            .renderActualTenderActivityForm(scap.getId(), null))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/actualtender/actualTenderActivityDetails"))
         .andExpect(model().attribute("backLinkUrl",
@@ -91,30 +95,63 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
   }
 
   @Test
-  void saveActualTenderDetailForm_validForm_assertRedirects() throws Exception {
+  void saveActualTenderActivityForm_validForm_assertRedirects() throws Exception {
     var form = new ActualTenderActivityForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
-    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()));
+    var createdTenderActivity = new ActualTenderActivity(8735);
+    createdTenderActivity.setContractStage(ContractStage.INVITATION_TO_TENDER);
+    var expectedRedirectUrl = ReverseRouter.route(on(BidParticipantsController.class)
+        .renderBidParticipantsForm(scap.getId(), createdTenderActivity.getId(), null));
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResult);
+    when(actualTenderActivityService.createActualTenderActivity(actualTender, form))
+        .thenReturn(createdTenderActivity);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ActualTenderActivityController.class)
-            .saveActualTenderDetailForm(scap.getId(), null, emptyBindingResult())))
+            .saveActualTenderActivityForm(scap.getId(), null, emptyBindingResult())))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
 
-    verify(actualTenderActivityService).createActualTenderDetail(actualTender, form);
+    verify(actualTenderActivityService).createActualTenderActivity(actualTender, form);
   }
 
   @Test
-  void saveActualTenderDetailForm_invalidForm_assertOk() throws Exception {
+  void saveActualTenderActivityForm_validForm_requestForInformation_assertRedirects() throws Exception {
+    var form = new ActualTenderActivityForm();
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    var createdTenderActivity = new ActualTenderActivity(8735);
+    createdTenderActivity.setContractStage(ContractStage.REQUEST_FOR_INFORMATION);
+    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class)
+        .renderTaskList(scap.getId()));
+
+    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
+    when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class)))
+        .thenReturn(bindingResult);
+    when(actualTenderActivityService.createActualTenderActivity(actualTender, form))
+        .thenReturn(createdTenderActivity);
+
+    mockMvc.perform(
+            post(ReverseRouter.route(on(ActualTenderActivityController.class)
+                .saveActualTenderActivityForm(scap.getId(), null, emptyBindingResult())))
+                .with(csrf())
+                .flashAttr("form", form))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
+
+    verify(actualTenderActivityService).createActualTenderActivity(actualTender, form);
+  }
+
+  @Test
+  void saveActualTenderActivityForm_invalidForm_assertOk() throws Exception {
     var form = new ActualTenderActivityForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("form", "testField", "Test field must not be blank"));
@@ -127,7 +164,7 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ActualTenderActivityController.class)
-            .saveActualTenderDetailForm(scap.getId(), null, emptyBindingResult())))
+            .saveActualTenderActivityForm(scap.getId(), null, emptyBindingResult())))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().isOk())
@@ -138,6 +175,6 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
         .andExpect(model().attribute("contractStages", ContractStage.getContractStages()))
         .andExpect(model().attributeExists("errorList"));
 
-    verify(actualTenderActivityService, never()).createActualTenderDetail(any(), any());
+    verify(actualTenderActivityService, never()).createActualTenderActivity(any(), any());
   }
 }

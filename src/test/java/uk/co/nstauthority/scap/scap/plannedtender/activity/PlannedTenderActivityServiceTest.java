@@ -111,13 +111,13 @@ class PlannedTenderActivityServiceTest {
 
   @Test
   void getPlannedTenderById_existing_assertCorrectReturn() {
-    var detail = new PlannedTenderActivity(22);
+    var activity = new PlannedTenderActivity(22);
 
-    when(plannedTenderActivityRepository.findById(22)).thenReturn(Optional.of(detail));
+    when(plannedTenderActivityRepository.findById(22)).thenReturn(Optional.of(activity));
 
     var returnedDetail = plannedTenderActivityService.getPlannedTenderDetailById(22);
 
-    assertThat(returnedDetail).isEqualTo(detail);
+    assertThat(returnedDetail).isEqualTo(activity);
   }
 
   @Test
@@ -130,16 +130,16 @@ class PlannedTenderActivityServiceTest {
 
   @Test
   void deletePlannedTenderDetail_verifyDeletes() {
-    var detail = new PlannedTenderActivity(24);
+    var activity = new PlannedTenderActivity(24);
 
-    plannedTenderActivityService.deletePlannedTenderDetail(detail);
+    plannedTenderActivityService.deletePlannedTenderDetail(activity);
 
-    verify(plannedTenderActivityRepository).delete(detail);
+    verify(plannedTenderActivityRepository).delete(activity);
   }
 
   @Test
   void updatePlannedTenderDetail_verifySaves() {
-    var detail = new PlannedTenderActivity(19);
+    var activity = new PlannedTenderActivity(19);
     var form = new PlannedTenderActivityForm();
     form.setAwardRationale("Some award rationale");
     form.setEstimatedValue("2.32");
@@ -148,7 +148,7 @@ class PlannedTenderActivityServiceTest {
     form.setScopeDescription("Some scope description");
     var argumentCaptor = ArgumentCaptor.forClass(PlannedTenderActivity.class);
 
-    plannedTenderActivityService.updatePlannedTenderDetail(detail, form);
+    plannedTenderActivityService.updatePlannedTenderDetail(activity, form);
 
     verify(plannedTenderActivityRepository).save(argumentCaptor.capture());
 
@@ -169,7 +169,7 @@ class PlannedTenderActivityServiceTest {
 
   @Test
   void updatePlannedTenderDetail_invalidEstimatedValue_verifyNeverSaves() {
-    var detail = new PlannedTenderActivity(19);
+    var activity = new PlannedTenderActivity(19);
     var form = new PlannedTenderActivityForm();
     form.setAwardRationale("Some award rationale");
     form.setEstimatedValue("not a number");
@@ -177,7 +177,7 @@ class PlannedTenderActivityServiceTest {
     form.setRemunerationModelName("Some remuneration model");
     form.setScopeDescription("Some scope description");
 
-    assertThatThrownBy(() -> plannedTenderActivityService.updatePlannedTenderDetail(detail, form))
+    assertThatThrownBy(() -> plannedTenderActivityService.updatePlannedTenderDetail(activity, form))
         .isInstanceOf(ClassCastException.class);
 
     verify(plannedTenderActivityRepository, never()).save(any());

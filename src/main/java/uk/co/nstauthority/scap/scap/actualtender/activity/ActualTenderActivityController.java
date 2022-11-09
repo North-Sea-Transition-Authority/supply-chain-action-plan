@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.actualtender.activity;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,11 +14,11 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
+import uk.co.nstauthority.scap.scap.actualtender.ActualTenderControllerRedirectionService;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTenderController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
-import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @Controller
 @RequestMapping("{scapId}/actual-tender/activity")
@@ -29,22 +30,26 @@ public class ActualTenderActivityController {
   private final ControllerHelperService controllerHelperService;
   private final ActualTenderActivityFormService actualTenderActivityFormService;
   private final ActualTenderActivityService actualTenderActivityService;
+  private final ActualTenderControllerRedirectionService actualTenderControllerRedirectionService;
 
+  @Autowired
   public ActualTenderActivityController(ScapService scapService, ScapDetailService scapDetailService,
                                         ActualTenderService actualTenderService,
                                         ControllerHelperService controllerHelperService,
                                         ActualTenderActivityFormService actualTenderActivityFormService,
-                                        ActualTenderActivityService actualTenderActivityService) {
+                                        ActualTenderActivityService actualTenderActivityService,
+                                        ActualTenderControllerRedirectionService actualTenderControllerRedirectionService) {
     this.scapService = scapService;
     this.scapDetailService = scapDetailService;
     this.actualTenderService = actualTenderService;
     this.controllerHelperService = controllerHelperService;
     this.actualTenderActivityFormService = actualTenderActivityFormService;
     this.actualTenderActivityService = actualTenderActivityService;
+    this.actualTenderControllerRedirectionService = actualTenderControllerRedirectionService;
   }
 
   @GetMapping
-  public ModelAndView renderActualTenderDetailForm(@PathVariable("scapId") Integer scapId,
+  public ModelAndView renderActualTenderActivityForm(@PathVariable("scapId") Integer scapId,
                                                    @ModelAttribute("form") ActualTenderActivityForm form) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
@@ -54,7 +59,7 @@ public class ActualTenderActivityController {
   }
 
   @PostMapping
-  public ModelAndView saveActualTenderDetailForm(@PathVariable("scapId") Integer scapId,
+  public ModelAndView saveActualTenderActivityForm(@PathVariable("scapId") Integer scapId,
                                                  @ModelAttribute("form") ActualTenderActivityForm form,
                                                  BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
@@ -67,10 +72,11 @@ public class ActualTenderActivityController {
         bindingResult,
         actualTenderDetailFormModelAndView(scapId),
         form,
-        // TODO SCAP2022-43: Update this to redirect to actual tendering activity summary
         () -> {
-          actualTenderActivityService.createActualTenderDetail(actualTender, form);
-          return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
+          var actualTenderActivity = actualTenderActivityService
+              .createActualTenderActivity(actualTender, form);
+          return actualTenderControllerRedirectionService
+              .redirectFromActualTenderActivityForm(scapId, actualTenderActivity);
         }
     );
   }

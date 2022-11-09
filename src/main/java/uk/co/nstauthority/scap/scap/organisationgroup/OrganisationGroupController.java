@@ -99,14 +99,14 @@ public class OrganisationGroupController {
           .addObject("errorItems", validationErrorOrderingService.getErrorItemsFromBindingResult(form, bindingResult));
     }
 
-    scapService.updateScapOverviewOrganisationGroup(scapOverview,
+    scapService.updateScapOrganisationGroup(scapOverview,
         Integer.valueOf(form.getOrganisationGroupId().getInputValue()));
     return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
   }
 
   @Transactional
   Scap createScap(Integer organisationGroupId) {
-    var scap = scapService.createScapOverview(organisationGroupId);
+    var scap = scapService.createScap(organisationGroupId);
     scapDetailService.createDraftScapDetail(scap);
     return scap;
   }

@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.scap.actualtender.activity;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -15,7 +16,7 @@ import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 
 @Entity
 @Table(name = "actual_tender_activities")
-class ActualTenderActivity {
+public class ActualTenderActivity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,9 +43,18 @@ class ActualTenderActivity {
   public ActualTenderActivity() {
   }
 
+  @VisibleForTesting
+  public ActualTenderActivity(Integer id) {
+    this.id = id;
+  }
+
   ActualTenderActivity(ActualTender actualTender, Instant createdTimestamp) {
     this.actualTender = actualTender;
     this.createdTimestamp = createdTimestamp;
+  }
+
+  public Integer getId() {
+    return id;
   }
 
   String getScopeTitle() {
@@ -79,7 +89,7 @@ class ActualTenderActivity {
     this.remunerationModelName = remunerationModelName;
   }
 
-  ContractStage getContractStage() {
+  public ContractStage getContractStage() {
     return contractStage;
   }
 
