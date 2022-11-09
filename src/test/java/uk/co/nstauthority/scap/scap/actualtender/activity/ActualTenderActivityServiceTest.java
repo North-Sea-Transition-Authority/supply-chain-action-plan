@@ -1,0 +1,132 @@
+package uk.co.nstauthority.scap.scap.actualtender.activity;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.nstauthority.scap.scap.RemunerationModel;
+import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
+
+@ExtendWith(MockitoExtension.class)
+class ActualTenderActivityServiceTest {
+
+  @Mock
+  ActualTenderActivityRepository actualTenderActivityRepository;
+
+  @Mock
+  InvitationToTenderParticipantRepository invitationToTenderParticipantRepository;
+
+  Clock clock;
+
+  ActualTenderActivityService actualTenderActivityService;
+
+  @Captor
+  private ArgumentCaptor<List<InvitationToTenderParticipant>> invitationToTenderParticipantCaptor;
+
+  private ActualTender actualTender;
+  private ActualTenderActivityForm form;
+
+  @BeforeEach
+  void setup() {
+    actualTender = new ActualTender(42);
+    form = new ActualTenderActivityForm();
+    form.setScopeTitle("test scope title");
+    form.setScopeDescription("test scope description");
+    form.setRemunerationModel(RemunerationModel.OTHER);
+    form.setRemunerationModelName("test remuneration model name");
+    form.setContractStage(ContractStage.CONTRACT_AWARDED);
+    form.setInvitationToTenderParticipants("test ITT participant");
+    clock = Clock.fixed(Instant.ofEpochSecond(1667316108), ZoneId.systemDefault());
+    actualTenderActivityService = new ActualTenderActivityService(
+        actualTenderActivityRepository, invitationToTenderParticipantRepository, clock);
+  }
+
+  @Test
+  void createActualTenderDetail_assertSaves() {
+    var actualTenderDetailArgumentCaptor = ArgumentCaptor.forClass(ActualTenderActivity.class);
+
+    actualTenderActivityService.createActualTenderDetail(actualTender, form);
+
+    verify(actualTenderActivityRepository).save(actualTenderDetailArgumentCaptor.capture());
+    verify(invitationToTenderParticipantRepository).saveAll(invitationToTenderParticipantCaptor.capture());
+    verify(invitationToTenderParticipantRepository, never()).deleteAll(any());
+
+    assertThat(actualTenderDetailArgumentCaptor.getValue()).extracting(
+        ActualTenderActivity::getScopeTitle,
+        ActualTenderActivity::getScopeDescription,
+        ActualTenderActivity::getRemunerationModel,
+        ActualTenderActivity::getRemunerationModelName,
+        ActualTenderActivity::getContractStage,
+        ActualTenderActivity::getCreatedTimestamp
+    ).containsExactly(
+        form.getScopeTitle().getInputValue(),
+        form.getScopeDescription().getInputValue(),
+        form.getRemunerationModel(),
+        form.getRemunerationModelName().getInputValue(),
+        form.getContractStage(),
+        clock.instant()
+    );
+
+    assertThat(invitationToTenderParticipantCaptor.getValue()).extracting(
+        InvitationToTenderParticipant::getCompanyName,
+        InvitationToTenderParticipant::getCreatedTimestamp
+    ).containsExactly(
+        tuple(form.getInvitationToTenderParticipants().getInputValue(), clock.instant())
+    );
+  }
+
+  @Test
+  void updateActualTenderDetail_assertSaves() {
+    var actualTenderDetailArgumentCaptor = ArgumentCaptor.forClass(ActualTenderActivity.class);
+    var actualTenderDetail = new ActualTenderActivity(actualTender, clock.instant());
+    var existingInvitationToTenderParticipants = List.of(
+        new InvitationToTenderParticipant()
+    );
+
+    when(invitationToTenderParticipantRepository.findAllByActualTenderActivity(actualTenderDetail))
+        .thenReturn(existingInvitationToTenderParticipants);
+
+    actualTenderActivityService.updateActualTenderDetail(actualTenderDetail, form);
+
+    verify(actualTenderActivityRepository).save(actualTenderDetailArgumentCaptor.capture());
+    verify(invitationToTenderParticipantRepository).saveAll(invitationToTenderParticipantCaptor.capture());
+    verify(invitationToTenderParticipantRepository).deleteAll(existingInvitationToTenderParticipants);
+
+    assertThat(actualTenderDetailArgumentCaptor.getValue()).extracting(
+        ActualTenderActivity::getScopeTitle,
+        ActualTenderActivity::getScopeDescription,
+        ActualTenderActivity::getRemunerationModel,
+        ActualTenderActivity::getRemunerationModelName,
+        ActualTenderActivity::getContractStage,
+        ActualTenderActivity::getCreatedTimestamp
+    ).containsExactly(
+        form.getScopeTitle().getInputValue(),
+        form.getScopeDescription().getInputValue(),
+        form.getRemunerationModel(),
+        form.getRemunerationModelName().getInputValue(),
+        form.getContractStage(),
+        clock.instant()
+    );
+
+    assertThat(invitationToTenderParticipantCaptor.getValue()).extracting(
+        InvitationToTenderParticipant::getCompanyName,
+        InvitationToTenderParticipant::getCreatedTimestamp
+    ).containsExactly(
+        tuple(form.getInvitationToTenderParticipants().getInputValue(), clock.instant())
+    );
+  }
+}

@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.workarea;
+package uk.co.nstauthority.scap.scap.start;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -13,23 +13,23 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
-import uk.co.nstauthority.scap.scap.start.ScapStartController;
+import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupController;
+import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @ExtendWith(MockitoExtension.class)
-@ContextConfiguration(classes = WorkAreaController.class)
+@ContextConfiguration(classes = ScapStartController.class)
 @WithMockUser
-class WorkAreaControllerTest extends AbstractControllerTest {
+class ScapStartControllerTest extends AbstractControllerTest {
 
   @Test
-  void getWorkArea() throws Exception {
-
-    mockMvc.perform(
-        get(ReverseRouter.route(on(WorkAreaController.class).getWorkArea())))
+  void renderStartNewScap() throws Exception {
+    mockMvc.perform(get(
+        ReverseRouter.route(on(ScapStartController.class).renderStartNewScap())))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/workarea/workArea"))
-        .andExpect(model().attribute("startScapUrl",
-            ReverseRouter.route(on(ScapStartController.class).renderStartNewScap())));
-
+        .andExpect(view().name("scap/application/start"))
+        .andExpect(model().attribute("startScapRedirectUrl",
+            ReverseRouter.route(on(OrganisationGroupController.class).renderNewScapOrganisationGroupForm(null))))
+        .andExpect(model().attribute("backLinkUrl",
+            ReverseRouter.route(on(WorkAreaController.class).getWorkArea())));
   }
-
 }
