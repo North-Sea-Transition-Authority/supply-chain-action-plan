@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -72,7 +71,6 @@ class ProjectDetailsFormValidatorTest {
     );
   }
 
-  @Disabled("DFL currently only validates one field at a time")
   @Test
   void validate_tooManyDecimalPlaces_assertHasExpectedErrors() {
     form.setProjectCostEstimate("0.1234");
@@ -90,7 +88,6 @@ class ProjectDetailsFormValidatorTest {
     );
   }
 
-  @Disabled("DFL currently only validates one field at a time")
   @Test
   void validate_tooSmallInputs_assertHasExpectedErrors() {
     form.setProjectCostEstimate("0");

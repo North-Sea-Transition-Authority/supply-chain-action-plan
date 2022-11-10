@@ -38,7 +38,7 @@ dependencies {
   implementation 'org.springframework.session:spring-session-core'
   implementation 'org.flywaydb:flyway-core'
 
-  implementation 'uk.co.fivium.digitalformlibrary:digital-form-library:develop-SNAPSHOT'
+  implementation 'uk.co.fivium.digitalformlibrary:digital-form-library:v1.0.0'
   implementation 'uk.co.fivium.energyportalapi:client:v2.0.1'
 
 	runtimeOnly 'org.postgresql:postgresql'
