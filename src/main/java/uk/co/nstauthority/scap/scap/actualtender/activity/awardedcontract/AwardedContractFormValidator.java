@@ -1,0 +1,91 @@
+package uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.Errors;
+import org.springframework.validation.SmartValidator;
+import org.springframework.validation.ValidationUtils;
+import uk.co.fivium.formlibrary.validator.decimal.DecimalInputValidator;
+import uk.co.fivium.formlibrary.validator.string.StringInputValidator;
+import uk.co.nstauthority.scap.energyportal.CountryService;
+import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
+
+@Service
+class AwardedContractFormValidator implements SmartValidator {
+
+  private static final String PREFERRED_BIDDER_FIELD = "preferredBidderId";
+  private static final String BIDDER_LOCATION_FIELD = "preferredBidderLocation";
+
+  private final CountryService countryService;
+
+  @Autowired
+  AwardedContractFormValidator(CountryService countryService) {
+    this.countryService = countryService;
+  }
+
+  @Override
+  public boolean supports(@NotNull Class<?> clazz) {
+    return AwardedContractForm.class.equals(clazz);
+  }
+
+  @Override
+  public void validate(@NotNull Object target, @NotNull Errors errors) {
+    throw new IllegalStateException("Missing 3rd argument of type List<InvitationToTenderParticipant>");
+  }
+
+  @Override
+  public void validate(@NotNull Object target, @NotNull Errors errors, @NotNull Object... validationHints) {
+    var awardedContractFormValidatorHint = Arrays.stream(validationHints)
+        .filter(Objects::nonNull)
+        .filter(validationHint -> AwardedContractFormValidatorHint.class.equals(validationHint.getClass()))
+        .map(AwardedContractFormValidatorHint.class::cast)
+        .findFirst()
+        .orElseThrow(() -> new IllegalStateException("Cannot get AwardedContractFormValidatorHint"));
+
+    var form = (AwardedContractForm) target;
+
+    ValidationUtils.rejectIfEmpty(
+        errors,
+        PREFERRED_BIDDER_FIELD,
+        String.format("%s.required", PREFERRED_BIDDER_FIELD),
+        "Select a preferred bidder");
+    if (!errors.hasFieldErrors(PREFERRED_BIDDER_FIELD)) {
+      var permittedBidderIds = awardedContractFormValidatorHint.bidParticipants().stream()
+          .map(InvitationToTenderParticipant::getId)
+          .collect(Collectors.toSet());
+      if (!permittedBidderIds.contains(form.getPreferredBidderId())) {
+        errors.rejectValue(
+            PREFERRED_BIDDER_FIELD,
+            String.format("%s.doesNotExist", PREFERRED_BIDDER_FIELD),
+            "Select a valid preferred bidder");
+      }
+    }
+
+    DecimalInputValidator.builder()
+        .mustBeMoreThanOrEqual(BigDecimal.valueOf(0.001))
+        .mustHaveNoMoreThanDecimalPlaces(3)
+        .validate(form.getAwardValue(), errors);
+
+    StringInputValidator.builder()
+        .validate(form.getAwardRationale(), errors);
+
+    ValidationUtils.rejectIfEmpty(
+        errors,
+        BIDDER_LOCATION_FIELD,
+        String.format("%s.required", BIDDER_LOCATION_FIELD),
+        "Select the location of the preferred bidder");
+    if (!errors.hasFieldErrors(BIDDER_LOCATION_FIELD)
+        && !countryService.doesCountryExist(form.getPreferredBidderLocation())) {
+      errors.rejectValue(
+          BIDDER_LOCATION_FIELD,
+          String.format("%s.doesNotExist", BIDDER_LOCATION_FIELD),
+          "Select a valid location of the preferred bidder"
+      );
+    }
+  }
+}

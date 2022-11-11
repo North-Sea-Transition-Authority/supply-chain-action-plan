@@ -21,6 +21,12 @@ public class InvitationToTenderParticipantService {
         .toList();
   }
 
+  public List<InvitationToTenderParticipant> getBidParticipants(ActualTenderActivity actualTenderActivity) {
+    return getInvitationToTenderParticipants(actualTenderActivity).stream()
+        .filter(invitationToTenderParticipant -> Boolean.TRUE.equals(invitationToTenderParticipant.getBidParticipant()))
+        .toList();
+  }
+
   public void updateBidParticipants(List<InvitationToTenderParticipant> invitationToTenderParticipants,
                                     List<Integer> bidParticipantIds) {
     invitationToTenderParticipants

@@ -8,6 +8,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ContractStage;
+import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContractController;
 import uk.co.nstauthority.scap.scap.actualtender.activity.bidparticipants.BidParticipantsController;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
@@ -26,8 +27,12 @@ public class ActualTenderControllerRedirectionService {
     return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
   }
 
-  public ModelAndView redirectFromBidParticipantsForm(Integer scapId) {
-    // TODO SCAP2022-43: Check if status is CONTRACT_AWARDED, redirect to relevant form page if it is
+  public ModelAndView redirectFromBidParticipantsForm(Integer scapId, ActualTenderActivity actualTenderActivity) {
+    if (ContractStage.CONTRACT_AWARDED.equals(actualTenderActivity.getContractStage())) {
+      return ReverseRouter.redirect(on(AwardedContractController.class)
+          .renderAwardedContractForm(scapId, actualTenderActivity.getId()));
+    }
+    // TODO SCAP2022-43: Replace with redirect to Actual Tender Activity summary
     return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
   }
 }

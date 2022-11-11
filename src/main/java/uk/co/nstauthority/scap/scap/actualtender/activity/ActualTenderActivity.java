@@ -93,7 +93,7 @@ public class ActualTenderActivity {
     return contractStage;
   }
 
-  void setContractStage(ContractStage contractStage) {
+  public void setContractStage(ContractStage contractStage) {
     this.contractStage = contractStage;
   }
 

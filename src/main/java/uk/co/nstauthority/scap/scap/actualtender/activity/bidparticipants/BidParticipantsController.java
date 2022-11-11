@@ -78,7 +78,7 @@ public class BidParticipantsController {
         () -> {
           invitationToTenderParticipantService
               .updateBidParticipants(invitationToTenderParticipants, form.getSelectedBidParticipantIds());
-          return actualTenderControllerRedirectionService.redirectFromBidParticipantsForm(scapId);
+          return actualTenderControllerRedirectionService.redirectFromBidParticipantsForm(scapId, actualTenderDetail);
         }
     );
   }

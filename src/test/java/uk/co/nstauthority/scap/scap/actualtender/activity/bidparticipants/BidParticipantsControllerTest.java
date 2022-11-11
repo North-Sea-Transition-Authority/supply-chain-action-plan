@@ -30,8 +30,10 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderControllerRedirectionServiceTestConfig;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
+import uk.co.nstauthority.scap.scap.actualtender.activity.ContractStage;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipantService;
+import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContractController;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
@@ -112,6 +114,34 @@ class BidParticipantsControllerTest extends AbstractControllerTest {
         .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
 
     verify(invitationToTenderParticipantService).updateBidParticipants(invitationToTenderParticipants, form.getSelectedBidParticipantIds());
+  }
+
+  @Test
+  void saveBidParticipantsForm_ContractAwarded_AssertRedirect() throws Exception {
+    actualTenderActivity.setContractStage(ContractStage.CONTRACT_AWARDED);
+    var form = new BidParticipantsForm();
+    form.setSelectedBidParticipantIds(List.of(1272));
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    var expectedRedirectUrl = ReverseRouter.route(on(AwardedContractController.class)
+        .renderAwardedContractForm(scap.getId(), actualTenderActivity.getId()));
+
+    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
+    when(invitationToTenderParticipantService.getInvitationToTenderParticipants(actualTenderActivity))
+        .thenReturn(invitationToTenderParticipants);
+    when(bidParticipantsFormService.validate(eq(form), any(BindingResult.class), eq(invitationToTenderParticipants)))
+        .thenReturn(bindingResult);
+
+    mockMvc.perform(post(
+        ReverseRouter.route(on(BidParticipantsController.class)
+            .renderBidParticipantsForm(scap.getId(), actualTenderActivity.getId(), null)))
+            .with(csrf())
+            .flashAttr("form", form))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
+
+    verify(invitationToTenderParticipantService)
+        .updateBidParticipants(invitationToTenderParticipants, form.getSelectedBidParticipantIds());
   }
 
   @Test

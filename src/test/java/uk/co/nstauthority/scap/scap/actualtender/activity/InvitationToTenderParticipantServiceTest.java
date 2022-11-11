@@ -43,6 +43,24 @@ class InvitationToTenderParticipantServiceTest {
   }
 
   @Test
+  void getBidParticipants() {
+    var actualTenderActivity = new ActualTenderActivity(141);
+    var participant1 = new InvitationToTenderParticipant(actualTenderActivity, Instant.now());
+    participant1.setCompanyName("test company name");
+    participant1.setBidParticipant(true);
+    var participant2 = new InvitationToTenderParticipant(actualTenderActivity, Instant.now());
+    participant2.setCompanyName("test company name");
+    participant2.setBidParticipant(false);
+
+    when(invitationToTenderParticipantRepository.findAllByActualTenderActivity(actualTenderActivity))
+        .thenReturn(List.of(participant1, participant2));
+
+    var bidParticipants = invitationToTenderParticipantService.getBidParticipants(actualTenderActivity);
+
+    assertThat(bidParticipants).containsExactly(participant1);
+  }
+
+  @Test
   void updateBidParticipants() {
     var invitationToTenderParticipant1 = new InvitationToTenderParticipant(37);
     invitationToTenderParticipant1.setCompanyName("company name 1");
