@@ -153,4 +153,26 @@ class AwardedContractServiceTest {
 
     verify(awardedContractRepository, never()).save(any());
   }
+
+  @Test
+  void deleteByActualTenderActivity_IsPresent_VerifyDeletes() {
+    var existingContract = new AwardedContract(44);
+
+    when(awardedContractRepository.findByActualTenderActivity(actualTenderActivity))
+        .thenReturn(Optional.of(existingContract));
+
+    awardedContractService.deleteByActualTenderActivity(actualTenderActivity);
+
+    verify(awardedContractRepository).delete(existingContract);
+  }
+
+  @Test
+  void deleteByActualTenderActivity_NotPresent_VerifyNeverDeletes() {
+    when(awardedContractRepository.findByActualTenderActivity(actualTenderActivity))
+        .thenReturn(Optional.empty());
+
+    awardedContractService.deleteByActualTenderActivity(actualTenderActivity);
+
+    verify(awardedContractRepository, never()).delete(any());
+  }
 }

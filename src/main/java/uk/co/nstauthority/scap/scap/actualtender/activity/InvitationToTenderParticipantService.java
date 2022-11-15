@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.actualtender.activity;
 
 import java.util.Comparator;
 import java.util.List;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,12 @@ public class InvitationToTenderParticipantService {
         .forEach(participant -> participant.setBidParticipant(bidParticipantIds.contains(participant.getId())));
 
     invitationToTenderParticipantRepository.saveAll(invitationToTenderParticipants);
+  }
+
+  @Transactional
+  public void deleteAllByActualTenderActivity(ActualTenderActivity actualTenderActivity) {
+    var invitationToTenderParticipants = getInvitationToTenderParticipants(actualTenderActivity);
+    invitationToTenderParticipantRepository.deleteAll(invitationToTenderParticipants);
   }
 
 }

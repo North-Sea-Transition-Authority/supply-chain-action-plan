@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.scap.actualtender.summary;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.when;
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.fivium.energyportalapi.generated.types.Country;
 import uk.co.nstauthority.scap.energyportal.CountryService;
+import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ContractStage;
@@ -23,6 +25,7 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderPart
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipantService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContract;
 import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContractService;
+import uk.co.nstauthority.scap.scap.actualtender.activity.delete.DeleteActualTenderActivityController;
 
 @ExtendWith(MockitoExtension.class)
 class ActualTenderSummaryServiceTest {
@@ -41,6 +44,8 @@ class ActualTenderSummaryServiceTest {
 
   @Test
   void getViewsForActualTenderActivities() {
+    var scapId = 11;
+
     var actualTenderActivity1 = new ActualTenderActivity(10);
     actualTenderActivity1.setScopeTitle("test scope title 1");
     actualTenderActivity1.setScopeDescription("test scope description 1");
@@ -98,7 +103,7 @@ class ActualTenderSummaryServiceTest {
         .thenReturn(Optional.of(country));
 
     var returnedViews = actualTenderSummaryService
-        .getViewsForActualTenderActivities(actualTenderActivities);
+        .getViewsForActualTenderActivities(actualTenderActivities, scapId);
 
     assertThat(returnedViews).extracting(
         ActualTenderSummaryView::scopeTitle,
@@ -120,7 +125,8 @@ class ActualTenderSummaryServiceTest {
             List.of(participant1.getCompanyName()),
             Collections.emptyList(),
             "#",
-            "#"
+            ReverseRouter.route(on(DeleteActualTenderActivityController.class)
+                .renderDeleteActualTenderActivityConfirmation(scapId, actualTenderActivity1.getId()))
         ),
         tuple(
             actualTenderActivity2.getScopeTitle(),
@@ -131,7 +137,8 @@ class ActualTenderSummaryServiceTest {
             List.of(participant2.getCompanyName(), participant3.getCompanyName()),
             List.of(participant2.getCompanyName()),
             "#",
-            "#"
+            ReverseRouter.route(on(DeleteActualTenderActivityController.class)
+                .renderDeleteActualTenderActivityConfirmation(scapId, actualTenderActivity2.getId()))
         ),
         tuple(
             actualTenderActivity3.getScopeTitle(),
@@ -142,7 +149,8 @@ class ActualTenderSummaryServiceTest {
             List.of(participant4.getCompanyName(), participant5.getCompanyName()),
             List.of(participant4.getCompanyName()),
             "#",
-            "#"
+            ReverseRouter.route(on(DeleteActualTenderActivityController.class)
+                .renderDeleteActualTenderActivityConfirmation(scapId, actualTenderActivity3.getId()))
         )
     );
 

@@ -48,7 +48,8 @@ public class ActualTenderSummaryController {
       return ReverseRouter.redirect(on(HasActualTenderController.class).renderHasActualTenderForm(scapId));
     }
 
-    var actualTenderSummaryViews = actualTenderSummaryService.getViewsForActualTenderActivities(actualTenderActivities);
+    var actualTenderSummaryViews = actualTenderSummaryService
+        .getViewsForActualTenderActivities(actualTenderActivities, scapId);
 
     return actualTenderSummaryModelAndView(scapId, actualTenderSummaryViews);
   }

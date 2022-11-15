@@ -1,9 +1,21 @@
 <#include '../../fds/layout.ftl'>
 <#import '_pageSizes.ftl' as PageSize>
+<#import '../scap/macros/notificationBanner.ftl' as notificationBanner>
 
 <#-- @ftlvariable name="serviceBranding" type="uk.co.nstauthority.scap.branding.ServiceConfigurationProperties" -->
 <#-- @ftlvariable name="customerBranding" type="uk.co.nstauthority.scap.branding.CustomerConfigurationProperties" -->
 <#-- @ftlvariable name="serviceHomeUrl" type="String" -->
+<#-- @ftlvariable name="notificationBannerView" type="uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerView" -->
+
+<#if notificationBannerView??>
+  <#assign notificationBannerContent>
+    <#if notificationBannerView.bannerType.getValue() == "notificationBannerSuccess">
+        <@notificationBanner.successNotificationBanner notificationBannerView=notificationBannerView/>
+    <#else>
+        <@notificationBanner.infoNotificationBanner notificationBannerView=notificationBannerView/>
+    </#if>
+  </#assign>
+</#if>
 
 <#macro defaultPage
   htmlTitle
@@ -59,6 +71,7 @@
     backLinkUrl=backLinkUrl
     caption=caption
     errorItems=errorItems
+    notificationBannerContent=notificationBannerContent
   >
     <#nested />
   </@fdsDefaultPageTemplate>

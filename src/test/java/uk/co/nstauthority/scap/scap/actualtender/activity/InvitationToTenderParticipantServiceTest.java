@@ -88,4 +88,21 @@ class InvitationToTenderParticipantServiceTest {
         tuple(invitationToTenderParticipant2.getId(), invitationToTenderParticipant2.getCompanyName(), Boolean.FALSE)
     );
   }
+
+  @Test
+  void deleteAllByActualTenderActivity_VerifyDeletes() {
+    var actualTenderActivity = new ActualTenderActivity(44);
+    var participant1 = new InvitationToTenderParticipant(441);
+    participant1.setCompanyName("company 1");
+    var participant2 = new InvitationToTenderParticipant(442);
+    participant2.setCompanyName("company 2");
+    var participants = List.of(participant1, participant2);
+
+    when(invitationToTenderParticipantRepository.findAllByActualTenderActivity(actualTenderActivity))
+        .thenReturn(participants);
+
+    invitationToTenderParticipantService.deleteAllByActualTenderActivity(actualTenderActivity);
+
+    verify(invitationToTenderParticipantRepository).deleteAll(participants);
+  }
 }

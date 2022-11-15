@@ -99,7 +99,7 @@ class ActualTenderSummaryControllerTest extends AbstractControllerTest {
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(actualTenderActivities);
-    when(actualTenderSummaryService.getViewsForActualTenderActivities(actualTenderActivities))
+    when(actualTenderSummaryService.getViewsForActualTenderActivities(actualTenderActivities, scap.getId()))
         .thenReturn(actualTenderActivitySummaryViews);
 
     mockMvc.perform(get(

@@ -75,4 +75,9 @@ public class ActualTenderActivityService {
     actualTenderActivityRepository.save(actualTenderActivity);
     invitationToTenderParticipantRepository.saveAll(newInvitationToTenderParticipants);
   }
+
+  @Transactional
+  public void deleteActualTenderActivity(ActualTenderActivity actualTenderActivity) {
+    actualTenderActivityRepository.delete(actualTenderActivity);
+  }
 }

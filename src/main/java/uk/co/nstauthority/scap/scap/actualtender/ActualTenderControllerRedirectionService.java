@@ -10,6 +10,7 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ContractStage;
 import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContractController;
 import uk.co.nstauthority.scap.scap.actualtender.activity.bidparticipants.BidParticipantsController;
+import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTenderController;
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
 
 @Service
@@ -32,5 +33,13 @@ public class ActualTenderControllerRedirectionService {
           .renderAwardedContractForm(scapId, actualTenderActivity.getId()));
     }
     return ReverseRouter.redirect(on(ActualTenderSummaryController.class).renderActualTenderSummary(scapId));
+  }
+
+  public ModelAndView redirectFromActualTenderDeletion(Integer scapId, Boolean hasActualTenderDetails) {
+    if (Boolean.TRUE.equals(hasActualTenderDetails)) {
+      return ReverseRouter.redirect(on(ActualTenderSummaryController.class).renderActualTenderSummary(scapId));
+    }
+
+    return ReverseRouter.redirect(on(HasActualTenderController.class).renderHasActualTenderForm(scapId));
   }
 }

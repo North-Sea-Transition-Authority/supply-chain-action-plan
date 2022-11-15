@@ -182,4 +182,13 @@ class ActualTenderActivityServiceTest {
 
     assertTrue(actualTenderActivityService.hasActualTenderActivity(actualTender));
   }
+
+  @Test
+  void deleteActualTenderActivity_VerifyDeletes() {
+    var actualTenderActivity = new ActualTenderActivity(44);
+
+    actualTenderActivityService.deleteActualTenderActivity(actualTenderActivity);
+
+    verify(actualTenderActivityRepository).delete(actualTenderActivity);
+  }
 }
