@@ -15,11 +15,11 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderControllerRedirectionService;
+import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityController;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipantService;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
-import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @Controller
 @RequestMapping("{scapId}/actual-tender/activity/{activityId}/bid-participants")
@@ -55,8 +55,11 @@ public class BidParticipantsController {
     var actualTenderDetail = actualTenderActivityService.getById(activityId);
     var invitationToTenderParticipants = invitationToTenderParticipantService
         .getInvitationToTenderParticipants(actualTenderDetail);
+    var existingBidParticipants = InvitationToTenderParticipantService
+        .getBidParticipantsFromInvitationToTenderParticipants(invitationToTenderParticipants);
+    form.setSelectedBidParticipantIds(BidParticipantsFormService.getParticipantIds(existingBidParticipants));
 
-    return bidParticipantsFormModelAndView(scapId, invitationToTenderParticipants);
+    return bidParticipantsFormModelAndView(scapId, invitationToTenderParticipants, activityId);
   }
 
   @PostMapping
@@ -73,7 +76,7 @@ public class BidParticipantsController {
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        bidParticipantsFormModelAndView(scapId, invitationToTenderParticipants),
+        bidParticipantsFormModelAndView(scapId, invitationToTenderParticipants, activityId),
         form,
         () -> {
           invitationToTenderParticipantService
@@ -83,10 +86,11 @@ public class BidParticipantsController {
     );
   }
 
-  private ModelAndView bidParticipantsFormModelAndView(Integer scapId, List<InvitationToTenderParticipant> participants) {
+  private ModelAndView bidParticipantsFormModelAndView(Integer scapId, List<InvitationToTenderParticipant> participants,
+                                                       Integer activityId) {
     return new ModelAndView("scap/scap/actualtender/bidParticipants")
-        // TODO SCAP2022-45: replace with link to update actual tendering activity
-        .addObject("backLinkUrl", ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
+        .addObject("backLinkUrl", ReverseRouter.route(on(ActualTenderActivityController.class)
+            .renderExistingActualTenderActivityForm(scapId, activityId)))
         .addObject("bidParticipantCheckboxes",
             BidParticipantsFormService.getBidParticipantsCheckboxes(participants));
   }

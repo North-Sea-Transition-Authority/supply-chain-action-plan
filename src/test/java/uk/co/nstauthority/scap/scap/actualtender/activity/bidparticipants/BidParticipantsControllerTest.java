@@ -29,6 +29,7 @@ import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderControllerRedirectionServiceTestConfig;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
+import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityController;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ContractStage;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
@@ -37,7 +38,6 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.Awarde
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
-import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = BidParticipantsController.class)
@@ -87,7 +87,8 @@ class BidParticipantsControllerTest extends AbstractControllerTest {
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/actualtender/bidParticipants"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
+            ReverseRouter.route(on(ActualTenderActivityController.class)
+                .renderExistingActualTenderActivityForm(scap.getId(), actualTenderActivity.getId()))))
         .andExpect(model().attribute("bidParticipantCheckboxes",
             BidParticipantsFormService.getBidParticipantsCheckboxes(invitationToTenderParticipants)));
   }
@@ -167,7 +168,8 @@ class BidParticipantsControllerTest extends AbstractControllerTest {
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/actualtender/bidParticipants"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
+            ReverseRouter.route(on(ActualTenderActivityController.class)
+                .renderExistingActualTenderActivityForm(scap.getId(), actualTenderActivity.getId()))))
         .andExpect(model().attribute("bidParticipantCheckboxes",
             BidParticipantsFormService.getBidParticipantsCheckboxes(invitationToTenderParticipants)))
         .andExpect(model().attributeExists("errorList"));

@@ -9,6 +9,7 @@ import uk.co.fivium.energyportalapi.generated.types.Country;
 import uk.co.nstauthority.scap.energyportal.CountryService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
+import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityController;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ContractStage;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipantService;
@@ -65,7 +66,8 @@ public class ActualTenderSummaryService {
         invitationToTenderParticipantNames,
         bidParticipantNames,
         awardedContractSummaryView,
-        "#",
+        ReverseRouter.route(on(ActualTenderActivityController.class)
+            .renderExistingActualTenderActivityForm(scapId, actualTenderActivity.getId())),
         ReverseRouter.route(on(DeleteActualTenderActivityController.class)
             .renderDeleteActualTenderActivityConfirmation(scapId, actualTenderActivity.getId()))
     );

@@ -24,6 +24,12 @@ class BidParticipantsFormService {
     return bindingResult;
   }
 
+  static List<Integer> getParticipantIds(List<InvitationToTenderParticipant> participants) {
+    return participants.stream()
+        .map(InvitationToTenderParticipant::getId)
+        .toList();
+  }
+
   static Map<String, String> getBidParticipantsCheckboxes(List<InvitationToTenderParticipant> participants) {
     return participants.stream()
         .collect(StreamUtils.toLinkedHashMap(

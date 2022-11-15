@@ -17,6 +17,7 @@ import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderControllerRedirectionService;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTenderController;
+import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 
@@ -31,6 +32,7 @@ public class ActualTenderActivityController {
   private final ActualTenderActivityFormService actualTenderActivityFormService;
   private final ActualTenderActivityService actualTenderActivityService;
   private final ActualTenderControllerRedirectionService actualTenderControllerRedirectionService;
+  private final InvitationToTenderParticipantService invitationToTenderParticipantService;
 
   @Autowired
   public ActualTenderActivityController(ScapService scapService, ScapDetailService scapDetailService,
@@ -38,7 +40,8 @@ public class ActualTenderActivityController {
                                         ControllerHelperService controllerHelperService,
                                         ActualTenderActivityFormService actualTenderActivityFormService,
                                         ActualTenderActivityService actualTenderActivityService,
-                                        ActualTenderControllerRedirectionService actualTenderControllerRedirectionService) {
+                                        ActualTenderControllerRedirectionService actualTenderControllerRedirectionService,
+                                        InvitationToTenderParticipantService invitationToTenderParticipantService) {
     this.scapService = scapService;
     this.scapDetailService = scapDetailService;
     this.actualTenderService = actualTenderService;
@@ -46,31 +49,34 @@ public class ActualTenderActivityController {
     this.actualTenderActivityFormService = actualTenderActivityFormService;
     this.actualTenderActivityService = actualTenderActivityService;
     this.actualTenderControllerRedirectionService = actualTenderControllerRedirectionService;
+    this.invitationToTenderParticipantService = invitationToTenderParticipantService;
   }
 
   @GetMapping
   public ModelAndView renderActualTenderActivityForm(@PathVariable("scapId") Integer scapId,
-                                                   @ModelAttribute("form") ActualTenderActivityForm form) {
+                                                     @ModelAttribute("form") ActualTenderActivityForm form) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
     actualTenderService.getByScapDetailOrThrow(scapDetail);
+    var backLinkUrl = ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scapId));
 
-    return actualTenderDetailFormModelAndView(scapId);
+    return actualTenderDetailFormModelAndView(backLinkUrl);
   }
 
   @PostMapping
   public ModelAndView saveActualTenderActivityForm(@PathVariable("scapId") Integer scapId,
-                                                 @ModelAttribute("form") ActualTenderActivityForm form,
-                                                 BindingResult bindingResult) {
+                                                   @ModelAttribute("form") ActualTenderActivityForm form,
+                                                   BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
     var actualTender = actualTenderService.getByScapDetailOrThrow(scapDetail);
+    var backLinkUrl = ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scapId));
 
     bindingResult = actualTenderActivityFormService.validate(form, bindingResult);
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        actualTenderDetailFormModelAndView(scapId),
+        actualTenderDetailFormModelAndView(backLinkUrl),
         form,
         () -> {
           var actualTenderActivity = actualTenderActivityService
@@ -81,9 +87,46 @@ public class ActualTenderActivityController {
     );
   }
 
-  private ModelAndView actualTenderDetailFormModelAndView(Integer scapId) {
+  @GetMapping("/{activityId}")
+  public ModelAndView renderExistingActualTenderActivityForm(@PathVariable("scapId") Integer scapId,
+                                                             @PathVariable("activityId") Integer activityId) {
+    scapService.getScapById(scapId);
+    var actualTenderActivity = actualTenderActivityService.getById(activityId);
+    var invitationToTenderParticipants = invitationToTenderParticipantService
+        .getInvitationToTenderParticipants(actualTenderActivity);
+    var form = actualTenderActivityFormService
+        .getForm(actualTenderActivity, invitationToTenderParticipants);
+    var backLinkUrl = ReverseRouter.route(on(ActualTenderSummaryController.class).renderActualTenderSummary(scapId));
+
+    return actualTenderDetailFormModelAndView(backLinkUrl)
+        .addObject("form", form);
+  }
+
+  @PostMapping("/{activityId}")
+  public ModelAndView saveExistingActualTenderActivityForm(@PathVariable("scapId") Integer scapId,
+                                                           @PathVariable("activityId") Integer activityId,
+                                                           @ModelAttribute("form") ActualTenderActivityForm form,
+                                                           BindingResult bindingResult) {
+    scapService.getScapById(scapId);
+    var actualTenderActivity = actualTenderActivityService.getById(activityId);
+    var backLinkUrl = ReverseRouter.route(on(ActualTenderSummaryController.class).renderActualTenderSummary(scapId));
+
+    bindingResult = actualTenderActivityFormService.validate(form, bindingResult);
+
+    return controllerHelperService.checkErrorsAndRedirect(
+        bindingResult,
+        actualTenderDetailFormModelAndView(backLinkUrl),
+        form,
+        () -> {
+          actualTenderActivityService.updateActualTenderActivity(actualTenderActivity, form);
+          return actualTenderControllerRedirectionService.redirectFromActualTenderActivityForm(scapId, actualTenderActivity);
+        }
+    );
+  }
+
+  private ModelAndView actualTenderDetailFormModelAndView(String backLinkUrl) {
     return new ModelAndView("scap/scap/actualtender/actualTenderActivityDetails")
-        .addObject("backLinkUrl", ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scapId)))
+        .addObject("backLinkUrl", backLinkUrl)
         .addObject("remunerationModels", RemunerationModel.getRemunerationModels())
         .addObject("contractStages", ContractStage.getContractStages());
   }

@@ -131,18 +131,11 @@ class ActualTenderActivityServiceTest {
   void updateActualTenderActivity_assertSaves() {
     var actualTenderDetailArgumentCaptor = ArgumentCaptor.forClass(ActualTenderActivity.class);
     var actualTenderDetail = new ActualTenderActivity(actualTender, clock.instant());
-    var existingInvitationToTenderParticipants = List.of(
-        new InvitationToTenderParticipant()
-    );
-
-    when(invitationToTenderParticipantRepository.findAllByActualTenderActivity(actualTenderDetail))
-        .thenReturn(existingInvitationToTenderParticipants);
 
     actualTenderActivityService.updateActualTenderActivity(actualTenderDetail, form);
 
     verify(actualTenderActivityRepository).save(actualTenderDetailArgumentCaptor.capture());
     verify(invitationToTenderParticipantRepository).saveAll(invitationToTenderParticipantCaptor.capture());
-    verify(invitationToTenderParticipantRepository).deleteAll(existingInvitationToTenderParticipants);
 
     assertThat(actualTenderDetailArgumentCaptor.getValue()).extracting(
         ActualTenderActivity::getScopeTitle,

@@ -25,7 +25,7 @@ backLinkUrl=springUrl(backLinkUrl)
   <#assign cardActionsContent>
     <@fdsSummaryList.summaryListCardActionList>
       <@fdsSummaryList.summaryListCardActionItem
-        itemUrl=actualTenderActivity.changeLinkUrl()
+        itemUrl=springUrl(actualTenderActivity.changeLinkUrl())
         itemText="Change"
         itemScreenReaderText="Change actual tendering activity ${index +1}"
       />

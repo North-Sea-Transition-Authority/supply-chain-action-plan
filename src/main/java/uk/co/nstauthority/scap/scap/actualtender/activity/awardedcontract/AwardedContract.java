@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract;
 import com.google.common.annotations.VisibleForTesting;
 import java.math.BigDecimal;
 import java.time.Instant;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -25,7 +26,7 @@ public class AwardedContract {
   @JoinColumn(name = "actual_tender_activity_id")
   private ActualTenderActivity actualTenderActivity;
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.REMOVE)
   @JoinColumn(name = "preferred_bidder_ittp_id")
   private InvitationToTenderParticipant preferredBidder;
 

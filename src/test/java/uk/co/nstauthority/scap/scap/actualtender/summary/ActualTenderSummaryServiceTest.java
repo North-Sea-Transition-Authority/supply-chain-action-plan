@@ -20,6 +20,7 @@ import uk.co.nstauthority.scap.energyportal.CountryService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
+import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityController;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ContractStage;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipantService;
@@ -124,7 +125,8 @@ class ActualTenderSummaryServiceTest {
             actualTenderActivity1.getContractStage(),
             List.of(participant1.getCompanyName()),
             Collections.emptyList(),
-            "#",
+            ReverseRouter.route(on(ActualTenderActivityController.class)
+                .renderExistingActualTenderActivityForm(scapId, actualTenderActivity1.getId())),
             ReverseRouter.route(on(DeleteActualTenderActivityController.class)
                 .renderDeleteActualTenderActivityConfirmation(scapId, actualTenderActivity1.getId()))
         ),
@@ -136,7 +138,8 @@ class ActualTenderSummaryServiceTest {
             actualTenderActivity2.getContractStage(),
             List.of(participant2.getCompanyName(), participant3.getCompanyName()),
             List.of(participant2.getCompanyName()),
-            "#",
+            ReverseRouter.route(on(ActualTenderActivityController.class)
+                .renderExistingActualTenderActivityForm(scapId, actualTenderActivity2.getId())),
             ReverseRouter.route(on(DeleteActualTenderActivityController.class)
                 .renderDeleteActualTenderActivityConfirmation(scapId, actualTenderActivity2.getId()))
         ),
@@ -148,7 +151,8 @@ class ActualTenderSummaryServiceTest {
             actualTenderActivity3.getContractStage(),
             List.of(participant4.getCompanyName(), participant5.getCompanyName()),
             List.of(participant4.getCompanyName()),
-            "#",
+            ReverseRouter.route(on(ActualTenderActivityController.class)
+                .renderExistingActualTenderActivityForm(scapId, actualTenderActivity3.getId())),
             ReverseRouter.route(on(DeleteActualTenderActivityController.class)
                 .renderDeleteActualTenderActivityConfirmation(scapId, actualTenderActivity3.getId()))
         )

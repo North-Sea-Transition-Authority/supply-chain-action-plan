@@ -15,6 +15,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import static uk.co.nstauthority.scap.mvc.ReverseRouter.emptyBindingResult;
 
 import java.time.Clock;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,6 +42,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
+import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = ActualTenderActivityController.class)
@@ -65,6 +67,9 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
 
   @MockBean
   ActualTenderActivityService actualTenderActivityService;
+
+  @MockBean
+  InvitationToTenderParticipantService invitationToTenderParticipantService;
 
   private Scap scap;
   private ScapDetail scapDetail;
@@ -176,5 +181,92 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
         .andExpect(model().attributeExists("errorList"));
 
     verify(actualTenderActivityService, never()).createActualTenderActivity(any(), any());
+  }
+
+  @Test
+  void renderExistingActualTenderActivityForm_ExpectOk() throws Exception {
+    var actualTenderActivity = new ActualTenderActivity(45);
+    var participant = new InvitationToTenderParticipant(451);
+    participant.setCompanyName("test company 1");
+    var invitationToTenderParticipants = List.of(participant);
+    var form = new ActualTenderActivityForm();
+
+    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(actualTenderActivityService.getById(actualTenderActivity.getId()))
+        .thenReturn(actualTenderActivity);
+    when(invitationToTenderParticipantService.getInvitationToTenderParticipants(actualTenderActivity))
+        .thenReturn(invitationToTenderParticipants);
+    when(actualTenderActivityFormService.getForm(actualTenderActivity, invitationToTenderParticipants))
+        .thenReturn(form);
+
+    mockMvc.perform(get(
+        ReverseRouter.route(on(ActualTenderActivityController.class)
+            .renderExistingActualTenderActivityForm(scap.getId(), actualTenderActivity.getId()))))
+        .andExpect(status().isOk())
+        .andExpect(view().name("scap/scap/actualtender/actualTenderActivityDetails"))
+        .andExpect(model().attribute("backLinkUrl", ReverseRouter.route(on(ActualTenderSummaryController.class)
+            .renderActualTenderSummary(scap.getId()))))
+        .andExpect(model().attribute("form", form))
+        .andExpect(model().attribute("remunerationModels", RemunerationModel.getRemunerationModels()))
+        .andExpect(model().attribute("contractStages", ContractStage.getContractStages()));
+  }
+
+  @Test
+  void saveExistingActualTenderActivityForm_NoErrors_VerifyUpdates() throws Exception {
+    var actualTenderActivity = new ActualTenderActivity(45);
+    actualTenderActivity.setContractStage(ContractStage.REQUEST_FOR_INFORMATION);
+    var form = new ActualTenderActivityForm();
+    var bindingResultWithoutErrors = new BeanPropertyBindingResult(form, "form");
+    var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderSummaryController.class)
+        .renderActualTenderSummary(scap.getId()));
+
+    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
+    when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class)))
+        .thenReturn(bindingResultWithoutErrors);
+
+    mockMvc.perform(post(
+        ReverseRouter.route(on(ActualTenderActivityController.class)
+            .saveExistingActualTenderActivityForm(scap.getId(), actualTenderActivity.getId(), null,
+                emptyBindingResult())))
+            .with(csrf())
+            .flashAttr("form", form))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(ControllerTestingUtil.redirectUrl(expectedRedirectUrl));
+
+    verify(actualTenderActivityService).updateActualTenderActivity(actualTenderActivity, form);
+  }
+
+  @Test
+  void saveExistingActualTenderActivityForm_HasErrors_VerifyNeverUpdates() throws Exception {
+    var actualTenderActivity = new ActualTenderActivity(45);
+    var form = new ActualTenderActivityForm();
+    var bindingResultWithErrors = new BeanPropertyBindingResult(form, "form");
+    bindingResultWithErrors.addError(
+        new FieldError("form", "testField", "test error message")
+    );
+
+    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(actualTenderActivityService.getById(actualTenderActivity.getId()))
+        .thenReturn(actualTenderActivity);
+    when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class)))
+        .thenReturn(bindingResultWithErrors);
+
+    mockMvc.perform(post(
+        ReverseRouter.route(on(ActualTenderActivityController.class)
+            .saveExistingActualTenderActivityForm(scap.getId(), actualTenderActivity.getId(), null,
+                emptyBindingResult())))
+            .with(csrf())
+            .flashAttr("form", form))
+        .andExpect(status().isOk())
+        .andExpect(view().name("scap/scap/actualtender/actualTenderActivityDetails"))
+        .andExpect(model().attribute("backLinkUrl", ReverseRouter.route(on(ActualTenderSummaryController.class)
+            .renderActualTenderSummary(scap.getId()))))
+        .andExpect(model().attribute("form", form))
+        .andExpect(model().attribute("remunerationModels", RemunerationModel.getRemunerationModels()))
+        .andExpect(model().attribute("contractStages", ContractStage.getContractStages()))
+        .andExpect(model().attributeExists("errorList"));
+
+    verify(actualTenderActivityService, never()).updateActualTenderActivity(any(), any());
   }
 }

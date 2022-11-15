@@ -54,9 +54,6 @@ public class ActualTenderActivityService {
   void updateActualTenderActivity(ActualTenderActivity actualTenderActivity, ActualTenderActivityForm form) {
     //TODO SCAP2022-41: when adding multiple companies, only delete those which have been removed from ITT,
     // and only add those that do not already exist
-    var existingInvitationToTenderParticipants = invitationToTenderParticipantRepository
-        .findAllByActualTenderActivity(actualTenderActivity);
-    invitationToTenderParticipantRepository.deleteAll(existingInvitationToTenderParticipants);
     saveActualTenderActivity(actualTenderActivity, form);
   }
 
