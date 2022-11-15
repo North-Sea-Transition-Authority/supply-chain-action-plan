@@ -34,11 +34,27 @@ public class ErrorService {
       addErrorReference(modelAndView, throwable);
     }
     addCommonUrls(modelAndView);
+    addBrandingConfigs(modelAndView);
+    addTechnicalSupportConfigs(modelAndView);
     return modelAndView;
   }
 
   private void addCommonUrls(ModelAndView modelAndView) {
     modelAndView.addObject("serviceHomeUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea()));
+  }
+
+  private void addBrandingConfigs(ModelAndView modelAndView) {
+    modelAndView.addObject("serviceBranding", errorConfiguration
+        .getServiceBrandingConfigurationProperties()
+        .getServiceConfigurationProperties());
+    modelAndView.addObject("customerBranding", errorConfiguration
+        .getServiceBrandingConfigurationProperties()
+        .getCustomerConfigurationProperties());
+  }
+
+  private void addTechnicalSupportConfigs(ModelAndView modelAndView) {
+    modelAndView.addObject("technicalSupport", errorConfiguration
+        .getTechnicalSupportConfigurationProperties());
   }
 
   private boolean isStackTraceEnabled() {

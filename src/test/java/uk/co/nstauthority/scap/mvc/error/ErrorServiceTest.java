@@ -11,13 +11,20 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
+import uk.co.nstauthority.scap.branding.ServiceBrandingConfigurationProperties;
+import uk.co.nstauthority.scap.branding.ServiceConfigurationProperties;
 import uk.co.nstauthority.scap.error.ErrorConfiguration;
 import uk.co.nstauthority.scap.error.ErrorConfigurationProperties;
 import uk.co.nstauthority.scap.error.ErrorService;
+import uk.co.nstauthority.scap.technicalsupport.TechnicalSupportConfigurationProperties;
 
 @ExtendWith(SpringExtension.class)
-@EnableConfigurationProperties(value = ErrorConfigurationProperties.class)
-@ContextConfiguration(classes = ErrorConfiguration.class)
+@EnableConfigurationProperties(value = {ErrorConfigurationProperties.class,
+    ServiceConfigurationProperties.class,
+    CustomerConfigurationProperties.class,
+    TechnicalSupportConfigurationProperties.class})
+@ContextConfiguration(classes = {ErrorConfiguration.class, ServiceBrandingConfigurationProperties.class})
 @TestPropertySource("classpath:application-test.properties")
 class ErrorServiceTest {
 
@@ -26,8 +33,17 @@ class ErrorServiceTest {
   private static final String STACK_TRACE_ATTRIBUTE = "stackTrace";
   private static final String UNSAFE_CHARACTERS = "0125AEIOULNSZ";
 
+  private static final String SERVICE_BRANDING_ATTRIBUTE = "serviceBranding";
+
+  private static final String CUSTOMER_BRANDING_ATTRIBUTE = "customerBranding";
+
+  private static final String TECHNICAL_SUPPORT_ATTRIBUTE = "technicalSupport";
+
   @Autowired
   private ErrorConfiguration errorConfiguration;
+
+  @Autowired
+  private ServiceBrandingConfigurationProperties serviceBrandingConfigurationProperties;
 
   private ErrorService errorService;
 
@@ -43,10 +59,13 @@ class ErrorServiceTest {
         new NullPointerException()
     ).getModelMap();
 
-    assertThat(resultingModelMap).containsOnlyKeys(
+    assertThat(resultingModelMap).containsKeys(
         ERROR_REF_ATTRIBUTE_NAME,
         SERVICE_HOME_URLS_ATTRIBUTE_NAME,
-        STACK_TRACE_ATTRIBUTE
+        STACK_TRACE_ATTRIBUTE,
+        SERVICE_BRANDING_ATTRIBUTE,
+        CUSTOMER_BRANDING_ATTRIBUTE,
+        TECHNICAL_SUPPORT_ATTRIBUTE
     );
     Object errorRef = resultingModelMap.get(ERROR_REF_ATTRIBUTE_NAME);
     assertThat(errorRef).isNotNull();
@@ -61,8 +80,11 @@ class ErrorServiceTest {
         null
     ).getModelMap();
 
-    assertThat(resultingModelMap).containsOnlyKeys(
-        SERVICE_HOME_URLS_ATTRIBUTE_NAME
+    assertThat(resultingModelMap).containsKeys(
+        SERVICE_HOME_URLS_ATTRIBUTE_NAME,
+        TECHNICAL_SUPPORT_ATTRIBUTE,
+        SERVICE_BRANDING_ATTRIBUTE,
+        CUSTOMER_BRANDING_ATTRIBUTE
     );
   }
 }
