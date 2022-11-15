@@ -15,6 +15,15 @@ backLinkUrl=springUrl(backLinkUrl)
   <#list actualTenderActivities as actualTenderActivity>
     <@actualTenderActivitySummary actualTenderActivity=actualTenderActivity index=actualTenderActivity_index/>
   </#list>
+
+  <@fdsForm.htmlForm>
+    <@fdsRadio.radio
+      path="form.hasMoreActualTenderActivities"
+      radioItems=radioItems
+      labelText="Do you want to add another actual tendering activity?"
+    />
+    <@fdsAction.button buttonText="Save and complete"/>
+  </@fdsForm.htmlForm>
 </@defaultPage>
 
 

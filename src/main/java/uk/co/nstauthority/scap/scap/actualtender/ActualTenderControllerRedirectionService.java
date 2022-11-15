@@ -7,11 +7,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
+import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityController;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ContractStage;
 import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContractController;
 import uk.co.nstauthority.scap.scap.actualtender.activity.bidparticipants.BidParticipantsController;
 import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTenderController;
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
+import uk.co.nstauthority.scap.scap.actualtender.summary.HasMoreActualTenderActivities;
+import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @Service
 public class ActualTenderControllerRedirectionService {
@@ -41,5 +44,14 @@ public class ActualTenderControllerRedirectionService {
     }
 
     return ReverseRouter.redirect(on(HasActualTenderController.class).renderHasActualTenderForm(scapId));
+  }
+
+  public ModelAndView redirectFromActualTenderSummary(Integer scapId,
+                                                      HasMoreActualTenderActivities hasMoreActualTenderActivities) {
+    if (HasMoreActualTenderActivities.YES_NOW.equals(hasMoreActualTenderActivities)) {
+      return ReverseRouter.redirect(on(ActualTenderActivityController.class).renderActualTenderActivityForm(scapId, null));
+    }
+
+    return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
   }
 }

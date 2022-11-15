@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.error.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.scap.actualtender.summary.HasMoreActualTenderActivities;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Service
@@ -40,6 +41,13 @@ public class ActualTenderService {
   @Transactional
   public void updateHasActualTenders(ActualTender actualTender, YesNo hasActualTenders) {
     actualTender.setHasActualTenders(YesNo.YES.equals(hasActualTenders));
+    actualTenderRepository.save(actualTender);
+  }
+
+  @Transactional
+  public void updateHasMoreActualTenders(ActualTender actualTender,
+                                         HasMoreActualTenderActivities hasMoreActualTenderActivities) {
+    actualTender.setHasMoreActualTenders(hasMoreActualTenderActivities);
     actualTenderRepository.save(actualTender);
   }
 }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTenderController;
+import uk.co.nstauthority.scap.scap.actualtender.summary.HasMoreActualTenderActivities;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapFormTaskListSection;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
@@ -51,7 +52,7 @@ public class ActualTenderTaskListItem implements ScapTaskListItem {
     var actualTender = actualTenderService.getByScapDetail(scapDetail);
     return actualTender.map(existingActualTender ->
         Boolean.FALSE.equals(existingActualTender.getHasActualTenders())
-        || Boolean.TRUE.equals(existingActualTender.getAllActualTendersAdded()))
+        || HasMoreActualTenderActivities.NO.equals(existingActualTender.getHasMoreActualTenders()))
         .orElse(false);
   }
 

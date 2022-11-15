@@ -3,12 +3,15 @@ package uk.co.nstauthority.scap.scap.actualtender;
 import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import uk.co.nstauthority.scap.scap.actualtender.summary.HasMoreActualTenderActivities;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Entity
@@ -25,7 +28,8 @@ public class ActualTender {
 
   private Boolean hasActualTenders;
 
-  private Boolean allActualTendersAdded;
+  @Enumerated(EnumType.STRING)
+  private HasMoreActualTenderActivities hasMoreActualTenders;
 
   private Instant createdTimestamp;
 
@@ -58,11 +62,11 @@ public class ActualTender {
     this.hasActualTenders = hasActualTenders;
   }
 
-  public Boolean getAllActualTendersAdded() {
-    return allActualTendersAdded;
+  public HasMoreActualTenderActivities getHasMoreActualTenders() {
+    return hasMoreActualTenders;
   }
 
-  public void setAllActualTendersAdded(Boolean allActualTendersAdded) {
-    this.allActualTendersAdded = allActualTendersAdded;
+  public void setHasMoreActualTenders(HasMoreActualTenderActivities hasMoreActualTenders) {
+    this.hasMoreActualTenders = hasMoreActualTenders;
   }
 }

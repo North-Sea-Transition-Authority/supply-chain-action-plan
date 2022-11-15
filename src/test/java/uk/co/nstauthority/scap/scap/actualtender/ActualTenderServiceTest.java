@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.error.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.scap.actualtender.summary.HasMoreActualTenderActivities;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @ExtendWith(MockitoExtension.class)
@@ -98,5 +99,19 @@ class ActualTenderServiceTest {
         scapDetail,
         createdTimestamp
     );
+  }
+
+  @Test
+  void updateAllActualTendersAdded() {
+    var existingActualTender = new ActualTender(46);
+    var argumentCaptor = ArgumentCaptor.forClass(ActualTender.class);
+    var hasMoreActualTenderActivities = HasMoreActualTenderActivities.NO;
+
+    actualTenderService.updateHasMoreActualTenders(existingActualTender, hasMoreActualTenderActivities);
+
+    verify(actualTenderRepository).save(argumentCaptor.capture());
+
+    assertThat(argumentCaptor.getValue().getHasMoreActualTenders())
+        .isEqualTo(hasMoreActualTenderActivities);
   }
 }

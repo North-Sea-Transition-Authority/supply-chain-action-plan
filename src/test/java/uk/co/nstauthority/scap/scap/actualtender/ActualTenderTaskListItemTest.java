@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTenderController;
+import uk.co.nstauthority.scap.scap.actualtender.summary.HasMoreActualTenderActivities;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
@@ -98,7 +99,7 @@ class ActualTenderTaskListItemTest {
   void isValid_existingActualTender_allActualTendersAdded_assertTrue() {
     var existingActualTender = new ActualTender(scapDetail, clock.instant());
     existingActualTender.setHasActualTenders(true);
-    existingActualTender.setAllActualTendersAdded(true);
+    existingActualTender.setHasMoreActualTenders(HasMoreActualTenderActivities.NO);
 
     when(scapService.getScapById(scapId)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
@@ -111,7 +112,7 @@ class ActualTenderTaskListItemTest {
   void isValid_existingActualTender_notAllActualTendersAdded_assertFalse() {
     var existingActualTender = new ActualTender(scapDetail, clock.instant());
     existingActualTender.setHasActualTenders(true);
-    existingActualTender.setAllActualTendersAdded(false);
+    existingActualTender.setHasMoreActualTenders(HasMoreActualTenderActivities.YES_LATER);
 
     when(scapService.getScapById(scapId)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
