@@ -3,6 +3,8 @@ package uk.co.nstauthority.scap.scap.actualtender.activity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -81,6 +83,17 @@ class ActualTenderActivityServiceTest {
   }
 
   @Test
+  void getAllByActualTender_VerifyCallsRepository() {
+    var actualTender = new ActualTender(43);
+    var actualTenderDetail = new ActualTenderActivity(actualTender, Instant.now());
+    when(actualTenderActivityRepository.findAllByActualTender(actualTender)).thenReturn(List.of(actualTenderDetail));
+
+    var returnedList = actualTenderActivityService.getAllByActualTender(actualTender);
+
+    assertThat(returnedList).containsExactly(actualTenderDetail);
+  }
+
+  @Test
   void createActualTenderActivity_assertSaves() {
     var actualTenderDetailArgumentCaptor = ArgumentCaptor.forClass(ActualTenderActivity.class);
 
@@ -153,5 +166,20 @@ class ActualTenderActivityServiceTest {
     ).containsExactly(
         tuple(form.getInvitationToTenderParticipants().getInputValue(), clock.instant())
     );
+  }
+
+  @Test
+  void hasActualTenderActivity_NoneFound_AssertFalse() {
+    when(actualTenderActivityRepository.findFirstByActualTender(actualTender)).thenReturn(Optional.empty());
+
+    assertFalse(actualTenderActivityService.hasActualTenderActivity(actualTender));
+  }
+
+  @Test
+  void hasActualTenderActivity_IsFound_AssertTrue() {
+    when(actualTenderActivityRepository.findFirstByActualTender(actualTender))
+        .thenReturn(Optional.of(new ActualTenderActivity()));
+
+    assertTrue(actualTenderActivityService.hasActualTenderActivity(actualTender));
   }
 }

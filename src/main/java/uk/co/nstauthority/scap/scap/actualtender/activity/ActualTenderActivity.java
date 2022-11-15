@@ -57,35 +57,35 @@ public class ActualTenderActivity {
     return id;
   }
 
-  String getScopeTitle() {
+  public String getScopeTitle() {
     return scopeTitle;
   }
 
-  void setScopeTitle(String scopeTitle) {
+  public void setScopeTitle(String scopeTitle) {
     this.scopeTitle = scopeTitle;
   }
 
-  String getScopeDescription() {
+  public String getScopeDescription() {
     return scopeDescription;
   }
 
-  void setScopeDescription(String scopeDescription) {
+  public void setScopeDescription(String scopeDescription) {
     this.scopeDescription = scopeDescription;
   }
 
-  RemunerationModel getRemunerationModel() {
+  public RemunerationModel getRemunerationModel() {
     return remunerationModel;
   }
 
-  void setRemunerationModel(RemunerationModel remunerationModel) {
+  public void setRemunerationModel(RemunerationModel remunerationModel) {
     this.remunerationModel = remunerationModel;
   }
 
-  String getRemunerationModelName() {
+  public String getRemunerationModelName() {
     return remunerationModelName;
   }
 
-  void setRemunerationModelName(String remunerationModelName) {
+  public void setRemunerationModelName(String remunerationModelName) {
     this.remunerationModelName = remunerationModelName;
   }
 

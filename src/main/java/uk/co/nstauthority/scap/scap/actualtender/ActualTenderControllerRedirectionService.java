@@ -10,7 +10,7 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ContractStage;
 import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContractController;
 import uk.co.nstauthority.scap.scap.actualtender.activity.bidparticipants.BidParticipantsController;
-import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
+import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
 
 @Service
 public class ActualTenderControllerRedirectionService {
@@ -23,8 +23,7 @@ public class ActualTenderControllerRedirectionService {
       return ReverseRouter.redirect(on(BidParticipantsController.class)
           .renderBidParticipantsForm(scapId, actualTenderDetail.getId(), null));
     }
-    // TODO SCAP2022-43: Replace with redirect to Actual Tender Activity summary
-    return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
+    return ReverseRouter.redirect(on(ActualTenderSummaryController.class).renderActualTenderSummary(scapId));
   }
 
   public ModelAndView redirectFromBidParticipantsForm(Integer scapId, ActualTenderActivity actualTenderActivity) {
@@ -32,7 +31,6 @@ public class ActualTenderControllerRedirectionService {
       return ReverseRouter.redirect(on(AwardedContractController.class)
           .renderAwardedContractForm(scapId, actualTenderActivity.getId()));
     }
-    // TODO SCAP2022-43: Replace with redirect to Actual Tender Activity summary
-    return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
+    return ReverseRouter.redirect(on(ActualTenderSummaryController.class).renderActualTenderSummary(scapId));
   }
 }

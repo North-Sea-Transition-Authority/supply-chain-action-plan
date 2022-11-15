@@ -15,7 +15,7 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderPart
 
 @Entity
 @Table(name = "awarded_contracts")
-class AwardedContract {
+public class AwardedContract {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -34,9 +34,9 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivitySe
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipantService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.bidparticipants.BidParticipantsController;
+import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
-import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = AwardedContractController.class)
@@ -172,7 +172,8 @@ class AwardedContractControllerTest extends AbstractControllerTest {
   void saveAwardedContractForm_HasNoErrors_VerifySaves() throws Exception {
     var form = new AwardedContractForm();
     var bindingResultWithoutErrors = new BeanPropertyBindingResult(form, "form");
-    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()));
+    var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderSummaryController.class)
+        .renderActualTenderSummary(scap.getId()));
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
@@ -181,10 +182,10 @@ class AwardedContractControllerTest extends AbstractControllerTest {
         .thenReturn(bindingResultWithoutErrors);
 
     mockMvc.perform(post(
-            ReverseRouter.route(on(AwardedContractController.class)
-                .saveAwardedContractForm(scap.getId(), actualTenderActivity.getId(), null, emptyBindingResult())))
-            .flashAttr("form", form)
-            .with(csrf()))
+        ReverseRouter.route(on(AwardedContractController.class)
+            .saveAwardedContractForm(scap.getId(), actualTenderActivity.getId(), null, emptyBindingResult())))
+        .flashAttr("form", form)
+        .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
 

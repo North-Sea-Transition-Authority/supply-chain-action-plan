@@ -22,7 +22,12 @@ public class InvitationToTenderParticipantService {
   }
 
   public List<InvitationToTenderParticipant> getBidParticipants(ActualTenderActivity actualTenderActivity) {
-    return getInvitationToTenderParticipants(actualTenderActivity).stream()
+    return getBidParticipantsFromInvitationToTenderParticipants(getInvitationToTenderParticipants(actualTenderActivity));
+  }
+
+  public static List<InvitationToTenderParticipant> getBidParticipantsFromInvitationToTenderParticipants(
+      List<InvitationToTenderParticipant> invitationToTenderParticipants) {
+    return invitationToTenderParticipants.stream()
         .filter(invitationToTenderParticipant -> Boolean.TRUE.equals(invitationToTenderParticipant.getBidParticipant()))
         .toList();
   }

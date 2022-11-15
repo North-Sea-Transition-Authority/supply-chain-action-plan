@@ -35,12 +35,12 @@ import uk.co.nstauthority.scap.scap.actualtender.ActualTenderControllerRedirecti
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.bidparticipants.BidParticipantsController;
 import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTenderController;
+import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
-import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = ActualTenderActivityController.class)
@@ -128,8 +128,8 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     var createdTenderActivity = new ActualTenderActivity(8735);
     createdTenderActivity.setContractStage(ContractStage.REQUEST_FOR_INFORMATION);
-    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class)
-        .renderTaskList(scap.getId()));
+    var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderSummaryController.class)
+        .renderActualTenderSummary(scap.getId()));
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
@@ -140,10 +140,10 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
         .thenReturn(createdTenderActivity);
 
     mockMvc.perform(
-            post(ReverseRouter.route(on(ActualTenderActivityController.class)
-                .saveActualTenderActivityForm(scap.getId(), null, emptyBindingResult())))
-                .with(csrf())
-                .flashAttr("form", form))
+        post(ReverseRouter.route(on(ActualTenderActivityController.class)
+            .saveActualTenderActivityForm(scap.getId(), null, emptyBindingResult())))
+            .with(csrf())
+            .flashAttr("form", form))
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
 

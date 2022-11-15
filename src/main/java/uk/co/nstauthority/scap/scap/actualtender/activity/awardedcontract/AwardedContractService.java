@@ -10,7 +10,7 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
 
 @Service
-class AwardedContractService {
+public class AwardedContractService {
 
   private final AwardedContractRepository awardedContractRepository;
   private final Clock clock;
@@ -21,7 +21,7 @@ class AwardedContractService {
     this.clock = clock;
   }
 
-  Optional<AwardedContract> getByActualTenderActivity(ActualTenderActivity actualTenderActivity) {
+  public Optional<AwardedContract> getByActualTenderActivity(ActualTenderActivity actualTenderActivity) {
     return awardedContractRepository.findByActualTenderActivity(actualTenderActivity);
   }
 

@@ -19,8 +19,8 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivitySe
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipantService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.bidparticipants.BidParticipantsController;
+import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
-import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @Controller
 @RequestMapping("{scapId}/actual-tender/activity/{activityId}/actual-contract-award")
@@ -90,8 +90,7 @@ public class AwardedContractController {
         form,
         () -> {
           awardedContractService.saveAwardedContract(actualTenderActivity, form, bidParticipants);
-          // TODO SCAP2022-43: Replace with redirect to actual tender activity summary
-          return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
+          return ReverseRouter.redirect(on(ActualTenderSummaryController.class).renderActualTenderSummary(scapId));
         }
     );
   }

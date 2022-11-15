@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.actualtender.hasactualtender;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -14,8 +15,11 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityController;
+import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
+import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
@@ -29,16 +33,19 @@ public class HasActualTenderController {
   private final ActualTenderService actualTenderService;
   private final ControllerHelperService controllerHelperService;
   private final HasActualTenderFormService hasActualTenderFormService;
+  private final ActualTenderActivityService actualTenderActivityService;
 
   @Autowired
   HasActualTenderController(ScapService scapService, ScapDetailService scapDetailService,
                             ActualTenderService actualTenderService, ControllerHelperService controllerHelperService,
-                            HasActualTenderFormService hasActualTenderFormService) {
+                            HasActualTenderFormService hasActualTenderFormService,
+                            ActualTenderActivityService actualTenderActivityService) {
     this.scapService = scapService;
     this.scapDetailService = scapDetailService;
     this.actualTenderService = actualTenderService;
     this.controllerHelperService = controllerHelperService;
     this.hasActualTenderFormService = hasActualTenderFormService;
+    this.actualTenderActivityService = actualTenderActivityService;
   }
 
   @GetMapping
@@ -49,6 +56,9 @@ public class HasActualTenderController {
     var form = actualTender
         .map(hasActualTenderFormService::getForm)
         .orElse(new HasActualTenderForm());
+    if (hasExistingActualTenderActivities(actualTender)) {
+      return ReverseRouter.redirect(on(ActualTenderSummaryController.class).renderActualTenderSummary(scapId));
+    }
 
     return hasActualTenderFormModelAndView(scapId, form);
   }
@@ -60,6 +70,11 @@ public class HasActualTenderController {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
     var actualTender = actualTenderService.getByScapDetail(scapDetail);
+
+    if (hasExistingActualTenderActivities(actualTender)) {
+      return ReverseRouter.redirect(on(ActualTenderSummaryController.class).renderActualTenderSummary(scapId));
+    }
+
     bindingResult = hasActualTenderFormService.validate(form, bindingResult);
 
     return controllerHelperService.checkErrorsAndRedirect(
@@ -85,5 +100,9 @@ public class HasActualTenderController {
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
         .addObject("hasActualTender", YesNo.getRadioOptions())
         .addObject("form", form);
+  }
+
+  private boolean hasExistingActualTenderActivities(Optional<ActualTender> actualTender) {
+    return actualTender.isPresent() && actualTenderActivityService.hasActualTenderActivity(actualTender.get());
   }
 }

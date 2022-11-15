@@ -1,6 +1,7 @@
 package uk.co.nstauthority.scap.scap.actualtender.activity;
 
 import java.time.Clock;
+import java.util.Comparator;
 import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,17 @@ public class ActualTenderActivityService {
         () -> new ScapEntityNotFoundException(
             String.format("Could not find actual tendering activity with ID [%s]", id))
     );
+  }
+
+  public List<ActualTenderActivity> getAllByActualTender(ActualTender actualTender) {
+    return actualTenderActivityRepository.findAllByActualTender(actualTender)
+        .stream()
+        .sorted(Comparator.comparing(ActualTenderActivity::getScopeTitle))
+        .toList();
+  }
+
+  public boolean hasActualTenderActivity(ActualTender actualTender) {
+    return actualTenderActivityRepository.findFirstByActualTender(actualTender).isPresent();
   }
 
   @Transactional
