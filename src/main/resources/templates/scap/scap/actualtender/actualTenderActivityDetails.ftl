@@ -16,6 +16,7 @@ backLinkUrl=springUrl(backLinkUrl)
       path="form.scopeTitle.inputValue"
       labelText="Scope title"
       inputClass="govuk-!-width-two-thirds"
+      maxCharacterLength=scopeTitleMaxLength
     />
 
     <@fdsTextarea.textarea path="form.scopeDescription.inputValue" labelText="Scope description"/>

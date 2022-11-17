@@ -72,7 +72,7 @@ public class ActualTenderActivityController {
     var actualTender = actualTenderService.getByScapDetailOrThrow(scapDetail);
     var backLinkUrl = ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scapId));
 
-    bindingResult = actualTenderActivityFormService.validate(form, bindingResult);
+    bindingResult = actualTenderActivityFormService.validate(form, bindingResult, actualTender);
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
@@ -107,11 +107,13 @@ public class ActualTenderActivityController {
                                                            @PathVariable("activityId") Integer activityId,
                                                            @ModelAttribute("form") ActualTenderActivityForm form,
                                                            BindingResult bindingResult) {
-    scapService.getScapById(scapId);
+    var scap = scapService.getScapById(scapId);
+    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var actualTender = actualTenderService.getByScapDetailOrThrow(scapDetail);
     var actualTenderActivity = actualTenderActivityService.getById(activityId);
     var backLinkUrl = ReverseRouter.route(on(ActualTenderSummaryController.class).renderActualTenderSummary(scapId));
 
-    bindingResult = actualTenderActivityFormService.validate(form, bindingResult);
+    bindingResult = actualTenderActivityFormService.validate(form, bindingResult, actualTender);
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
@@ -128,6 +130,7 @@ public class ActualTenderActivityController {
     return new ModelAndView("scap/scap/actualtender/actualTenderActivityDetails")
         .addObject("backLinkUrl", backLinkUrl)
         .addObject("remunerationModels", RemunerationModel.getRemunerationModels())
-        .addObject("contractStages", ContractStage.getContractStages());
+        .addObject("contractStages", ContractStage.getContractStages())
+        .addObject("scopeTitleMaxLength", ActualTenderActivityFormValidator.MAX_SCOPE_TITLE_LENGTH.toString());
   }
 }

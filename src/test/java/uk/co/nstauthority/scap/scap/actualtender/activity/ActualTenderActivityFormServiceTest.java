@@ -1,15 +1,18 @@
 package uk.co.nstauthority.scap.scap.actualtender.activity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,11 +28,14 @@ class ActualTenderActivityFormServiceTest {
   void validate_verifyCallsValidator() {
     var form = new ActualTenderActivityForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
+    var actualTender = new ActualTender(156);
+    var validatorHintCaptor = ArgumentCaptor.forClass(ActualTenderActivityFormValidatorHint.class);
 
-    var returnedBindingResult = actualTenderActivityFormService.validate(form, bindingResult);
+    var returnedBindingResult = actualTenderActivityFormService.validate(form, bindingResult, actualTender);
 
-    verify(actualTenderActivityFormValidator).validate(form, bindingResult);
+    verify(actualTenderActivityFormValidator).validate(eq(form), eq(bindingResult), validatorHintCaptor.capture());
     assertThat(returnedBindingResult).isEqualTo(bindingResult);
+    assertThat(validatorHintCaptor.getValue().actualTender()).isEqualTo(actualTender);
   }
 
   @Test

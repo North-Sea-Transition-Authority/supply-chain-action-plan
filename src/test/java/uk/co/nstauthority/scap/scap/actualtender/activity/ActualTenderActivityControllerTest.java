@@ -96,7 +96,9 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scap.getId()))))
         .andExpect(model().attribute("remunerationModels", RemunerationModel.getRemunerationModels()))
-        .andExpect(model().attribute("contractStages", ContractStage.getContractStages()));
+        .andExpect(model().attribute("contractStages", ContractStage.getContractStages()))
+        .andExpect(model().attribute("scopeTitleMaxLength",
+            ActualTenderActivityFormValidator.MAX_SCOPE_TITLE_LENGTH.toString()));
   }
 
   @Test
@@ -111,7 +113,7 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
-    when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class)))
+    when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender)))
         .thenReturn(bindingResult);
     when(actualTenderActivityService.createActualTenderActivity(actualTender, form))
         .thenReturn(createdTenderActivity);
@@ -139,7 +141,7 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
-    when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class)))
+    when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender)))
         .thenReturn(bindingResult);
     when(actualTenderActivityService.createActualTenderActivity(actualTender, form))
         .thenReturn(createdTenderActivity);
@@ -164,7 +166,7 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
-    when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class)))
+    when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender)))
         .thenReturn(bindingResult);
 
     mockMvc.perform(
@@ -178,7 +180,9 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
             ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scap.getId()))))
         .andExpect(model().attribute("remunerationModels", RemunerationModel.getRemunerationModels()))
         .andExpect(model().attribute("contractStages", ContractStage.getContractStages()))
-        .andExpect(model().attributeExists("errorList"));
+        .andExpect(model().attributeExists("errorList"))
+        .andExpect(model().attribute("scopeTitleMaxLength",
+            ActualTenderActivityFormValidator.MAX_SCOPE_TITLE_LENGTH.toString()));
 
     verify(actualTenderActivityService, never()).createActualTenderActivity(any(), any());
   }
@@ -208,7 +212,9 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
             .renderActualTenderSummary(scap.getId()))))
         .andExpect(model().attribute("form", form))
         .andExpect(model().attribute("remunerationModels", RemunerationModel.getRemunerationModels()))
-        .andExpect(model().attribute("contractStages", ContractStage.getContractStages()));
+        .andExpect(model().attribute("contractStages", ContractStage.getContractStages()))
+        .andExpect(model().attribute("scopeTitleMaxLength",
+            ActualTenderActivityFormValidator.MAX_SCOPE_TITLE_LENGTH.toString()));
   }
 
   @Test
@@ -221,8 +227,10 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
         .renderActualTenderSummary(scap.getId()));
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
-    when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class)))
+    when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender)))
         .thenReturn(bindingResultWithoutErrors);
 
     mockMvc.perform(post(
@@ -249,7 +257,9 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(actualTenderActivityService.getById(actualTenderActivity.getId()))
         .thenReturn(actualTenderActivity);
-    when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class)))
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
+    when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender)))
         .thenReturn(bindingResultWithErrors);
 
     mockMvc.perform(post(
@@ -265,7 +275,9 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
         .andExpect(model().attribute("form", form))
         .andExpect(model().attribute("remunerationModels", RemunerationModel.getRemunerationModels()))
         .andExpect(model().attribute("contractStages", ContractStage.getContractStages()))
-        .andExpect(model().attributeExists("errorList"));
+        .andExpect(model().attributeExists("errorList"))
+        .andExpect(model().attribute("scopeTitleMaxLength",
+            ActualTenderActivityFormValidator.MAX_SCOPE_TITLE_LENGTH.toString()));
 
     verify(actualTenderActivityService, never()).updateActualTenderActivity(any(), any());
   }

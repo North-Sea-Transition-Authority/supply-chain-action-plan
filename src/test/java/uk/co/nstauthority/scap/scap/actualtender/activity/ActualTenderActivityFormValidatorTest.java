@@ -1,32 +1,45 @@
 package uk.co.nstauthority.scap.scap.actualtender.activity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Set;
+import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
+import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 import uk.co.nstauthority.scap.utils.ValidatorTestingUtil;
 
 @ExtendWith(MockitoExtension.class)
 class ActualTenderActivityFormValidatorTest {
 
-  private ActualTenderActivityFormValidator validator;
+  @Mock
+  ActualTenderActivityService actualTenderActivityService;
+
+  @InjectMocks
+  ActualTenderActivityFormValidator validator;
+
   private ActualTenderActivityForm form;
   private BindingResult bindingResult;
+  private ActualTender actualTender;
 
   @BeforeEach
   void setup() {
-    validator = new ActualTenderActivityFormValidator();
     form = new ActualTenderActivityForm();
     bindingResult = new BeanPropertyBindingResult(form, "form");
+    actualTender = new ActualTender(156);
   }
 
   @Test
@@ -40,6 +53,17 @@ class ActualTenderActivityFormValidatorTest {
   }
 
   @Test
+  void validate_NoValidationHint_AssertThrows() {
+    assertThatThrownBy(() -> validator.validate(form, bindingResult)).isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  void validate_InvalidValidationHint_AssertThrows() {
+    var object = new Object();
+    assertThatThrownBy(() -> validator.validate(form, bindingResult, object)).isInstanceOf(IllegalStateException.class);
+  }
+
+  @Test
   void validate_simpleValidForm_assertNoErrors() {
     form.setScopeTitle("test scope title");
     form.setScopeDescription("test scope description");
@@ -48,14 +72,14 @@ class ActualTenderActivityFormValidatorTest {
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
     form.setInvitationToTenderParticipants("test participant");
 
-    validator.validate(form, bindingResult);
+    validator.validate(form, bindingResult, new ActualTenderActivityFormValidatorHint(actualTender));
 
     assertFalse(bindingResult.hasErrors());
   }
 
   @Test
   void validate_emptyForm_assertRequiredErrors() {
-    validator.validate(form, bindingResult);
+    validator.validate(form, bindingResult, new ActualTenderActivityFormValidatorHint(actualTender));
 
     var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
 
@@ -76,11 +100,49 @@ class ActualTenderActivityFormValidatorTest {
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
     form.setInvitationToTenderParticipants("test participant");
 
-    validator.validate(form, bindingResult);
+    validator.validate(form, bindingResult, new ActualTenderActivityFormValidatorHint(actualTender));
     var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
 
     assertThat(extractedErrors).containsExactly(
         entry("remunerationModelName.inputValue", Set.of("remunerationModelName.required"))
+    );
+  }
+
+  @Test
+  void validate_NonUniqueScope_AssertError() {
+    form.setScopeTitle("test scope title");
+    form.setScopeDescription("test scope description");
+    form.setRemunerationModel(RemunerationModel.LUMP_SUM);
+    form.setContractStage(ContractStage.CONTRACT_AWARDED);
+    form.setInvitationToTenderParticipants("test participant");
+    var existingActualTenderActivity = new ActualTenderActivity(156);
+    existingActualTenderActivity.setScopeTitle("Test SCOPE title");
+
+    when(actualTenderActivityService.getAllByActualTender(actualTender))
+        .thenReturn(List.of(existingActualTenderActivity));
+
+    validator.validate(form, bindingResult, new ActualTenderActivityFormValidatorHint(actualTender));
+    var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
+
+    assertThat(extractedErrors).containsExactly(
+        entry("scopeTitle.inputValue", Set.of("scopeTitle.notUnique"))
+    );
+  }
+
+  @Test
+  void validate_ScopeTitleTooLong_AssertError() {
+    var tooLongScopeTitle = StringUtils.repeat("X", ActualTenderActivityFormValidator.MAX_SCOPE_TITLE_LENGTH + 1);
+    form.setScopeTitle(tooLongScopeTitle);
+    form.setScopeDescription("test scope description");
+    form.setRemunerationModel(RemunerationModel.LUMP_SUM);
+    form.setContractStage(ContractStage.CONTRACT_AWARDED);
+    form.setInvitationToTenderParticipants("test participant");
+
+    validator.validate(form, bindingResult, new ActualTenderActivityFormValidatorHint(actualTender));
+    var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
+
+    assertThat(extractedErrors).containsExactly(
+        entry("scopeTitle.inputValue", Set.of("scopeTitle.maxCharExceeded"))
     );
   }
 }

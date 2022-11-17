@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
+import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 
 @Service
 class ActualTenderActivityFormService {
@@ -15,8 +16,8 @@ class ActualTenderActivityFormService {
     this.validator = validator;
   }
 
-  BindingResult validate(ActualTenderActivityForm form, BindingResult bindingResult) {
-    validator.validate(form, bindingResult);
+  BindingResult validate(ActualTenderActivityForm form, BindingResult bindingResult, ActualTender actualTender) {
+    validator.validate(form, bindingResult, new ActualTenderActivityFormValidatorHint(actualTender));
     return bindingResult;
   }
 
