@@ -72,14 +72,14 @@ class ActualTenderActivityFormValidatorTest {
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
     form.setInvitationToTenderParticipants("test participant");
 
-    validator.validate(form, bindingResult, new ActualTenderActivityFormValidatorHint(actualTender));
+    validator.validate(form, bindingResult, new ActualTenderFormValidatorHint(actualTender));
 
     assertFalse(bindingResult.hasErrors());
   }
 
   @Test
   void validate_emptyForm_assertRequiredErrors() {
-    validator.validate(form, bindingResult, new ActualTenderActivityFormValidatorHint(actualTender));
+    validator.validate(form, bindingResult, new ActualTenderFormValidatorHint(actualTender));
 
     var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
 
@@ -100,7 +100,7 @@ class ActualTenderActivityFormValidatorTest {
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
     form.setInvitationToTenderParticipants("test participant");
 
-    validator.validate(form, bindingResult, new ActualTenderActivityFormValidatorHint(actualTender));
+    validator.validate(form, bindingResult, new ActualTenderFormValidatorHint(actualTender));
     var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
 
     assertThat(extractedErrors).containsExactly(
@@ -121,7 +121,48 @@ class ActualTenderActivityFormValidatorTest {
     when(actualTenderActivityService.getAllByActualTender(actualTender))
         .thenReturn(List.of(existingActualTenderActivity));
 
-    validator.validate(form, bindingResult, new ActualTenderActivityFormValidatorHint(actualTender));
+    validator.validate(form, bindingResult, new ActualTenderFormValidatorHint(actualTender));
+    var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
+
+    assertThat(extractedErrors).containsExactly(
+        entry("scopeTitle.inputValue", Set.of("scopeTitle.notUnique"))
+    );
+  }
+
+  @Test
+  void validate_ChangingOwnScopeTitle_AssertNoErrors() {
+    form.setScopeTitle("test scope title");
+    form.setScopeDescription("test scope description");
+    form.setRemunerationModel(RemunerationModel.LUMP_SUM);
+    form.setContractStage(ContractStage.CONTRACT_AWARDED);
+    form.setInvitationToTenderParticipants("test participant");
+    var existingActualTenderActivity = new ActualTenderActivity(156);
+    existingActualTenderActivity.setScopeTitle("Test SCOPE title");
+
+    when(actualTenderActivityService.getAllByActualTender(actualTender))
+        .thenReturn(List.of(existingActualTenderActivity));
+
+    validator.validate(form, bindingResult, new ActualTenderFormValidatorHint(actualTender),
+        new ActualTenderActivityFormValidatorHint(existingActualTenderActivity.getId()));
+
+    assertFalse(bindingResult.hasErrors());
+  }
+
+  @Test
+  void validate_ChangingOtherExistingScopeTitle_AssertErrors() {
+    form.setScopeTitle("test scope title");
+    form.setScopeDescription("test scope description");
+    form.setRemunerationModel(RemunerationModel.LUMP_SUM);
+    form.setContractStage(ContractStage.CONTRACT_AWARDED);
+    form.setInvitationToTenderParticipants("test participant");
+    var existingActualTenderActivity = new ActualTenderActivity(156);
+    existingActualTenderActivity.setScopeTitle("Test SCOPE title");
+
+    when(actualTenderActivityService.getAllByActualTender(actualTender))
+        .thenReturn(List.of(existingActualTenderActivity));
+
+    validator.validate(form, bindingResult, new ActualTenderFormValidatorHint(actualTender),
+        new ActualTenderActivityFormValidatorHint(999));
     var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
 
     assertThat(extractedErrors).containsExactly(
@@ -138,7 +179,7 @@ class ActualTenderActivityFormValidatorTest {
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
     form.setInvitationToTenderParticipants("test participant");
 
-    validator.validate(form, bindingResult, new ActualTenderActivityFormValidatorHint(actualTender));
+    validator.validate(form, bindingResult, new ActualTenderFormValidatorHint(actualTender));
     var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
 
     assertThat(extractedErrors).containsExactly(

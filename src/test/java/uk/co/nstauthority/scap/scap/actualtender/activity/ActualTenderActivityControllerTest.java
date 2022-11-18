@@ -230,7 +230,7 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
-    when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender)))
+    when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender), eq(actualTenderActivity)))
         .thenReturn(bindingResultWithoutErrors);
 
     mockMvc.perform(post(
@@ -259,7 +259,7 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
         .thenReturn(actualTenderActivity);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
-    when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender)))
+    when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender), eq(actualTenderActivity)))
         .thenReturn(bindingResultWithErrors);
 
     mockMvc.perform(post(

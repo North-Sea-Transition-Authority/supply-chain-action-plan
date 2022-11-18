@@ -34,19 +34,24 @@ class ActualTenderActivityFormValidator implements SmartValidator {
   @Override
   public void validate(@NotNull Object target, @NotNull Errors errors) {
     throw new IllegalArgumentException("Missing 3rd parameter of type %s"
-        .formatted(ActualTenderActivityFormValidatorHint.class));
+        .formatted(ActualTenderFormValidatorHint.class));
   }
 
   @Override
   public void validate(@NotNull Object target, @NotNull Errors errors, @NotNull Object... validationHints) {
+    var actualTenderFormValidatorHint = Arrays.stream(validationHints)
+        .filter(Objects::nonNull)
+        .filter(validationHint -> ActualTenderFormValidatorHint.class.equals(validationHint.getClass()))
+        .map(ActualTenderFormValidatorHint.class::cast)
+        .findFirst()
+        .orElseThrow(() -> new IllegalStateException("Cannot get %s"
+            .formatted(ActualTenderFormValidatorHint.class)));
     var actualTenderActivityFormValidatorHint = Arrays.stream(validationHints)
         .filter(Objects::nonNull)
         .filter(validationHint -> ActualTenderActivityFormValidatorHint.class.equals(validationHint.getClass()))
         .map(ActualTenderActivityFormValidatorHint.class::cast)
-        .findFirst()
-        .orElseThrow(() -> new IllegalStateException("Cannot get %s"
-            .formatted(ActualTenderActivityFormValidatorHint.class)));
-    var actualTender = actualTenderActivityFormValidatorHint.actualTender();
+        .findFirst();
+    var actualTender = actualTenderFormValidatorHint.actualTender();
 
     var form = (ActualTenderActivityForm) target;
 
@@ -54,16 +59,21 @@ class ActualTenderActivityFormValidator implements SmartValidator {
         .mustHaveCharacterCountAtMost(MAX_SCOPE_TITLE_LENGTH)
         .validate(form.getScopeTitle(), errors);
     if (!errors.hasFieldErrors("scopeTitle.inputValue")) {
+      var inputScopeTitle = form.getScopeTitle().getInputValue();
       var existingScopeTitles = actualTenderActivityService.getAllByActualTender(actualTender).stream()
+          .filter(actualTenderActivity -> actualTenderActivityFormValidatorHint
+              .map(tenderActivityFormValidatorHint -> !actualTenderActivity.getId()
+                  .equals(tenderActivityFormValidatorHint.currentActivityId()))
+              .orElse(true)
+          )
           .map(ActualTenderActivity::getScopeTitle)
           .map(String::toLowerCase)
           .collect(Collectors.toSet());
-      if (existingScopeTitles.contains(form.getScopeTitle().getInputValue())) {
+      if (existingScopeTitles.contains(inputScopeTitle.toLowerCase())) {
         errors.rejectValue(
             "scopeTitle.inputValue",
             "scopeTitle.notUnique",
-            "There is already an actual tendering activity with the scope title \"%s\""
-                .formatted(form.getScopeTitle().getInputValue().toLowerCase())
+            "There is already an actual tendering activity with the scope title \"%s\"".formatted(inputScopeTitle)
         );
       }
     }

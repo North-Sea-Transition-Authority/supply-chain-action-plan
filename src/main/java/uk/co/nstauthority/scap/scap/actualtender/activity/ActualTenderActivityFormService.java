@@ -17,7 +17,19 @@ class ActualTenderActivityFormService {
   }
 
   BindingResult validate(ActualTenderActivityForm form, BindingResult bindingResult, ActualTender actualTender) {
-    validator.validate(form, bindingResult, new ActualTenderActivityFormValidatorHint(actualTender));
+    validator.validate(form, bindingResult, new ActualTenderFormValidatorHint(actualTender));
+    return bindingResult;
+  }
+
+  BindingResult validate(ActualTenderActivityForm form,
+                         BindingResult bindingResult,
+                         ActualTender actualTender,
+                         ActualTenderActivity actualTenderActivity) {
+    validator.validate(
+        form,
+        bindingResult,
+        new ActualTenderFormValidatorHint(actualTender),
+        new ActualTenderActivityFormValidatorHint(actualTenderActivity.getId()));
     return bindingResult;
   }
 

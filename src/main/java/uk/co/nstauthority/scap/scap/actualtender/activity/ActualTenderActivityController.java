@@ -113,7 +113,7 @@ public class ActualTenderActivityController {
     var actualTenderActivity = actualTenderActivityService.getById(activityId);
     var backLinkUrl = ReverseRouter.route(on(ActualTenderSummaryController.class).renderActualTenderSummary(scapId));
 
-    bindingResult = actualTenderActivityFormService.validate(form, bindingResult, actualTender);
+    bindingResult = actualTenderActivityFormService.validate(form, bindingResult, actualTender, actualTenderActivity);
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,

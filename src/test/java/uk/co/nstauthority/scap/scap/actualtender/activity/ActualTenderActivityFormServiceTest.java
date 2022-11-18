@@ -12,8 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
-import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
+import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 
 @ExtendWith(MockitoExtension.class)
 class ActualTenderActivityFormServiceTest {
@@ -29,13 +29,31 @@ class ActualTenderActivityFormServiceTest {
     var form = new ActualTenderActivityForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     var actualTender = new ActualTender(156);
-    var validatorHintCaptor = ArgumentCaptor.forClass(ActualTenderActivityFormValidatorHint.class);
+    var validatorHintCaptor = ArgumentCaptor.forClass(ActualTenderFormValidatorHint.class);
 
     var returnedBindingResult = actualTenderActivityFormService.validate(form, bindingResult, actualTender);
 
     verify(actualTenderActivityFormValidator).validate(eq(form), eq(bindingResult), validatorHintCaptor.capture());
     assertThat(returnedBindingResult).isEqualTo(bindingResult);
     assertThat(validatorHintCaptor.getValue().actualTender()).isEqualTo(actualTender);
+  }
+
+  @Test
+  void validate_WithExistingId_VerifyCallsValidator() {
+    var form = new ActualTenderActivityForm();
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    var actualTender = new ActualTender(156);
+    var actualTenderActivity = new ActualTenderActivity(176);
+    var validatorHintCaptor = ArgumentCaptor.forClass(ActualTenderFormValidatorHint.class);
+    var activityValidatorHintCaptor = ArgumentCaptor.forClass(ActualTenderActivityFormValidatorHint.class);
+
+    var returnedBindingResult = actualTenderActivityFormService.validate(form, bindingResult, actualTender, actualTenderActivity);
+
+    verify(actualTenderActivityFormValidator).validate(eq(form), eq(bindingResult), validatorHintCaptor.capture(),
+        activityValidatorHintCaptor.capture());
+    assertThat(returnedBindingResult).isEqualTo(bindingResult);
+    assertThat(validatorHintCaptor.getValue().actualTender()).isEqualTo(actualTender);
+    assertThat(activityValidatorHintCaptor.getValue().currentActivityId()).isEqualTo(actualTenderActivity.getId());
   }
 
   @Test
