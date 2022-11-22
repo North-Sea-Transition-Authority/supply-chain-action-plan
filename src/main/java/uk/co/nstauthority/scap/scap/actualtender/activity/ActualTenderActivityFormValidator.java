@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.actualtender.activity;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.validation.SmartValidator;
 import org.springframework.validation.ValidationUtils;
 import uk.co.fivium.formlibrary.validator.string.StringInputValidator;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
+import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 
 @Service
 class ActualTenderActivityFormValidator implements SmartValidator {
@@ -55,28 +57,7 @@ class ActualTenderActivityFormValidator implements SmartValidator {
 
     var form = (ActualTenderActivityForm) target;
 
-    StringInputValidator.builder()
-        .mustHaveCharacterCountAtMost(MAX_SCOPE_TITLE_LENGTH)
-        .validate(form.getScopeTitle(), errors);
-    if (!errors.hasFieldErrors("scopeTitle.inputValue")) {
-      var inputScopeTitle = form.getScopeTitle().getInputValue();
-      var existingScopeTitles = actualTenderActivityService.getAllByActualTender(actualTender).stream()
-          .filter(actualTenderActivity -> actualTenderActivityFormValidatorHint
-              .map(tenderActivityFormValidatorHint -> !actualTenderActivity.getId()
-                  .equals(tenderActivityFormValidatorHint.currentActivityId()))
-              .orElse(true)
-          )
-          .map(ActualTenderActivity::getScopeTitle)
-          .map(String::toLowerCase)
-          .collect(Collectors.toSet());
-      if (existingScopeTitles.contains(inputScopeTitle.toLowerCase())) {
-        errors.rejectValue(
-            "scopeTitle.inputValue",
-            "scopeTitle.notUnique",
-            "There is already an actual tendering activity with the scope title \"%s\"".formatted(inputScopeTitle)
-        );
-      }
-    }
+    validateScopeTitle(form, errors, actualTender, actualTenderActivityFormValidatorHint);
 
     StringInputValidator.builder().validate(form.getScopeDescription(), errors);
     ValidationUtils.rejectIfEmpty(
@@ -91,5 +72,36 @@ class ActualTenderActivityFormValidator implements SmartValidator {
         "contractStage.required",
         MISSING_CONTRACT_STAGE_ERROR);
     StringInputValidator.builder().validate(form.getInvitationToTenderParticipants(), errors);
+  }
+
+  private void validateScopeTitle(ActualTenderActivityForm form, Errors errors, ActualTender actualTender,
+                                  Optional<ActualTenderActivityFormValidatorHint> actualTenderActivityFormValidatorHint) {
+    StringInputValidator.builder()
+        .mustHaveCharacterCountAtMost(MAX_SCOPE_TITLE_LENGTH)
+        .validate(form.getScopeTitle(), errors);
+
+    if (!errors.hasFieldErrors("scopeTitle.inputValue")) {
+
+      var inputScopeTitle = form.getScopeTitle().getInputValue();
+      var actualTenderActivitiesWithoutCurrent = actualTenderActivityService.getAllByActualTender(actualTender)
+          .stream()
+          .filter(actualTenderActivity -> actualTenderActivityFormValidatorHint
+              .map(tenderActivityFormValidatorHint -> !actualTenderActivity.getId()
+                  .equals(tenderActivityFormValidatorHint.currentActivityId()))
+              .orElse(true));
+      var existingScopeTitles = actualTenderActivitiesWithoutCurrent
+          .map(ActualTenderActivity::getScopeTitle)
+          .map(scopeTitle -> scopeTitle.trim().replaceAll(" +", " "))
+          .map(String::toLowerCase)
+          .collect(Collectors.toSet());
+      var cleanedInputScopeTitle = inputScopeTitle.toLowerCase().trim().replaceAll(" +", " ");
+      if (existingScopeTitles.contains(cleanedInputScopeTitle)) {
+        errors.rejectValue(
+            "scopeTitle.inputValue",
+            "scopeTitle.notUnique",
+            "There is already an actual tendering activity with the scope title \"%s\"".formatted(inputScopeTitle)
+        );
+      }
+    }
   }
 }

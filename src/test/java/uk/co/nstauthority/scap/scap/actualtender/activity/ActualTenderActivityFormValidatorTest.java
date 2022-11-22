@@ -171,6 +171,28 @@ class ActualTenderActivityFormValidatorTest {
   }
 
   @Test
+  void validate_ChangingOtherExistingScopeTitleWithWhitespace_AssertErrors() {
+    form.setScopeTitle("      test scope title    ");
+    form.setScopeDescription("test scope description");
+    form.setRemunerationModel(RemunerationModel.LUMP_SUM);
+    form.setContractStage(ContractStage.CONTRACT_AWARDED);
+    form.setInvitationToTenderParticipants("test participant");
+    var existingActualTenderActivity = new ActualTenderActivity(156);
+    existingActualTenderActivity.setScopeTitle("Test SCOPE title");
+
+    when(actualTenderActivityService.getAllByActualTender(actualTender))
+        .thenReturn(List.of(existingActualTenderActivity));
+
+    validator.validate(form, bindingResult, new ActualTenderFormValidatorHint(actualTender),
+        new ActualTenderActivityFormValidatorHint(999));
+    var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
+
+    assertThat(extractedErrors).containsExactly(
+        entry("scopeTitle.inputValue", Set.of("scopeTitle.notUnique"))
+    );
+  }
+
+  @Test
   void validate_ScopeTitleTooLong_AssertError() {
     var tooLongScopeTitle = StringUtils.repeat("X", ActualTenderActivityFormValidator.MAX_SCOPE_TITLE_LENGTH + 1);
     form.setScopeTitle(tooLongScopeTitle);
