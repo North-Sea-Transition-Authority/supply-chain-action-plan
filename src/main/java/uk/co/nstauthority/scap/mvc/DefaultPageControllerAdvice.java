@@ -40,14 +40,8 @@ class DefaultPageControllerAdvice {
   }
 
   private void addBrandingAttributes(Model model) {
-    model.addAttribute(
-        "serviceBranding",
-        serviceBrandingConfigurationProperties.getServiceConfigurationProperties()
-    );
-    model.addAttribute(
-        "customerBranding",
-        serviceBrandingConfigurationProperties.getCustomerConfigurationProperties()
-    );
+    model.addAttribute("serviceBranding", serviceBrandingConfigurationProperties.getServiceConfigurationProperties());
+    model.addAttribute("customerBranding", serviceBrandingConfigurationProperties.getCustomerConfigurationProperties());
   }
 
   private void addCommonUrls(Model model) {

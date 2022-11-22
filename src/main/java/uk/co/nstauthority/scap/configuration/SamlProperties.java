@@ -8,7 +8,7 @@ import org.springframework.validation.annotation.Validated;
 @Configuration
 @ConfigurationProperties(prefix = "saml")
 @Validated
-class SamlProperties {
+public class SamlProperties {
 
   @NotNull
   private String registrationId;
@@ -21,6 +21,9 @@ class SamlProperties {
 
   @NotNull
   private String loginUrl;
+
+  @NotNull
+  private String logoutUrl;
 
   @NotNull
   private String consumerServiceLocation;
@@ -55,6 +58,14 @@ class SamlProperties {
 
   public void setLoginUrl(String loginUrl) {
     this.loginUrl = loginUrl;
+  }
+
+  public String getLogoutUrl() {
+    return logoutUrl;
+  }
+
+  public void setLogoutUrl(String logoutUrl) {
+    this.logoutUrl = logoutUrl;
   }
 
   public String getConsumerServiceLocation() {

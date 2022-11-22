@@ -16,28 +16,35 @@ import org.springframework.security.saml2.provider.service.registration.RelyingP
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.Saml2MessageBinding;
 import org.springframework.security.web.SecurityFilterChain;
+import uk.co.nstauthority.scap.authentication.ServiceLogoutSuccessHandler;
 
 @Configuration
 public class WebSecurityConfiguration {
 
   private final SamlProperties samlProperties;
 
+  private final ServiceLogoutSuccessHandler serviceLogoutSuccessHandler;
+
   @Autowired
-  public WebSecurityConfiguration(SamlProperties samlProperties) {
+  public WebSecurityConfiguration(SamlProperties samlProperties,
+                                  ServiceLogoutSuccessHandler serviceLogoutSuccessHandler) {
     this.samlProperties = samlProperties;
+    this.serviceLogoutSuccessHandler = serviceLogoutSuccessHandler;
   }
 
   @Bean
   protected SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
     httpSecurity
         .authorizeHttpRequests()
-        .mvcMatchers("/assets/**")
+          .mvcMatchers("/assets/**")
         .permitAll()
-        .anyRequest()
-        .authenticated()
+          .anyRequest()
+          .authenticated()
         .and()
-        .saml2Login();
-
+          .saml2Login()
+        .and()
+          .logout()
+          .logoutSuccessHandler(serviceLogoutSuccessHandler);
     return httpSecurity.build();
   }
 

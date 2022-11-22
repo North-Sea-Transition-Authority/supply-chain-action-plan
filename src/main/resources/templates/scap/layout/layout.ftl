@@ -50,6 +50,20 @@
   <#else>
     <#assign twoThirdsColumn=true/>
   </#if>
+  <#assign headerContent>
+    <@fdsHeader.header
+    homePageUrl=serviceHomeUrl
+    serviceUrl=serviceHomeUrl
+    logoProductText=customerMnemonic
+    headerNav=true
+    serviceName=serviceName
+    headerLogo="GOV_CREST"
+    >
+      <@fdsHeader.headerNavigation>
+        <@fdsHeader.headerNavigationSignOutButton formUrl=springUrl("/logout") buttonText=signOutButtonText/>
+      </@fdsHeader.headerNavigation>
+    </@fdsHeader.header>
+  </#assign>
 
   <@fdsDefaultPageTemplate
     htmlTitle=htmlTitle
@@ -72,6 +86,7 @@
     caption=caption
     errorItems=errorItems
     notificationBannerContent=notificationBannerContent
+    headerContent=headerContent
   >
     <#nested />
   </@fdsDefaultPageTemplate>
