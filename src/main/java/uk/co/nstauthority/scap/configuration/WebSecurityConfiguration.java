@@ -9,13 +9,16 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.saml2.core.Saml2X509Credential;
+import org.springframework.security.saml2.provider.service.authentication.OpenSaml4AuthenticationProvider;
 import org.springframework.security.saml2.provider.service.registration.InMemoryRelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.Saml2MessageBinding;
 import org.springframework.security.web.SecurityFilterChain;
+import uk.co.nstauthority.scap.authentication.SamlResponseParser;
 import uk.co.nstauthority.scap.authentication.ServiceLogoutSuccessHandler;
 
 @Configuration
@@ -23,17 +26,24 @@ public class WebSecurityConfiguration {
 
   private final SamlProperties samlProperties;
 
+  private final SamlResponseParser samlResponseParser;
+
   private final ServiceLogoutSuccessHandler serviceLogoutSuccessHandler;
 
   @Autowired
   public WebSecurityConfiguration(SamlProperties samlProperties,
+                                  SamlResponseParser samlResponseParser,
                                   ServiceLogoutSuccessHandler serviceLogoutSuccessHandler) {
     this.samlProperties = samlProperties;
+    this.samlResponseParser = samlResponseParser;
     this.serviceLogoutSuccessHandler = serviceLogoutSuccessHandler;
   }
 
   @Bean
   protected SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+    var authenticationProvider = new OpenSaml4AuthenticationProvider();
+    authenticationProvider.setResponseAuthenticationConverter(r -> samlResponseParser.parseSamlResponse(r.getResponse()));
+
     httpSecurity
         .authorizeHttpRequests()
           .mvcMatchers("/assets/**")
@@ -41,8 +51,7 @@ public class WebSecurityConfiguration {
           .anyRequest()
           .authenticated()
         .and()
-          .saml2Login()
-        .and()
+        .saml2Login(saml2 -> saml2.authenticationManager(new ProviderManager(authenticationProvider)))
           .logout()
           .logoutSuccessHandler(serviceLogoutSuccessHandler);
     return httpSecurity.build();

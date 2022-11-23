@@ -20,6 +20,9 @@ public class SamlProperties {
   private String certificate;
 
   @NotNull
+  private String registrationUrl;
+
+  @NotNull
   private String loginUrl;
 
   @NotNull
@@ -34,6 +37,14 @@ public class SamlProperties {
 
   public void setRegistrationId(String registrationId) {
     this.registrationId = registrationId;
+  }
+
+  public String getRegistrationUrl() {
+    return registrationUrl;
+  }
+
+  public void setRegistrationUrl(String registrationUrl) {
+    this.registrationUrl = registrationUrl;
   }
 
   public String getEntityId() {

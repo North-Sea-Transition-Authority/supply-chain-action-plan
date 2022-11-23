@@ -6,6 +6,7 @@
 <#-- @ftlvariable name="customerBranding" type="uk.co.nstauthority.scap.branding.CustomerConfigurationProperties" -->
 <#-- @ftlvariable name="serviceHomeUrl" type="String" -->
 <#-- @ftlvariable name="notificationBannerView" type="uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerView" -->
+<#-- @ftlvariable name="loggedInUser" type="uk.co.nstauthority.scap.authentication.ServiceUserDetail" -->
 
 <#if notificationBannerView??>
   <#assign notificationBannerContent>
@@ -50,19 +51,26 @@
   <#else>
     <#assign twoThirdsColumn=true/>
   </#if>
+
   <#assign headerContent>
-    <@fdsHeader.header
-    homePageUrl=serviceHomeUrl
-    serviceUrl=serviceHomeUrl
-    logoProductText=customerMnemonic
-    headerNav=true
-    serviceName=serviceName
-    headerLogo="GOV_CREST"
-    >
-      <@fdsHeader.headerNavigation>
-        <@fdsHeader.headerNavigationSignOutButton formUrl=springUrl("/logout") buttonText=signOutButtonText/>
-      </@fdsHeader.headerNavigation>
-    </@fdsHeader.header>
+      <@fdsHeader.header
+      homePageUrl=serviceHomeUrl
+      serviceUrl=serviceHomeUrl
+      logoProductText=customerMnemonic
+      headerNav=true
+      serviceName=serviceName
+      headerLogo="GOV_CREST"
+      >
+        <#if loggedInUser?has_content>
+          <@fdsHeader.headerNavigation>
+            <@fdsHeader.headerNavigationItem
+            itemText=loggedInUser.displayName()
+            itemActive=false
+            />
+            <@fdsHeader.headerNavigationSignOutButton formUrl=springUrl("/logout") buttonText="Sign out"/>
+          </@fdsHeader.headerNavigation>
+        </#if>
+      </@fdsHeader.header>
   </#assign>
 
   <@fdsDefaultPageTemplate
