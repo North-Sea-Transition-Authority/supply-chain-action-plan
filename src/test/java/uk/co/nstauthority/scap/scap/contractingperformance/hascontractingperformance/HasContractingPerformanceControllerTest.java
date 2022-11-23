@@ -28,6 +28,7 @@ import org.springframework.validation.FieldError;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverview;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverviewService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
@@ -135,7 +136,32 @@ class HasContractingPerformanceControllerTest extends AbstractControllerTest {
     var form = new HasContractingPerformanceForm();
     form.setHasContractingPerformance(YesNo.YES);
     var bindingResultWithoutErrors = new BeanPropertyBindingResult(form, "form");
-    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()));
+    var expectedRedirectUrl = ReverseRouter.route(on(ContractingPerformanceController.class)
+        .renderNewContractingPerformanceForm(scap.getId(), null));
+
+    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(contractingPerformanceFormService.validate(eq(form), any(BindingResult.class)))
+        .thenReturn(bindingResultWithoutErrors);
+
+    mockMvc.perform(post(
+        ReverseRouter.route(on(HasContractingPerformanceController.class)
+            .saveHasContractingPerformanceForm(scap.getId(), null, emptyBindingResult())))
+            .with(csrf())
+            .flashAttr("form", form))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(ControllerTestingUtil.redirectUrl(expectedRedirectUrl));
+
+    verify(contractingPerformanceOverviewService).saveContractingPerformance(scapDetail, form.getHasContractingPerformance());
+  }
+
+  @Test
+  void saveHasContractingPerformanceForm_NoErrors_NoContractingPerformance_VerifySaveAndRedirect() throws Exception {
+    var form = new HasContractingPerformanceForm();
+    form.setHasContractingPerformance(YesNo.NO);
+    var bindingResultWithoutErrors = new BeanPropertyBindingResult(form, "form");
+    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class)
+        .renderTaskList(scap.getId()));
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);

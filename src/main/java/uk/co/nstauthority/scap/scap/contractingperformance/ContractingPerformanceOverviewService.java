@@ -6,6 +6,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.enumutil.YesNo;
+import uk.co.nstauthority.scap.error.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Service
@@ -23,6 +24,13 @@ public class ContractingPerformanceOverviewService {
 
   public Optional<ContractingPerformanceOverview> getByScapDetail(ScapDetail scapDetail) {
     return contractingPerformanceOverviewRepository.findByScapDetail(scapDetail);
+  }
+
+  public ContractingPerformanceOverview getByScapDetailOrThrow(ScapDetail scapDetail) {
+    return getByScapDetail(scapDetail).orElseThrow(
+        () -> new ScapEntityNotFoundException(
+            "Could not find Contracting Performance Overview for ScapDetail with ID [%d]"
+                .formatted(scapDetail.getId())));
   }
 
   @Transactional

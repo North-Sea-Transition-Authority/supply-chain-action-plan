@@ -9,5 +9,7 @@ interface ActualTenderActivityRepository extends CrudRepository<ActualTenderActi
 
   List<ActualTenderActivity> findAllByActualTender(ActualTender actualTender);
 
+  List<ActualTenderActivity> findAllByActualTenderAndContractStage(ActualTender actualTender, ContractStage contractStage);
+
   Optional<ActualTenderActivity> findFirstByActualTender(ActualTender actualTender);
 }

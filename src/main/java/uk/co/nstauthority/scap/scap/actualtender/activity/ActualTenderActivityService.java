@@ -39,6 +39,14 @@ public class ActualTenderActivityService {
         .toList();
   }
 
+  public List<ActualTenderActivity> getActivitiesWithContractAwarded(ActualTender actualTender) {
+    return actualTenderActivityRepository
+        .findAllByActualTenderAndContractStage(actualTender, ContractStage.CONTRACT_AWARDED)
+        .stream()
+        .sorted(Comparator.comparing(ActualTenderActivity::getScopeTitle))
+        .toList();
+  }
+
   public boolean hasActualTenderActivity(ActualTender actualTender) {
     return actualTenderActivityRepository.findFirstByActualTender(actualTender).isPresent();
   }

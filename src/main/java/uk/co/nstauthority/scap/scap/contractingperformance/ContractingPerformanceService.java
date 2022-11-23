@@ -1,0 +1,46 @@
+package uk.co.nstauthority.scap.scap.contractingperformance;
+
+import java.time.Clock;
+import javax.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
+
+@Service
+class ContractingPerformanceService {
+
+  private final ContractingPerformanceRepository contractingPerformanceRepository;
+  private final ActualTenderActivityService actualTenderActivityService;
+  private final Clock clock;
+
+  @Autowired
+  ContractingPerformanceService(ContractingPerformanceRepository contractingPerformanceRepository,
+                                ActualTenderActivityService actualTenderActivityService, Clock clock) {
+    this.contractingPerformanceRepository = contractingPerformanceRepository;
+    this.actualTenderActivityService = actualTenderActivityService;
+    this.clock = clock;
+  }
+
+  @Transactional
+  void createContractingPerformance(ContractingPerformanceOverview contractingPerformanceOverview,
+                                    ContractingPerformanceForm form) {
+    var contractingPerformance = new ContractingPerformance(contractingPerformanceOverview, clock.instant());
+    saveContractingPerformance(contractingPerformance, form);
+  }
+
+  @Transactional
+  void saveContractingPerformance(ContractingPerformance contractingPerformance,
+                                  ContractingPerformanceForm form) {
+    var actualTenderActivity = actualTenderActivityService.getById(form.getActualTenderActivityId());
+    contractingPerformance.setActualTenderActivity(actualTenderActivity);
+    var outturnCost = form.getOutturnCost()
+        .getAsBigDecimal()
+        .orElseThrow(() -> new IllegalArgumentException("%s could not be cast to BigDecimal"
+            .formatted(form.getOutturnCost().getInputValue())));
+    contractingPerformance.setOutturnCost(outturnCost);
+    contractingPerformance.setOutturnRationale(form.getOutturnRationale().getInputValue());
+
+    contractingPerformanceRepository.save(contractingPerformance);
+  }
+
+}

@@ -1,6 +1,7 @@
 package uk.co.nstauthority.scap.scap.contractingperformance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.enumutil.YesNo;
+import uk.co.nstauthority.scap.error.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,6 +50,28 @@ class ContractingPerformanceOverviewServiceTest {
         .getByScapDetail(scapDetail);
 
     assertThat(returnedContractingPerformanceOverview).contains(contractingPerformanceOverview);
+  }
+
+  @Test
+  void getByScapDetailOrThrow_IsFound_AssertNotThrows() {
+    var contractingPerformanceOverview = new ContractingPerformanceOverview();
+
+    when(contractingPerformanceOverviewRepository.findByScapDetail(scapDetail))
+        .thenReturn(Optional.of(contractingPerformanceOverview));
+
+    var returnedContractingPerformanceOverview = contractingPerformanceOverviewService
+        .getByScapDetailOrThrow(scapDetail);
+
+    assertThat(returnedContractingPerformanceOverview).isEqualTo(contractingPerformanceOverview);
+  }
+
+  @Test
+  void getByScapDetailOrThrow_NotFound_AssertThrows() {
+    when(contractingPerformanceOverviewRepository.findByScapDetail(scapDetail))
+        .thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
+        .isInstanceOf(ScapEntityNotFoundException.class);
   }
 
   @Test

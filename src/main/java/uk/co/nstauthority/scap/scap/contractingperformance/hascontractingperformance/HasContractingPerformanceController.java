@@ -14,6 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverviewService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
@@ -70,10 +71,13 @@ public class HasContractingPerformanceController {
         bindingResult,
         hasContractingPerformanceModelAndView(scapId),
         form,
-        // TODO SCAP2022-49: In PR for next form page change this redirect
         () -> {
           contractingPerformanceOverviewService.saveContractingPerformance(scapDetail, form.getHasContractingPerformance());
-          return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
+          if (YesNo.NO.equals(form.getHasContractingPerformance())) {
+            return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
+          }
+          return ReverseRouter.redirect(on(ContractingPerformanceController.class)
+              .renderNewContractingPerformanceForm(scapId, null));
         }
     );
   }

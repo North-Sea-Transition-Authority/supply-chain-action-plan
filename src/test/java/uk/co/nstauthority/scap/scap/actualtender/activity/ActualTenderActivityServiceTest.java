@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.error.ScapEntityNotFoundException;
@@ -35,8 +36,10 @@ class ActualTenderActivityServiceTest {
   @Mock
   InvitationToTenderParticipantRepository invitationToTenderParticipantRepository;
 
-  Clock clock;
+  @Mock
+  Clock clock = Clock.fixed(Instant.ofEpochSecond(1667316108), ZoneId.systemDefault());
 
+  @InjectMocks
   ActualTenderActivityService actualTenderActivityService;
 
   @Captor
@@ -55,9 +58,6 @@ class ActualTenderActivityServiceTest {
     form.setRemunerationModelName("test remuneration model name");
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
     form.setInvitationToTenderParticipants("test ITT participant");
-    clock = Clock.fixed(Instant.ofEpochSecond(1667316108), ZoneId.systemDefault());
-    actualTenderActivityService = new ActualTenderActivityService(
-        actualTenderActivityRepository, invitationToTenderParticipantRepository, clock);
   }
 
   @Test
@@ -85,12 +85,28 @@ class ActualTenderActivityServiceTest {
   @Test
   void getAllByActualTender_VerifyCallsRepository() {
     var actualTender = new ActualTender(43);
-    var actualTenderDetail = new ActualTenderActivity(actualTender, Instant.now());
-    when(actualTenderActivityRepository.findAllByActualTender(actualTender)).thenReturn(List.of(actualTenderDetail));
+    var actualTenderActivity = new ActualTenderActivity(actualTender, Instant.now());
+    when(actualTenderActivityRepository.findAllByActualTender(actualTender)).thenReturn(List.of(actualTenderActivity));
 
     var returnedList = actualTenderActivityService.getAllByActualTender(actualTender);
 
-    assertThat(returnedList).containsExactly(actualTenderDetail);
+    assertThat(returnedList).containsExactly(actualTenderActivity);
+  }
+
+  @Test
+  void getActivitiesWithContractAwarded_VerifyCallsRepository() {
+    var actualTender = new ActualTender(43);
+    var actualTenderActivity1 = new ActualTenderActivity(actualTender, Instant.now());
+    actualTenderActivity1.setScopeTitle("test scope title");
+    var actualTenderActivity2 = new ActualTenderActivity(actualTender, Instant.now());
+    actualTenderActivity2.setScopeTitle("test scope title 2");
+    when(actualTenderActivityRepository
+        .findAllByActualTenderAndContractStage(actualTender, ContractStage.CONTRACT_AWARDED))
+        .thenReturn(List.of(actualTenderActivity2, actualTenderActivity1));
+
+    var returnedList = actualTenderActivityService.getActivitiesWithContractAwarded(actualTender);
+
+    assertThat(returnedList).containsExactly(actualTenderActivity1, actualTenderActivity2);
   }
 
   @Test
