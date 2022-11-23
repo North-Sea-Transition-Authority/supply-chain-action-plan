@@ -46,7 +46,7 @@ public class EnergyPortalUserService {
     return energyPortalApiWrapper.makeRequest(((logCorrelationId, requestPurpose) ->
         userApi.searchUsersByEmail(
             username,
-                USERS_PROJECTION_ROOT,
+            USERS_PROJECTION_ROOT,
             requestPurpose.purpose(),
             logCorrelationId.id()
         )

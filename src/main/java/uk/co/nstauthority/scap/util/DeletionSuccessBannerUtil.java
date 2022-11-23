@@ -1,12 +1,13 @@
 package uk.co.nstauthority.scap.util;
 
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import uk.co.nstauthority.scap.error.exception.IllegalUtilClassInstantiationException;
 import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerBodyLine;
 
 public class DeletionSuccessBannerUtil {
 
   private DeletionSuccessBannerUtil() {
-    throw new IllegalStateException("This is a helper class, it should not be instantiated");
+    throw new IllegalUtilClassInstantiationException(DeletionSuccessBannerUtil.class);
   }
 
   public static void addRedirectionNotification(RedirectAttributes redirectAttributes, String message) {

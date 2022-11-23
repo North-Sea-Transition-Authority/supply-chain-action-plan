@@ -1,13 +1,18 @@
-package uk.co.nstauthority.scap.tasklist;
+package uk.co.nstauthority.scap.util;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import uk.co.nstauthority.scap.error.exception.IllegalUtilClassInstantiationException;
+import uk.co.nstauthority.scap.tasklist.TaskListItem;
+import uk.co.nstauthority.scap.tasklist.TaskListItemView;
+import uk.co.nstauthority.scap.tasklist.TaskListSection;
+import uk.co.nstauthority.scap.tasklist.TaskListSectionView;
 
 public class TaskListSectionUtil {
 
   private TaskListSectionUtil() {
-    throw new IllegalStateException("TaskListSectionUtil is a static utility class and should not be instantiated");
+    throw new IllegalUtilClassInstantiationException(TaskListSectionUtil.class);
   }
 
   /**
@@ -19,9 +24,9 @@ public class TaskListSectionUtil {
    * @param <T> Helps to ensure type safety is kept when passing in the given object.
    * @return A generated {@link TaskListSectionView} object
    */
-  static <T> TaskListSectionView createSectionView(TaskListSection<T> section,
-                                                   Collection<? extends TaskListItem<T>> taskListItems,
-                                                   T target) {
+  public static <T> TaskListSectionView createSectionView(TaskListSection<T> section,
+                                                          Collection<? extends TaskListItem<T>> taskListItems,
+                                                          T target) {
     var itemViews = taskListItems
         .stream()
         .filter(taskListItem -> taskListItem.getTaskListSection().equals(section.getClass()))
@@ -54,7 +59,7 @@ public class TaskListSectionUtil {
         .toList();
   }
 
-  static <T> TaskListItemView createTaskListItemView(TaskListItem<T> taskListItem, T target) {
+  public static <T> TaskListItemView createTaskListItemView(TaskListItem<T> taskListItem, T target) {
     return new TaskListItemView.TaskListItemViewBuilder(
         taskListItem.getDisplayOrder(),
         taskListItem.getItemDisplayText(),

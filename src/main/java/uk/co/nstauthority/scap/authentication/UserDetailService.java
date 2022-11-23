@@ -2,6 +2,8 @@ package uk.co.nstauthority.scap.authentication;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import uk.co.nstauthority.scap.error.exception.InvalidAuthenticationException;
+
 
 @Service
 public class UserDetailService {

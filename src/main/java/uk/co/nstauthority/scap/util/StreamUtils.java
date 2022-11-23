@@ -8,11 +8,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import uk.co.nstauthority.scap.error.exception.IllegalUtilClassInstantiationException;
 
 public class StreamUtils {
 
   private StreamUtils() {
-    throw new AssertionError();
+    throw new IllegalUtilClassInstantiationException(StreamUtils.class);
   }
 
   public static <T, K, U> Collector<T, ?, Map<K, U>> toLinkedHashMap(Function<? super T, ? extends K> keyMapper,

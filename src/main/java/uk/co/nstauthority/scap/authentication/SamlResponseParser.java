@@ -11,6 +11,8 @@ import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.Response;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
+import uk.co.nstauthority.scap.error.exception.SamlResponseException;
+
 
 @Service
 public class SamlResponseParser {

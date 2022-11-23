@@ -24,4 +24,5 @@ class ServiceSaml2Authentication extends AbstractAuthenticationToken {
   public Object getPrincipal() {
     return principal;
   }
+
 }

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
+import uk.co.nstauthority.scap.error.exception.InvalidAuthenticationException;
 
 class UserDetailServiceTest {
 
