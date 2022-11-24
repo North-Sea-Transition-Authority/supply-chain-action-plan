@@ -53,7 +53,8 @@ public class ActualTenderSummaryViewService {
 
     return activities.stream()
         .map(actualTenderActivity -> {
-          var activityInvitationToTenderParticipants = invitationToTenderParticipantsMap.get(actualTenderActivity);
+          var activityInvitationToTenderParticipants = invitationToTenderParticipantsMap
+              .getOrDefault(actualTenderActivity, Collections.emptyList());
           var activityBidParticipants = bidParticipantsMap.getOrDefault(actualTenderActivity, Collections.emptyList());
           var awardedContract = getAwardedContractForActivity(actualTenderActivity, awardedContracts);
           var awardedContractView = awardedContract.map(awardedContract1 ->
