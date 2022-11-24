@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.scap.actualtender.summary;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.List;
+import javax.transaction.Transactional;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,42 +30,43 @@ public class ActualTenderSummaryController {
   private final ScapDetailService scapDetailService;
   private final ActualTenderService actualTenderService;
   private final ActualTenderActivityService actualTenderActivityService;
-  private final ActualTenderSummaryService actualTenderSummaryService;
   private final ActualTenderSummaryFormService actualTenderSummaryFormService;
   private final ControllerHelperService controllerHelperService;
   private final ActualTenderControllerRedirectionService actualTenderControllerRedirectionService;
+  private final ActualTenderSummaryViewService actualTenderSummaryViewService;
 
   ActualTenderSummaryController(ScapService scapService, ScapDetailService scapDetailService,
                                 ActualTenderService actualTenderService,
                                 ActualTenderActivityService actualTenderActivityService,
-                                ActualTenderSummaryService actualTenderSummaryService,
                                 ActualTenderSummaryFormService actualTenderSummaryFormService,
                                 ControllerHelperService controllerHelperService,
-                                ActualTenderControllerRedirectionService actualTenderControllerRedirectionService) {
+                                ActualTenderControllerRedirectionService actualTenderControllerRedirectionService,
+                                ActualTenderSummaryViewService actualTenderSummaryViewService) {
     this.scapService = scapService;
     this.scapDetailService = scapDetailService;
     this.actualTenderService = actualTenderService;
     this.actualTenderActivityService = actualTenderActivityService;
-    this.actualTenderSummaryService = actualTenderSummaryService;
     this.actualTenderSummaryFormService = actualTenderSummaryFormService;
     this.controllerHelperService = controllerHelperService;
     this.actualTenderControllerRedirectionService = actualTenderControllerRedirectionService;
+    this.actualTenderSummaryViewService = actualTenderSummaryViewService;
   }
 
   @GetMapping
+  @Transactional
   public ModelAndView renderActualTenderSummary(@PathVariable("scapId") Integer scapId) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
     var actualTender = actualTenderService.getByScapDetailOrThrow(scapDetail);
-    var form = actualTenderSummaryFormService.getForm(actualTender);
     var actualTenderActivities = actualTenderActivityService.getAllByActualTender(actualTender);
 
     if (actualTenderActivities.isEmpty()) {
       return ReverseRouter.redirect(on(HasActualTenderController.class).renderHasActualTenderForm(scapId));
     }
 
-    var actualTenderSummaryViews = actualTenderSummaryService
-        .getViewsForActualTenderActivities(actualTenderActivities, scapId);
+    var form = actualTenderSummaryFormService.getForm(actualTender);
+    var actualTenderSummaryViews = actualTenderSummaryViewService
+        .getByActualTenderActivities(actualTenderActivities, scapId);
 
     return actualTenderSummaryModelAndView(scapId, actualTenderSummaryViews)
         .addObject("form", form);
@@ -83,8 +85,8 @@ public class ActualTenderSummaryController {
       return ReverseRouter.redirect(on(HasActualTenderController.class).renderHasActualTenderForm(scapId));
     }
 
-    var actualTenderSummaryViews = actualTenderSummaryService
-        .getViewsForActualTenderActivities(actualTenderActivities, scapId);
+    var actualTenderSummaryViews = actualTenderSummaryViewService
+        .getByActualTenderActivities(actualTenderActivities, scapId);
 
     bindingResult = actualTenderSummaryFormService.validate(form, bindingResult);
 

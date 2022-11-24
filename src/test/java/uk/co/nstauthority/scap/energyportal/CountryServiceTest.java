@@ -17,11 +17,14 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.fivium.energyportalapi.client.LogCorrelationId;
 import uk.co.fivium.energyportalapi.client.RequestPurpose;
 import uk.co.fivium.energyportalapi.client.countries.CountryApi;
 import uk.co.fivium.energyportalapi.generated.client.CountriesProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.client.CountryProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.types.Country;
+import uk.co.fivium.energyportalapi.generated.types.PortalCountrySet;
+import uk.co.fivium.energyportalapi.generated.types.PortalCountryStatus;
 
 @ExtendWith(MockitoExtension.class)
 class CountryServiceTest {
@@ -156,5 +159,36 @@ class CountryServiceTest {
         entry("countryId", null),
         entry("countryName", null)
     );
+  }
+
+  @Test
+  void findCountriesByIds() {
+    var purpose = "test request purpose";
+    var countries = List.of(
+        new Country(0, "United Kingdom", PortalCountryStatus.ACTIVE, PortalCountrySet.EXPORT_CONTROL),
+        new Country(27, "Bahrain", PortalCountryStatus.ACTIVE, PortalCountrySet.EXPORT_CONTROL)
+    );
+    var countryIds = List.of(countries.get(0).getCountryId(), countries.get(1).getCountryId());
+    var requestedFieldsArgumentCaptor = ArgumentCaptor.forClass(CountriesProjectionRoot.class);
+    var requestPurposeArgumentCaptor = ArgumentCaptor.forClass(RequestPurpose.class);
+
+    when(countryApi.getAllCountriesByIds(
+        eq(countryIds), any(CountriesProjectionRoot.class), any(RequestPurpose.class), any(LogCorrelationId.class)))
+        .thenReturn(countries);
+
+    var returnedCountries = countryService.getCountriesByIds(countryIds, purpose);
+
+    verify(countryApi).getAllCountriesByIds(
+        eq(countryIds),
+        requestedFieldsArgumentCaptor.capture(),
+        requestPurposeArgumentCaptor.capture(),
+        any(LogCorrelationId.class));
+
+    assertThat(returnedCountries).isEqualTo(countries);
+    assertThat(requestedFieldsArgumentCaptor.getValue().getFields()).containsExactly(
+        entry("countryId", null),
+        entry("countryName", null)
+    );
+    assertThat(requestPurposeArgumentCaptor.getValue().purpose()).isEqualTo(purpose);
   }
 }

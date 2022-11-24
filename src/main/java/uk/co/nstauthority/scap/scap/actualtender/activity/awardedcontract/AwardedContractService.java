@@ -52,4 +52,8 @@ public class AwardedContractService {
     var awardedContract = getByActualTenderActivity(actualTenderActivity);
     awardedContract.ifPresent(awardedContractRepository::delete);
   }
+
+  public List<AwardedContract> getByActualTenderActivityIn(List<ActualTenderActivity> activities) {
+    return awardedContractRepository.findByActualTenderActivityIn(activities);
+  }
 }

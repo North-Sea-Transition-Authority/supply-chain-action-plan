@@ -105,4 +105,19 @@ class InvitationToTenderParticipantServiceTest {
 
     verify(invitationToTenderParticipantRepository).deleteAll(participants);
   }
+
+  @Test
+  void getInvitationToTenderParticipantsForActivities() {
+    var actualTenderingActivities = List.of(new ActualTenderActivity(173));
+    var participant1 = new InvitationToTenderParticipant(441);
+    var participant2 = new InvitationToTenderParticipant(442);
+    var participants = List.of(participant1, participant2);
+
+    when(invitationToTenderParticipantRepository.findAllByActualTenderActivityIn(actualTenderingActivities))
+        .thenReturn(participants);
+
+    var returnedParticipants = invitationToTenderParticipantService.getInvitationToTenderParticipantsForActivities(actualTenderingActivities);
+
+    assertThat(returnedParticipants).isEqualTo(participants);
+  }
 }

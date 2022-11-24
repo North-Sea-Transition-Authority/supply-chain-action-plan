@@ -31,8 +31,8 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivitySe
 import uk.co.nstauthority.scap.scap.actualtender.activity.ContractStage;
 import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTenderController;
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
-import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryService;
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryView;
+import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryViewService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
@@ -58,7 +58,7 @@ class DeleteActualTenderActivityControllerTest extends AbstractControllerTest {
   ActualTenderActivityService actualTenderActivityService;
 
   @MockBean
-  ActualTenderSummaryService actualTenderSummaryService;
+  ActualTenderSummaryViewService actualTenderSummaryViewService;
 
   @MockBean
   DeleteActualTenderActivityService deleteActualTenderActivityService;
@@ -75,6 +75,8 @@ class DeleteActualTenderActivityControllerTest extends AbstractControllerTest {
   @Test
   void renderDeleteActualTenderActivityConfirmation() throws Exception {
     var actualTenderSummaryView = new ActualTenderSummaryView(
+        scap.getId(),
+        actualTenderActivity.getId(),
         "test scope title",
         "test scope description",
         RemunerationModel.LUMP_SUM,
@@ -82,14 +84,12 @@ class DeleteActualTenderActivityControllerTest extends AbstractControllerTest {
         ContractStage.REQUEST_FOR_INFORMATION,
         List.of("company name"),
         Collections.emptyList(),
-        null,
-        "#",
-        "#"
-    ) ;
+        null
+    );
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
-    when(actualTenderSummaryService.getActualTenderSummaryView(actualTenderActivity, scap.getId()))
+    when(actualTenderSummaryViewService.getSingleViewByActualTenderActivity(actualTenderActivity, scap.getId()))
         .thenReturn(actualTenderSummaryView);
 
     mockMvc.perform(get(

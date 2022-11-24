@@ -33,6 +33,13 @@ public class CountryService {
     return countryApi.findCountryById(id, filters, requestPurpose, getLogCorrelationId());
   }
 
+  public List<Country> getCountriesByIds(List<Integer> countryIds, String purpose) {
+    var filters = new CountriesProjectionRoot().countryId().countryName();
+    var requestPurpose = new RequestPurpose(purpose);
+
+    return countryApi.getAllCountriesByIds(countryIds, filters, requestPurpose, getLogCorrelationId());
+  }
+
   public List<Country> searchCountries(String term, String purpose) {
     var requestPurpose = new RequestPurpose(purpose);
     var filters = new CountriesProjectionRoot().countryId().countryName();

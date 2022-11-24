@@ -22,6 +22,11 @@ public class InvitationToTenderParticipantService {
         .toList();
   }
 
+  public List<InvitationToTenderParticipant> getInvitationToTenderParticipantsForActivities(
+      List<ActualTenderActivity> activities) {
+    return invitationToTenderParticipantRepository.findAllByActualTenderActivityIn(activities);
+  }
+
   public List<InvitationToTenderParticipant> getBidParticipants(ActualTenderActivity actualTenderActivity) {
     return getBidParticipantsFromInvitationToTenderParticipants(getInvitationToTenderParticipants(actualTenderActivity));
   }

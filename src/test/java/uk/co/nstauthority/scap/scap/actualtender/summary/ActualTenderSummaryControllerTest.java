@@ -67,7 +67,7 @@ class ActualTenderSummaryControllerTest extends AbstractControllerTest {
   ActualTenderActivityService actualTenderActivityService;
 
   @MockBean
-  ActualTenderSummaryService actualTenderSummaryService;
+  ActualTenderSummaryViewService actualTenderSummaryViewService;
 
   @MockBean
   ActualTenderSummaryFormService actualTenderSummaryFormService;
@@ -106,18 +106,19 @@ class ActualTenderSummaryControllerTest extends AbstractControllerTest {
         "preferred bidder name", BigDecimal.valueOf(1.32),
         "award rationale", "preferred bidder location");
     var actualTenderSummaryView = new ActualTenderSummaryView(
+        scap.getId(), actualTenderActivities.get(0).getId(),
         "scope title", "scope description",
         RemunerationModel.OTHER, "remuneration model name",
-        ContractStage.CONTRACT_AWARDED, List.of("ITT participant 1", "ITT participant 2"),
-        List.of("bid participant 1", "bid participant 2"), awardedContractSummaryView,
-        "changeLinkUrl", "deleteLinkUrl");
+        ContractStage.CONTRACT_AWARDED,
+        List.of("ITT participant 1", "ITT participant 2"),
+        List.of("bid participant 1", "bid participant 2"), awardedContractSummaryView);
     var actualTenderActivitySummaryViews = List.of(actualTenderSummaryView);
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(actualTenderActivities);
-    when(actualTenderSummaryService.getViewsForActualTenderActivities(actualTenderActivities, scap.getId()))
+    when(actualTenderSummaryViewService.getByActualTenderActivities(actualTenderActivities, scap.getId()))
         .thenReturn(actualTenderActivitySummaryViews);
     when(actualTenderSummaryFormService.getForm(actualTender)).thenReturn(new ActualTenderSummaryForm());
 
@@ -155,11 +156,12 @@ class ActualTenderSummaryControllerTest extends AbstractControllerTest {
         "preferred bidder name", BigDecimal.valueOf(1.32),
         "award rationale", "preferred bidder location");
     var actualTenderSummaryView = new ActualTenderSummaryView(
+        scap.getId(), actualTenderActivities.get(0).getId(),
         "scope title", "scope description",
         RemunerationModel.OTHER, "remuneration model name",
-        ContractStage.CONTRACT_AWARDED, List.of("ITT participant 1", "ITT participant 2"),
-        List.of("bid participant 1", "bid participant 2"), awardedContractSummaryView,
-        "changeLinkUrl", "deleteLinkUrl");
+        ContractStage.CONTRACT_AWARDED,
+        List.of("ITT participant 1", "ITT participant 2"),
+        List.of("bid participant 1", "bid participant 2"), awardedContractSummaryView);
     var actualTenderActivitySummaryViews = List.of(actualTenderSummaryView);
     var form = new ActualTenderSummaryForm();
     var bindingResultWithErrors = new BeanPropertyBindingResult(form, "form");
@@ -171,7 +173,7 @@ class ActualTenderSummaryControllerTest extends AbstractControllerTest {
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(actualTenderActivities);
-    when(actualTenderSummaryService.getViewsForActualTenderActivities(actualTenderActivities, scap.getId()))
+    when(actualTenderSummaryViewService.getByActualTenderActivities(actualTenderActivities, scap.getId()))
         .thenReturn(actualTenderActivitySummaryViews);
     when(actualTenderSummaryFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResultWithErrors);
@@ -198,11 +200,12 @@ class ActualTenderSummaryControllerTest extends AbstractControllerTest {
         "preferred bidder name", BigDecimal.valueOf(1.32),
         "award rationale", "preferred bidder location");
     var actualTenderSummaryView = new ActualTenderSummaryView(
+        scap.getId(), actualTenderActivities.get(0).getId(),
         "scope title", "scope description",
         RemunerationModel.OTHER, "remuneration model name",
-        ContractStage.CONTRACT_AWARDED, List.of("ITT participant 1", "ITT participant 2"),
-        List.of("bid participant 1", "bid participant 2"), awardedContractSummaryView,
-        "changeLinkUrl", "deleteLinkUrl");
+        ContractStage.CONTRACT_AWARDED,
+        List.of("ITT participant 1", "ITT participant 2"),
+        List.of("bid participant 1", "bid participant 2"), awardedContractSummaryView);
     var actualTenderActivitySummaryViews = List.of(actualTenderSummaryView);
     var form = new ActualTenderSummaryForm();
     form.setHasMoreActualTenderActivities(HasMoreActualTenderActivities.YES_LATER);
@@ -213,7 +216,7 @@ class ActualTenderSummaryControllerTest extends AbstractControllerTest {
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(actualTenderActivities);
-    when(actualTenderSummaryService.getViewsForActualTenderActivities(actualTenderActivities, scap.getId()))
+    when(actualTenderSummaryViewService.getByActualTenderActivities(actualTenderActivities, scap.getId()))
         .thenReturn(actualTenderActivitySummaryViews);
     when(actualTenderSummaryFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResultNoErrors);
@@ -236,11 +239,12 @@ class ActualTenderSummaryControllerTest extends AbstractControllerTest {
         "preferred bidder name", BigDecimal.valueOf(1.32),
         "award rationale", "preferred bidder location");
     var actualTenderSummaryView = new ActualTenderSummaryView(
+        scap.getId(), actualTenderActivities.get(0).getId(),
         "scope title", "scope description",
         RemunerationModel.OTHER, "remuneration model name",
-        ContractStage.CONTRACT_AWARDED, List.of("ITT participant 1", "ITT participant 2"),
-        List.of("bid participant 1", "bid participant 2"), awardedContractSummaryView,
-        "changeLinkUrl", "deleteLinkUrl");
+        ContractStage.CONTRACT_AWARDED,
+        List.of("ITT participant 1", "ITT participant 2"),
+        List.of("bid participant 1", "bid participant 2"), awardedContractSummaryView);
     var actualTenderActivitySummaryViews = List.of(actualTenderSummaryView);
     var form = new ActualTenderSummaryForm();
     form.setHasMoreActualTenderActivities(HasMoreActualTenderActivities.YES_NOW);
@@ -252,7 +256,7 @@ class ActualTenderSummaryControllerTest extends AbstractControllerTest {
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(actualTenderActivities);
-    when(actualTenderSummaryService.getViewsForActualTenderActivities(actualTenderActivities, scap.getId()))
+    when(actualTenderSummaryViewService.getByActualTenderActivities(actualTenderActivities, scap.getId()))
         .thenReturn(actualTenderActivitySummaryViews);
     when(actualTenderSummaryFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResultNoErrors);

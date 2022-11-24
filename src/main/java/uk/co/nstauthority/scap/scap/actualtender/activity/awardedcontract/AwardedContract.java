@@ -55,6 +55,10 @@ public class AwardedContract {
     return id;
   }
 
+  public ActualTenderActivity getActualTenderActivity() {
+    return actualTenderActivity;
+  }
+
   public InvitationToTenderParticipant getPreferredBidder() {
     return preferredBidder;
   }

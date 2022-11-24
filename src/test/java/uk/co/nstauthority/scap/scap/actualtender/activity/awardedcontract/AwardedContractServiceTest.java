@@ -175,4 +175,17 @@ class AwardedContractServiceTest {
 
     verify(awardedContractRepository, never()).delete(any());
   }
+
+  @Test
+  void getByActualTenderActivityIn() {
+    var actualTenderingActivities = List.of(new ActualTenderActivity(173));
+    var awardedContracts = List.of(new AwardedContract(5411));
+
+    when(awardedContractRepository.findByActualTenderActivityIn(actualTenderingActivities))
+        .thenReturn(awardedContracts);
+
+    var returnedContracts = awardedContractService.getByActualTenderActivityIn(actualTenderingActivities);
+
+    assertThat(returnedContracts).isEqualTo(awardedContracts);
+  }
 }

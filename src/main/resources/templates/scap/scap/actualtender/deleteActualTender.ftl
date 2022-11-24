@@ -2,6 +2,9 @@
 <#import  'actualTenderActivitySummaryContent.ftl' as summaryContent>
 
 <#assign pageTitle = "Are you sure you want to delete this actual tender activity?"/>
+<#-- @ftlvariable name="actualTenderActivityView"
+type="uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryView"
+-->
 
 <@defaultPage
   htmlTitle=pageTitle

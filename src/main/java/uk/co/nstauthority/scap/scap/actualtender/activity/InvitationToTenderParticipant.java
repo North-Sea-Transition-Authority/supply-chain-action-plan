@@ -46,6 +46,16 @@ public class InvitationToTenderParticipant {
     return id;
   }
 
+  public ActualTenderActivity getActualTenderActivity() {
+    return actualTenderActivity;
+  }
+
+  @VisibleForTesting
+  public void setActualTenderActivity(
+      ActualTenderActivity actualTenderActivity) {
+    this.actualTenderActivity = actualTenderActivity;
+  }
+
   public String getCompanyName() {
     return companyName;
   }

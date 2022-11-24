@@ -3,13 +3,11 @@ package uk.co.nstauthority.scap.scap.actualtender.summary;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.when;
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,19 +15,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.fivium.energyportalapi.generated.types.Country;
 import uk.co.nstauthority.scap.energyportal.CountryService;
-import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
-import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityController;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ContractStage;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipantService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContract;
 import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContractService;
-import uk.co.nstauthority.scap.scap.actualtender.activity.delete.DeleteActualTenderActivityController;
 
 @ExtendWith(MockitoExtension.class)
-class ActualTenderSummaryServiceTest {
+class ActualTenderSummaryViewServiceTest {
 
   @Mock
   InvitationToTenderParticipantService invitationToTenderParticipantService;
@@ -41,10 +36,56 @@ class ActualTenderSummaryServiceTest {
   CountryService countryService;
 
   @InjectMocks
-  ActualTenderSummaryService actualTenderSummaryService;
+  ActualTenderSummaryViewService actualTenderSummaryViewService;
+
 
   @Test
-  void getViewsForActualTenderActivities() {
+  void getSingleViewByActualTenderActivity() {
+    var scapId = 173;
+
+    var actualTenderActivity = new ActualTenderActivity(10);
+    actualTenderActivity.setScopeTitle("test scope title 1");
+    actualTenderActivity.setScopeDescription("test scope description 1");
+    actualTenderActivity.setRemunerationModel(RemunerationModel.LUMP_SUM);
+    actualTenderActivity.setContractStage(ContractStage.REQUEST_FOR_INFORMATION);
+    var participant = new InvitationToTenderParticipant(210);
+    participant.setCompanyName("company name 1");
+    participant.setActualTenderActivity(actualTenderActivity);
+    var participants = List.of(participant);
+
+    when(invitationToTenderParticipantService.getInvitationToTenderParticipantsForActivities(
+        List.of(actualTenderActivity)))
+        .thenReturn(participants);
+
+    var view = actualTenderSummaryViewService.getSingleViewByActualTenderActivity(actualTenderActivity, scapId);
+
+    assertThat(view).extracting(
+        ActualTenderSummaryView::scapId,
+        ActualTenderSummaryView::activityId,
+        ActualTenderSummaryView::scopeTitle,
+        ActualTenderSummaryView::scopeDescription,
+        ActualTenderSummaryView::remunerationModel,
+        ActualTenderSummaryView::remunerationModelName,
+        ActualTenderSummaryView::contractStage,
+        ActualTenderSummaryView::invitationToTenderParticipants,
+        ActualTenderSummaryView::bidParticipants,
+        ActualTenderSummaryView::awardedContract
+    ).containsExactly(
+        scapId,
+        actualTenderActivity.getId(),
+        actualTenderActivity.getScopeTitle(),
+        actualTenderActivity.getScopeDescription(),
+        actualTenderActivity.getRemunerationModel(),
+        actualTenderActivity.getRemunerationModelName(),
+        actualTenderActivity.getContractStage(),
+        List.of(participant.getCompanyName()),
+        Collections.emptyList(),
+        null
+    );
+  }
+
+  @Test
+  void getByActualTenderActivities() {
     var scapId = 11;
 
     var actualTenderActivity1 = new ActualTenderActivity(10);
@@ -54,7 +95,7 @@ class ActualTenderSummaryServiceTest {
     actualTenderActivity1.setContractStage(ContractStage.REQUEST_FOR_INFORMATION);
     var participant1 = new InvitationToTenderParticipant(210);
     participant1.setCompanyName("company name 1");
-    var participants1 = List.of(participant1);
+    participant1.setActualTenderActivity(actualTenderActivity1);
 
     var actualTenderActivity2 = new ActualTenderActivity(11);
     actualTenderActivity2.setScopeTitle("test scope title 2");
@@ -65,9 +106,10 @@ class ActualTenderSummaryServiceTest {
     var participant2 = new InvitationToTenderParticipant(211);
     participant2.setCompanyName("company name 2");
     participant2.setBidParticipant(true);
+    participant2.setActualTenderActivity(actualTenderActivity2);
     var participant3 = new InvitationToTenderParticipant(212);
     participant3.setCompanyName("company name 3");
-    var participants2 = List.of(participant2, participant3);
+    participant3.setActualTenderActivity(actualTenderActivity2);
 
     var actualTenderActivity3 = new ActualTenderActivity(12);
     actualTenderActivity3.setScopeTitle("test scope title 3");
@@ -77,9 +119,10 @@ class ActualTenderSummaryServiceTest {
     var participant4 = new InvitationToTenderParticipant(213);
     participant4.setCompanyName("company name 4");
     participant4.setBidParticipant(true);
+    participant4.setActualTenderActivity(actualTenderActivity3);
     var participant5 = new InvitationToTenderParticipant(214);
     participant5.setCompanyName("company name 5");
-    var participants3 = List.of(participant4, participant5);
+    participant5.setActualTenderActivity(actualTenderActivity3);
     var country = new Country(0, "United Kingdom", null, null);
     var awardedContract = new AwardedContract(actualTenderActivity3, Instant.now());
     awardedContract.setPreferredBidder(participant4);
@@ -90,71 +133,63 @@ class ActualTenderSummaryServiceTest {
     var actualTenderActivities = List.of(
         actualTenderActivity1, actualTenderActivity2, actualTenderActivity3
     );
+    var participants = List.of(
+        participant1, participant2, participant3, participant4, participant5
+    );
 
-    when(invitationToTenderParticipantService.getInvitationToTenderParticipants(actualTenderActivity1))
-        .thenReturn(participants1);
-    when(invitationToTenderParticipantService.getInvitationToTenderParticipants(actualTenderActivity2))
-        .thenReturn(participants2);
-    when(invitationToTenderParticipantService.getInvitationToTenderParticipants(actualTenderActivity3))
-        .thenReturn(participants3);
-    when(awardedContractService.getByActualTenderActivity(actualTenderActivity3))
-        .thenReturn(Optional.of(awardedContract));
-    when(countryService
-        .findCountryById(country.getCountryId(), ActualTenderSummaryService.AWARDED_CONTRACT_VIEW_REQUEST_PURPOSE))
-        .thenReturn(Optional.of(country));
+    when(invitationToTenderParticipantService.getInvitationToTenderParticipantsForActivities(actualTenderActivities))
+        .thenReturn(participants);
+    when(awardedContractService.getByActualTenderActivityIn(actualTenderActivities))
+        .thenReturn(List.of(awardedContract));
+    when(countryService.getCountriesByIds(List.of(country.getCountryId()), ActualTenderSummaryViewService.REQUEST_PURPOSE))
+        .thenReturn(List.of(country));
 
-    var returnedViews = actualTenderSummaryService
-        .getViewsForActualTenderActivities(actualTenderActivities, scapId);
+    var returnedViews = actualTenderSummaryViewService
+        .getByActualTenderActivities(actualTenderActivities, scapId);
 
     assertThat(returnedViews).extracting(
+        ActualTenderSummaryView::scapId,
+        ActualTenderSummaryView::activityId,
         ActualTenderSummaryView::scopeTitle,
         ActualTenderSummaryView::scopeDescription,
         ActualTenderSummaryView::remunerationModel,
         ActualTenderSummaryView::remunerationModelName,
         ActualTenderSummaryView::contractStage,
         ActualTenderSummaryView::invitationToTenderParticipants,
-        ActualTenderSummaryView::bidParticipants,
-        ActualTenderSummaryView::changeLinkUrl,
-        ActualTenderSummaryView::deleteLinkUrl
+        ActualTenderSummaryView::bidParticipants
     ).containsExactly(
         tuple(
+            scapId,
+            actualTenderActivity1.getId(),
             actualTenderActivity1.getScopeTitle(),
             actualTenderActivity1.getScopeDescription(),
             actualTenderActivity1.getRemunerationModel(),
             actualTenderActivity1.getRemunerationModelName(),
             actualTenderActivity1.getContractStage(),
             List.of(participant1.getCompanyName()),
-            Collections.emptyList(),
-            ReverseRouter.route(on(ActualTenderActivityController.class)
-                .renderExistingActualTenderActivityForm(scapId, actualTenderActivity1.getId())),
-            ReverseRouter.route(on(DeleteActualTenderActivityController.class)
-                .renderDeleteActualTenderActivityConfirmation(scapId, actualTenderActivity1.getId()))
+            Collections.emptyList()
         ),
         tuple(
+            scapId,
+            actualTenderActivity2.getId(),
             actualTenderActivity2.getScopeTitle(),
             actualTenderActivity2.getScopeDescription(),
             actualTenderActivity2.getRemunerationModel(),
             actualTenderActivity2.getRemunerationModelName(),
             actualTenderActivity2.getContractStage(),
             List.of(participant2.getCompanyName(), participant3.getCompanyName()),
-            List.of(participant2.getCompanyName()),
-            ReverseRouter.route(on(ActualTenderActivityController.class)
-                .renderExistingActualTenderActivityForm(scapId, actualTenderActivity2.getId())),
-            ReverseRouter.route(on(DeleteActualTenderActivityController.class)
-                .renderDeleteActualTenderActivityConfirmation(scapId, actualTenderActivity2.getId()))
+            List.of(participant2.getCompanyName())
         ),
         tuple(
+            scapId,
+            actualTenderActivity3.getId(),
             actualTenderActivity3.getScopeTitle(),
             actualTenderActivity3.getScopeDescription(),
             actualTenderActivity3.getRemunerationModel(),
             actualTenderActivity3.getRemunerationModelName(),
             actualTenderActivity3.getContractStage(),
             List.of(participant4.getCompanyName(), participant5.getCompanyName()),
-            List.of(participant4.getCompanyName()),
-            ReverseRouter.route(on(ActualTenderActivityController.class)
-                .renderExistingActualTenderActivityForm(scapId, actualTenderActivity3.getId())),
-            ReverseRouter.route(on(DeleteActualTenderActivityController.class)
-                .renderDeleteActualTenderActivityConfirmation(scapId, actualTenderActivity3.getId()))
+            List.of(participant4.getCompanyName())
         )
     );
 

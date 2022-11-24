@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.actualtender.activity;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -99,5 +100,29 @@ public class ActualTenderActivity {
 
   Instant getCreatedTimestamp() {
     return createdTimestamp;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    ActualTenderActivity that = (ActualTenderActivity) o;
+    return Objects.equals(id, that.id) && Objects.equals(actualTender,
+        that.actualTender) && Objects.equals(scopeTitle, that.scopeTitle) && Objects.equals(
+        scopeDescription,
+        that.scopeDescription) && remunerationModel == that.remunerationModel && Objects.equals(
+        remunerationModelName,
+        that.remunerationModelName) && contractStage == that.contractStage && Objects.equals(createdTimestamp,
+        that.createdTimestamp);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, actualTender, scopeTitle, scopeDescription, remunerationModel, remunerationModelName,
+        contractStage, createdTimestamp);
   }
 }

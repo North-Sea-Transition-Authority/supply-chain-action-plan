@@ -15,7 +15,7 @@ import uk.co.nstauthority.scap.scap.actualtender.ActualTenderControllerRedirecti
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
-import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryService;
+import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryViewService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 
@@ -27,7 +27,7 @@ public class DeleteActualTenderActivityController {
   private final ScapDetailService scapDetailService;
   private final ActualTenderService actualTenderService;
   private final ActualTenderActivityService actualTenderActivityService;
-  private final ActualTenderSummaryService actualTenderSummaryService;
+  private final ActualTenderSummaryViewService actualTenderSummaryViewService;
   private final DeleteActualTenderActivityService deleteActualTenderActivityService;
   private final ActualTenderControllerRedirectionService actualTenderControllerRedirectionService;
 
@@ -35,14 +35,14 @@ public class DeleteActualTenderActivityController {
   DeleteActualTenderActivityController(ScapService scapService, ScapDetailService scapDetailService,
                                        ActualTenderService actualTenderService,
                                        ActualTenderActivityService actualTenderActivityService,
-                                       ActualTenderSummaryService actualTenderSummaryService,
+                                       ActualTenderSummaryViewService actualTenderSummaryViewService,
                                        DeleteActualTenderActivityService deleteActualTenderActivityService,
                                        ActualTenderControllerRedirectionService actualTenderControllerRedirectionService) {
     this.scapService = scapService;
     this.scapDetailService = scapDetailService;
     this.actualTenderService = actualTenderService;
     this.actualTenderActivityService = actualTenderActivityService;
-    this.actualTenderSummaryService = actualTenderSummaryService;
+    this.actualTenderSummaryViewService = actualTenderSummaryViewService;
     this.deleteActualTenderActivityService = deleteActualTenderActivityService;
     this.actualTenderControllerRedirectionService = actualTenderControllerRedirectionService;
   }
@@ -52,8 +52,8 @@ public class DeleteActualTenderActivityController {
                                                                    @PathVariable("activityId") Integer activityId) {
     scapService.getScapById(scapId);
     var actualTenderActivity = actualTenderActivityService.getById(activityId);
-    var actualTenderActivityView = actualTenderSummaryService
-        .getActualTenderSummaryView(actualTenderActivity, scapId);
+    var actualTenderActivityView = actualTenderSummaryViewService
+        .getSingleViewByActualTenderActivity(actualTenderActivity, scapId);
 
     return new ModelAndView("scap/scap/actualtender/deleteActualTender")
         .addObject("backLinkUrl", ReverseRouter.route(on(ActualTenderSummaryController.class)

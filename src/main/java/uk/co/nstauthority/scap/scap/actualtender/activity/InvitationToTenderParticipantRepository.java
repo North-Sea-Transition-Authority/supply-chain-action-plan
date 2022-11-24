@@ -9,4 +9,6 @@ interface InvitationToTenderParticipantRepository extends CrudRepository<Invitat
 
   List<InvitationToTenderParticipant> findAllByIdInAndActualTenderActivityIs(List<Integer> ids,
                                                                              ActualTenderActivity actualTenderDetail);
+
+  List<InvitationToTenderParticipant> findAllByActualTenderActivityIn(List<ActualTenderActivity> activities);
 }
