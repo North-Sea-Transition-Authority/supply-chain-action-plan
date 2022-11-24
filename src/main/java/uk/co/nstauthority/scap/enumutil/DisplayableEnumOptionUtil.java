@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import uk.co.nstauthority.scap.util.StreamUtils;
 
 public class DisplayableEnumOptionUtil {
 
@@ -22,6 +23,15 @@ public class DisplayableEnumOptionUtil {
             Displayable::getDisplayName,
             (x, y) -> y,
             LinkedHashMap::new
+        ));
+  }
+
+  public static Map<String, String> getDisplayableOptionsWithDescription(Class<? extends Displayable> displayableOptionEnum) {
+    return Arrays.stream((DisplayableEnumOption[]) displayableOptionEnum.getEnumConstants())
+        .sorted(Comparator.comparingInt(Displayable::getDisplayOrder))
+        .collect(StreamUtils.toLinkedHashMap(
+            DisplayableEnumOption::getEnumName,
+            opt -> "%s (%s)".formatted(opt.getDescription(), opt.getDisplayName())
         ));
   }
 }

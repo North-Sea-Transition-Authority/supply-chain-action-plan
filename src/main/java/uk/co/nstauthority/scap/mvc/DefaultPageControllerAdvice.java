@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.branding.ServiceBrandingConfigurationProperties;
+import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
 import uk.co.nstauthority.scap.technicalsupport.TechnicalSupportConfiguration;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
@@ -20,20 +21,24 @@ class DefaultPageControllerAdvice {
 
   private final ServiceBrandingConfigurationProperties serviceBrandingConfigurationProperties;
   private final TechnicalSupportConfiguration technicalSupportConfiguration;
+  private final TopNavigationService topNavigationService;
   private final UserDetailService userDetailService;
 
   @Autowired
   DefaultPageControllerAdvice(ServiceBrandingConfigurationProperties serviceBrandingConfigurationProperties,
                               TechnicalSupportConfiguration technicalSupportConfiguration,
+                              TopNavigationService topNavigationService,
                               UserDetailService userDetailService) {
     this.serviceBrandingConfigurationProperties = serviceBrandingConfigurationProperties;
     this.technicalSupportConfiguration = technicalSupportConfiguration;
+    this.topNavigationService = topNavigationService;
     this.userDetailService = userDetailService;
   }
 
   @ModelAttribute
   void addDefaultModelAttributes(Model model, HttpServletRequest request) {
     addUser(model);
+    addTopNavigationItems(model, request);
     addBrandingAttributes(model);
     addCommonUrls(model);
     addTechnicalSupportContactInfo(model);
@@ -60,5 +65,10 @@ class DefaultPageControllerAdvice {
 
   private void addUser(Model model) {
     model.addAttribute("loggedInUser", userDetailService.getUserDetail());
+  }
+
+  private void addTopNavigationItems(Model model, HttpServletRequest request) {
+    model.addAttribute("navigationItems", topNavigationService.getTopNavigationItems());
+    model.addAttribute("currentEndPoint", request.getRequestURI());
   }
 }

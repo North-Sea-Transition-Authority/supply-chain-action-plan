@@ -16,7 +16,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.branding.IncludeServiceBrandingConfigurationProperties;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
+import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
 import uk.co.nstauthority.scap.mvc.WithDefaultPageControllerAdvice;
+import uk.co.nstauthority.scap.permissionmanagement.TeamMemberService;
 import uk.co.nstauthority.scap.technicalsupport.IncludeTechnicalSupportConfigurationProperties;
 import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 
@@ -33,6 +35,12 @@ public abstract class AbstractControllerTest {
 
   @MockBean
   UserDetailService userDetailService;
+
+  @MockBean
+  protected TeamMemberService teamMemberService;
+
+  @MockBean
+  TopNavigationService topNavigationService;
 
   @TestConfiguration
   public static class TestConfig {

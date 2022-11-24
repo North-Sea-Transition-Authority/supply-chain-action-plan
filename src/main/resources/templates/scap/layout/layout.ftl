@@ -101,6 +101,7 @@
     pageHeading=pageHeading
     headerLogo="GOV_CREST"
     logoProductText=customerMnemonic
+    topNavigation=true
     phaseBanner=phaseBanner
     serviceUrl=serviceHomeUrl
     homePageUrl=serviceHomeUrl
