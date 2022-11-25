@@ -3,18 +3,34 @@ package uk.co.nstauthority.scap.scap.contractingperformance;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperformance.HasContractingPerformanceController;
+import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapFormTaskListSection;
+import uk.co.nstauthority.scap.scap.scap.ScapService;
 
 @ExtendWith(MockitoExtension.class)
 class ContractingPerformanceTaskListItemTest {
+
+  @Mock
+  ScapService scapService;
+
+  @Mock
+  ScapDetailService scapDetailService;
+
+  @Mock
+  ContractingPerformanceOverviewService contractingPerformanceOverviewService;
 
   @InjectMocks
   ContractingPerformanceTaskListItem contractingPerformanceTaskListItem;
@@ -40,8 +56,64 @@ class ContractingPerformanceTaskListItemTest {
   }
 
   @Test
-  void isValid() {
-    assertFalse(contractingPerformanceTaskListItem.isValid(0));
+  void isValid_NoContractingPerformanceOverview() {
+    var scapId = 51;
+    var scap = new Scap(scapId);
+    var scapDetail = new ScapDetail();
+    var contractingPerformanceOverview = new ContractingPerformanceOverview();
+
+    when(scapService.getScapById(scapId)).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail)).thenReturn(Optional.empty());
+
+    assertFalse(contractingPerformanceTaskListItem.isValid(scapId));
+  }
+
+  @Test
+  void isValid_NullHasContractingPerformance() {
+    var scapId = 51;
+    var scap = new Scap(scapId);
+    var scapDetail = new ScapDetail();
+    var contractingPerformanceOverview = new ContractingPerformanceOverview();
+
+    when(scapService.getScapById(scapId)).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
+        .thenReturn(Optional.of(contractingPerformanceOverview));
+
+    assertFalse(contractingPerformanceTaskListItem.isValid(scapId));
+  }
+
+  @Test
+  void isValid_HasContractingPerformance() {
+    var scapId = 51;
+    var scap = new Scap(scapId);
+    var scapDetail = new ScapDetail();
+    var contractingPerformanceOverview = new ContractingPerformanceOverview();
+    contractingPerformanceOverview.setHasContractingPerformance(true);
+
+    when(scapService.getScapById(scapId)).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
+        .thenReturn(Optional.of(contractingPerformanceOverview));
+
+    assertFalse(contractingPerformanceTaskListItem.isValid(scapId));
+  }
+
+  @Test
+  void isValid_HasNoContractingPerformance() {
+    var scapId = 51;
+    var scap = new Scap(scapId);
+    var scapDetail = new ScapDetail();
+    var contractingPerformanceOverview = new ContractingPerformanceOverview();
+    contractingPerformanceOverview.setHasContractingPerformance(false);
+
+    when(scapService.getScapById(scapId)).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
+        .thenReturn(Optional.of(contractingPerformanceOverview));
+
+    assertTrue(contractingPerformanceTaskListItem.isValid(scapId));
   }
 
   @Test

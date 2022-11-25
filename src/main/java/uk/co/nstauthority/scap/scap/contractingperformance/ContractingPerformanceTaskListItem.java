@@ -6,15 +6,28 @@ import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Component;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperformance.HasContractingPerformanceController;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapFormTaskListSection;
+import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.tasklist.ScapTaskListItem;
 import uk.co.nstauthority.scap.tasklist.TaskListSection;
 
 @Component
 public class ContractingPerformanceTaskListItem implements ScapTaskListItem {
 
+  private final ScapService scapService;
+  private final ScapDetailService scapDetailService;
+  private final ContractingPerformanceOverviewService contractingPerformanceOverviewService;
+
   @VisibleForTesting
   static final String DISPLAY_TEXT = "Contracting performance";
+
+  public ContractingPerformanceTaskListItem(ScapService scapService, ScapDetailService scapDetailService,
+                                            ContractingPerformanceOverviewService contractingPerformanceOverviewService) {
+    this.scapService = scapService;
+    this.scapDetailService = scapDetailService;
+    this.contractingPerformanceOverviewService = contractingPerformanceOverviewService;
+  }
 
   @Override
   public String getItemDisplayText() {
@@ -33,7 +46,20 @@ public class ContractingPerformanceTaskListItem implements ScapTaskListItem {
 
   @Override
   public boolean isValid(Integer target) {
-    return false;
+    var scap = scapService.getScapById(target);
+    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetail(scapDetail);
+
+    return contractingPerformanceOverview
+        .map(existingContractingPerformanceOverview -> {
+          if (Boolean.FALSE.equals(existingContractingPerformanceOverview.getHasContractingPerformance())) {
+            return true;
+          }
+          // TODO: SCAP2022-53 - replace the below 'false' with, once 'hasMoreContractingPerformance' column added:
+          // Boolean.FALSE.equals(existingContractingPerformanceOverview.getHasMoreContractingPerformance())
+          return false;
+        })
+        .orElse(false);
   }
 
   @Override
