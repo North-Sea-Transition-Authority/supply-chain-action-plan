@@ -6,8 +6,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivity;
-import uk.co.nstauthority.scap.scap.plannedtender.activity.delete.DeletePlannedTenderDetailController;
-import uk.co.nstauthority.scap.scap.plannedtender.activity.update.UpdatePlannedTenderDetailController;
+import uk.co.nstauthority.scap.scap.plannedtender.activity.delete.DeletePlannedTenderActivityController;
+import uk.co.nstauthority.scap.scap.plannedtender.activity.update.UpdatePlannedTenderActivityController;
 
 @Service
 public class PlannedTenderActivityListService {
@@ -16,9 +16,9 @@ public class PlannedTenderActivityListService {
                                                                              List<PlannedTenderActivity> details) {
     return details.stream()
         .map(scapPlannedTenderDetail -> new PlannedTenderActivityListItem(scapPlannedTenderDetail,
-            ReverseRouter.route(on(UpdatePlannedTenderDetailController.class)
+            ReverseRouter.route(on(UpdatePlannedTenderActivityController.class)
                 .renderUpdatePlannedTenderDetail(scapId, scapPlannedTenderDetail.getId())),
-            ReverseRouter.route(on(DeletePlannedTenderDetailController.class)
+            ReverseRouter.route(on(DeletePlannedTenderActivityController.class)
                 .renderPlannedTenderRemoval(scapId, scapPlannedTenderDetail.getId()))))
         .toList();
   }

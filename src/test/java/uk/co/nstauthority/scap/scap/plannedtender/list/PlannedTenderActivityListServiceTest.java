@@ -11,8 +11,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivity;
-import uk.co.nstauthority.scap.scap.plannedtender.activity.delete.DeletePlannedTenderDetailController;
-import uk.co.nstauthority.scap.scap.plannedtender.activity.update.UpdatePlannedTenderDetailController;
+import uk.co.nstauthority.scap.scap.plannedtender.activity.delete.DeletePlannedTenderActivityController;
+import uk.co.nstauthority.scap.scap.plannedtender.activity.update.UpdatePlannedTenderActivityController;
 
 @ExtendWith(MockitoExtension.class)
 class PlannedTenderActivityListServiceTest {
@@ -39,11 +39,11 @@ class PlannedTenderActivityListServiceTest {
         PlannedTenderActivityListItem::deleteLinkUrl
     ).containsExactly(
         tuple(detail1,
-            ReverseRouter.route(on(UpdatePlannedTenderDetailController.class).renderUpdatePlannedTenderDetail(scapId, detail1.getId())),
-            ReverseRouter.route(on(DeletePlannedTenderDetailController.class).renderPlannedTenderRemoval(scapId, detail1.getId()))),
+            ReverseRouter.route(on(UpdatePlannedTenderActivityController.class).renderUpdatePlannedTenderDetail(scapId, detail1.getId())),
+            ReverseRouter.route(on(DeletePlannedTenderActivityController.class).renderPlannedTenderRemoval(scapId, detail1.getId()))),
         tuple(detail2,
-            ReverseRouter.route(on(UpdatePlannedTenderDetailController.class).renderUpdatePlannedTenderDetail(scapId, detail2.getId())),
-            ReverseRouter.route(on(DeletePlannedTenderDetailController.class).renderPlannedTenderRemoval(scapId, detail2.getId())))
+            ReverseRouter.route(on(UpdatePlannedTenderActivityController.class).renderUpdatePlannedTenderDetail(scapId, detail2.getId())),
+            ReverseRouter.route(on(DeletePlannedTenderActivityController.class).renderPlannedTenderRemoval(scapId, detail2.getId())))
     );
   }
 }

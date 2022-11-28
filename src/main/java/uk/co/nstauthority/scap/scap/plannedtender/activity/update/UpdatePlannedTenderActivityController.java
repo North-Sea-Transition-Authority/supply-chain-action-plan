@@ -21,16 +21,16 @@ import uk.co.nstauthority.scap.scap.scap.ScapService;
 
 @Controller
 @RequestMapping("{scapId}/planned-tender/{plannedTenderDetailId}/update")
-public class UpdatePlannedTenderDetailController {
+public class UpdatePlannedTenderActivityController {
 
   private final ScapService scapService;
   private final PlannedTenderActivityService plannedTenderActivityService;
   private final PlannedTenderActivityFormService plannedTenderActivityFormService;
 
   @Autowired
-  UpdatePlannedTenderDetailController(ScapService scapService,
-                                      PlannedTenderActivityService plannedTenderActivityService,
-                                      PlannedTenderActivityFormService plannedTenderActivityFormService) {
+  UpdatePlannedTenderActivityController(ScapService scapService,
+                                        PlannedTenderActivityService plannedTenderActivityService,
+                                        PlannedTenderActivityFormService plannedTenderActivityFormService) {
     this.scapService = scapService;
     this.plannedTenderActivityService = plannedTenderActivityService;
     this.plannedTenderActivityFormService = plannedTenderActivityFormService;

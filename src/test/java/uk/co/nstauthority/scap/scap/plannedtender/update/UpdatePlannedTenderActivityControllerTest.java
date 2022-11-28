@@ -33,14 +33,14 @@ import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivity
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityForm;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityFormService;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityService;
-import uk.co.nstauthority.scap.scap.plannedtender.activity.update.UpdatePlannedTenderDetailController;
+import uk.co.nstauthority.scap.scap.plannedtender.activity.update.UpdatePlannedTenderActivityController;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 
 @ExtendWith(MockitoExtension.class)
-@ContextConfiguration(classes = UpdatePlannedTenderDetailController.class)
+@ContextConfiguration(classes = UpdatePlannedTenderActivityController.class)
 @WithMockUser
-class UpdatePlannedTenderDetailControllerTest extends AbstractControllerTest {
+class UpdatePlannedTenderActivityControllerTest extends AbstractControllerTest {
 
   @MockBean
   ScapService scapService;
@@ -70,7 +70,7 @@ class UpdatePlannedTenderDetailControllerTest extends AbstractControllerTest {
     when(plannedTenderActivityFormService.getForm(plannedTenderDetail)).thenReturn(form);
 
     mockMvc.perform(
-        get(ReverseRouter.route(on(UpdatePlannedTenderDetailController.class)
+        get(ReverseRouter.route(on(UpdatePlannedTenderActivityController.class)
             .renderUpdatePlannedTenderDetail(scap.getId(), plannedTenderDetail.getId()))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/plannedtender/plannedTenderActivityDetails"))
@@ -89,7 +89,7 @@ class UpdatePlannedTenderDetailControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
         get(
-            ReverseRouter.route(on(UpdatePlannedTenderDetailController.class)
+            ReverseRouter.route(on(UpdatePlannedTenderActivityController.class)
                 .renderUpdatePlannedTenderDetail(scap.getId(), plannedTenderDetail.getId()))))
         .andExpect(status().isNotFound());
   }
@@ -103,7 +103,7 @@ class UpdatePlannedTenderDetailControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
         get(
-            ReverseRouter.route(on(UpdatePlannedTenderDetailController.class)
+            ReverseRouter.route(on(UpdatePlannedTenderActivityController.class)
                 .renderUpdatePlannedTenderDetail(scap.getId(), plannedTenderDetail.getId()))))
         .andExpect(status().isNotFound());
   }
@@ -122,7 +122,7 @@ class UpdatePlannedTenderDetailControllerTest extends AbstractControllerTest {
         .thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(UpdatePlannedTenderDetailController.class)
+        post(ReverseRouter.route(on(UpdatePlannedTenderActivityController.class)
             .saveUpdatedPlannedTenderDetail(scap.getId(), plannedTenderDetail.getId(), null, emptyBindingResult())))
             .with(csrf())
             .flashAttr("form", form))
@@ -147,7 +147,7 @@ class UpdatePlannedTenderDetailControllerTest extends AbstractControllerTest {
         .thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(UpdatePlannedTenderDetailController.class)
+        post(ReverseRouter.route(on(UpdatePlannedTenderActivityController.class)
             .saveUpdatedPlannedTenderDetail(scap.getId(), plannedTenderDetail.getId(), null, emptyBindingResult())))
             .with(csrf())
             .flashAttr("form", form))
@@ -170,7 +170,7 @@ class UpdatePlannedTenderDetailControllerTest extends AbstractControllerTest {
             String.format("Could not find planned tender detail with ID %d", plannedTenderDetail.getId())));
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(UpdatePlannedTenderDetailController.class)
+        post(ReverseRouter.route(on(UpdatePlannedTenderActivityController.class)
             .saveUpdatedPlannedTenderDetail(scap.getId(), plannedTenderDetail.getId(), null, emptyBindingResult())))
             .with(csrf()))
         .andExpect(status().isNotFound());
@@ -185,7 +185,7 @@ class UpdatePlannedTenderDetailControllerTest extends AbstractControllerTest {
             String.format("Could not find SCAP with ID %d", plannedTenderDetail.getId())));
 
     mockMvc.perform(
-            post(ReverseRouter.route(on(UpdatePlannedTenderDetailController.class)
+            post(ReverseRouter.route(on(UpdatePlannedTenderActivityController.class)
                 .saveUpdatedPlannedTenderDetail(scap.getId(), plannedTenderDetail.getId(), null, emptyBindingResult())))
                 .with(csrf()))
         .andExpect(status().isNotFound());

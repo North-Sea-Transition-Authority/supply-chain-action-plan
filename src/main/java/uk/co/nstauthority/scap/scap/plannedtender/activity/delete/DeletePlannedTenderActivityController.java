@@ -22,7 +22,7 @@ import uk.co.nstauthority.scap.util.DeletionSuccessBannerUtil;
 
 @Controller
 @RequestMapping("{scapId}/planned-tender/{plannedTenderDetailId}/delete")
-public class DeletePlannedTenderDetailController {
+public class DeletePlannedTenderActivityController {
 
   private final ScapService scapService;
   private final ScapDetailService scapDetailService;
@@ -30,9 +30,9 @@ public class DeletePlannedTenderDetailController {
   private final PlannedTenderActivityService plannedTenderActivityService;
 
   @Autowired
-  DeletePlannedTenderDetailController(ScapService scapService,
-                                      ScapDetailService scapDetailService, PlannedTenderService plannedTenderService,
-                                      PlannedTenderActivityService plannedTenderActivityService) {
+  DeletePlannedTenderActivityController(ScapService scapService,
+                                        ScapDetailService scapDetailService, PlannedTenderService plannedTenderService,
+                                        PlannedTenderActivityService plannedTenderActivityService) {
     this.scapService = scapService;
     this.scapDetailService = scapDetailService;
     this.plannedTenderService = plannedTenderService;
@@ -72,7 +72,7 @@ public class DeletePlannedTenderDetailController {
             ReverseRouter.route(on(PlannedTenderController.class).renderPlannedTenderActivities(scapId)))
         .addObject("plannedTenderDetail", plannedTenderDetail)
         .addObject("submitPostUrl",
-            ReverseRouter.route(on(DeletePlannedTenderDetailController.class)
+            ReverseRouter.route(on(DeletePlannedTenderActivityController.class)
                 .deletePlannedTenderDetail(scapId, plannedTenderDetail.getId(), null)));
   }
 }
