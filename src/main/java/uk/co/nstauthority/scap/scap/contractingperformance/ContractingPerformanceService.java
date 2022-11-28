@@ -4,6 +4,7 @@ import java.time.Clock;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 
 @Service
@@ -23,6 +24,12 @@ public class ContractingPerformanceService {
 
   public boolean hasContractingPerformance(ContractingPerformanceOverview contractingPerformanceOverview) {
     return contractingPerformanceRepository.existsByContractingPerformanceOverview(contractingPerformanceOverview);
+  }
+
+  public ContractingPerformance getById(Integer contractingPerformanceId) {
+    return contractingPerformanceRepository.findById(contractingPerformanceId)
+        .orElseThrow(() -> new ScapEntityNotFoundException(
+            "Could not find ContractingPerformance with ID [%s]".formatted(contractingPerformanceId)));
   }
 
   @Transactional
@@ -47,4 +54,8 @@ public class ContractingPerformanceService {
     contractingPerformanceRepository.save(contractingPerformance);
   }
 
+  @Transactional
+  public void deleteContractingPerformance(ContractingPerformance contractingPerformance) {
+    contractingPerformanceRepository.delete(contractingPerformance);
+  }
 }

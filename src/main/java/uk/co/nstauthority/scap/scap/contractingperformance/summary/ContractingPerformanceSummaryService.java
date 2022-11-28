@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.contractingperformance.summary;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,7 +10,7 @@ import uk.co.fivium.energyportalapi.generated.types.Country;
 import uk.co.nstauthority.scap.energyportal.CountryService;
 
 @Service
-class ContractingPerformanceSummaryService {
+public class ContractingPerformanceSummaryService {
 
   public static final String REQUEST_PURPOSE = "Show contracting performance summaries for SCAP";
   private final ContractingPerformanceSummaryViewRepository contractingPerformanceSummaryViewRepository;
@@ -22,7 +23,14 @@ class ContractingPerformanceSummaryService {
     this.countryService = countryService;
   }
 
-  public List<ContractingPerformanceSummaryView> getContractingPerformanceSummaryViews(Integer scapId) {
+  public Optional<ContractingPerformanceSummaryView> getContractingPerformanceSummaryView(Integer scapId,
+                                                                                          Integer contractingPerformanceId) {
+    return getContractingPerformanceSummaryViews(scapId).stream()
+        .filter(view -> view.contractingPerformanceId().equals(contractingPerformanceId))
+        .findFirst();
+  }
+
+  List<ContractingPerformanceSummaryView> getContractingPerformanceSummaryViews(Integer scapId) {
     return contractingPerformanceSummaryViewRepository.getContractingPerformanceSummaryViewsByScapId(scapId);
   }
 

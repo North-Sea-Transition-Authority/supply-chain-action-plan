@@ -29,7 +29,7 @@ class ContractingPerformanceSummaryServiceTest {
   void getContractingPerformanceSummaryViews_VerifyCallsRepository() {
     var scapId = 33;
     var views = List.of(new ContractingPerformanceSummaryView(
-        null, null, null, null, null,
+        null, null, null, null, null, null,
         null, null, null, null, null
     ));
 
@@ -43,11 +43,47 @@ class ContractingPerformanceSummaryServiceTest {
   }
 
   @Test
+  void getContractingPerformanceSummaryView_VerifyCallsRepository() {
+    var scapId = 33;
+    var contractingPerformanceId = 51;
+    var view = new ContractingPerformanceSummaryView(
+        scapId, contractingPerformanceId, null, null, null, null,
+        null, null, null, null, null
+    );
+
+    when(contractingPerformanceSummaryViewRepository.getContractingPerformanceSummaryViewsByScapId(scapId))
+        .thenReturn(List.of(view));
+
+    var returnedView = contractingPerformanceSummaryService
+        .getContractingPerformanceSummaryView(scapId, contractingPerformanceId);
+
+    assertThat(returnedView).contains(view);
+  }
+
+  @Test
+  void getContractingPerformanceSummaryView_WhenNotFoundReturnEmpty() {
+    var scapId = 33;
+    var contractingPerformanceId = 51;
+    var view = new ContractingPerformanceSummaryView(
+        scapId, 9999, null, null, null, null,
+        null, null, null, null, null
+    );
+
+    when(contractingPerformanceSummaryViewRepository.getContractingPerformanceSummaryViewsByScapId(scapId))
+        .thenReturn(List.of(view));
+
+    var returnedView = contractingPerformanceSummaryService
+        .getContractingPerformanceSummaryView(scapId, contractingPerformanceId);
+
+    assertThat(returnedView).isEmpty();
+  }
+
+  @Test
   void getCountryMap() {
     var countryId = 0;
     var views = List.of(
         new ContractingPerformanceSummaryView(
-            null, null, null, null,null,
+            null, null, null, null, null,null,
             null, null, countryId, null, null
         )
     );

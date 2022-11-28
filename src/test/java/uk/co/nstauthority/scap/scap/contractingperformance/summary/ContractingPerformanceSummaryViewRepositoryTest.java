@@ -107,6 +107,7 @@ class ContractingPerformanceSummaryViewRepositoryTest {
         .getContractingPerformanceSummaryViewsByScapId(scap.getId());
 
     assertThat(summaryViews).extracting(
+        ContractingPerformanceSummaryView::scapId,
         ContractingPerformanceSummaryView::contractingPerformanceId,
         ContractingPerformanceSummaryView::scopeTitle,
         ContractingPerformanceSummaryView::scopeDescription,
@@ -119,6 +120,7 @@ class ContractingPerformanceSummaryViewRepositoryTest {
         ContractingPerformanceSummaryView::outturnRationale
     ).containsExactly(
         tuple(
+            scap.getId(),
             contractingPerformance1.getId(),
             actualTenderActivity1.getScopeTitle(),
             actualTenderActivity1.getScopeDescription(),
@@ -131,6 +133,7 @@ class ContractingPerformanceSummaryViewRepositoryTest {
             contractingPerformance1.getOutturnRationale()
         ),
         tuple(
+            scap.getId(),
             contractingPerformance2.getId(),
             actualTenderActivity2.getScopeTitle(),
             actualTenderActivity2.getScopeDescription(),

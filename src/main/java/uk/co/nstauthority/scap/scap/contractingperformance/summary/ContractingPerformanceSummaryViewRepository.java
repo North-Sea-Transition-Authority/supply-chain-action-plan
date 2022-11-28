@@ -18,7 +18,7 @@ class ContractingPerformanceSummaryViewRepository {
   List<ContractingPerformanceSummaryView> getContractingPerformanceSummaryViewsByScapId(Integer scapId) {
     return entityManager.createQuery(
         "SELECT new uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryView(" +
-            "cp.id, ata.scopeTitle, ata.scopeDescription, ac.awardValue, ata.remunerationModel, " +
+            "s.id, cp.id, ata.scopeTitle, ata.scopeDescription, ac.awardValue, ata.remunerationModel, " +
             "ata.remunerationModelName, " +
             "ittp.companyName, ac.preferredBidderLocation, cp.outturnCost, cp.outturnRationale) " +
             "FROM Scap s " +

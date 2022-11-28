@@ -43,6 +43,7 @@ class ContractingPerformanceSummaryControllerTest extends AbstractControllerTest
   @Test
   void renderContractingPerformanceSummary() throws Exception {
     var summaryViews = List.of(new ContractingPerformanceSummaryView(
+        scapId,
         5106,
         "Some scope title",
         "Some scope description",

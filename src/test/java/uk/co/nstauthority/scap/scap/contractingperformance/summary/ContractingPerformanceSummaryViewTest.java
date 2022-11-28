@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
+import uk.co.nstauthority.scap.scap.contractingperformance.delete.DeleteContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @ExtendWith(MockitoExtension.class)
@@ -20,6 +21,7 @@ class ContractingPerformanceSummaryViewTest {
   @BeforeEach
   void setup() {
     contractingPerformanceSummaryView = new ContractingPerformanceSummaryView(
+        51,
         1813,
         "some scope title",
         "some scope description",
@@ -42,7 +44,9 @@ class ContractingPerformanceSummaryViewTest {
 
   @Test
   void getDeleteLinkUrl() {
-    var expectedDeleteLinkUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(0));
+    var expectedDeleteLinkUrl = ReverseRouter.route(on(DeleteContractingPerformanceController.class)
+        .renderDeleteContractingPerformanceConfirmation(
+            contractingPerformanceSummaryView.scapId(), contractingPerformanceSummaryView.contractingPerformanceId()));
 
     assertThat(contractingPerformanceSummaryView.getDeleteLinkUrl()).isEqualTo(expectedDeleteLinkUrl);
   }

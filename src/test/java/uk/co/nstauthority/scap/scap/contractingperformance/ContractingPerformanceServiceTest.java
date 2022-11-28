@@ -2,6 +2,8 @@ package uk.co.nstauthority.scap.scap.contractingperformance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -11,12 +13,14 @@ import static org.mockito.Mockito.when;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 
@@ -34,6 +38,30 @@ class ContractingPerformanceServiceTest {
 
   @InjectMocks
   ContractingPerformanceService contractingPerformanceService;
+
+  @Test
+  void getById_IsFound_VerifyCallsRepository() {
+    var contractingPerformanceId = 51;
+    var contractingPerformance = new ContractingPerformance(contractingPerformanceId);
+
+    when(contractingPerformanceRepository.findById(contractingPerformanceId))
+        .thenReturn(Optional.of(contractingPerformance));
+
+    var returnedContractingPerformance = contractingPerformanceService.getById(contractingPerformanceId);
+
+    assertThat(returnedContractingPerformance).isEqualTo(contractingPerformance);
+  }
+
+  @Test
+  void getById_NotFound_AssertThrows() {
+    var contractingPerformanceId = 51;
+
+    when(contractingPerformanceRepository.findById(contractingPerformanceId))
+        .thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> contractingPerformanceService.getById(contractingPerformanceId))
+        .isInstanceOf(ScapEntityNotFoundException.class);
+  }
 
   @Test
   void hasContractingPerformance_Empty_AssertCallsRepository() {
@@ -119,5 +147,14 @@ class ContractingPerformanceServiceTest {
         form.getOutturnCost().getAsBigDecimal().get(),
         form.getOutturnRationale().getInputValue()
     );
+  }
+
+  @Test
+  void deleteContractingPerformance_VerifyDeletes() {
+    var contractingPerformance = new ContractingPerformance();
+
+    contractingPerformanceService.deleteContractingPerformance(contractingPerformance);
+
+    verify(contractingPerformanceRepository).delete(contractingPerformance);
   }
 }
