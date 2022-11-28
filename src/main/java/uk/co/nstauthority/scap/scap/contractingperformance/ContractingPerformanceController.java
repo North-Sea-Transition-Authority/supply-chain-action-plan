@@ -97,6 +97,59 @@ public class ContractingPerformanceController {
     );
   }
 
+  @GetMapping("/{contractingPerformanceId}")
+  public ModelAndView renderExistingContractingPerformanceForm(@PathVariable("scapId") Integer scapId,
+                                                               @PathVariable("contractingPerformanceId")
+                                                               Integer contractingPerformanceId) {
+    var scap = scapService.getScapById(scapId);
+    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var actualTender = actualTenderService.getByScapDetail(scapDetail);
+    var contractedActivities = actualTender
+        .map(actualTenderActivityService::getActivitiesWithContractAwarded)
+        .orElse(Collections.emptyList());
+    var contractingPerformance = contractingPerformanceService.getById(contractingPerformanceId);
+
+    var form = contractingPerformanceFormService.getForm(contractingPerformance);
+    var scopeTitlesMap = contractingPerformanceFormService.getScopeTitlesMap(contractedActivities);
+
+    return contractingPerformanceFormModelAndView(scopeTitlesMap,
+        ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
+            .renderContractingPerformanceSummary(scapId)))
+        .addObject("form", form);
+  }
+
+  @PostMapping("/{contractingPerformanceId}")
+  public ModelAndView saveExistingContractingPerformanceForm(@PathVariable("scapId") Integer scapId,
+                                                             @PathVariable("contractingPerformanceId")
+                                                             Integer contractingPerformanceId,
+                                                             @ModelAttribute("form") ContractingPerformanceForm form,
+                                                             BindingResult bindingResult) {
+    var scap = scapService.getScapById(scapId);
+    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var actualTender = actualTenderService.getByScapDetail(scapDetail);
+    var contractedActivities = actualTender
+        .map(actualTenderActivityService::getActivitiesWithContractAwarded)
+        .orElse(Collections.emptyList());
+    var contractingPerformance = contractingPerformanceService.getById(contractingPerformanceId);
+
+    var scopeTitlesMap = contractingPerformanceFormService.getScopeTitlesMap(contractedActivities);
+
+    bindingResult = contractingPerformanceFormService.validate(form, bindingResult, contractedActivities);
+
+    return controllerHelperService.checkErrorsAndRedirect(
+        bindingResult,
+        contractingPerformanceFormModelAndView(scopeTitlesMap,
+            ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
+                .renderContractingPerformanceSummary(scapId))),
+        form,
+        () -> {
+          contractingPerformanceService.saveContractingPerformance(contractingPerformance, form);
+          return ReverseRouter.redirect(on(ContractingPerformanceSummaryController.class)
+              .renderContractingPerformanceSummary(scapId));
+        }
+    );
+  }
+
   private String getBackLinkUrl(Integer scapId, ContractingPerformanceOverview contractingPerformanceOverview) {
     if (contractingPerformanceService.hasContractingPerformance(contractingPerformanceOverview)) {
       return ReverseRouter.route(on(ContractingPerformanceSummaryController.class)

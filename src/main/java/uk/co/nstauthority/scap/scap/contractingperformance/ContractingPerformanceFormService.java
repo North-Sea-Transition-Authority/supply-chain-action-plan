@@ -34,4 +34,12 @@ class ContractingPerformanceFormService {
             ActualTenderActivity::getScopeTitle
         ));
   }
+
+  ContractingPerformanceForm getForm(ContractingPerformance contractingPerformance) {
+    var form = new ContractingPerformanceForm();
+    form.setActualTenderActivityId(contractingPerformance.getActualTenderActivity().getId());
+    form.setOutturnCost(contractingPerformance.getOutturnCost().toPlainString());
+    form.setOutturnRationale(contractingPerformance.getOutturnRationale());
+    return form;
+  }
 }

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
+import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,6 +53,27 @@ class ContractingPerformanceFormServiceTest {
     assertThat(returnedScopeTitlesMap).containsExactly(
         entry(String.valueOf(activity1.getId()), activity1.getScopeTitle()),
         entry(String.valueOf(activity2.getId()), activity2.getScopeTitle())
+    );
+  }
+
+  @Test
+  void getForm() {
+    var actualTenderActivity = new ActualTenderActivity(62);
+    var contractingPerformance = new ContractingPerformance(52);
+    contractingPerformance.setActualTenderActivity(actualTenderActivity);
+    contractingPerformance.setOutturnCost(BigDecimal.valueOf(6.53));
+    contractingPerformance.setOutturnRationale("Some outturn");
+
+    var form = contractingPerformanceFormService.getForm(contractingPerformance);
+
+    assertThat(form).extracting(
+        ContractingPerformanceForm::getActualTenderActivityId,
+        form1 -> form1.getOutturnCost().getInputValue(),
+        form1 -> form1.getOutturnRationale().getInputValue()
+    ).containsExactly(
+        actualTenderActivity.getId(),
+        contractingPerformance.getOutturnCost().toPlainString(),
+        contractingPerformance.getOutturnRationale()
     );
   }
 }

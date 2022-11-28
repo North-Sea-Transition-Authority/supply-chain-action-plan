@@ -5,8 +5,8 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.math.BigDecimal;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
+import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.contractingperformance.delete.DeleteContractingPerformanceController;
-import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 public record ContractingPerformanceSummaryView(Integer scapId,
                                                 Integer contractingPerformanceId,
@@ -21,8 +21,8 @@ public record ContractingPerformanceSummaryView(Integer scapId,
                                                 String outturnRationale) {
 
   public String getChangeLinkUrl() {
-    // TODO: SCAP2022-52 - Replace with link to update contracting performance (using contractingPerformanceId)
-    return ReverseRouter.route(on(TaskListController.class).renderTaskList(0));
+    return ReverseRouter.route(on(ContractingPerformanceController.class)
+        .renderExistingContractingPerformanceForm(scapId, contractingPerformanceId));
   }
 
   public String getDeleteLinkUrl() {

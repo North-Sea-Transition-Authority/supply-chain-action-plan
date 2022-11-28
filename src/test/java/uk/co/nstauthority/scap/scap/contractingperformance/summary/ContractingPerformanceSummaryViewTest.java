@@ -10,8 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
+import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.contractingperformance.delete.DeleteContractingPerformanceController;
-import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @ExtendWith(MockitoExtension.class)
 class ContractingPerformanceSummaryViewTest {
@@ -37,7 +37,9 @@ class ContractingPerformanceSummaryViewTest {
 
   @Test
   void getChangeLinkUrl() {
-    var expectedChangeLinkUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(0));
+    var expectedChangeLinkUrl = ReverseRouter.route(on(ContractingPerformanceController.class)
+        .renderExistingContractingPerformanceForm(
+            contractingPerformanceSummaryView.scapId(), contractingPerformanceSummaryView.contractingPerformanceId()));
 
     assertThat(contractingPerformanceSummaryView.getChangeLinkUrl()).isEqualTo(expectedChangeLinkUrl);
   }
