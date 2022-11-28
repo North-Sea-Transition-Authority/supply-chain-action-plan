@@ -31,6 +31,8 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverview;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverviewService;
+import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
+import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
@@ -51,6 +53,9 @@ class HasContractingPerformanceControllerTest extends AbstractControllerTest {
 
   @MockBean
   ContractingPerformanceOverviewService contractingPerformanceOverviewService;
+
+  @MockBean
+  ContractingPerformanceService contractingPerformanceService;
 
   @MockBean
   HasContractingPerformanceFormService contractingPerformanceFormService;
@@ -101,6 +106,49 @@ class HasContractingPerformanceControllerTest extends AbstractControllerTest {
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
         .andExpect(model().attribute("radioItems", YesNo.getRadioOptions()))
         .andExpect(model().attribute("form", filledForm));
+  }
+
+  @Test
+  void renderHasContractingPerformanceForm_HasContractingPerformances_AssertRedirects() throws Exception {
+    var existingContractPerformanceOverview = new ContractingPerformanceOverview();
+    var filledForm = new HasContractingPerformanceForm();
+    var expectedRedirectUrl = ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
+        .renderContractingPerformanceSummary(scap.getId()));
+
+    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
+        .thenReturn(Optional.of(existingContractPerformanceOverview));
+    when(contractingPerformanceService.hasContractingPerformance(existingContractPerformanceOverview))
+        .thenReturn(true);
+    when(contractingPerformanceFormService.getForm(existingContractPerformanceOverview)).thenReturn(filledForm);
+
+    mockMvc.perform(get(
+        ReverseRouter.route(on(HasContractingPerformanceController.class)
+            .renderHasContractingPerformanceForm(scap.getId()))))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(ControllerTestingUtil.redirectUrl(expectedRedirectUrl));
+  }
+
+  @Test
+  void saveHasContractingPerformanceForm_HasContractingPerformances_AssertRedirects() throws Exception {
+    var existingContractPerformanceOverview = new ContractingPerformanceOverview();
+    var expectedRedirectUrl = ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
+        .renderContractingPerformanceSummary(scap.getId()));
+
+    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
+        .thenReturn(Optional.of(existingContractPerformanceOverview));
+    when(contractingPerformanceService.hasContractingPerformance(existingContractPerformanceOverview))
+        .thenReturn(true);
+
+    mockMvc.perform(post(
+        ReverseRouter.route(on(HasContractingPerformanceController.class)
+            .saveHasContractingPerformanceForm(scap.getId(), null, emptyBindingResult())))
+        .with(csrf()))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(ControllerTestingUtil.redirectUrl(expectedRedirectUrl));
   }
 
   @Test

@@ -36,11 +36,11 @@ import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperformance.HasContractingPerformanceController;
+import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
-import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = ContractingPerformanceController.class)
@@ -124,14 +124,42 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
   }
 
   @Test
+  void renderNewContractingPerformanceForm_HasContractingPerformances() throws Exception {
+    var activity = new ActualTenderActivity(3447);
+    var activities = List.of(activity);
+    var scopeTitlesMap = Map.of(String.valueOf(activity.getId()), "Activity scope title");
+
+    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
+    when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
+    when(contractingPerformanceFormService.getScopeTitlesMap(activities)).thenReturn(scopeTitlesMap);
+    when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
+        .thenReturn(contractingPerformanceOverview);
+    when(contractingPerformanceService.hasContractingPerformance(contractingPerformanceOverview))
+        .thenReturn(true);
+
+    mockMvc.perform(get(
+            ReverseRouter.route(on(ContractingPerformanceController.class)
+                .renderNewContractingPerformanceForm(scap.getId(), null))))
+        .andExpect(status().isOk())
+        .andExpect(view().name("scap/scap/contractingperformance/contractingPerformanceDetail"))
+        .andExpect(model().attribute("backLinkUrl",
+            ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
+                .renderContractingPerformanceSummary(scap.getId()))))
+        .andExpect(model().attribute("scopeTitlesMap", scopeTitlesMap))
+        .andExpect(model().attributeExists("form"));
+  }
+
+  @Test
   void saveNewContractingPerformanceForm_NoErrors_VerifySaves() throws Exception {
     var activity = new ActualTenderActivity(3447);
     var activities = List.of(activity);
     var scopeTitlesMap = Map.of(String.valueOf(activity.getId()), "Activity scope title");
     var form = new ContractingPerformanceForm();
     var bindingResultWithoutErrors = new BeanPropertyBindingResult(form, "form");
-    // TODO SCAP2022-50: Update with new redirect url
-    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()));
+    var expectedRedirectUrl = ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
+        .renderContractingPerformanceSummary(scap.getId()));
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);

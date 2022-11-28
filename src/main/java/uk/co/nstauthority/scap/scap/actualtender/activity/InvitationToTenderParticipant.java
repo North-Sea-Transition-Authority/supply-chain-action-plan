@@ -36,7 +36,7 @@ public class InvitationToTenderParticipant {
     this.id = id;
   }
 
-  InvitationToTenderParticipant(ActualTenderActivity actualTenderActivity, Instant createdTimestamp) {
+  public InvitationToTenderParticipant(ActualTenderActivity actualTenderActivity, Instant createdTimestamp) {
     this.actualTenderActivity = actualTenderActivity;
     this.createdTimestamp = createdTimestamp;
     this.isBidParticipant = false;

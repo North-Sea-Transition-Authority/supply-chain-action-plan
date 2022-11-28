@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.contractingperformance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -33,6 +34,15 @@ class ContractingPerformanceServiceTest {
 
   @InjectMocks
   ContractingPerformanceService contractingPerformanceService;
+
+  @Test
+  void hasContractingPerformance_Empty_AssertCallsRepository() {
+    var contractingPerformanceOverview = new ContractingPerformanceOverview();
+    when(contractingPerformanceRepository.existsByContractingPerformanceOverview(contractingPerformanceOverview))
+        .thenReturn(true);
+
+    assertTrue(contractingPerformanceService.hasContractingPerformance(contractingPerformanceOverview));
+  }
 
   @Test
   void saveContractingPerformance_InvalidOutturnCost_AssertThrows() {

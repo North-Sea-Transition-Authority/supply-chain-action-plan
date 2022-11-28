@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 
 @Service
-class ContractingPerformanceService {
+public class ContractingPerformanceService {
 
   private final ContractingPerformanceRepository contractingPerformanceRepository;
   private final ActualTenderActivityService actualTenderActivityService;
@@ -19,6 +19,10 @@ class ContractingPerformanceService {
     this.contractingPerformanceRepository = contractingPerformanceRepository;
     this.actualTenderActivityService = actualTenderActivityService;
     this.clock = clock;
+  }
+
+  public boolean hasContractingPerformance(ContractingPerformanceOverview contractingPerformanceOverview) {
+    return contractingPerformanceRepository.existsByContractingPerformanceOverview(contractingPerformanceOverview);
   }
 
   @Transactional

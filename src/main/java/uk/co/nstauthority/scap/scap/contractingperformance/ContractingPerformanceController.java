@@ -18,9 +18,9 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperformance.HasContractingPerformanceController;
+import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
-import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @Controller
 @RequestMapping("{scapId}/contracting-performance")
@@ -59,13 +59,14 @@ public class ContractingPerformanceController {
 
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
-    contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail);
+    var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail);
     var actualTender = actualTenderService.getByScapDetail(scapDetail);
     var contractedActivities = actualTender
         .map(actualTenderActivityService::getActivitiesWithContractAwarded)
         .orElse(Collections.emptyList());
     var scopeTitlesMap = contractingPerformanceFormService.getScopeTitlesMap(contractedActivities);
-    return contractingPerformanceFormModelAndView(scapId, scopeTitlesMap);
+    return contractingPerformanceFormModelAndView(scopeTitlesMap,
+        getBackLinkUrl(scapId, contractingPerformanceOverview));
   }
 
   @PostMapping("/new")
@@ -85,21 +86,30 @@ public class ContractingPerformanceController {
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        contractingPerformanceFormModelAndView(scapId, scopeTitlesMap),
+        contractingPerformanceFormModelAndView(scopeTitlesMap,
+            getBackLinkUrl(scapId, contractingPerformanceOverview)),
         form,
         () -> {
           contractingPerformanceService.createContractingPerformance(contractingPerformanceOverview, form);
-          return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
+          return ReverseRouter.redirect(on(ContractingPerformanceSummaryController.class)
+              .renderContractingPerformanceSummary(scapId));
         }
     );
   }
 
-  private ModelAndView contractingPerformanceFormModelAndView(Integer scapId, Map<String, String> scopeTitlesMap) {
+  private String getBackLinkUrl(Integer scapId, ContractingPerformanceOverview contractingPerformanceOverview) {
+    if (contractingPerformanceService.hasContractingPerformance(contractingPerformanceOverview)) {
+      return ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
+          .renderContractingPerformanceSummary(scapId));
+    }
+    return ReverseRouter.route(on(HasContractingPerformanceController.class)
+        .renderHasContractingPerformanceForm(scapId));
+  }
+
+  private ModelAndView contractingPerformanceFormModelAndView(Map<String, String> scopeTitlesMap,
+                                                              String backLinkUrl) {
     return new ModelAndView("scap/scap/contractingperformance/contractingPerformanceDetail")
-        // TODO: SCAP2022-50 if there are existing contracting performance details, redirect to contracting performance summary
-        .addObject("backLinkUrl",
-            ReverseRouter.route(on(HasContractingPerformanceController.class)
-                .renderHasContractingPerformanceForm(scapId)))
+        .addObject("backLinkUrl", backLinkUrl)
         .addObject("scopeTitlesMap", scopeTitlesMap);
   }
 

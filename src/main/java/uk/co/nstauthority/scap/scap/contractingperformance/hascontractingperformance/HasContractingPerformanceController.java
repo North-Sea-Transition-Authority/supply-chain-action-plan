@@ -16,6 +16,8 @@ import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverviewService;
+import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
+import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
@@ -27,17 +29,20 @@ public class HasContractingPerformanceController {
   private final ScapService scapService;
   private final ScapDetailService scapDetailService;
   private final ContractingPerformanceOverviewService contractingPerformanceOverviewService;
+  private final ContractingPerformanceService contractingPerformanceService;
   private final HasContractingPerformanceFormService contractingPerformanceFormService;
   private final ControllerHelperService controllerHelperService;
 
   @Autowired
   public HasContractingPerformanceController(ScapService scapService, ScapDetailService scapDetailService,
                                              ContractingPerformanceOverviewService contractingPerformanceOverviewService,
+                                             ContractingPerformanceService contractingPerformanceService,
                                              HasContractingPerformanceFormService contractingPerformanceFormService,
                                              ControllerHelperService controllerHelperService) {
     this.scapService = scapService;
     this.scapDetailService = scapDetailService;
     this.contractingPerformanceOverviewService = contractingPerformanceOverviewService;
+    this.contractingPerformanceService = contractingPerformanceService;
     this.contractingPerformanceFormService = contractingPerformanceFormService;
     this.controllerHelperService = controllerHelperService;
   }
@@ -47,6 +52,12 @@ public class HasContractingPerformanceController {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
     var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetail(scapDetail);
+
+    if (contractingPerformanceOverview.map(contractingPerformanceService::hasContractingPerformance).orElse(false)) {
+      return ReverseRouter.redirect(on(ContractingPerformanceSummaryController.class)
+          .renderContractingPerformanceSummary(scapId));
+    }
+
     var form = contractingPerformanceOverview.map(contractingPerformanceFormService::getForm)
         .orElse(new HasContractingPerformanceForm());
 
@@ -61,9 +72,12 @@ public class HasContractingPerformanceController {
 
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetail(scapDetail);
 
-    // TODO: SCAP2022-49 - In PR for next form page add check for if there are already contracting performances for this,
-    // TODO: for now redirect to task list, replace this with TODO for SCAP2022-50
+    if (contractingPerformanceOverview.map(contractingPerformanceService::hasContractingPerformance).orElse(false)) {
+      return ReverseRouter.redirect(on(ContractingPerformanceSummaryController.class)
+          .renderContractingPerformanceSummary(scapId));
+    }
 
     bindingResult = contractingPerformanceFormService.validate(form, bindingResult);
 

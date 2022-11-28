@@ -49,7 +49,7 @@ public class ContractingPerformance {
     this.createdTimestamp = createdTimestamp;
   }
 
-  Integer getId() {
+  public Integer getId() {
     return id;
   }
 
@@ -63,28 +63,28 @@ public class ContractingPerformance {
     return createdTimestamp;
   }
 
-  ActualTenderActivity getActualTenderActivity() {
+  public ActualTenderActivity getActualTenderActivity() {
     return actualTenderActivity;
   }
 
-  void setActualTenderActivity(
+  public void setActualTenderActivity(
       ActualTenderActivity actualTenderActivity) {
     this.actualTenderActivity = actualTenderActivity;
   }
 
-  BigDecimal getOutturnCost() {
+  public BigDecimal getOutturnCost() {
     return outturnCost;
   }
 
-  void setOutturnCost(BigDecimal outturnCost) {
+  public void setOutturnCost(BigDecimal outturnCost) {
     this.outturnCost = outturnCost;
   }
 
-  String getOutturnRationale() {
+  public String getOutturnRationale() {
     return outturnRationale;
   }
 
-  void setOutturnRationale(String outturnRationale) {
+  public void setOutturnRationale(String outturnRationale) {
     this.outturnRationale = outturnRationale;
   }
 }
