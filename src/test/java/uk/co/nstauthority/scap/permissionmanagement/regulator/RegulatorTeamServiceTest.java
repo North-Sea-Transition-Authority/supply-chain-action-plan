@@ -1,6 +1,7 @@
 package uk.co.nstauthority.scap.permissionmanagement.regulator;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
@@ -18,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
+import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRoleService;
@@ -62,6 +64,15 @@ class RegulatorTeamServiceTest {
     var result = regulatorTeamService.getRegulatorTeamForUser(user);
 
     assertThat(result).isEmpty();
+  }
+
+  @Test
+  void getRegulatorTeamForUser_whenUserDoesNotBelong_throwException() {
+    var user = ServiceUserDetailTestUtil.Builder().build();
+    when(teamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR)).thenReturn(List.of());
+
+    assertThatThrownBy(() -> regulatorTeamService.getRegulatorTeamForUserOrThrow(user)).isInstanceOf(
+        ScapEntityNotFoundException.class);
   }
 
   @Test

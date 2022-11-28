@@ -19,6 +19,18 @@ public enum RegulatorTeamRole implements TeamRole {
       "Can manage organisation access to this service",
       20,
       EnumSet.of(RolePermission.MANAGE_ORGANISATIONS)
+  ),
+  SCAP_CASE_OFFICER(
+      "Case officer",
+      "Can process SCAP applications",
+      30,
+      EnumSet.of(RolePermission.REVIEW_SCAP)
+  ),
+  SCAP_VIEWER(
+      "SCAP viewer",
+      "Can view SCAP applications",
+      40,
+      EnumSet.of(RolePermission.VIEW_SCAP)
   );
 
   private final String screenDisplayText;

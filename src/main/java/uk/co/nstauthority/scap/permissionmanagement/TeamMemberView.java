@@ -1,11 +1,16 @@
 package uk.co.nstauthority.scap.permissionmanagement;
 
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
+import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorEditMemberController;
+import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorRemoveMemberController;
 
 public record TeamMemberView(WebUserAccountId wuaId, TeamView teamView, String title, String firstName,
                              String lastName, String contactEmail, String contactNumber,
@@ -17,6 +22,20 @@ public record TeamMemberView(WebUserAccountId wuaId, TeamView teamView, String t
         .filter(Optional::isPresent)
         .map(Optional::get)
         .collect(Collectors.joining(" "));
+  }
+
+  public String removeUrl() {
+    return switch (teamView.teamType()) {
+      case REGULATOR -> ReverseRouter.route(on(RegulatorRemoveMemberController.class)
+          .renderRemoveMember(teamView.teamId(), wuaId));
+    };
+  }
+
+  public String editUrl() {
+    return switch (teamView.teamType()) {
+      case REGULATOR -> ReverseRouter.route(on(RegulatorEditMemberController.class)
+          .renderEditMember(teamView.teamId(), wuaId));
+    };
   }
 
 }

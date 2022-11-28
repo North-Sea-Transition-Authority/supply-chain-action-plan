@@ -34,10 +34,20 @@
               <#list member.teamRoles() as role>
                 <li>${role.getDisplayName()}</li>
               </#list>
-            </ul>
-          </td>
-        </tr>
-      </#list>
+          </ul>
+        </td>
+          <#if showActionColumn>
+            <td class="govuk-table__cell">
+              <#if canEditUsers>
+                <ul class="govuk-list govuk-!-margin-bottom-0"><@fdsAction.link linkText="Edit" linkUrl=springUrl(member.editUrl()) linkScreenReaderText=member.getDisplayName() /></ul>
+              </#if>
+              <#if canRemoveUsers>
+                <ul class="govuk-list govuk-!-margin-bottom-0"><@fdsAction.link linkText="Remove" linkUrl=springUrl(member.removeUrl()) linkScreenReaderText=member.getDisplayName() /></ul>
+              </#if>
+            </td>
+          </#if>
+      </tr>
+    </#list>
     </tbody>
   </table>
 </#macro>

@@ -61,7 +61,7 @@ class EnergyPortalUserServiceTest {
         anyString()
     )).thenReturn(Collections.emptyList());
 
-    assertTrue(energyPortalUserService.findUserByUsername(username).isEmpty());
+    assertTrue(energyPortalUserService.findUsersByUsername(username).isEmpty());
   }
 
   @Test
@@ -81,7 +81,7 @@ class EnergyPortalUserServiceTest {
         anyString()
     )).thenReturn(List.of(expectedUser));
 
-    assertThat(energyPortalUserService.findUserByUsername(username))
+    assertThat(energyPortalUserService.findUsersByUsername(username))
         .extracting(
             EnergyPortalUserDto::webUserAccountId,
             EnergyPortalUserDto::title,
@@ -133,7 +133,7 @@ class EnergyPortalUserServiceTest {
         notLoginUser
     ));
 
-    assertThat(energyPortalUserService.findUserByUsername(username))
+    assertThat(energyPortalUserService.findUsersByUsername(username))
         .extracting(EnergyPortalUserDto::webUserAccountId)
         .containsExactly(Long.valueOf(canLoginUser.getWebUserAccountId()));
   }

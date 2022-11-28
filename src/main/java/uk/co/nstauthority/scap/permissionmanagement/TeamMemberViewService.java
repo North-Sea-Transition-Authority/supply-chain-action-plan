@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
+import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 
 @Service
 public class TeamMemberViewService {
@@ -35,6 +36,14 @@ public class TeamMemberViewService {
     return createUserViewsFromTeamMembers(List.of(teamMember))
         .stream()
         .findFirst();
+  }
+
+  public TeamMemberView getTeamMemberViewOrThrow(TeamMember teamMember) {
+    return createUserViewsFromTeamMembers(List.of(teamMember))
+        .stream()
+        .findFirst()
+        .orElseThrow(() -> new ScapEntityNotFoundException(
+            "Could not find View for User with ID: %s".formatted(teamMember.wuaId().id())));
   }
 
   private List<TeamMemberView> createUserViewsFromTeamMembers(Collection<TeamMember> teamMembers) {

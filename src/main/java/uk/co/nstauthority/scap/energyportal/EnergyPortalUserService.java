@@ -8,6 +8,8 @@ import uk.co.fivium.energyportalapi.client.user.UserApi;
 import uk.co.fivium.energyportalapi.generated.client.UserProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.client.UsersProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.types.User;
+import uk.co.nstauthority.scap.error.exception.EnergyPortalBadRequestException;
+import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 
 @Service
 public class EnergyPortalUserService {
@@ -42,7 +44,7 @@ public class EnergyPortalUserService {
     this.energyPortalApiWrapper = energyPortalApiWrapper;
   }
 
-  public List<EnergyPortalUserDto> findUserByUsername(String username) {
+  public List<EnergyPortalUserDto> findUsersByUsername(String username) {
     return energyPortalApiWrapper.makeRequest(((logCorrelationId, requestPurpose) ->
         userApi.searchUsersByEmail(
             username,
@@ -88,6 +90,30 @@ public class EnergyPortalUserService {
         .map(this::convertToEnergyPortalUser)
         .findFirst()
     ));
+  }
+
+  public EnergyPortalUserDto getEnergyPortalUser(WebUserAccountId webUserAccountId) {
+    var energyPortalUser = findByWuaId(webUserAccountId)
+        .orElseThrow(() -> new ScapEntityNotFoundException(
+            "No Energy Portal user with WUA_ID %s could be found".formatted(webUserAccountId)
+        ));
+
+    if (energyPortalUser.isSharedAccount()) {
+      throw new EnergyPortalBadRequestException(
+          "Energy Portal user with WUA_ID %s is a shared account and is not allowed to be added to this service"
+              .formatted(webUserAccountId)
+      );
+    }
+
+    if (!energyPortalUser.canLogin()) {
+      throw new EnergyPortalBadRequestException(
+          (" Energy Portal user with WUA_ID %s does not have login access to the Energy Portal " +
+              "and is not allowed to be added to this service")
+              .formatted(webUserAccountId)
+      );
+    }
+
+    return energyPortalUser;
   }
 
   private EnergyPortalUserDto convertToEnergyPortalUser(User user) {

@@ -3,8 +3,8 @@ package uk.co.nstauthority.scap.permissionmanagement;
 public enum RolePermission {
 
   GRANT_ROLES,
-  EDIT_NOMINATIONS,
-  VIEW_NOMINATIONS,
+  REVIEW_SCAP,
+  VIEW_SCAP,
   MANAGE_ORGANISATIONS,
   CREATE_NOMINATION
   ;

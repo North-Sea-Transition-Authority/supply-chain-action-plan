@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
+import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 
 @Service
@@ -48,6 +49,13 @@ public class TeamMemberService {
 
     var teamMember = new TeamMember(wuaId, createTeamView(team), mapMemberRolesToTeamRoles(teamMemberRoles, team));
     return Optional.of(teamMember);
+  }
+
+  public TeamMember getTeamMemberOrThrow(Team team, WebUserAccountId wuaId) {
+    return getTeamMember(team, wuaId)
+        .orElseThrow(() -> new ScapEntityNotFoundException(
+            "Could not find User with ID: %s in Team: %s"
+                .formatted(wuaId.id(), team.getUuid())));
   }
 
   private TeamView createTeamView(Team team) {

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
+import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRoleService;
@@ -37,8 +38,18 @@ class RegulatorTeamService {
         .findFirst();
   }
 
+  Team getRegulatorTeamForUserOrThrow(ServiceUserDetail user) {
+    return getRegulatorTeamForUser(user)
+        .orElseThrow(() -> new ScapEntityNotFoundException("User is not a member of regulator team"));
+  }
+
   Optional<Team> getTeam(TeamId teamId) {
     return teamService.getTeam(teamId, TeamType.REGULATOR);
+  }
+
+  Team getTeamOrThrow(TeamId teamId) {
+    return getTeam(teamId)
+        .orElseThrow(() -> new ScapEntityNotFoundException("User is not a member of regulator team"));
   }
 
   boolean isAccessManager(TeamId teamId, ServiceUserDetail user) {

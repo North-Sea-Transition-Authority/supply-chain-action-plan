@@ -3,14 +3,12 @@ package uk.co.nstauthority.scap.permissionmanagement.regulator;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -21,6 +19,7 @@ import org.springframework.test.context.ContextConfiguration;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
+import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
@@ -48,18 +47,6 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
   }
 
   @Test
-  void renderMemberListRedirect_whenNoAccessToRegulatorTeam_thenForbidden() throws Exception {
-    var user = ServiceUserDetailTestUtil.Builder().build();
-
-    when(regulatorTeamService.getRegulatorTeamForUser(user)).thenReturn(Optional.empty());
-
-    mockMvc.perform(
-      get(ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberListRedirect()))
-        .with(user(user)))
-        .andExpect(status().isForbidden());
-  }
-
-  @Test
   void renderMemberList_whenNotAuthenticated_thenUnauthorised() throws Exception {
     var teamId = new TeamId(UUID.randomUUID());
 
@@ -77,7 +64,7 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
     var teamId = new TeamId(team.getUuid());
 
     when(teamMemberService.isMemberOfTeam(teamId, user)).thenReturn(true);
-    when(regulatorTeamService.getTeam(teamId)).thenReturn(Optional.of(team));
+    when(regulatorTeamService.getTeamOrThrow(teamId)).thenReturn(team);
 
     mockMvc.perform(
       get(ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberList(teamId)))
@@ -91,7 +78,7 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
     var teamId = new TeamId(UUID.randomUUID());
 
     when(teamMemberService.isMemberOfTeam(teamId, user)).thenReturn(true);
-    when(regulatorTeamService.getTeam(teamId)).thenReturn(Optional.empty());
+    when(regulatorTeamService.getTeamOrThrow(teamId)).thenThrow(ScapEntityNotFoundException.class);
 
     mockMvc.perform(
       get(ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberList(teamId)))
@@ -108,7 +95,7 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
     var teamId = new TeamId(team.getUuid());
 
     when(teamMemberService.isMemberOfTeam(teamId, user)).thenReturn(true);
-    when(regulatorTeamService.getTeam(teamId)).thenReturn(Optional.of(team));
+    when(regulatorTeamService.getTeamOrThrow(teamId)).thenReturn(team);
 
     var teamMemberView = TeamMemberViewTestUtil.Builder()
       .withRole(RegulatorTeamRole.ACCESS_MANAGER)
@@ -139,7 +126,7 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
 
     when(regulatorTeamService.isAccessManager(teamId, user)).thenReturn(true);
     when(teamMemberService.isMemberOfTeam(teamId, user)).thenReturn(true);
-    when(regulatorTeamService.getTeam(teamId)).thenReturn(Optional.of(team));
+    when(regulatorTeamService.getTeamOrThrow(teamId)).thenReturn(team);
 
     var canRemoveUsers = true;
     var teamMemberView = TeamMemberViewTestUtil.Builder()
