@@ -87,7 +87,7 @@ class RegulatorAddRolesController extends AbstractRegulatorPermissionManagement 
                                                          EnergyPortalUserDto energyPortalUser,
                                                          TeamMemberRolesForm form) {
     return new ModelAndView("scap/permissionmanagement/regulator/regulatorTeamMemberRoles")
-        .addObject("pageTitle", "What actions does %s perform?".formatted(energyPortalUser.displayName()))
+        .addObject("userDisplayName", energyPortalUser.displayName())
         .addObject("form", form)
         .addObject("roles", DisplayableEnumOptionUtil.getDisplayableOptionsWithDescription(RegulatorTeamRole.class))
         .addObject(
