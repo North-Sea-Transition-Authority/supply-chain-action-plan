@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.scap.contractingperformance.summary.HasMoreContractingPerformance;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Service
@@ -38,6 +39,13 @@ public class ContractingPerformanceOverviewService {
     var contractingPerformanceOverview = getByScapDetail(scapDetail)
         .orElse(new ContractingPerformanceOverview(scapDetail, clock.instant()));
     contractingPerformanceOverview.setHasContractingPerformance(YesNo.YES.equals(hasContractingPerformance));
+    contractingPerformanceOverviewRepository.save(contractingPerformanceOverview);
+  }
+
+  @Transactional
+  public void updateHasMoreContractingPerformance(ContractingPerformanceOverview contractingPerformanceOverview,
+                                                  HasMoreContractingPerformance hasMoreContractingPerformance) {
+    contractingPerformanceOverview.setHasMoreContractingPerformance(hasMoreContractingPerformance);
     contractingPerformanceOverviewRepository.save(contractingPerformanceOverview);
   }
 }

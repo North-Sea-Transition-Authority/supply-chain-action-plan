@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.scap.contractingperformance.summary.HasMoreContractingPerformance;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @ExtendWith(MockitoExtension.class)
@@ -112,6 +113,30 @@ class ContractingPerformanceOverviewServiceTest {
     ).containsExactly(
         contractingPerformanceOverviewId,
         Boolean.TRUE
+    );
+  }
+
+  @Test
+  void updateHasMoreContractingPerformance_VerifySaves() {
+    var contractingPerformanceOverviewId = 17;
+    var contractingPerformanceOverview = new ContractingPerformanceOverview(contractingPerformanceOverviewId);
+    contractingPerformanceOverview.setHasContractingPerformance(true);
+    var hasMoreContractingPerformance = HasMoreContractingPerformance.NO;
+    var argumentCaptor = ArgumentCaptor.forClass(ContractingPerformanceOverview.class);
+
+    contractingPerformanceOverviewService.updateHasMoreContractingPerformance(
+        contractingPerformanceOverview, hasMoreContractingPerformance);
+
+    verify(contractingPerformanceOverviewRepository).save(argumentCaptor.capture());
+
+    assertThat(argumentCaptor.getValue()).extracting(
+        ContractingPerformanceOverview::getHasMoreContractingPerformance,
+        ContractingPerformanceOverview::getHasContractingPerformance,
+        ContractingPerformanceOverview::getId
+    ).containsExactly(
+        hasMoreContractingPerformance,
+        Boolean.TRUE,
+        contractingPerformanceOverviewId
     );
   }
 

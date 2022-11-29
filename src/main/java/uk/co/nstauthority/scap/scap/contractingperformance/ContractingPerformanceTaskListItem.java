@@ -6,6 +6,7 @@ import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Component;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperformance.HasContractingPerformanceController;
+import uk.co.nstauthority.scap.scap.contractingperformance.summary.HasMoreContractingPerformance;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapFormTaskListSection;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
@@ -55,9 +56,8 @@ public class ContractingPerformanceTaskListItem implements ScapTaskListItem {
           if (Boolean.FALSE.equals(existingContractingPerformanceOverview.getHasContractingPerformance())) {
             return true;
           }
-          // TODO: SCAP2022-53 - replace the below 'false' with, once 'hasMoreContractingPerformance' column added:
-          // Boolean.FALSE.equals(existingContractingPerformanceOverview.getHasMoreContractingPerformance())
-          return false;
+          return HasMoreContractingPerformance.NO
+              .equals(existingContractingPerformanceOverview.getHasMoreContractingPerformance());
         })
         .orElse(false);
   }

@@ -1,11 +1,18 @@
 package uk.co.nstauthority.scap.scap.contractingperformance.summary;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import static uk.co.nstauthority.scap.utils.ControllerTestingUtil.redirectUrl;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -18,12 +25,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
+import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceController;
+import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverview;
+import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverviewService;
 import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperformance.HasContractingPerformanceController;
+import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.scap.Scap;
+import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
-import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = ContractingPerformanceSummaryController.class)
@@ -31,18 +47,34 @@ import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
 class ContractingPerformanceSummaryControllerTest extends AbstractControllerTest {
 
   @MockBean
+  ScapService scapService;
+
+  @MockBean
+  ScapDetailService scapDetailService;
+
+  @MockBean
+  ContractingPerformanceOverviewService contractingPerformanceOverviewService;
+
+  @MockBean
+  HasMoreContractingPerformanceFormService hasMoreContractingPerformanceFormService;
+
+  @MockBean
   ContractingPerformanceSummaryService contractingPerformanceSummaryService;
 
   private Integer scapId;
+  private Scap scap;
+  private ScapDetail scapDetail;
+  private ContractingPerformanceOverview contractingPerformanceOverview;
+  private List<ContractingPerformanceSummaryView> summaryViews;
+  private Map<String, String> countryMap;
 
   @BeforeEach
   void setup() {
     scapId = 59;
-  }
-
-  @Test
-  void renderContractingPerformanceSummary() throws Exception {
-    var summaryViews = List.of(new ContractingPerformanceSummaryView(
+    scap = new Scap(scapId);
+    scapDetail = new ScapDetail();
+    contractingPerformanceOverview = new ContractingPerformanceOverview();
+    summaryViews = List.of(new ContractingPerformanceSummaryView(
         scapId,
         5106,
         "Some scope title",
@@ -55,11 +87,20 @@ class ContractingPerformanceSummaryControllerTest extends AbstractControllerTest
         BigDecimal.valueOf(1.3),
         "Some outturn rationale"
     ));
-    var countryMap = Map.of("0", "United Kingdom");
+    countryMap = Map.of("0", "United Kingdom");
+  }
 
+  @Test
+  void renderContractingPerformanceSummary() throws Exception {
+    when(scapService.getScapById(scapId)).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
+        .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceSummaryService.getContractingPerformanceSummaryViews(scapId))
         .thenReturn(summaryViews);
     when(contractingPerformanceSummaryService.getCountryMap(summaryViews)).thenReturn(countryMap);
+    when(hasMoreContractingPerformanceFormService.getForm(contractingPerformanceOverview))
+        .thenReturn(new HasMoreContractingPerformanceForm());
 
     mockMvc.perform(get(
         ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
@@ -84,6 +125,119 @@ class ContractingPerformanceSummaryControllerTest extends AbstractControllerTest
             ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
                 .renderContractingPerformanceSummary(scapId))))
         .andExpect(status().is3xxRedirection())
-        .andExpect(ControllerTestingUtil.redirectUrl(expectedRedirectUrl));
+        .andExpect(redirectUrl(expectedRedirectUrl));
+  }
+
+  @Test
+  void saveContractingPerformanceSummary_NoContractingPerformances_AssertRedirects() throws Exception {
+    var expectedRedirectUrl = ReverseRouter.route(on(HasContractingPerformanceController.class)
+        .renderHasContractingPerformanceForm(scapId));
+
+    when(contractingPerformanceSummaryService.getContractingPerformanceSummaryViews(scapId))
+        .thenReturn(Collections.emptyList());
+
+    mockMvc.perform(post(
+        ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
+            .renderContractingPerformanceSummary(scapId)))
+            .with(csrf()))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectUrl(expectedRedirectUrl));
+
+    verify(contractingPerformanceOverviewService, never()).updateHasMoreContractingPerformance(any(), any());
+  }
+
+  @Test
+  void saveContractingPerformanceSummary_HasErrors_VerifyNeverSaves() throws Exception {
+    var form = new HasMoreContractingPerformanceForm();
+    var bindingResultWithErrors = new BeanPropertyBindingResult(form, "form");
+    bindingResultWithErrors.addError(new FieldError(
+        "form", "testField", "test error message"
+    ));
+
+    when(scapService.getScapById(scapId)).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
+        .thenReturn(contractingPerformanceOverview);
+    when(contractingPerformanceSummaryService.getContractingPerformanceSummaryViews(scapId))
+        .thenReturn(summaryViews);
+    when(contractingPerformanceSummaryService.getCountryMap(summaryViews)).thenReturn(countryMap);
+    when(hasMoreContractingPerformanceFormService.validate(eq(form), any(BindingResult.class)))
+        .thenReturn(bindingResultWithErrors);
+
+    mockMvc.perform(post(
+        ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
+            .renderContractingPerformanceSummary(scapId)))
+            .with(csrf())
+            .flashAttr("form", form))
+        .andExpect(status().isOk())
+        .andExpect(view().name("scap/scap/contractingperformance/contractingPerformanceSummary"))
+        .andExpect(model().attribute("backLinkUrl",
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId))))
+        .andExpect(model().attribute("summaryViews", summaryViews))
+        .andExpect(model().attribute("countryMap", countryMap))
+        .andExpect(model().attributeExists("errorList"));
+
+    verify(contractingPerformanceOverviewService, never()).updateHasMoreContractingPerformance(any(), any());
+  }
+
+  @Test
+  void saveContractingPerformanceSummary_NoErrors_AddMoreNow_VerifyUpdateAndRedirect() throws Exception {
+    var expectedRedirectUrl = ReverseRouter.route(on(ContractingPerformanceController.class)
+        .renderNewContractingPerformanceForm(scapId, null));
+    var hasMoreContractingPerformance = HasMoreContractingPerformance.YES_NOW;
+    var form = new HasMoreContractingPerformanceForm();
+    form.setHasMoreContractingPerformance(hasMoreContractingPerformance);
+    var bindingResultWithoutErrors = new BeanPropertyBindingResult(form, "form");
+
+    when(scapService.getScapById(scapId)).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
+        .thenReturn(contractingPerformanceOverview);
+    when(contractingPerformanceSummaryService.getContractingPerformanceSummaryViews(scapId))
+        .thenReturn(summaryViews);
+    when(contractingPerformanceSummaryService.getCountryMap(summaryViews)).thenReturn(countryMap);
+    when(hasMoreContractingPerformanceFormService.validate(eq(form), any(BindingResult.class)))
+        .thenReturn(bindingResultWithoutErrors);
+
+    mockMvc.perform(post(
+        ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
+            .renderContractingPerformanceSummary(scapId)))
+            .with(csrf())
+            .flashAttr("form", form))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectUrl(expectedRedirectUrl));
+
+    verify(contractingPerformanceOverviewService, never()).updateHasMoreContractingPerformance(any(), any());
+  }
+
+  @Test
+  void saveContractingPerformanceSummary_NoErrors_VerifyUpdateAndRedirect() throws Exception {
+    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId));
+    var hasMoreContractingPerformance = HasMoreContractingPerformance.NO;
+    var form = new HasMoreContractingPerformanceForm();
+    form.setHasMoreContractingPerformance(hasMoreContractingPerformance);
+    var bindingResultWithoutErrors = new BeanPropertyBindingResult(form, "form");
+
+    when(scapService.getScapById(scapId)).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
+        .thenReturn(contractingPerformanceOverview);
+    when(contractingPerformanceSummaryService.getContractingPerformanceSummaryViews(scapId))
+        .thenReturn(summaryViews);
+    when(contractingPerformanceSummaryService.getCountryMap(summaryViews)).thenReturn(countryMap);
+    when(hasMoreContractingPerformanceFormService.validate(eq(form), any(BindingResult.class)))
+        .thenReturn(bindingResultWithoutErrors);
+
+    mockMvc.perform(post(
+        ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
+            .renderContractingPerformanceSummary(scapId)))
+            .with(csrf())
+            .flashAttr("form", form))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectUrl(expectedRedirectUrl));
+
+    verify(contractingPerformanceOverviewService).updateHasMoreContractingPerformance(
+        contractingPerformanceOverview, hasMoreContractingPerformance
+    );
   }
 }

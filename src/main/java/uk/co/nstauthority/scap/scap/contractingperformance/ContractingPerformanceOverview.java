@@ -3,12 +3,15 @@ package uk.co.nstauthority.scap.scap.contractingperformance;
 import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import uk.co.nstauthority.scap.scap.contractingperformance.summary.HasMoreContractingPerformance;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Entity
@@ -24,6 +27,9 @@ public class ContractingPerformanceOverview {
   private ScapDetail scapDetail;
 
   private Boolean hasContractingPerformance;
+
+  @Enumerated(EnumType.STRING)
+  private HasMoreContractingPerformance hasMoreContractingPerformance;
 
   private Instant createdTimestamp;
 
@@ -60,5 +66,14 @@ public class ContractingPerformanceOverview {
 
   public void setHasContractingPerformance(Boolean hasContractingPerformance) {
     this.hasContractingPerformance = hasContractingPerformance;
+  }
+
+  public HasMoreContractingPerformance getHasMoreContractingPerformance() {
+    return hasMoreContractingPerformance;
+  }
+
+  public void setHasMoreContractingPerformance(
+      HasMoreContractingPerformance hasMoreContractingPerformance) {
+    this.hasMoreContractingPerformance = hasMoreContractingPerformance;
   }
 }

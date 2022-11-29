@@ -17,6 +17,16 @@ backLinkUrl=springUrl(backLinkUrl)
     <@contractingPerformanceSummaryCard summaryView=summaryView index=summaryView_index countryMap=countryMap/>
   </#list>
 
+  <@fdsForm.htmlForm>
+    <@fdsRadio.radio
+      path="form.hasMoreContractingPerformance"
+      radioItems=radioItems
+      labelText="Do you want to add further contracting performance?"
+    />
+
+    <@fdsAction.button buttonText="Save and complete"/>
+  </@fdsForm.htmlForm>
+
 </@defaultPage>
 
 <#macro contractingPerformanceSummaryCard summaryView index countryMap>
