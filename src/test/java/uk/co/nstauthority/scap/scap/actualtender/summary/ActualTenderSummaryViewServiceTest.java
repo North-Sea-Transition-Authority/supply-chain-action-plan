@@ -128,7 +128,7 @@ class ActualTenderSummaryViewServiceTest {
     awardedContract.setPreferredBidder(participant4);
     awardedContract.setAwardValue(BigDecimal.valueOf(1.2));
     awardedContract.setAwardRationale("award rationale");
-    awardedContract.setPreferredBidderLocation(country.getCountryId());
+    awardedContract.setPreferredBidderCountryId(country.getCountryId());
 
     var actualTenderActivities = List.of(
         actualTenderActivity1, actualTenderActivity2, actualTenderActivity3

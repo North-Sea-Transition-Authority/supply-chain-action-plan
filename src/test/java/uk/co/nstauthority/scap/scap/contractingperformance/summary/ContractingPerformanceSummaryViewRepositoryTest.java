@@ -77,11 +77,11 @@ class ContractingPerformanceSummaryViewRepositoryTest {
 
     var awardedContract1 = new AwardedContract(actualTenderActivity1, Instant.now());
     awardedContract1.setAwardValue(BigDecimal.valueOf(58.03));
-    awardedContract1.setPreferredBidderLocation(0);
+    awardedContract1.setPreferredBidderCountryId(0);
     awardedContract1.setPreferredBidder(contractor1);
     var awardedContract2 = new AwardedContract(actualTenderActivity2, Instant.now());
     awardedContract2.setAwardValue(BigDecimal.valueOf(58.31));
-    awardedContract2.setPreferredBidderLocation(1);
+    awardedContract2.setPreferredBidderCountryId(1);
     awardedContract2.setPreferredBidder(contractor2);
     var otherAwardedContract = new AwardedContract(otherActualTenderActivity, Instant.now());
 
@@ -128,7 +128,7 @@ class ContractingPerformanceSummaryViewRepositoryTest {
             actualTenderActivity1.getRemunerationModel(),
             actualTenderActivity1.getRemunerationModelName(),
             contractor1.getCompanyName(),
-            awardedContract1.getPreferredBidderLocation(),
+            awardedContract1.getPreferredBidderCountryId(),
             contractingPerformance1.getOutturnCost(),
             contractingPerformance1.getOutturnRationale()
         ),
@@ -141,7 +141,7 @@ class ContractingPerformanceSummaryViewRepositoryTest {
             actualTenderActivity2.getRemunerationModel(),
             actualTenderActivity2.getRemunerationModelName(),
             contractor2.getCompanyName(),
-            awardedContract2.getPreferredBidderLocation(),
+            awardedContract2.getPreferredBidderCountryId(),
             contractingPerformance2.getOutturnCost(),
             contractingPerformance2.getOutturnRationale()
         )

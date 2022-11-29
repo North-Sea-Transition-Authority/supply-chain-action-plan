@@ -67,7 +67,7 @@ class AwardedContractServiceTest {
     form.setPreferredBidderId(bidParticipants.get(0).getId());
     form.setAwardValue("1.23");
     form.setAwardRationale("Test award rationale");
-    form.setPreferredBidderLocation(0);
+    form.setPreferredBidderCountryId(0);
     var argumentCaptor = ArgumentCaptor.forClass(AwardedContract.class);
 
     when(awardedContractRepository.findByActualTenderActivity(actualTenderActivity))
@@ -82,13 +82,13 @@ class AwardedContractServiceTest {
         AwardedContract::getPreferredBidder,
         AwardedContract::getAwardValue,
         AwardedContract::getAwardRationale,
-        AwardedContract::getPreferredBidderLocation
+        AwardedContract::getPreferredBidderCountryId
     ).containsExactly(
         awardedContract.getId(),
         bidParticipants.get(0),
         form.getAwardValue().getAsBigDecimal().get(),
         form.getAwardRationale().getInputValue(),
-        form.getPreferredBidderLocation()
+        form.getPreferredBidderCountryId()
     );
   }
 
@@ -98,7 +98,7 @@ class AwardedContractServiceTest {
     form.setPreferredBidderId(bidParticipants.get(0).getId());
     form.setAwardValue("1.23");
     form.setAwardRationale("Test award rationale");
-    form.setPreferredBidderLocation(0);
+    form.setPreferredBidderCountryId(0);
     var argumentCaptor = ArgumentCaptor.forClass(AwardedContract.class);
 
     when(awardedContractRepository.findByActualTenderActivity(actualTenderActivity))
@@ -112,13 +112,13 @@ class AwardedContractServiceTest {
         AwardedContract::getPreferredBidder,
         AwardedContract::getAwardValue,
         AwardedContract::getAwardRationale,
-        AwardedContract::getPreferredBidderLocation,
+        AwardedContract::getPreferredBidderCountryId,
         AwardedContract::getCreatedTimestamp
     ).containsExactly(
         bidParticipants.get(0),
         form.getAwardValue().getAsBigDecimal().get(),
         form.getAwardRationale().getInputValue(),
-        form.getPreferredBidderLocation(),
+        form.getPreferredBidderCountryId(),
         clock.instant()
     );
   }

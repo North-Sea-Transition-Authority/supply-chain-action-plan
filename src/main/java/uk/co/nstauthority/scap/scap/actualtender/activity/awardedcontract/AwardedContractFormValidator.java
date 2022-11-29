@@ -19,7 +19,7 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderPart
 class AwardedContractFormValidator implements SmartValidator {
 
   private static final String PREFERRED_BIDDER_FIELD = "preferredBidderId";
-  private static final String BIDDER_LOCATION_FIELD = "preferredBidderLocation";
+  private static final String BIDDER_LOCATION_FIELD = "preferredBidderCountryId";
 
   private final CountryService countryService;
 
@@ -80,7 +80,7 @@ class AwardedContractFormValidator implements SmartValidator {
         String.format("%s.required", BIDDER_LOCATION_FIELD),
         "Select the location of the preferred bidder");
     if (!errors.hasFieldErrors(BIDDER_LOCATION_FIELD)
-        && !countryService.doesCountryExist(form.getPreferredBidderLocation())) {
+        && !countryService.doesCountryExist(form.getPreferredBidderCountryId())) {
       errors.rejectValue(
           BIDDER_LOCATION_FIELD,
           String.format("%s.doesNotExist", BIDDER_LOCATION_FIELD),

@@ -29,7 +29,7 @@ backLinkUrl=springUrl(backLinkUrl)
       labelText="Award rationale"
     />
     <@fdsSearchSelector.searchSelectorRest
-      path="form.preferredBidderLocation"
+      path="form.preferredBidderCountryId"
       restUrl=springUrl(countrySearchRestUrl)
       labelText="Location of preferred bidder"
       selectorMinInputLength=2

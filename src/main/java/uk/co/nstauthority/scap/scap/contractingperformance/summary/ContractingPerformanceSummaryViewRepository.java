@@ -20,7 +20,7 @@ class ContractingPerformanceSummaryViewRepository {
         "SELECT new uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryView(" +
             "s.id, cp.id, ata.scopeTitle, ata.scopeDescription, ac.awardValue, ata.remunerationModel, " +
             "ata.remunerationModelName, " +
-            "ittp.companyName, ac.preferredBidderLocation, cp.outturnCost, cp.outturnRationale) " +
+            "ittp.companyName, ac.preferredBidderCountryId, cp.outturnCost, cp.outturnRationale) " +
             "FROM Scap s " +
             "JOIN ScapDetail sd ON sd.scap = s AND sd.tipFlag = true " +
             "JOIN ContractingPerformanceOverview cpo ON cpo.scapDetail = sd " +

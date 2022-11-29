@@ -56,7 +56,7 @@ class AwardedContractFormServiceTest {
     awardedContract.setPreferredBidder(new InvitationToTenderParticipant(preferredBidderId));
     awardedContract.setAwardValue(awardValue);
     awardedContract.setAwardRationale(awardRationale);
-    awardedContract.setPreferredBidderLocation(preferredBidderLocation);
+    awardedContract.setPreferredBidderCountryId(preferredBidderLocation);
 
     var form = awardedContractFormService.getForm(awardedContract);
 
@@ -64,7 +64,7 @@ class AwardedContractFormServiceTest {
         AwardedContractForm::getPreferredBidderId,
         actualForm -> actualForm.getAwardValue().getInputValue(),
         actualForm -> actualForm.getAwardRationale().getInputValue(),
-        AwardedContractForm::getPreferredBidderLocation
+        AwardedContractForm::getPreferredBidderCountryId
     ).containsExactly(
         preferredBidderId,
         String.valueOf(awardValue),

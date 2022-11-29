@@ -68,7 +68,7 @@ class AwardedContractFormValidatorTest {
     form.setPreferredBidderId(bidParticipant1.getId());
     form.setAwardValue("1.41");
     form.setAwardRationale("test award rationale");
-    form.setPreferredBidderLocation(countryId);
+    form.setPreferredBidderCountryId(countryId);
 
     when(countryService.doesCountryExist(countryId)).thenReturn(true);
 
@@ -91,7 +91,7 @@ class AwardedContractFormValidatorTest {
         entry("preferredBidderId", Set.of("preferredBidderId.required")),
         entry("awardValue.inputValue", Set.of("awardValue.required")),
         entry("awardRationale.inputValue", Set.of("awardRationale.required")),
-        entry("preferredBidderLocation", Set.of("preferredBidderLocation.required"))
+        entry("preferredBidderCountryId", Set.of("preferredBidderCountryId.required"))
     );
   }
 
@@ -104,7 +104,7 @@ class AwardedContractFormValidatorTest {
     form.setPreferredBidderId(9999);
     form.setAwardValue("1.41");
     form.setAwardRationale("test award rationale");
-    form.setPreferredBidderLocation(countryId);
+    form.setPreferredBidderCountryId(countryId);
 
     when(countryService.doesCountryExist(countryId)).thenReturn(false);
 
@@ -114,7 +114,7 @@ class AwardedContractFormValidatorTest {
 
     assertThat(extractedErrors).containsExactly(
         entry("preferredBidderId", Set.of("preferredBidderId.doesNotExist")),
-        entry("preferredBidderLocation", Set.of("preferredBidderLocation.doesNotExist"))
+        entry("preferredBidderCountryId", Set.of("preferredBidderCountryId.doesNotExist"))
     );
   }
 
@@ -127,7 +127,7 @@ class AwardedContractFormValidatorTest {
     form.setPreferredBidderId(bidParticipant1.getId());
     form.setAwardValue("0");
     form.setAwardRationale("test award rationale");
-    form.setPreferredBidderLocation(countryId);
+    form.setPreferredBidderCountryId(countryId);
 
     when(countryService.doesCountryExist(countryId)).thenReturn(true);
 
@@ -149,7 +149,7 @@ class AwardedContractFormValidatorTest {
     form.setPreferredBidderId(bidParticipant1.getId());
     form.setAwardValue("0.1234");
     form.setAwardRationale("test award rationale");
-    form.setPreferredBidderLocation(countryId);
+    form.setPreferredBidderCountryId(countryId);
 
     when(countryService.doesCountryExist(countryId)).thenReturn(true);
 

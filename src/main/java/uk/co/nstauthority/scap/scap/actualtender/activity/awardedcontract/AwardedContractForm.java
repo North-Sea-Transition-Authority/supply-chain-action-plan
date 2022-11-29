@@ -8,7 +8,7 @@ class AwardedContractForm {
   private Integer preferredBidderId;
   private final DecimalInput awardValue;
   private final StringInput awardRationale;
-  private Integer preferredBidderLocation;
+  private Integer preferredBidderCountryId;
 
   public AwardedContractForm() {
     this.awardValue = new DecimalInput("awardValue", "Award value");
@@ -39,11 +39,11 @@ class AwardedContractForm {
     this.awardRationale.setInputValue(awardRationale);
   }
 
-  public Integer getPreferredBidderLocation() {
-    return preferredBidderLocation;
+  public Integer getPreferredBidderCountryId() {
+    return preferredBidderCountryId;
   }
 
-  public void setPreferredBidderLocation(Integer preferredBidderLocation) {
-    this.preferredBidderLocation = preferredBidderLocation;
+  public void setPreferredBidderCountryId(Integer preferredBidderCountryId) {
+    this.preferredBidderCountryId = preferredBidderCountryId;
   }
 }

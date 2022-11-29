@@ -42,7 +42,7 @@ public class AwardedContractService {
     awardedContract.setPreferredBidder(preferredBidder);
     awardedContract.setAwardValue(awardValue);
     awardedContract.setAwardRationale(form.getAwardRationale().getInputValue());
-    awardedContract.setPreferredBidderLocation(form.getPreferredBidderLocation());
+    awardedContract.setPreferredBidderCountryId(form.getPreferredBidderCountryId());
 
     awardedContractRepository.save(awardedContract);
   }

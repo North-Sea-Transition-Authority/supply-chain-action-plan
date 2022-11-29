@@ -34,7 +34,7 @@ public class AwardedContract {
 
   private String awardRationale;
 
-  private Integer preferredBidderLocation;
+  private Integer preferredBidderCountryId;
 
   private Instant createdTimestamp;
 
@@ -84,12 +84,12 @@ public class AwardedContract {
     this.awardRationale = awardRationale;
   }
 
-  public Integer getPreferredBidderLocation() {
-    return preferredBidderLocation;
+  public Integer getPreferredBidderCountryId() {
+    return preferredBidderCountryId;
   }
 
-  public void setPreferredBidderLocation(Integer preferredBidderLocation) {
-    this.preferredBidderLocation = preferredBidderLocation;
+  public void setPreferredBidderCountryId(Integer preferredBidderCountryId) {
+    this.preferredBidderCountryId = preferredBidderCountryId;
   }
 
   public Instant getCreatedTimestamp() {

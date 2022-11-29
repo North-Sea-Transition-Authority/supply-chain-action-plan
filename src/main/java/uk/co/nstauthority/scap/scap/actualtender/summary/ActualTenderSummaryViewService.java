@@ -101,13 +101,13 @@ public class ActualTenderSummaryViewService {
         awardedContract.getPreferredBidder().getCompanyName(),
         awardedContract.getAwardValue(),
         awardedContract.getAwardRationale(),
-        countriesMap.get(awardedContract.getPreferredBidderLocation())
+        countriesMap.get(awardedContract.getPreferredBidderCountryId())
     );
   }
 
   private List<Integer> getCountryIds(List<AwardedContract> awardedContracts) {
     return awardedContracts.stream()
-        .map(AwardedContract::getPreferredBidderLocation)
+        .map(AwardedContract::getPreferredBidderCountryId)
         .toList();
   }
 
