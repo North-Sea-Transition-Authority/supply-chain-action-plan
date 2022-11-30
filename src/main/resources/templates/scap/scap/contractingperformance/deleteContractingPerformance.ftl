@@ -1,7 +1,7 @@
 <#include '../../layout/layout.ftl'>
 <#import  'contractingPerformanceSummaryContent.ftl' as summaryContent>
 
-<#assign pageTitle = "Are you sure you want to delete this actual tender activity?"/>
+<#assign pageTitle = "Are you sure you want to delete this contracting performance?"/>
 
 <@defaultPage
   htmlTitle=pageTitle
@@ -9,12 +9,14 @@
   pageSize=PageSize.TWO_THIRDS_COLUMN
   backLinkUrl=springUrl(backLinkUrl)
 >
-  <@fdsSummaryList.summaryListCard
-    summaryListId="actual-tender-activity"
-    headingText="Actual tender activity"
+  <@fdsSummaryList.summaryListWrapper
+    summaryListId="contracting-performance"
+    headingText="Contracting performance"
   >
-    <@summaryContent.contractingPerformanceSummaryContent summaryView=summaryView countryMap=countryMap />
-  </@fdsSummaryList.summaryListCard>
+    <@fdsSummaryList.summaryList>
+      <@summaryContent.contractingPerformanceSummaryContent summaryView=summaryView countryMap=countryMap />
+    </@fdsSummaryList.summaryList>
+  </@fdsSummaryList.summaryListWrapper>
   <@fdsForm.htmlForm>
     <@fdsAction.submitButtons
       primaryButtonText="Delete"

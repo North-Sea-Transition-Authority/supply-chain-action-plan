@@ -12,12 +12,14 @@ type="uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryView"
   pageSize=PageSize.TWO_THIRDS_COLUMN
   backLinkUrl=springUrl(backLinkUrl)
 >
-  <@fdsSummaryList.summaryListCard
+  <@fdsSummaryList.summaryListWrapper
     summaryListId="actual-tender-activity"
     headingText="Actual tender activity"
   >
-    <@summaryContent.actualTenderActivitySummaryContent actualTenderActivity=actualTenderActivityView />
-  </@fdsSummaryList.summaryListCard>
+    <@fdsSummaryList.summaryList>
+      <@summaryContent.actualTenderActivitySummaryContent actualTenderActivity=actualTenderActivityView />
+    </@fdsSummaryList.summaryList>
+  </@fdsSummaryList.summaryListWrapper>
   <@fdsForm.htmlForm>
     <@fdsAction.submitButtons primaryButtonText="Delete" secondaryLinkText="Cancel" linkSecondaryAction=true linkSecondaryActionUrl=springUrl(backLinkUrl) primaryButtonClass="govuk-button govuk-button--warning"/>
   </@fdsForm.htmlForm>
