@@ -57,7 +57,7 @@ class ActualTenderTaskListItemTest {
 
   @Test
   void getItemDisplayText() {
-    assertThat(actualTenderTaskListItem.getItemDisplayText()).isEqualTo("Actual tendering activity");
+    assertThat(actualTenderTaskListItem.getItemDisplayText()).isEqualTo("Actual tender activity");
   }
 
   @Test

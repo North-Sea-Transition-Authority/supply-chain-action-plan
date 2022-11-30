@@ -16,7 +16,7 @@ import uk.co.nstauthority.scap.tasklist.TaskListSection;
 @Component
 public class ActualTenderTaskListItem implements ScapTaskListItem {
 
-  private static final String DISPLAY_NAME = "Actual tendering activity";
+  private static final String DISPLAY_NAME = "Actual tender activity";
 
   private final ScapService scapService;
   private final ScapDetailService scapDetailService;
