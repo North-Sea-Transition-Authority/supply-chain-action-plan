@@ -15,7 +15,7 @@ backLinkUrl=springUrl(backLinkUrl)
     <@fdsSelect.select
       path="form.actualTenderActivityId"
       labelText="Scope title"
-      hintText="If your scope is not shown then you must add it as an actual tendering activity at \"Contract has been awarded\" stage"
+      hintText="If your scope is not shown then you must add it as an actual tender activity at \"Contract has been awarded\" stage"
       options=scopeTitlesMap
     />
     <@fdsTextInput.textInput

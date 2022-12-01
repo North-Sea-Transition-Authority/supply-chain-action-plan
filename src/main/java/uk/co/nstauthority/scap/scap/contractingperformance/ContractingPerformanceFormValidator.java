@@ -47,7 +47,7 @@ class ContractingPerformanceFormValidator implements SmartValidator {
       errors.rejectValue(
           ACTUAL_TENDER_ACTIVITY_FIELD_NAME,
           "%s.doesNotExist".formatted(ACTUAL_TENDER_ACTIVITY_FIELD_NAME),
-          "Select an actual tendering activity which has a contract awarded"
+          "Select an actual tender activity which has a contract awarded"
       );
     }
 

@@ -20,7 +20,7 @@ backLinkUrl=springUrl(backLinkUrl)
     <@fdsRadio.radio
       path="form.hasMoreActualTenderActivities"
       radioItems=radioItems
-      labelText="Do you want to add another actual tendering activity?"
+      labelText="Do you want to add another actual tender activity?"
     />
     <@fdsAction.button buttonText="Save and complete"/>
   </@fdsForm.htmlForm>
@@ -36,12 +36,12 @@ backLinkUrl=springUrl(backLinkUrl)
       <@fdsSummaryList.summaryListCardActionItem
         itemUrl=springUrl(actualTenderActivity.getChangeLinkUrl())
         itemText="Change"
-        itemScreenReaderText="Change actual tendering activity ${index +1}"
+        itemScreenReaderText="Change actual tender activity ${index +1}"
       />
       <@fdsSummaryList.summaryListCardActionItem
         itemUrl=springUrl(actualTenderActivity.getDeleteLinkUrl())
         itemText="Delete"
-        itemScreenReaderText="Delete actual tendering activity ${index +1}"
+        itemScreenReaderText="Delete actual tender activity ${index +1}"
       />
     </@fdsSummaryList.summaryListCardActionList>
   </#assign>

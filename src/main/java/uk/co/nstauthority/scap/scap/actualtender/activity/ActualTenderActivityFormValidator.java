@@ -99,7 +99,7 @@ class ActualTenderActivityFormValidator implements SmartValidator {
         errors.rejectValue(
             "scopeTitle.inputValue",
             "scopeTitle.notUnique",
-            "There is already an actual tendering activity with the scope title \"%s\"".formatted(inputScopeTitle)
+            "There is already an actual tender activity with the scope title \"%s\"".formatted(inputScopeTitle)
         );
       }
     }

@@ -28,7 +28,7 @@ public class ActualTenderActivityService {
   public ActualTenderActivity getById(Integer id) {
     return actualTenderActivityRepository.findById(id).orElseThrow(
         () -> new ScapEntityNotFoundException(
-            String.format("Could not find actual tendering activity with ID [%s]", id))
+            String.format("Could not find actual tender activity with ID [%s]", id))
     );
   }
 

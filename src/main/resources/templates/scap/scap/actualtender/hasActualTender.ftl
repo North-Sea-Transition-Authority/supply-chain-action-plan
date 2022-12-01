@@ -1,12 +1,14 @@
 <#include '../../layout/layout.ftl'>
 
-<#assign pageTitle = "Does this SCAP have any actual tendering activity?" />
+<#assign pageTitle = "Does this SCAP have any actual tender activity?" />
+
+<#-- @ftlvariable name="errorList" type="java.util.List<uk.co.nstauthority.scap.fds.ErrorItem>" -->
 
 <@defaultPage
   htmlTitle=pageTitle
   pageHeading=""
   pageSize=PageSize.TWO_THIRDS_COLUMN
-  errorItems=errorItems
+  errorItems=errorList
   backLinkUrl=springUrl(backLinkUrl)
 >
   <@fdsForm.htmlForm>

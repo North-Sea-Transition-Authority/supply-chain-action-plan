@@ -18,7 +18,7 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.Awarde
 @Repository
 public class ActualTenderSummaryViewService {
 
-  public static final String REQUEST_PURPOSE = "Get summary of actual tendering activities for SCAP";
+  public static final String REQUEST_PURPOSE = "Get summary of actual tender activities for SCAP";
 
   private final InvitationToTenderParticipantService invitationToTenderParticipantService;
   private final AwardedContractService awardedContractService;
