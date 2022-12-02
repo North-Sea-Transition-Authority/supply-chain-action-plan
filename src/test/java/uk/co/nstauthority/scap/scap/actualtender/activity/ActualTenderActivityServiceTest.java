@@ -144,40 +144,6 @@ class ActualTenderActivityServiceTest {
   }
 
   @Test
-  void updateActualTenderActivity_assertSaves() {
-    var actualTenderDetailArgumentCaptor = ArgumentCaptor.forClass(ActualTenderActivity.class);
-    var actualTenderDetail = new ActualTenderActivity(actualTender, clock.instant());
-
-    actualTenderActivityService.updateActualTenderActivity(actualTenderDetail, form);
-
-    verify(actualTenderActivityRepository).save(actualTenderDetailArgumentCaptor.capture());
-    verify(invitationToTenderParticipantRepository).saveAll(invitationToTenderParticipantCaptor.capture());
-
-    assertThat(actualTenderDetailArgumentCaptor.getValue()).extracting(
-        ActualTenderActivity::getScopeTitle,
-        ActualTenderActivity::getScopeDescription,
-        ActualTenderActivity::getRemunerationModel,
-        ActualTenderActivity::getRemunerationModelName,
-        ActualTenderActivity::getContractStage,
-        ActualTenderActivity::getCreatedTimestamp
-    ).containsExactly(
-        form.getScopeTitle().getInputValue(),
-        form.getScopeDescription().getInputValue(),
-        form.getRemunerationModel(),
-        form.getRemunerationModelName().getInputValue(),
-        form.getContractStage(),
-        clock.instant()
-    );
-
-    assertThat(invitationToTenderParticipantCaptor.getValue()).extracting(
-        InvitationToTenderParticipant::getCompanyName,
-        InvitationToTenderParticipant::getCreatedTimestamp
-    ).containsExactly(
-        tuple(form.getInvitationToTenderParticipants().getInputValue(), clock.instant())
-    );
-  }
-
-  @Test
   void hasActualTenderActivity_NoneFound_AssertFalse() {
     when(actualTenderActivityRepository.findFirstByActualTender(actualTender)).thenReturn(Optional.empty());
 

@@ -13,9 +13,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderControllerRedirectionService;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
+import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryViewService;
+import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 
@@ -23,6 +25,9 @@ import uk.co.nstauthority.scap.scap.scap.ScapService;
 @RequestMapping("{scapId}/actual-tender/activity/{activityId}/delete")
 public class DeleteActualTenderActivityController {
 
+  static final String DELETES_CONTRACTING_PERFORMANCE_WARNING =
+      "This actual tendering activity has associated contracting performance. " +
+      "The related contracting performance information will also be deleted.";
   private final ScapService scapService;
   private final ScapDetailService scapDetailService;
   private final ActualTenderService actualTenderService;
@@ -30,6 +35,7 @@ public class DeleteActualTenderActivityController {
   private final ActualTenderSummaryViewService actualTenderSummaryViewService;
   private final DeleteActualTenderActivityService deleteActualTenderActivityService;
   private final ActualTenderControllerRedirectionService actualTenderControllerRedirectionService;
+  private final ContractingPerformanceService contractingPerformanceService;
 
   @Autowired
   DeleteActualTenderActivityController(ScapService scapService, ScapDetailService scapDetailService,
@@ -37,7 +43,8 @@ public class DeleteActualTenderActivityController {
                                        ActualTenderActivityService actualTenderActivityService,
                                        ActualTenderSummaryViewService actualTenderSummaryViewService,
                                        DeleteActualTenderActivityService deleteActualTenderActivityService,
-                                       ActualTenderControllerRedirectionService actualTenderControllerRedirectionService) {
+                                       ActualTenderControllerRedirectionService actualTenderControllerRedirectionService,
+                                       ContractingPerformanceService contractingPerformanceService) {
     this.scapService = scapService;
     this.scapDetailService = scapDetailService;
     this.actualTenderService = actualTenderService;
@@ -45,6 +52,7 @@ public class DeleteActualTenderActivityController {
     this.actualTenderSummaryViewService = actualTenderSummaryViewService;
     this.deleteActualTenderActivityService = deleteActualTenderActivityService;
     this.actualTenderControllerRedirectionService = actualTenderControllerRedirectionService;
+    this.contractingPerformanceService = contractingPerformanceService;
   }
 
   @GetMapping
@@ -55,10 +63,13 @@ public class DeleteActualTenderActivityController {
     var actualTenderActivityView = actualTenderSummaryViewService
         .getSingleViewByActualTenderActivity(actualTenderActivity, scapId);
 
+    var contractingPerformanceWarning = getContractingPerformanceWarning(actualTenderActivity);
+
     return new ModelAndView("scap/scap/actualtender/deleteActualTender")
         .addObject("backLinkUrl", ReverseRouter.route(on(ActualTenderSummaryController.class)
             .renderActualTenderSummary(scapId)))
-        .addObject("actualTenderActivityView", actualTenderActivityView);
+        .addObject("actualTenderActivityView", actualTenderActivityView)
+        .addObject("contractingPerformanceWarning", contractingPerformanceWarning);
   }
 
   @PostMapping
@@ -76,5 +87,12 @@ public class DeleteActualTenderActivityController {
 
     var hasRemainingActualTenderActivities = actualTenderActivityService.hasActualTenderActivity(actualTender);
     return actualTenderControllerRedirectionService.redirectFromActualTenderDeletion(scapId, hasRemainingActualTenderActivities);
+  }
+
+  private String getContractingPerformanceWarning(ActualTenderActivity actualTenderActivity) {
+    if (contractingPerformanceService.hasContractingPerformance(actualTenderActivity)) {
+      return DELETES_CONTRACTING_PERFORMANCE_WARNING;
+    }
+    return null;
   }
 }

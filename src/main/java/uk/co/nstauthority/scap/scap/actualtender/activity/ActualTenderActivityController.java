@@ -18,6 +18,7 @@ import uk.co.nstauthority.scap.scap.actualtender.ActualTenderControllerRedirecti
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTenderController;
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
+import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 
@@ -25,6 +26,9 @@ import uk.co.nstauthority.scap.scap.scap.ScapService;
 @RequestMapping("{scapId}/actual-tender/activity")
 public class ActualTenderActivityController {
 
+  static final String DELETES_CONTRACTING_PERFORMANCE_WARNING =
+      "This actual tendering activity has associated contracting performance. " +
+      "On changing the stage of this contract, the related contracting performance information will be deleted.";
   private final ScapService scapService;
   private final ScapDetailService scapDetailService;
   private final ActualTenderService actualTenderService;
@@ -33,6 +37,8 @@ public class ActualTenderActivityController {
   private final ActualTenderActivityService actualTenderActivityService;
   private final ActualTenderControllerRedirectionService actualTenderControllerRedirectionService;
   private final InvitationToTenderParticipantService invitationToTenderParticipantService;
+  private final UpdateActualTenderActivityService updateActualTenderActivityService;
+  private final ContractingPerformanceService contractingPerformanceService;
 
   @Autowired
   public ActualTenderActivityController(ScapService scapService, ScapDetailService scapDetailService,
@@ -41,7 +47,9 @@ public class ActualTenderActivityController {
                                         ActualTenderActivityFormService actualTenderActivityFormService,
                                         ActualTenderActivityService actualTenderActivityService,
                                         ActualTenderControllerRedirectionService actualTenderControllerRedirectionService,
-                                        InvitationToTenderParticipantService invitationToTenderParticipantService) {
+                                        InvitationToTenderParticipantService invitationToTenderParticipantService,
+                                        UpdateActualTenderActivityService updateActualTenderActivityService,
+                                        ContractingPerformanceService contractingPerformanceService) {
     this.scapService = scapService;
     this.scapDetailService = scapDetailService;
     this.actualTenderService = actualTenderService;
@@ -50,6 +58,8 @@ public class ActualTenderActivityController {
     this.actualTenderActivityService = actualTenderActivityService;
     this.actualTenderControllerRedirectionService = actualTenderControllerRedirectionService;
     this.invitationToTenderParticipantService = invitationToTenderParticipantService;
+    this.updateActualTenderActivityService = updateActualTenderActivityService;
+    this.contractingPerformanceService = contractingPerformanceService;
   }
 
   @GetMapping
@@ -98,8 +108,11 @@ public class ActualTenderActivityController {
         .getForm(actualTenderActivity, invitationToTenderParticipants);
     var backLinkUrl = ReverseRouter.route(on(ActualTenderSummaryController.class).renderActualTenderSummary(scapId));
 
+    var contractingPerformanceWarning = getContractingPerformanceWarning(actualTenderActivity);
+
     return actualTenderDetailFormModelAndView(backLinkUrl)
-        .addObject("form", form);
+        .addObject("form", form)
+        .addObject("contractingPerformanceWarning", contractingPerformanceWarning);
   }
 
   @PostMapping("/{activityId}")
@@ -115,12 +128,15 @@ public class ActualTenderActivityController {
 
     bindingResult = actualTenderActivityFormService.validate(form, bindingResult, actualTender, actualTenderActivity);
 
+    var contractingPerformanceWarning = getContractingPerformanceWarning(actualTenderActivity);
+
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        actualTenderDetailFormModelAndView(backLinkUrl),
+        actualTenderDetailFormModelAndView(backLinkUrl)
+            .addObject("contractingPerformanceWarning", contractingPerformanceWarning),
         form,
         () -> {
-          actualTenderActivityService.updateActualTenderActivity(actualTenderActivity, form);
+          updateActualTenderActivityService.updateActualTenderActivity(actualTenderActivity, form);
           return actualTenderControllerRedirectionService.redirectFromActualTenderActivityForm(scapId, actualTenderActivity);
         }
     );
@@ -132,5 +148,12 @@ public class ActualTenderActivityController {
         .addObject("remunerationModels", RemunerationModel.getRemunerationModels())
         .addObject("contractStages", ContractStage.getContractStages())
         .addObject("scopeTitleMaxLength", ActualTenderActivityFormValidator.MAX_SCOPE_TITLE_LENGTH.toString());
+  }
+
+  private String getContractingPerformanceWarning(ActualTenderActivity actualTenderActivity) {
+    if (contractingPerformanceService.hasContractingPerformance(actualTenderActivity)) {
+      return DELETES_CONTRACTING_PERFORMANCE_WARNING;
+    }
+    return null;
   }
 }

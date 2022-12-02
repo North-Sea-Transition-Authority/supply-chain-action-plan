@@ -39,16 +39,20 @@ backLinkUrl=springUrl(backLinkUrl)
 
     <@fdsRadio.radio
       path="form.contractStage"
-      labelText="What stage is the contract at?"
+      labelText="Contract stage"
       radioItems=contractStages
     />
-
     <@fdsTextInput.textInput
       path="form.invitationToTenderParticipants.inputValue"
       labelText="Invitation to tender participants"
       inputClass="govuk-!-width-two-thirds"
     />
 
+    <#if contractingPerformanceWarning?has_content>
+        <@fdsWarning.warning>
+            ${contractingPerformanceWarning}
+        </@fdsWarning.warning>
+    </#if>
     <@fdsAction.button buttonText="Save and continue"/>
   </@fdsForm.htmlForm>
 </@defaultPage>

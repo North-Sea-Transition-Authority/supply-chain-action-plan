@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -64,12 +63,21 @@ class ContractingPerformanceServiceTest {
   }
 
   @Test
-  void hasContractingPerformance_Empty_AssertCallsRepository() {
+  void hasContractingPerformance_ByContractingPerformanceOverview_AssertCallsRepository() {
     var contractingPerformanceOverview = new ContractingPerformanceOverview();
     when(contractingPerformanceRepository.existsByContractingPerformanceOverview(contractingPerformanceOverview))
         .thenReturn(true);
 
     assertTrue(contractingPerformanceService.hasContractingPerformance(contractingPerformanceOverview));
+  }
+
+  @Test
+  void hasContractingPerformance_ByActualTenderActivity_AssertCallsRepository() {
+    var actualTenderActivity = new ActualTenderActivity(168);
+
+    when(contractingPerformanceRepository.existsByActualTenderActivity(actualTenderActivity)).thenReturn(true);
+
+    assertTrue(contractingPerformanceService.hasContractingPerformance(actualTenderActivity));
   }
 
   @Test
@@ -156,5 +164,14 @@ class ContractingPerformanceServiceTest {
     contractingPerformanceService.deleteContractingPerformance(contractingPerformance);
 
     verify(contractingPerformanceRepository).delete(contractingPerformance);
+  }
+
+  @Test
+  void deleteByContractingPerformance_VerifyDeletes() {
+    var actualTenderActivity = new ActualTenderActivity();
+
+    contractingPerformanceService.deleteByActualTenderActivity(actualTenderActivity);
+
+    verify(contractingPerformanceRepository).deleteByActualTenderActivity(actualTenderActivity);
   }
 }

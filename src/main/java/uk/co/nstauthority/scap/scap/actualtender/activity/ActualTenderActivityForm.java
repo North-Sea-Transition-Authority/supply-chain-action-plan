@@ -3,7 +3,7 @@ package uk.co.nstauthority.scap.scap.actualtender.activity;
 import uk.co.fivium.formlibrary.input.StringInput;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 
-class ActualTenderActivityForm {
+public class ActualTenderActivityForm {
 
   private final StringInput scopeTitle;
   private final StringInput scopeDescription;

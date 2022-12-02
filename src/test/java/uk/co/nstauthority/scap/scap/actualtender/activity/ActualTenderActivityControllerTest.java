@@ -37,6 +37,7 @@ import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.bidparticipants.BidParticipantsController;
 import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTenderController;
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
+import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
@@ -71,6 +72,12 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
   @MockBean
   InvitationToTenderParticipantService invitationToTenderParticipantService;
 
+  @MockBean
+  ContractingPerformanceService contractingPerformanceService;
+
+  @MockBean
+  UpdateActualTenderActivityService updateActualTenderActivityService;
+
   private Scap scap;
   private ScapDetail scapDetail;
   private ActualTender actualTender;
@@ -80,11 +87,12 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
     scap = new Scap(72);
     scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, clock.instant(), 1);
     actualTender = new ActualTender(scapDetail, clock.instant());
+
+    when(scapService.getScapById(scap.getId())).thenReturn(scap);
   }
 
   @Test
   void renderActualTenderActivityForm() throws Exception {
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
 
@@ -110,7 +118,6 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
     var expectedRedirectUrl = ReverseRouter.route(on(BidParticipantsController.class)
         .renderBidParticipantsForm(scap.getId(), createdTenderActivity.getId(), null));
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender)))
@@ -138,7 +145,6 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
     var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderSummaryController.class)
         .renderActualTenderSummary(scap.getId()));
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender)))
@@ -163,7 +169,6 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("form", "testField", "Test field must not be blank"));
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender)))
@@ -195,7 +200,6 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
     var invitationToTenderParticipants = List.of(participant);
     var form = new ActualTenderActivityForm();
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(actualTenderActivityService.getById(actualTenderActivity.getId()))
         .thenReturn(actualTenderActivity);
     when(invitationToTenderParticipantService.getInvitationToTenderParticipants(actualTenderActivity))
@@ -218,6 +222,38 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
   }
 
   @Test
+  void renderExistingActualTenderActivityForm_HasContractingPerformance() throws Exception {
+    var actualTenderActivity = new ActualTenderActivity(45);
+    var participant = new InvitationToTenderParticipant(451);
+    participant.setCompanyName("test company 1");
+    var invitationToTenderParticipants = List.of(participant);
+    var form = new ActualTenderActivityForm();
+
+    when(actualTenderActivityService.getById(actualTenderActivity.getId()))
+        .thenReturn(actualTenderActivity);
+    when(invitationToTenderParticipantService.getInvitationToTenderParticipants(actualTenderActivity))
+        .thenReturn(invitationToTenderParticipants);
+    when(actualTenderActivityFormService.getForm(actualTenderActivity, invitationToTenderParticipants))
+        .thenReturn(form);
+    when(contractingPerformanceService.hasContractingPerformance(actualTenderActivity)).thenReturn(true);
+
+    mockMvc.perform(get(
+        ReverseRouter.route(on(ActualTenderActivityController.class)
+            .renderExistingActualTenderActivityForm(scap.getId(), actualTenderActivity.getId()))))
+        .andExpect(status().isOk())
+        .andExpect(view().name("scap/scap/actualtender/actualTenderActivityDetails"))
+        .andExpect(model().attribute("backLinkUrl", ReverseRouter.route(on(ActualTenderSummaryController.class)
+            .renderActualTenderSummary(scap.getId()))))
+        .andExpect(model().attribute("form", form))
+        .andExpect(model().attribute("remunerationModels", RemunerationModel.getRemunerationModels()))
+        .andExpect(model().attribute("contractStages", ContractStage.getContractStages()))
+        .andExpect(model().attribute("scopeTitleMaxLength",
+            ActualTenderActivityFormValidator.MAX_SCOPE_TITLE_LENGTH.toString()))
+        .andExpect(model().attribute("contractingPerformanceWarning",
+            ActualTenderActivityController.DELETES_CONTRACTING_PERFORMANCE_WARNING));
+  }
+
+  @Test
   void saveExistingActualTenderActivityForm_NoErrors_VerifyUpdates() throws Exception {
     var actualTenderActivity = new ActualTenderActivity(45);
     actualTenderActivity.setContractStage(ContractStage.REQUEST_FOR_INFORMATION);
@@ -226,7 +262,6 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
     var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderSummaryController.class)
         .renderActualTenderSummary(scap.getId()));
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
@@ -242,7 +277,7 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
         .andExpect(status().is3xxRedirection())
         .andExpect(ControllerTestingUtil.redirectUrl(expectedRedirectUrl));
 
-    verify(actualTenderActivityService).updateActualTenderActivity(actualTenderActivity, form);
+    verify(updateActualTenderActivityService).updateActualTenderActivity(actualTenderActivity, form);
   }
 
   @Test
@@ -254,7 +289,6 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
         new FieldError("form", "testField", "test error message")
     );
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(actualTenderActivityService.getById(actualTenderActivity.getId()))
         .thenReturn(actualTenderActivity);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
@@ -279,6 +313,6 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
         .andExpect(model().attribute("scopeTitleMaxLength",
             ActualTenderActivityFormValidator.MAX_SCOPE_TITLE_LENGTH.toString()));
 
-    verify(actualTenderActivityService, never()).updateActualTenderActivity(any(), any());
+    verify(updateActualTenderActivityService, never()).updateActualTenderActivity(any(), any());
   }
 }

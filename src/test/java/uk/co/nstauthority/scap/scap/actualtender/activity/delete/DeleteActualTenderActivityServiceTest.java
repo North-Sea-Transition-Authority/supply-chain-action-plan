@@ -18,6 +18,7 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipantService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContractService;
+import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
 
 @ExtendWith(MockitoExtension.class)
 class DeleteActualTenderActivityServiceTest {
@@ -31,6 +32,9 @@ class DeleteActualTenderActivityServiceTest {
   @Mock
   AwardedContractService awardedContractService;
 
+  @Mock
+  ContractingPerformanceService contractingPerformanceService;
+
   @InjectMocks
   DeleteActualTenderActivityService deleteActualTenderActivityService;
 
@@ -41,8 +45,13 @@ class DeleteActualTenderActivityServiceTest {
     deleteActualTenderActivityService.deleteActualTenderActivity(actualTenderActivity);
 
     var inOrder = inOrder(
-        awardedContractService, invitationToTenderParticipantService, actualTenderActivityService);
+        contractingPerformanceService,
+        awardedContractService,
+        invitationToTenderParticipantService,
+        actualTenderActivityService
+    );
 
+    inOrder.verify(contractingPerformanceService).deleteByActualTenderActivity(actualTenderActivity);
     inOrder.verify(awardedContractService).deleteByActualTenderActivity(actualTenderActivity);
     inOrder.verify(invitationToTenderParticipantService).deleteAllByActualTenderActivity(actualTenderActivity);
     inOrder.verify(actualTenderActivityService).deleteActualTenderActivity(actualTenderActivity);

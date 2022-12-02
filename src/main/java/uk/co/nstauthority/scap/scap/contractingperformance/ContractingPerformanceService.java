@@ -5,6 +5,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 
 @Service
@@ -24,6 +25,10 @@ public class ContractingPerformanceService {
 
   public boolean hasContractingPerformance(ContractingPerformanceOverview contractingPerformanceOverview) {
     return contractingPerformanceRepository.existsByContractingPerformanceOverview(contractingPerformanceOverview);
+  }
+
+  public boolean hasContractingPerformance(ActualTenderActivity actualTenderActivity) {
+    return contractingPerformanceRepository.existsByActualTenderActivity(actualTenderActivity);
   }
 
   public ContractingPerformance getById(Integer contractingPerformanceId) {
@@ -57,5 +62,10 @@ public class ContractingPerformanceService {
   @Transactional
   public void deleteContractingPerformance(ContractingPerformance contractingPerformance) {
     contractingPerformanceRepository.delete(contractingPerformance);
+  }
+
+  @Transactional
+  public void deleteByActualTenderActivity(ActualTenderActivity actualTenderActivity) {
+    contractingPerformanceRepository.deleteByActualTenderActivity(actualTenderActivity);
   }
 }

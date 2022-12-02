@@ -33,6 +33,7 @@ import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTender
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryView;
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryViewService;
+import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
@@ -62,6 +63,9 @@ class DeleteActualTenderActivityControllerTest extends AbstractControllerTest {
 
   @MockBean
   DeleteActualTenderActivityService deleteActualTenderActivityService;
+
+  @MockBean
+  ContractingPerformanceService contractingPerformanceService;
 
   private Scap scap;
   private ActualTenderActivity actualTenderActivity;
@@ -100,6 +104,39 @@ class DeleteActualTenderActivityControllerTest extends AbstractControllerTest {
         .andExpect(model().attribute("backLinkUrl", ReverseRouter.route(on(ActualTenderSummaryController.class)
             .renderActualTenderSummary(scap.getId()))))
         .andExpect(model().attribute("actualTenderActivityView", actualTenderSummaryView));
+  }
+
+  @Test
+  void renderDeleteActualTenderActivityConfirmation_HasContractingPerformance() throws Exception {
+    var actualTenderSummaryView = new ActualTenderSummaryView(
+        scap.getId(),
+        actualTenderActivity.getId(),
+        "test scope title",
+        "test scope description",
+        RemunerationModel.LUMP_SUM,
+        null,
+        ContractStage.REQUEST_FOR_INFORMATION,
+        List.of("company name"),
+        Collections.emptyList(),
+        null
+    );
+
+    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
+    when(actualTenderSummaryViewService.getSingleViewByActualTenderActivity(actualTenderActivity, scap.getId()))
+        .thenReturn(actualTenderSummaryView);
+    when(contractingPerformanceService.hasContractingPerformance(actualTenderActivity)).thenReturn(true);
+
+    mockMvc.perform(get(
+        ReverseRouter.route(on(DeleteActualTenderActivityController.class)
+            .renderDeleteActualTenderActivityConfirmation(scap.getId(), actualTenderActivity.getId()))))
+        .andExpect(status().isOk())
+        .andExpect(view().name("scap/scap/actualtender/deleteActualTender"))
+        .andExpect(model().attribute("backLinkUrl", ReverseRouter.route(on(ActualTenderSummaryController.class)
+            .renderActualTenderSummary(scap.getId()))))
+        .andExpect(model().attribute("actualTenderActivityView", actualTenderSummaryView))
+        .andExpect(model().attribute("contractingPerformanceWarning",
+            DeleteActualTenderActivityController.DELETES_CONTRACTING_PERFORMANCE_WARNING));
   }
 
   @Test
