@@ -41,4 +41,15 @@ public class ScapDetailService {
             String.format("Could not find a ScapDetail for Scap with ID [%d]", scap.getId())
         ));
   }
+
+  public Optional<ScapDetail> getLatestScapDetailByScapId(Integer scapId) {
+    return scapDetailRepository.findFirstByScapIdAndTipFlag(scapId, true);
+  }
+
+  public ScapDetail getLatestScapDetailByScapIdOrThrow(Integer scapId) {
+    return getLatestScapDetailByScapId(scapId).orElseThrow(
+        () -> new ScapEntityNotFoundException(
+            String.format("Could not find a ScapDetail for Scap with ID [%d]", scapId)
+        ));
+  }
 }

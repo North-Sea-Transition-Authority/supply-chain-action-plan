@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -75,6 +76,36 @@ class ScapDetailServiceTest {
     when(scapDetailRepository.findAllByScap(scap)).thenReturn(Collections.emptyList());
 
     assertThatThrownBy(() -> scapDetailService.getLatestScapDetailByScapOrThrow(scap))
+        .isInstanceOf(ScapEntityNotFoundException.class);
+  }
+
+  @Test
+  void getLatestScapDetailByScapId() {
+    var scapDetail = new ScapDetail();
+
+    when(scapDetailRepository.findFirstByScapIdAndTipFlag(scap.getId(), true)).thenReturn(Optional.of(scapDetail));
+
+    var returnedScapDetail = scapDetailService.getLatestScapDetailByScapId(scap.getId());
+
+    assertThat(returnedScapDetail).contains(scapDetail);
+  }
+
+  @Test
+  void getLatestScapDetailByScapIdOrThrow_IsFound_AssertReturns() {
+    var scapDetail = new ScapDetail();
+
+    when(scapDetailRepository.findFirstByScapIdAndTipFlag(scap.getId(), true)).thenReturn(Optional.of(scapDetail));
+
+    var returnedScapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scap.getId());
+
+    assertThat(returnedScapDetail).isEqualTo(scapDetail);
+  }
+
+  @Test
+  void getLatestScapDetailByScapIdOrThrow_NotFound_AssertThrows() {
+    when(scapDetailRepository.findFirstByScapIdAndTipFlag(scap.getId(), true)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> scapDetailService.getLatestScapDetailByScapIdOrThrow(scap.getId()))
         .isInstanceOf(ScapEntityNotFoundException.class);
   }
 }
