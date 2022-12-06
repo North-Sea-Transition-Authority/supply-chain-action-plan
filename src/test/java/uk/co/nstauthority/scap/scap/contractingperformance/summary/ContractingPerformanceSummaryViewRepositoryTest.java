@@ -32,8 +32,8 @@ class ContractingPerformanceSummaryViewRepositoryTest {
 
   @Test
   void getContractingPerformanceSummaryViews_AssertCorrectResult() {
-    var scap = new Scap(59803, Instant.now());
-    var otherScap = new Scap(4598, Instant.now());
+    var scap = new Scap(59803, Instant.now(), null);
+    var otherScap = new Scap(4598, Instant.now(), null);
 
     entityManager.persistAndFlush(scap);
     entityManager.persistAndFlush(otherScap);

@@ -22,13 +22,16 @@ public class Scap {
 
   private Instant createdTimestamp;
 
+  private String reference;
+
   public Scap() {
 
   }
 
-  public Scap(Integer organisationGroupId, Instant createdTimestamp) {
+  public Scap(Integer organisationGroupId, Instant createdTimestamp, String reference) {
     this.organisationGroupId = organisationGroupId;
     this.createdTimestamp = createdTimestamp;
+    this.reference = reference;
   }
 
   @VisibleForTesting
@@ -50,5 +53,9 @@ public class Scap {
 
   public void setOrganisationGroupId(Integer organisationGroupId) {
     this.organisationGroupId = organisationGroupId;
+  }
+
+  public String getReference() {
+    return reference;
   }
 }
