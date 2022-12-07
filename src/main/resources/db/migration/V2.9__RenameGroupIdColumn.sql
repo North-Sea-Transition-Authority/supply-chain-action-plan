@@ -1,1 +1,2 @@
-ALTER TABLE teams RENAME COLUMN group_id TO organisation_group_id;
+ALTER TABLE teams ADD COLUMN organisation_group_id INTEGER;
+ALTER TABLE teams ADD COLUMN display_name VARCHAR(150);
