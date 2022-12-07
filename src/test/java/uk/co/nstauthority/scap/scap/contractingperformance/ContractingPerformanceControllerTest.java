@@ -91,6 +91,7 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
+    when(contractingPerformanceService.getActivitiesWithoutContractingPerformance(activities)).thenReturn(activities);
     when(contractingPerformanceFormService.getScopeTitlesMap(activities)).thenReturn(scopeTitlesMap);
 
     mockMvc.perform(get(
@@ -133,6 +134,7 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
+    when(contractingPerformanceService.getActivitiesWithoutContractingPerformance(activities)).thenReturn(activities);
     when(contractingPerformanceFormService.getScopeTitlesMap(activities)).thenReturn(scopeTitlesMap);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
@@ -199,6 +201,7 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
+    when(contractingPerformanceService.getActivitiesWithoutContractingPerformance(activities)).thenReturn(activities);
     when(contractingPerformanceFormService.getScopeTitlesMap(activities)).thenReturn(scopeTitlesMap);
     when(contractingPerformanceFormService.validate(eq(form), any(BindingResult.class), eq(activities)))
         .thenReturn(bindingResultWithErrors);
@@ -267,6 +270,8 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
     when(contractingPerformanceService.getById(contractingPerformanceId)).thenReturn(contractingPerformance);
+    when(contractingPerformanceService.getActivitiesWithoutContractingPerformancesWithCurrent(activities, contractingPerformance))
+        .thenReturn(activities);
     when(contractingPerformanceFormService.getForm(contractingPerformance)).thenReturn(form);
     when(contractingPerformanceFormService.getScopeTitlesMap(activities)).thenReturn(scopeTitlesMap);
 
@@ -335,6 +340,8 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceService.getById(contractingPerformanceId)).thenReturn(contractingPerformance);
+    when(contractingPerformanceService.getActivitiesWithoutContractingPerformancesWithCurrent(activities, contractingPerformance))
+        .thenReturn(activities);
     when(contractingPerformanceFormService.getScopeTitlesMap(activities)).thenReturn(scopeTitlesMap);
     when(contractingPerformanceFormService.validate(eq(form), any(BindingResult.class), eq(activities)))
         .thenReturn(bindingResultWithErrors);

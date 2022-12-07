@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.scap.contractingperformance;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
+import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperformance.HasContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryController;
@@ -64,7 +66,9 @@ public class ContractingPerformanceController {
     var contractedActivities = actualTender
         .map(actualTenderActivityService::getActivitiesWithContractAwarded)
         .orElse(Collections.emptyList());
-    var scopeTitlesMap = contractingPerformanceFormService.getScopeTitlesMap(contractedActivities);
+
+    var scopeTitlesMap = getScopeTitlesMap(contractedActivities);
+
     return contractingPerformanceFormModelAndView(scopeTitlesMap,
         getBackLinkUrl(scapId, contractingPerformanceOverview));
   }
@@ -80,7 +84,8 @@ public class ContractingPerformanceController {
     var contractedActivities = actualTender
         .map(actualTenderActivityService::getActivitiesWithContractAwarded)
         .orElse(Collections.emptyList());
-    var scopeTitlesMap = contractingPerformanceFormService.getScopeTitlesMap(contractedActivities);
+
+    var scopeTitlesMap = getScopeTitlesMap(contractedActivities);
 
     bindingResult = contractingPerformanceFormService.validate(form, bindingResult, contractedActivities);
 
@@ -110,7 +115,8 @@ public class ContractingPerformanceController {
     var contractingPerformance = contractingPerformanceService.getById(contractingPerformanceId);
 
     var form = contractingPerformanceFormService.getForm(contractingPerformance);
-    var scopeTitlesMap = contractingPerformanceFormService.getScopeTitlesMap(contractedActivities);
+
+    var scopeTitlesMap = getScopeTitlesMapWithCurrent(contractedActivities, contractingPerformance);
 
     return contractingPerformanceFormModelAndView(scopeTitlesMap,
         ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
@@ -132,7 +138,7 @@ public class ContractingPerformanceController {
         .orElse(Collections.emptyList());
     var contractingPerformance = contractingPerformanceService.getById(contractingPerformanceId);
 
-    var scopeTitlesMap = contractingPerformanceFormService.getScopeTitlesMap(contractedActivities);
+    var scopeTitlesMap = getScopeTitlesMapWithCurrent(contractedActivities, contractingPerformance);
 
     bindingResult = contractingPerformanceFormService.validate(form, bindingResult, contractedActivities);
 
@@ -157,6 +163,19 @@ public class ContractingPerformanceController {
     }
     return ReverseRouter.route(on(HasContractingPerformanceController.class)
         .renderHasContractingPerformanceForm(scapId));
+  }
+
+  private Map<String, String> getScopeTitlesMap(List<ActualTenderActivity> contractedActivities) {
+    var activitiesWithoutContractingPerformance = contractingPerformanceService
+        .getActivitiesWithoutContractingPerformance(contractedActivities);
+    return contractingPerformanceFormService.getScopeTitlesMap(activitiesWithoutContractingPerformance);
+  }
+
+  private Map<String, String> getScopeTitlesMapWithCurrent(List<ActualTenderActivity> contractedActivities,
+                                                           ContractingPerformance contractingPerformance) {
+    var activitiesWithoutContractingPerformance = contractingPerformanceService
+        .getActivitiesWithoutContractingPerformancesWithCurrent(contractedActivities, contractingPerformance);
+    return contractingPerformanceFormService.getScopeTitlesMap(activitiesWithoutContractingPerformance);
   }
 
   private ModelAndView contractingPerformanceFormModelAndView(Map<String, String> scopeTitlesMap,

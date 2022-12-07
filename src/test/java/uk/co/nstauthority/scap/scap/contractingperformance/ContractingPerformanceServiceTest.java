@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,6 +61,18 @@ class ContractingPerformanceServiceTest {
 
     assertThatThrownBy(() -> contractingPerformanceService.getById(contractingPerformanceId))
         .isInstanceOf(ScapEntityNotFoundException.class);
+  }
+
+  @Test
+  void getAllByActualTenderActivities_AssertCallsRepository() {
+    var activities = List.of(new ActualTenderActivity(91));
+    var contractingPerformances = List.of(new ContractingPerformance(1131));
+
+    when(contractingPerformanceRepository.getAllByActualTenderActivityIn(activities)).thenReturn(contractingPerformances);
+
+    var returnedContractingPerformances = contractingPerformanceService.getAllByActualTenderActivities(activities);
+
+    assertThat(returnedContractingPerformances).isEqualTo(contractingPerformances);
   }
 
   @Test
@@ -173,5 +186,48 @@ class ContractingPerformanceServiceTest {
     contractingPerformanceService.deleteByActualTenderActivity(actualTenderActivity);
 
     verify(contractingPerformanceRepository).deleteByActualTenderActivity(actualTenderActivity);
+  }
+
+  @Test
+  void getActivitiesWithoutContractingPerformance() {
+    var activitiesWithContractAwarded = List.of(
+        new ActualTenderActivity(49), new ActualTenderActivity(52)
+    );
+    var contractingPerformance = new ContractingPerformance(58);
+    contractingPerformance.setActualTenderActivity(activitiesWithContractAwarded.get(0));
+    var contractingPerformances = List.of(contractingPerformance);
+
+    when(contractingPerformanceRepository.getAllByActualTenderActivityIn(activitiesWithContractAwarded))
+        .thenReturn(contractingPerformances);
+
+    var activitiesWithoutContractingPerformance = contractingPerformanceService
+        .getActivitiesWithoutContractingPerformance(activitiesWithContractAwarded);
+
+    assertThat(activitiesWithoutContractingPerformance).containsExactly(
+        activitiesWithContractAwarded.get(1)
+    );
+  }
+
+  @Test
+  void getActivitiesWithoutContractingPerformancesWithCurrent() {
+    var activitiesWithContractAwarded = List.of(
+        new ActualTenderActivity(49), new ActualTenderActivity(52), new ActualTenderActivity(54)
+    );
+    var contractingPerformance = new ContractingPerformance(58);
+    contractingPerformance.setActualTenderActivity(activitiesWithContractAwarded.get(0));
+    var currentContractingPerformance = new ContractingPerformance(73);
+    currentContractingPerformance.setActualTenderActivity(activitiesWithContractAwarded.get(2));
+    var contractingPerformances = List.of(contractingPerformance, currentContractingPerformance);
+
+    when(contractingPerformanceRepository.getAllByActualTenderActivityIn(activitiesWithContractAwarded))
+        .thenReturn(contractingPerformances);
+
+    var activitiesWithoutContractingPerformance = contractingPerformanceService
+        .getActivitiesWithoutContractingPerformancesWithCurrent(activitiesWithContractAwarded, currentContractingPerformance);
+
+    assertThat(activitiesWithoutContractingPerformance).containsExactly(
+        activitiesWithContractAwarded.get(1),
+        activitiesWithContractAwarded.get(2)
+    );
   }
 }

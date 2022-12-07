@@ -1,6 +1,8 @@
 package uk.co.nstauthority.scap.scap.contractingperformance;
 
 import java.time.Clock;
+import java.util.List;
+import java.util.Objects;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,10 @@ public class ContractingPerformanceService {
             "Could not find ContractingPerformance with ID [%s]".formatted(contractingPerformanceId)));
   }
 
+  public List<ContractingPerformance> getAllByActualTenderActivities(List<ActualTenderActivity> activities) {
+    return contractingPerformanceRepository.getAllByActualTenderActivityIn(activities);
+  }
+
   @Transactional
   void createContractingPerformance(ContractingPerformanceOverview contractingPerformanceOverview,
                                     ContractingPerformanceForm form) {
@@ -67,5 +73,30 @@ public class ContractingPerformanceService {
   @Transactional
   public void deleteByActualTenderActivity(ActualTenderActivity actualTenderActivity) {
     contractingPerformanceRepository.deleteByActualTenderActivity(actualTenderActivity);
+  }
+
+  List<ActualTenderActivity> getActivitiesWithoutContractingPerformance(
+      List<ActualTenderActivity> contractedActivities) {
+    var activityIdsWithContractingPerformance = getActivityIdsWithContractingPerformances(contractedActivities);
+    return contractedActivities.stream()
+        .filter(actualTenderActivity -> !activityIdsWithContractingPerformance.contains(actualTenderActivity.getId()))
+        .toList();
+  }
+
+  List<ActualTenderActivity> getActivitiesWithoutContractingPerformancesWithCurrent(
+      List<ActualTenderActivity> contractedActivities, ContractingPerformance contractingPerformance) {
+    var activityIdsWithContractingPerformance = getActivityIdsWithContractingPerformances(contractedActivities);
+    return contractedActivities.stream()
+        .filter(actualTenderActivity -> !activityIdsWithContractingPerformance.contains(actualTenderActivity.getId())
+            || Objects.equals(actualTenderActivity.getId(), contractingPerformance.getActualTenderActivity().getId()))
+        .toList();
+  }
+
+  private List<Integer> getActivityIdsWithContractingPerformances(List<ActualTenderActivity> activities) {
+    return getAllByActualTenderActivities(activities)
+        .stream()
+        .map(ContractingPerformance::getActualTenderActivity)
+        .map(ActualTenderActivity::getId)
+        .toList();
   }
 }

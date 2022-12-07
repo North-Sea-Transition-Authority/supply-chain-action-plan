@@ -15,9 +15,19 @@ backLinkUrl=springUrl(backLinkUrl)
     <@fdsSelect.select
       path="form.actualTenderActivityId"
       labelText="Scope title"
-      hintText="If your scope is not shown then you must add it as an actual tender activity at \"Contract has been awarded\" stage"
       options=scopeTitlesMap
     />
+    <@fdsDetails.summaryDetails summaryTitle="The scope title I want to provide contracting performance for is not shown">
+      <p class="govuk-body">
+        If your scope is not shown then you must add it as an actual tendering activity at "Contract has been awarded" stage.
+      </p>
+      <p class="govuk-body">
+        You can only provide a single contracting performance for each actual tendering activity.
+      </p>
+      <p class="govuk-body">
+        If you have split a tender into multiple contract awards, then you will need to provide an actual tender activity for each award individually.
+      </p>
+    </@fdsDetails.summaryDetails>
     <@fdsTextInput.textInput
       path="form.outturnCost.inputValue"
       labelText="Outturn cost"
