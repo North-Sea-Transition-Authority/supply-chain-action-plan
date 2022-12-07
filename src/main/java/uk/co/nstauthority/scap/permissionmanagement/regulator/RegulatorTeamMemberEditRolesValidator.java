@@ -48,7 +48,6 @@ class RegulatorTeamMemberEditRolesValidator implements SmartValidator {
         .stream()
         .map(RegulatorTeamRole::valueOf)
         .toList();
-
     if (!hasAccessManagerRole(validatorDto.team(), validatorDto.teamMember(), newRoles)) {
       errors.rejectValue(ROLES_FIELD_NAME, ROLES_NO_ACCESS_MANAGER_ERROR_CODE, ROLES_NO_ACCESS_MANAGER_ERROR_MESSAGE);
     }

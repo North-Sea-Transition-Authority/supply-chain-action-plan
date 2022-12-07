@@ -5,10 +5,6 @@ import uk.co.nstauthority.scap.error.exception.IllegalUtilClassInstantiationExce
 
 public class TeamTestUtil {
 
-  public static TeamView createTeamView(Team team) {
-    return new TeamView(new TeamId(team.getUuid()), team.getTeamType());
-  }
-
   private TeamTestUtil() {
     throw new IllegalUtilClassInstantiationException(this.getClass());
   }
@@ -22,6 +18,8 @@ public class TeamTestUtil {
     private UUID uuid = UUID.randomUUID();
     private TeamType teamType = TeamType.REGULATOR;
 
+    private String teamName = "TestTeam";
+
     public TeamBuilder withId(UUID uuid) {
       this.uuid = uuid;
       return this;
@@ -32,9 +30,15 @@ public class TeamTestUtil {
       return this;
     }
 
+    public TeamBuilder withTeamName(String teamName) {
+      this.teamName = teamName;
+      return this;
+    }
+
     public Team build() {
       var team = new Team(uuid);
       team.setTeamType(teamType);
+      team.setDisplayName(teamName);
       return team;
     }
   }

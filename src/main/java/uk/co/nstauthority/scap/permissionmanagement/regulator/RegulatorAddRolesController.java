@@ -24,7 +24,6 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRolesForm;
 
 @Controller
 @RequestMapping("/permission-management/regulator/{teamId}")
-@RegulatorRolesAllowed(roles = RegulatorTeamRole.ACCESS_MANAGER)
 class RegulatorAddRolesController extends AbstractRegulatorPermissionManagement {
 
   private final EnergyPortalUserService energyPortalUserService;

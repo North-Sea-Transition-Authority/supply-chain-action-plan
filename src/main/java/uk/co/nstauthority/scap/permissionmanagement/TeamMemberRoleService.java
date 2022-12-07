@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
-import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 
 @Service
 public class TeamMemberRoleService {

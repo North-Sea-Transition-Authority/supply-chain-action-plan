@@ -34,6 +34,7 @@ public abstract class AbstractControllerTest {
   protected MockMvc mockMvc;
 
   @MockBean
+  protected
   UserDetailService userDetailService;
 
   @MockBean

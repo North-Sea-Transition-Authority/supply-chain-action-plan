@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamView;
 import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,7 +36,7 @@ class TeamMemberViewServiceTest {
     var team = new Team(UUID.randomUUID());
     var wuaId = 100L;
 
-    var teamView = new TeamView(new TeamId(team.getUuid()), team.getTeamType());
+    var teamView = TeamView.fromTeam(team);
 
     var teamMember = new TeamMember(new WebUserAccountId(wuaId), teamView,
         Set.of(RegulatorTeamRole.ACCESS_MANAGER, RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER));
@@ -86,7 +87,7 @@ class TeamMemberViewServiceTest {
     var team = new Team(UUID.randomUUID());
     var wuaId = 100L;
 
-    var teamView = new TeamView(new TeamId(team.getUuid()), team.getTeamType());
+    var teamView = TeamView.fromTeam(team);
 
     var teamMember = new TeamMember(new WebUserAccountId(wuaId), teamView,
         Set.of(RegulatorTeamRole.ACCESS_MANAGER, RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER));

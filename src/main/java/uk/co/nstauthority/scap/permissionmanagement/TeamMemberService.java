@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamView;
 
 @Service
 public class TeamMemberService {
@@ -59,7 +61,7 @@ public class TeamMemberService {
   }
 
   private TeamView createTeamView(Team team) {
-    return new TeamView(new TeamId(team.getUuid()), team.getTeamType());
+    return new TeamView(new TeamId(team.getUuid()), team.getTeamType(), team.getDisplayName());
   }
 
   public boolean isMemberOfTeam(TeamId teamId, ServiceUserDetail user) {
@@ -74,6 +76,7 @@ public class TeamMemberService {
     return roles.stream()
         .map(teamMemberRole -> switch (team.getTeamType()) {
           case REGULATOR -> RegulatorTeamRole.valueOf(teamMemberRole.getRole());
+          case INDUSTRY -> IndustryTeamRole.valueOf(teamMemberRole.getRole());
         })
         .collect(Collectors.toSet());
   }

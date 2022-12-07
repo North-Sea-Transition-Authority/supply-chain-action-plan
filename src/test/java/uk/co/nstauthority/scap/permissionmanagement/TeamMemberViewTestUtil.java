@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.UUID;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.error.exception.IllegalUtilClassInstantiationException;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamView;
 
 public class TeamMemberViewTestUtil {
 
@@ -21,6 +22,9 @@ public class TeamMemberViewTestUtil {
     private WebUserAccountId wuaId = new WebUserAccountId(1L);
     private TeamId teamId = new TeamId(UUID.randomUUID());
     private TeamType teamType = TeamType.REGULATOR;
+
+    private String teamName = "Test Regulator Team";
+
     private String title = "Mr";
     private String firstName = "Forename";
     private String lastName = "Surname";
@@ -82,7 +86,7 @@ public class TeamMemberViewTestUtil {
     }
 
     public TeamMemberView build() {
-      return new TeamMemberView(wuaId, new TeamView(teamId, teamType), title, firstName, lastName, contactEmail,
+      return new TeamMemberView(wuaId, new TeamView(teamId, teamType, teamName), title, firstName, lastName, contactEmail,
           contactNumber, roles);
     }
   }

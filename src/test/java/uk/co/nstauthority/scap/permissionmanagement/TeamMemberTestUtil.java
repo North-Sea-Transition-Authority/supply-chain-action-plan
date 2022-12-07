@@ -6,6 +6,7 @@ import java.util.UUID;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.error.exception.IllegalUtilClassInstantiationException;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamView;
 
 public class TeamMemberTestUtil {
 
@@ -23,6 +24,8 @@ public class TeamMemberTestUtil {
     private Set<TeamRole> teamRoles = new HashSet<>();
     private TeamId teamId = new TeamId(UUID.randomUUID());
     private TeamType teamType = TeamType.REGULATOR;
+
+    private String teamName = "Test Team";
 
     public TeamMemberBuilder withWebUserAccountId(long webUserAccountId) {
       this.webUserAccountId = new WebUserAccountId(webUserAccountId);
@@ -53,7 +56,7 @@ public class TeamMemberTestUtil {
       if (teamRoles.isEmpty()) {
         teamRoles.add(RegulatorTeamRole.ACCESS_MANAGER);
       }
-      return new TeamMember(webUserAccountId, new TeamView(teamId, teamType), teamRoles);
+      return new TeamMember(webUserAccountId, new TeamView(teamId, teamType, teamName), teamRoles);
     }
 
   }

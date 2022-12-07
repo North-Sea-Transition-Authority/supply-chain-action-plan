@@ -95,19 +95,19 @@ public class EnergyPortalUserService {
   public EnergyPortalUserDto getEnergyPortalUser(WebUserAccountId webUserAccountId) {
     var energyPortalUser = findByWuaId(webUserAccountId)
         .orElseThrow(() -> new ScapEntityNotFoundException(
-            "No Energy Portal user with WUA_ID %s could be found".formatted(webUserAccountId)
+            "No Energy Portal user with WUA_ID: %s could be found".formatted(webUserAccountId)
         ));
 
     if (energyPortalUser.isSharedAccount()) {
       throw new EnergyPortalBadRequestException(
-          "Energy Portal user with WUA_ID %s is a shared account and is not allowed to be added to this service"
+          "Energy Portal user with WUA_ID: %s is a shared account and is not allowed to be added to this service"
               .formatted(webUserAccountId)
       );
     }
 
     if (!energyPortalUser.canLogin()) {
       throw new EnergyPortalBadRequestException(
-          (" Energy Portal user with WUA_ID %s does not have login access to the Energy Portal " +
+          ("Energy Portal user with WUA_ID: %s does not have login access to the Energy Portal " +
               "and is not allowed to be added to this service")
               .formatted(webUserAccountId)
       );

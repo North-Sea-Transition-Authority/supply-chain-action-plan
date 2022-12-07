@@ -12,8 +12,8 @@ import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRoleService;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberService;
-import uk.co.nstauthority.scap.permissionmanagement.TeamService;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 @Service
 class RegulatorTeamService {

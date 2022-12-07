@@ -59,7 +59,7 @@ public class RegulatorTeamManagementController {
 
     var user = userDetailService.getUserDetail();
 
-    var modelAndView = new ModelAndView("scap/permissionmanagement/regulator/regulatorTeamMembers")
+    var modelAndView = new ModelAndView("scap/permissionmanagement/teamMembers")
         .addObject("pageTitle", "Manage %s".formatted(customerConfigurationProperties.mnemonic()))
         .addObject("teamName", customerConfigurationProperties.mnemonic())
         .addObject("teamRoles", RegulatorTeamRole.values())

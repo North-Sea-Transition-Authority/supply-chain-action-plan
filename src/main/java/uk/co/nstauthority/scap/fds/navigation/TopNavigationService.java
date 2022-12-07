@@ -6,14 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
-import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamManagementController;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamManagementController;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @Service
 public class TopNavigationService {
 
   public static final String TEAM_MANAGEMENT_NAVIGATION_ITEM_TITLE = "Manage teams";
-
   public static final String WORK_AREA_TITLE = "Work area";
 
   public List<TopNavigationItem> getTopNavigationItems() {
@@ -25,7 +24,7 @@ public class TopNavigationService {
 
     navigationItems.add(
         new TopNavigationItem(TEAM_MANAGEMENT_NAVIGATION_ITEM_TITLE,
-            ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberListRedirect()))
+            ReverseRouter.route(on(TeamManagementController.class).renderTeamList()))
     );
 
     return navigationItems;

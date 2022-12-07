@@ -1,6 +1,5 @@
 package uk.co.nstauthority.scap.permissionmanagement;
 
-import java.util.Objects;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,6 +23,12 @@ public class Team {
   @Enumerated(EnumType.STRING)
   private TeamType teamType;
 
+  @Column(name = "display_name")
+  private String displayName;
+
+  @Column(name = "organisation_group_id")
+  private int energyPortalOrgGroupId;
+
   public Team() {
   }
 
@@ -41,5 +46,21 @@ public class Team {
 
   public void setTeamType(TeamType teamType) {
     this.teamType = teamType;
+  }
+
+  public String getDisplayName() {
+    return displayName;
+  }
+
+  public void setDisplayName(String displayName) {
+    this.displayName = displayName;
+  }
+
+  public int getEnergyPortalOrgGroupId() {
+    return energyPortalOrgGroupId;
+  }
+
+  public void setEnergyPortalOrgGroupId(int groupId) {
+    this.energyPortalOrgGroupId = groupId;
   }
 }

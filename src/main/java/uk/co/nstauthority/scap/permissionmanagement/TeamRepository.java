@@ -8,7 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-interface TeamRepository extends CrudRepository<Team, UUID> {
+public interface TeamRepository extends CrudRepository<Team, UUID> {
 
   Optional<Team> findByUuidAndTeamType(UUID uuid, TeamType teamType);
 
@@ -21,5 +21,16 @@ interface TeamRepository extends CrudRepository<Team, UUID> {
       """
   )
   List<Team> findAllTeamsOfTypeThatUserIsMemberOf(Long wuaId, TeamType teamType);
+
+  @Query(
+      """
+      SELECT DISTINCT tmr.team
+      FROM TeamMemberRole tmr
+      WHERE tmr.wuaId = :wuaId
+      """
+  )
+  List<Team> findAllTeamsThatUserIsMemberOf(Long wuaId);
+
+  Optional<Team> findByEnergyPortalOrgGroupId(int energyPortalOrgGroupId);
 
 }

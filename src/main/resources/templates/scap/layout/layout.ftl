@@ -73,27 +73,6 @@
       </@fdsHeader.header>
   </#assign>
 
-  <#assign headerContent>
-      <@fdsHeader.header
-      homePageUrl=serviceHomeUrl
-      serviceUrl=serviceHomeUrl
-      logoProductText=customerMnemonic
-      headerNav=true
-      serviceName=serviceName
-      headerLogo="GOV_CREST"
-      >
-        <#if loggedInUser?has_content>
-          <@fdsHeader.headerNavigation>
-            <@fdsHeader.headerNavigationItem
-            itemText=loggedInUser.displayName()
-            itemActive=false
-            />
-            <@fdsHeader.headerNavigationSignOutButton formUrl=springUrl("/logout") buttonText="sign out"/>
-          </@fdsHeader.headerNavigation>
-        </#if>
-      </@fdsHeader.header>
-  </#assign>
-
   <@fdsDefaultPageTemplate
     htmlTitle=htmlTitle
     serviceName=serviceName

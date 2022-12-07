@@ -13,6 +13,7 @@ import uk.co.nstauthority.scap.fds.navigation.TopNavigationItem;
 import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamManagementController;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamManagementController;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,7 +39,7 @@ class TopNavigationServiceTest {
             Tuple.tuple(
                 TopNavigationService.TEAM_MANAGEMENT_NAVIGATION_ITEM_TITLE,
                 StringUtils.stripEnd(
-                    ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberListRedirect()), "/")
+                    ReverseRouter.route(on(TeamManagementController.class).renderTeamList()), "/")
             )
         );
   }

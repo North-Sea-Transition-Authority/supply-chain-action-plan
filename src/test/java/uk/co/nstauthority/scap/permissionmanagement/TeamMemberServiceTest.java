@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.permissionmanagement;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,7 +18,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
+import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamView;
 
 @ExtendWith(MockitoExtension.class)
 class TeamMemberServiceTest {
@@ -48,7 +51,7 @@ class TeamMemberServiceTest {
 
     var result = teamMemberService.getTeamMembers(team);
 
-    var teamView = new TeamView(new TeamId(team.getUuid()), team.getTeamType());
+    var teamView = TeamView.fromTeam(team);
 
     var expectedTeamMember = new TeamMember(new WebUserAccountId(1L), teamView, Set.of(RegulatorTeamRole.ACCESS_MANAGER,
         RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER));
@@ -115,6 +118,14 @@ class TeamMemberServiceTest {
   }
 
   @Test
+  void getTeamMemberOrThrow_noTeamMemberThrows() {
+    var team = TeamTestUtil.Builder().build();
+    var webUserAccountId = new WebUserAccountId(100L);
+    assertThrows(ScapEntityNotFoundException.class,
+        () -> teamMemberService.getTeamMemberOrThrow(team, webUserAccountId));
+  }
+
+  @Test
   void getTeamMembers_whenTeamMemberHasMultipleRoles_thenRolesMappedCorrectly() {
 
     var team = TeamTestUtil.Builder().build();
@@ -167,7 +178,7 @@ class TeamMemberServiceTest {
         .withWebUserAccountId(wuaId.id())
         .build();
 
-    var teamView = new TeamView(new TeamId(team.getUuid()), team.getTeamType());
+    var teamView = TeamView.fromTeam(team);
 
     when(teamMemberRoleRepository.findAllByTeamAndWuaId(team, wuaId.id()))
         .thenReturn(List.of(role));

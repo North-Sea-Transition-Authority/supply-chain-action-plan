@@ -1,0 +1,1 @@
+ALTER TABLE teams RENAME COLUMN group_id TO organisation_group_id;

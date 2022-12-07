@@ -1,7 +1,9 @@
 package uk.co.nstauthority.scap.energyportal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -19,6 +21,8 @@ import uk.co.fivium.energyportalapi.client.user.UserApi;
 import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
 import uk.co.nstauthority.scap.branding.ServiceBrandingConfigurationProperties;
 import uk.co.nstauthority.scap.branding.ServiceConfigurationProperties;
+import uk.co.nstauthority.scap.error.exception.EnergyPortalBadRequestException;
+import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class EnergyPortalUserServiceTest {
@@ -251,5 +255,77 @@ class EnergyPortalUserServiceTest {
     )).thenReturn(Optional.empty());
 
     assertThat(energyPortalUserService.findByWuaId(webUserAccountId)).isEmpty();
+  }
+
+  @Test
+  void getEnergyPortalUser_whenNotFound_thenScapException() {
+    var webUserAccountId = new WebUserAccountId(123L);
+    var userProjectionRoot = EnergyPortalUserService.USER_PROJECTION_ROOT;
+
+    when(userApi.findUserById(
+        eq(webUserAccountId.toInt()),
+        eq(userProjectionRoot),
+        anyString(),
+        anyString()
+    )).thenReturn(Optional.empty());
+
+    assertThrowsExactly(ScapEntityNotFoundException.class,
+        () -> energyPortalUserService.getEnergyPortalUser(webUserAccountId));
+  }
+
+  @Test
+  void getEnergyPortalUser_whenSharedAccount_thenEPAException() {
+    var webUserAccountId = new WebUserAccountId(123L);
+    var userProjectionRoot = EnergyPortalUserService.USER_PROJECTION_ROOT;
+    var expectedUser = EpaUserTestUtil.Builder()
+        .isSharedAccount(true)
+        .build();
+
+    when(userApi.findUserById(
+        eq(webUserAccountId.toInt()),
+        eq(userProjectionRoot),
+        anyString(),
+        anyString()
+    )).thenReturn(Optional.of(expectedUser));
+
+    assertThrowsExactly(EnergyPortalBadRequestException.class,
+        () -> energyPortalUserService.getEnergyPortalUser(webUserAccountId));
+  }
+
+  @Test
+  void getEnergyPortalUser_whenDisabled_thenEPAException() {
+    var webUserAccountId = new WebUserAccountId(123L);
+    var userProjectionRoot = EnergyPortalUserService.USER_PROJECTION_ROOT;
+    var expectedUser = EpaUserTestUtil.Builder()
+        .canLogin(false)
+        .build();
+
+    when(userApi.findUserById(
+        eq(webUserAccountId.toInt()),
+        eq(userProjectionRoot),
+        anyString(),
+        anyString()
+    )).thenReturn(Optional.of(expectedUser));
+
+    assertThrowsExactly(EnergyPortalBadRequestException.class,
+        () -> energyPortalUserService.getEnergyPortalUser(webUserAccountId));
+  }
+
+  @Test
+  void getEnergyPortalUser_whenSharedAccount_thenScapException() {
+    var webUserAccountId = new WebUserAccountId(123L);
+    var userProjectionRoot = EnergyPortalUserService.USER_PROJECTION_ROOT;
+    var expectedUser = EpaUserTestUtil.Builder()
+        .build();
+
+    when(userApi.findUserById(
+        eq(webUserAccountId.toInt()),
+        eq(userProjectionRoot),
+        anyString(),
+        anyString()
+    )).thenReturn(Optional.of(expectedUser));
+
+   assertThat(energyPortalUserService.getEnergyPortalUser(webUserAccountId).forename())
+       .isEqualTo(expectedUser.getForename());
   }
 }

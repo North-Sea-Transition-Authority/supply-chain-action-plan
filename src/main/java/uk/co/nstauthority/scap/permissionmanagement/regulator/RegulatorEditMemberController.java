@@ -25,7 +25,6 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamRoleUtil;
 
 @Controller
 @RequestMapping("/permission-management/regulator/{teamId}/edit")
-@RegulatorRolesAllowed(roles = {RegulatorTeamRole.ACCESS_MANAGER})
 public class RegulatorEditMemberController extends AbstractRegulatorPermissionManagement {
   private final TeamMemberService teamMemberService;
   private final TeamMemberViewService teamMemberViewService;

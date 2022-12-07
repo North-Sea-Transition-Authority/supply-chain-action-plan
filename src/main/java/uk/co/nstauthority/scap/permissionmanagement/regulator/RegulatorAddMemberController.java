@@ -23,7 +23,6 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 
 @Controller
 @RequestMapping("/permission-management/regulator/{teamId}")
-@RegulatorRolesAllowed(roles = RegulatorTeamRole.ACCESS_MANAGER)
 class RegulatorAddMemberController extends AbstractRegulatorPermissionManagement {
 
   private final CustomerConfigurationProperties customerConfigurationProperties;

@@ -2,7 +2,8 @@ package uk.co.nstauthority.scap.permissionmanagement;
 
 public enum TeamType {
 
-  REGULATOR("Regulator", "Team for managing regulator users", 10);
+  REGULATOR("Regulator", "Teams for managing regulator users", 10),
+  INDUSTRY("Industry", "Teams for managing industry users", 20);
 
   private final String displayText;
   private final String hintText;

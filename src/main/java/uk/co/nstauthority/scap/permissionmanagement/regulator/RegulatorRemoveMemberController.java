@@ -20,7 +20,6 @@ import uk.co.nstauthority.scap.util.DeletionSuccessBannerUtil;
 
 @Controller
 @RequestMapping("/permission-management/regulator/{teamId}/remove")
-@RegulatorRolesAllowed(roles = {RegulatorTeamRole.ACCESS_MANAGER})
 public class RegulatorRemoveMemberController extends AbstractRegulatorPermissionManagement {
 
   private final TeamMemberService teamMemberService;
