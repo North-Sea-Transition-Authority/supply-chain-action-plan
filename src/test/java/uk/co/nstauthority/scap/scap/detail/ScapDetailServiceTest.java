@@ -19,6 +19,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
+import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.utils.EntityTestingUtil;
@@ -28,6 +30,9 @@ class ScapDetailServiceTest {
 
   @Mock
   ScapDetailRepository scapDetailRepository;
+
+  @Mock
+  UserDetailService userDetailService;
 
   @Mock
   Clock clock = Clock.fixed(Instant.ofEpochSecond(1667576106), ZoneId.systemDefault());
@@ -44,6 +49,7 @@ class ScapDetailServiceTest {
 
   @Test
   void createDraftScapDetail_verifySaves() {
+    when(userDetailService.getUserDetail()).thenReturn(getUserDetail());
     scapDetailService.createDraftScapDetail(scap);
 
     var argumentCaptor = ArgumentCaptor.forClass(ScapDetail.class);
@@ -56,6 +62,7 @@ class ScapDetailServiceTest {
     assertThat(scapDetail.getScap()).isEqualTo(scap);
     assertThat(scapDetail.getStatus()).isEqualTo(ScapDetailStatus.DRAFT);
     assertThat(scapDetail.getVersionNumber()).isEqualTo(1);
+    assertThat(scapDetail.getCreatedByUserId()).isEqualTo(1000);
   }
 
   @Test
@@ -107,5 +114,9 @@ class ScapDetailServiceTest {
 
     assertThatThrownBy(() -> scapDetailService.getLatestScapDetailByScapIdOrThrow(scap.getId()))
         .isInstanceOf(ScapEntityNotFoundException.class);
+  }
+
+  private ServiceUserDetail getUserDetail() {
+    return new ServiceUserDetail(1000L, 1000L, "Test", "Testerson", "test@test.com");
   }
 }

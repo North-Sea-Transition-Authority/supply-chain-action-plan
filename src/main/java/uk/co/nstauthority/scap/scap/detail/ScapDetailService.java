@@ -5,6 +5,7 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 
@@ -12,19 +13,26 @@ import uk.co.nstauthority.scap.scap.scap.Scap;
 public class ScapDetailService {
 
   private final ScapDetailRepository scapDetailRepository;
+
+  private final UserDetailService userDetailService;
   private final Clock clock;
 
   @Autowired
-  public ScapDetailService(ScapDetailRepository scapDetailRepository, Clock clock) {
+  public ScapDetailService(ScapDetailRepository scapDetailRepository, UserDetailService userDetailService, Clock clock) {
     this.scapDetailRepository = scapDetailRepository;
+    this.userDetailService = userDetailService;
     this.clock = clock;
   }
 
   @Transactional
   public void createDraftScapDetail(Scap scap) {
     var isLatestScapDetail = true;
-    // TODO SCAP2022-148: replace with actual createdByUserId (1) with actual user ID
-    var scapDetail = new ScapDetail(scap, 1, isLatestScapDetail, ScapDetailStatus.DRAFT, clock.instant(), 1);
+    var userId = userDetailService
+        .getUserDetail()
+        .wuaId()
+        .intValue();
+
+    var scapDetail = new ScapDetail(scap, 1, isLatestScapDetail, ScapDetailStatus.DRAFT, clock.instant(), userId);
     scapDetailRepository.save(scapDetail);
   }
 
