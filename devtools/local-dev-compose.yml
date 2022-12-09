@@ -17,5 +17,20 @@ services:
         target: /docker-entrypoint-initdb.d/create_db_user.sh
         type: bind
 
+  s3mock:
+    image: adobe/s3mock:2.1.28
+    ports:
+      - "9090:9090"
+      - "9191:9191"
+    environment:
+      initialBuckets: scap-dev
+      retainFilesOnExit: true
+      root: ./s3data
+
+  clamav:
+    image: clamav/clamav:0.105
+    ports:
+      - "3310:3310"
+
 volumes:
   scap-volume:
