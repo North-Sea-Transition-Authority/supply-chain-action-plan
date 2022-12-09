@@ -2,8 +2,11 @@ package uk.co.nstauthority.scap.energyportal;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.fivium.energyportalapi.client.LogCorrelationId;
+import uk.co.fivium.energyportalapi.client.RequestPurpose;
 import uk.co.fivium.energyportalapi.client.user.UserApi;
 import uk.co.fivium.energyportalapi.generated.client.UserProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.client.UsersProjectionRoot;
@@ -34,62 +37,65 @@ public class EnergyPortalUserService {
       .canLogin()
       .isAccountShared();
 
+  static final RequestPurpose FIND_USERS_REQUEST_PURPOSE = new RequestPurpose("test");
+  static final RequestPurpose FIND_USER_REQUEST_PURPOSE = new RequestPurpose("test");
+
   private final UserApi userApi;
 
-  private final EnergyPortalApiWrapper energyPortalApiWrapper;
-
   @Autowired
-  public EnergyPortalUserService(UserApi userApi, EnergyPortalApiWrapper energyPortalApiWrapper) {
+  public EnergyPortalUserService(UserApi userApi) {
     this.userApi = userApi;
-    this.energyPortalApiWrapper = energyPortalApiWrapper;
+  }
+
+  public List<User> searchUsersByUsername(String username) {
+    return userApi.searchUsersByEmail(
+        username,
+        USERS_PROJECTION_ROOT,
+        FIND_USERS_REQUEST_PURPOSE,
+        new LogCorrelationId(UUID.randomUUID().toString())
+    );
   }
 
   public List<EnergyPortalUserDto> findUsersByUsername(String username) {
-    return energyPortalApiWrapper.makeRequest(((logCorrelationId, requestPurpose) ->
-        userApi.searchUsersByEmail(
-            username,
-            USERS_PROJECTION_ROOT,
-            requestPurpose.purpose(),
-            logCorrelationId.id()
-        )
-        .stream()
+    return searchUsersByUsername(username).stream()
         .filter(User::getCanLogin)
         .map(this::convertToEnergyPortalUser)
-        .toList()
-    ));
+        .toList();
+  }
+
+  public List<User> searchUsersByIds(List<WebUserAccountId> webUserAccountIds) {
+    var userIds = webUserAccountIds.stream()
+        .map(WebUserAccountId::toInt)
+        .toList();
+
+    return userApi.searchUsersByIds(
+        userIds,
+        USERS_PROJECTION_ROOT,
+        FIND_USERS_REQUEST_PURPOSE,
+        new LogCorrelationId(UUID.randomUUID().toString())
+    );
   }
 
   public List<EnergyPortalUserDto> findByWuaIds(List<WebUserAccountId> webUserAccountIds) {
-    return energyPortalApiWrapper.makeRequest(((logCorrelationId, requestPurpose) -> {
+    return searchUsersByIds(webUserAccountIds).stream()
+        .map(this::convertToEnergyPortalUser)
+        .toList();
+  }
 
-      List<Integer> webUserAccountIdApiInputs = webUserAccountIds
-          .stream()
-          .map(WebUserAccountId::toInt)
-          .toList();
-
-      return userApi.searchUsersByIds(
-              webUserAccountIdApiInputs,
-              USERS_PROJECTION_ROOT,
-              requestPurpose.purpose(),
-              logCorrelationId.id()
-          )
-          .stream()
-          .map(this::convertToEnergyPortalUser)
-          .toList();
-    }));
+  public Optional<User> findUserById(WebUserAccountId webUserAccountId) {
+    return userApi.findUserById(
+        webUserAccountId.toInt(),
+        USER_PROJECTION_ROOT,
+        FIND_USER_REQUEST_PURPOSE,
+        new LogCorrelationId(UUID.randomUUID().toString())
+    );
   }
 
   public Optional<EnergyPortalUserDto> findByWuaId(WebUserAccountId webUserAccountId) {
-    return energyPortalApiWrapper.makeRequest(((logCorrelationId, requestPurpose) -> userApi.findUserById(
-            webUserAccountId.toInt(),
-            USER_PROJECTION_ROOT,
-            requestPurpose.purpose(),
-            logCorrelationId.id()
-        )
+    return findUserById(webUserAccountId)
         .stream()
         .map(this::convertToEnergyPortalUser)
-        .findFirst()
-    ));
+        .findFirst();
   }
 
   public EnergyPortalUserDto getEnergyPortalUser(WebUserAccountId webUserAccountId) {

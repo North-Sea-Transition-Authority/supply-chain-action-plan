@@ -1,35 +1,31 @@
 package uk.co.nstauthority.scap.energyportal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.fivium.energyportalapi.client.LogCorrelationId;
+import uk.co.fivium.energyportalapi.client.RequestPurpose;
 import uk.co.fivium.energyportalapi.client.user.UserApi;
 import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
-import uk.co.nstauthority.scap.branding.ServiceBrandingConfigurationProperties;
 import uk.co.nstauthority.scap.branding.ServiceConfigurationProperties;
 import uk.co.nstauthority.scap.error.exception.EnergyPortalBadRequestException;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class EnergyPortalUserServiceTest {
-
-  private static UserApi userApi;
-
-  private static EnergyPortalUserService energyPortalUserService;
 
   private static final ServiceConfigurationProperties serviceConfigurationProperties = new ServiceConfigurationProperties(
       "name",
@@ -42,14 +38,11 @@ class EnergyPortalUserServiceTest {
       "guidanceDocumentURL"
   );
 
-  @BeforeAll
-  static void setup() {
-    userApi = mock(UserApi.class);
-    energyPortalUserService = new EnergyPortalUserService(
-        userApi,
-        new EnergyPortalApiWrapper(new ServiceBrandingConfigurationProperties(customerConfigurationProperties, serviceConfigurationProperties))
-    );
-  }
+  @Mock
+  UserApi userApi;
+
+  @InjectMocks
+  EnergyPortalUserService energyPortalUserService;
 
   @Test
   void findUserByUsername_whenNoResults_thenEmptyList() {
@@ -61,8 +54,8 @@ class EnergyPortalUserServiceTest {
     when(userApi.searchUsersByEmail(
         eq(username),
         eq(userProjectionRoot),
-        anyString(),
-        anyString()
+        any(RequestPurpose.class),
+        any(LogCorrelationId.class)
     )).thenReturn(Collections.emptyList());
 
     assertTrue(energyPortalUserService.findUsersByUsername(username).isEmpty());
@@ -81,8 +74,8 @@ class EnergyPortalUserServiceTest {
     when(userApi.searchUsersByEmail(
         eq(username),
         eq(userProjectionRoot),
-        anyString(),
-        anyString()
+        any(RequestPurpose.class),
+        any(LogCorrelationId.class)
     )).thenReturn(List.of(expectedUser));
 
     assertThat(energyPortalUserService.findUsersByUsername(username))
@@ -130,8 +123,8 @@ class EnergyPortalUserServiceTest {
     when(userApi.searchUsersByEmail(
         eq(username),
         eq(userProjectionRoot),
-        anyString(),
-        anyString()
+        any(RequestPurpose.class),
+        any(LogCorrelationId.class)
     )).thenReturn(List.of(
         canLoginUser,
         notLoginUser
@@ -152,8 +145,8 @@ class EnergyPortalUserServiceTest {
     when(userApi.searchUsersByIds(
         eq(List.of(webUserAccountId.toInt())),
         eq(userProjectionRoot),
-        anyString(),
-        anyString()
+        any(RequestPurpose.class),
+        any(LogCorrelationId.class)
     )).thenReturn(Collections.emptyList());
 
     assertTrue(energyPortalUserService.findByWuaIds(List.of(webUserAccountId)).isEmpty());
@@ -170,8 +163,8 @@ class EnergyPortalUserServiceTest {
       when(userApi.searchUsersByIds(
           eq(List.of(webUserAccountId.toInt())),
           eq(userProjectionRoot),
-          anyString(),
-          anyString()
+          any(RequestPurpose.class),
+          any(LogCorrelationId.class)
       )).thenReturn(List.of(expectedUser));
 
     assertThat(energyPortalUserService.findByWuaIds(List.of(webUserAccountId)))
@@ -210,8 +203,8 @@ class EnergyPortalUserServiceTest {
     when(userApi.findUserById(
         eq(webUserAccountId.toInt()),
         eq(userProjectionRoot),
-        anyString(),
-        anyString()
+        any(RequestPurpose.class),
+        any(LogCorrelationId.class)
     )).thenReturn(Optional.of(expectedUser));
 
     var resultingUser = energyPortalUserService.findByWuaId(webUserAccountId);
@@ -250,8 +243,8 @@ class EnergyPortalUserServiceTest {
     when(userApi.findUserById(
         eq(webUserAccountId.toInt()),
         eq(userProjectionRoot),
-        anyString(),
-        anyString()
+        any(RequestPurpose.class),
+        any(LogCorrelationId.class)
     )).thenReturn(Optional.empty());
 
     assertThat(energyPortalUserService.findByWuaId(webUserAccountId)).isEmpty();
@@ -265,8 +258,8 @@ class EnergyPortalUserServiceTest {
     when(userApi.findUserById(
         eq(webUserAccountId.toInt()),
         eq(userProjectionRoot),
-        anyString(),
-        anyString()
+        any(RequestPurpose.class),
+        any(LogCorrelationId.class)
     )).thenReturn(Optional.empty());
 
     assertThrowsExactly(ScapEntityNotFoundException.class,
@@ -284,8 +277,8 @@ class EnergyPortalUserServiceTest {
     when(userApi.findUserById(
         eq(webUserAccountId.toInt()),
         eq(userProjectionRoot),
-        anyString(),
-        anyString()
+        any(RequestPurpose.class),
+        any(LogCorrelationId.class)
     )).thenReturn(Optional.of(expectedUser));
 
     assertThrowsExactly(EnergyPortalBadRequestException.class,
@@ -303,8 +296,8 @@ class EnergyPortalUserServiceTest {
     when(userApi.findUserById(
         eq(webUserAccountId.toInt()),
         eq(userProjectionRoot),
-        anyString(),
-        anyString()
+        any(RequestPurpose.class),
+        any(LogCorrelationId.class)
     )).thenReturn(Optional.of(expectedUser));
 
     assertThrowsExactly(EnergyPortalBadRequestException.class,
@@ -321,8 +314,8 @@ class EnergyPortalUserServiceTest {
     when(userApi.findUserById(
         eq(webUserAccountId.toInt()),
         eq(userProjectionRoot),
-        anyString(),
-        anyString()
+        any(RequestPurpose.class),
+        any(LogCorrelationId.class)
     )).thenReturn(Optional.of(expectedUser));
 
    assertThat(energyPortalUserService.getEnergyPortalUser(webUserAccountId).forename())
