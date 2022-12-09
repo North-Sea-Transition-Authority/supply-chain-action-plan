@@ -1,10 +1,12 @@
 package uk.co.nstauthority.scap.scap.projectdetails;
 
+import java.util.List;
 import java.util.Set;
 import uk.co.fivium.formlibrary.input.DecimalInput;
 import uk.co.fivium.formlibrary.input.IntegerInput;
 import uk.co.fivium.formlibrary.input.StringInput;
 import uk.co.fivium.formlibrary.input.ThreeFieldDateInput;
+import uk.co.nstauthority.scap.enumutil.YesNo;
 
 class ProjectDetailsForm {
 
@@ -13,6 +15,9 @@ class ProjectDetailsForm {
   private final DecimalInput projectCostEstimate;
   private final DecimalInput estimatedValueLocalContent;
   private final IntegerInput fieldId;
+  private YesNo hasPlatforms;
+  private List<Integer> installationIds;
+  private Integer installationSelector;
   private final IntegerInput startDay;
   private final IntegerInput startMonth;
   private final IntegerInput startYear;
@@ -88,6 +93,30 @@ class ProjectDetailsForm {
 
   public void setFieldId(String fieldId) {
     this.fieldId.setInputValue(fieldId);
+  }
+
+  public YesNo getHasPlatforms() {
+    return hasPlatforms;
+  }
+
+  public void setHasPlatforms(YesNo hasPlatforms) {
+    this.hasPlatforms = hasPlatforms;
+  }
+
+  public List<Integer> getInstallationIds() {
+    return installationIds;
+  }
+
+  public void setInstallationIds(List<Integer> installationIds) {
+    this.installationIds = installationIds;
+  }
+
+  public Integer getInstallationSelector() {
+    return installationSelector;
+  }
+
+  public void setInstallationSelector(Integer installationSelector) {
+    this.installationSelector = installationSelector;
   }
 
   public ThreeFieldDateInput getExpectedStartDate() {

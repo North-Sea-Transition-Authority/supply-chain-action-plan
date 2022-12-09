@@ -11,6 +11,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -80,7 +81,7 @@ class ProjectDetailsTaskListItemTest {
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(projectDetailsService.getProjectDetailsByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
-    when(projectDetailsFormService.getForm(projectDetails)).thenReturn(form);
+    when(projectDetailsFormService.getForm(projectDetails, Collections.emptyList())).thenReturn(form);
     when(projectDetailsFormService.validate(eq(form), any(BindingResult.class))).thenReturn(bindingResult);
 
     assertFalse(projectDetailsTaskListItem.isValid(scap.getId()));
@@ -95,7 +96,7 @@ class ProjectDetailsTaskListItemTest {
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(projectDetailsService.getProjectDetailsByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
-    when(projectDetailsFormService.getForm(projectDetails)).thenReturn(form);
+    when(projectDetailsFormService.getForm(projectDetails, Collections.emptyList())).thenReturn(form);
     when(projectDetailsFormService.validate(eq(form), any(BindingResult.class))).thenReturn(bindingResult);
 
     assertTrue(projectDetailsTaskListItem.isValid(scap.getId()));

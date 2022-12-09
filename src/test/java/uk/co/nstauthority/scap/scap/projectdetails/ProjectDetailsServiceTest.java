@@ -11,17 +11,21 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.nstauthority.scap.energyportal.FieldService;
+import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,6 +37,10 @@ class ProjectDetailsServiceTest {
   @Mock
   ProjectDetailTypeRepository projectDetailTypeRepository;
 
+
+  @Mock
+  ProjectFacilityRepository projectFacilityRepository;
+
   @Mock
   Clock clock = Clock.fixed(Instant.ofEpochSecond(1667576106), ZoneId.systemDefault());
 
@@ -41,6 +49,12 @@ class ProjectDetailsServiceTest {
 
   @InjectMocks
   ProjectDetailsService projectDetailsService;
+
+  @Captor
+  private ArgumentCaptor<Set<ProjectFacility>> savedProjectFacilitiesArgumentCaptor;
+
+  @Captor
+  private ArgumentCaptor<Set<ProjectFacility>> deletedProjectFacilitiesArgumentCaptor;
 
   private ScapDetail scapDetail;
 
@@ -116,6 +130,7 @@ class ProjectDetailsServiceTest {
         ProjectDetails::getEstimatedValueLocalContent,
         ProjectDetails::getFieldId,
         ProjectDetails::getFieldName,
+        ProjectDetails::getHasFacilities,
         ProjectDetails::getPlannedExecutionStartDate,
         ProjectDetails::getPlannedCompletionDate,
         ProjectDetails::getCreatedTimestamp
@@ -125,6 +140,7 @@ class ProjectDetailsServiceTest {
         form.getEstimatedValueLocalContent().getAsBigDecimal().get(),
         form.getFieldId().getAsInteger().get(),
         field.getFieldName(),
+        false,
         startDate,
         endDate,
         createdTimestamp
@@ -191,6 +207,7 @@ class ProjectDetailsServiceTest {
         ProjectDetails::getEstimatedValueLocalContent,
         ProjectDetails::getFieldId,
         ProjectDetails::getFieldName,
+        ProjectDetails::getHasFacilities,
         ProjectDetails::getPlannedExecutionStartDate,
         ProjectDetails::getPlannedCompletionDate,
         ProjectDetails::getCreatedTimestamp
@@ -200,6 +217,7 @@ class ProjectDetailsServiceTest {
         form.getEstimatedValueLocalContent().getAsBigDecimal().get(),
         form.getFieldId().getAsInteger().get(),
         field.getFieldName(),
+        false,
         startDate,
         endDate,
         createdTimestamp
@@ -214,6 +232,38 @@ class ProjectDetailsServiceTest {
     );
   }
 
+  @Test
+  void saveProjectDetails_HasPlatforms_VerifyRepositoryCalls() {
+    var keptExistingFacility = new ProjectFacility(1);
+    keptExistingFacility.setFacilityId(11);
+    var removedExistingFacility = new ProjectFacility(2);
+    removedExistingFacility.setFacilityId(22);
+    var existingProjectFacilities = List.of(keptExistingFacility, removedExistingFacility);
+
+    var addedFacilityId = 33;
+    var form = getFilledProjectDetailsForm();
+    form.setHasPlatforms(YesNo.YES);
+    form.setInstallationIds(List.of(addedFacilityId, keptExistingFacility.getFacilityId()));
+    var projectDetails = new ProjectDetails();
+
+    when(projectDetailsService.getProjectDetailsByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
+    when(projectFacilityRepository.findAllByProjectDetails(projectDetails)).thenReturn(existingProjectFacilities);
+
+    projectDetailsService.saveProjectDetails(scapDetail, form);
+
+    verify(projectFacilityRepository).saveAll(savedProjectFacilitiesArgumentCaptor.capture());
+    verify(projectFacilityRepository).deleteAll(deletedProjectFacilitiesArgumentCaptor.capture());
+
+    assertThat(savedProjectFacilitiesArgumentCaptor.getValue()).extracting(
+        ProjectFacility::getProjectDetails,
+        ProjectFacility::getFacilityId
+    ).containsExactly(
+        Tuple.tuple(projectDetails, addedFacilityId)
+    );
+
+    assertThat(deletedProjectFacilitiesArgumentCaptor.getValue()).containsExactly(removedExistingFacility);
+  }
+
   private ProjectDetailsForm getFilledProjectDetailsForm() {
     var form = new ProjectDetailsForm();
     form.setProjectName("Test project name");
@@ -223,6 +273,7 @@ class ProjectDetailsServiceTest {
     form.setProjectCostEstimate("2.2");
     form.setEstimatedValueLocalContent("1.1");
     form.setFieldId(String.valueOf(7235));
+    form.setHasPlatforms(YesNo.NO);
     form.setStartDay("22");
     form.setStartMonth("1");
     form.setStartYear("2022");

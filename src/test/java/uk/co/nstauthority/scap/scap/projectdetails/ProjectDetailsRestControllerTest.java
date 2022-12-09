@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -14,9 +15,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import uk.co.fivium.energyportalapi.generated.types.Facility;
 import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldQueryService;
 import uk.co.nstauthority.scap.energyportal.FieldSelectable;
 import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
@@ -31,6 +35,9 @@ class ProjectDetailsRestControllerTest extends AbstractControllerTest {
 
   @MockBean
   FieldQueryService fieldQueryService;
+
+  @MockBean
+  FacilityService facilityService;
 
   @MockBean
   SearchSelectorService searchSelectorService;
@@ -65,5 +72,30 @@ class ProjectDetailsRestControllerTest extends AbstractControllerTest {
     assertThat(response.getContentType()).isEqualTo("application/json");
     assertThat(response.getContentAsString())
         .isEqualTo("{\"results\":[{\"id\":\"1\",\"text\":\"test field 1\"},{\"id\":\"2\",\"text\":\"test field 2\"}]}");
+  }
+
+  @Test
+  void getFacilitySearchResults() throws Exception {
+    var searchTerm = "test";
+    var facility = new Facility(1, "test facility", null, null, null);
+    var facilities = List.of(facility);
+    var facilitiesRestSearchResult = new RestSearchResult(List.of(
+        new RestSearchItem(String.valueOf(facility.getId()), facility.getName())
+    ));
+
+    when(facilityService.searchFacilities(searchTerm, ProjectDetailsRestController.FACILITIES_SEARCH_REQUEST_PURPOSE))
+        .thenReturn(facilities);
+    when(facilityService.facilitiesToRestSearchResult(facilities)).thenReturn(facilitiesRestSearchResult);
+
+    var response = mockMvc.perform(get(
+        ReverseRouter.route(on(ProjectDetailsRestController.class).getFacilitySearchResults(null)))
+        .param("term", searchTerm))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(content().json("""
+{"results":[{"id":"1","text":"test facility"}]}
+"""))
+        .andReturn()
+        .getResponse();
   }
 }

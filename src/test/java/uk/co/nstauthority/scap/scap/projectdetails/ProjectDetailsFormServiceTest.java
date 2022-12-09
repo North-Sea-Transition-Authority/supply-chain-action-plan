@@ -1,11 +1,13 @@
 package uk.co.nstauthority.scap.scap.projectdetails;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -15,8 +17,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.fivium.energyportalapi.generated.types.Facility;
 import uk.co.fivium.energyportalapi.generated.types.Field;
+import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
+import uk.co.nstauthority.scap.enumutil.YesNo;
+import uk.co.nstauthority.scap.fds.addtolist.AddToListItem;
 
 @ExtendWith(MockitoExtension.class)
 class ProjectDetailsFormServiceTest {
@@ -29,6 +35,9 @@ class ProjectDetailsFormServiceTest {
 
   @Mock
   FieldService fieldService;
+
+  @Mock
+  FacilityService facilityService;
 
   @InjectMocks
   ProjectDetailsFormService projectDetailsFormService;
@@ -63,7 +72,7 @@ class ProjectDetailsFormServiceTest {
 
     when(projectDetailsService.getProjectTypesByProjectDetails(projectDetails)).thenReturn(projectTypes);
 
-    var form = projectDetailsFormService.getForm(projectDetails);
+    var form = projectDetailsFormService.getForm(projectDetails, null);
 
     assertThat(form).extracting(
         extractedForm -> extractedForm.getProjectName().getInputValue(),
@@ -71,6 +80,7 @@ class ProjectDetailsFormServiceTest {
         extractedForm -> extractedForm.getProjectCostEstimate().getInputValue(),
         extractedForm -> extractedForm.getEstimatedValueLocalContent().getInputValue(),
         extractedForm -> extractedForm.getFieldId().getInputValue(),
+        ProjectDetailsForm::getHasPlatforms,
         extractedForm -> extractedForm.getStartDay().getInputValue(),
         extractedForm -> extractedForm.getStartMonth().getInputValue(),
         extractedForm -> extractedForm.getStartYear().getInputValue(),
@@ -83,6 +93,7 @@ class ProjectDetailsFormServiceTest {
         projectCostEstimate.toString(),
         estimatedValueLocalContent.toString(),
         String.valueOf(fieldId),
+        null,
         String.valueOf(startDate.getDayOfMonth()),
         String.valueOf(startDate.getMonthValue()),
         String.valueOf(startDate.getYear()),
@@ -94,9 +105,41 @@ class ProjectDetailsFormServiceTest {
   }
 
   @Test
+  void getForm_NoFacilities_AssertHasPlatformsIsNo() {
+    var projectDetails = new ProjectDetails();
+    projectDetails.setHasFacilities(false);
+    projectDetails.setProjectCostEstimate(BigDecimal.valueOf(1));
+    projectDetails.setEstimatedValueLocalContent(BigDecimal.valueOf(1));
+    projectDetails.setFieldId(1);
+    projectDetails.setPlannedExecutionStartDate(LocalDate.of(1, 1, 1));
+    projectDetails.setPlannedCompletionDate(LocalDate.of(1, 1, 1));
+
+    var form = projectDetailsFormService.getForm(projectDetails, null);
+
+    assertThat(form.getHasPlatforms()).isEqualTo(YesNo.NO);
+  }
+
+  @Test
+  void getForm_HasFacilities_AssertHasPlatformsIsYes() {
+    var projectDetails = new ProjectDetails();
+    projectDetails.setHasFacilities(true);
+    projectDetails.setProjectCostEstimate(BigDecimal.valueOf(1));
+    projectDetails.setEstimatedValueLocalContent(BigDecimal.valueOf(1));
+    projectDetails.setFieldId(1);
+    projectDetails.setPlannedExecutionStartDate(LocalDate.of(1, 1, 1));
+    projectDetails.setPlannedCompletionDate(LocalDate.of(1, 1, 1));
+    var projectFacilityIds = List.of(1, 2, 3);
+
+    var form = projectDetailsFormService.getForm(projectDetails, projectFacilityIds);
+
+    assertThat(form.getHasPlatforms()).isEqualTo(YesNo.YES);
+    assertThat(form.getInstallationIds()).isEqualTo(projectFacilityIds);
+  }
+
+  @Test
   void getPreselectedField_existingField() {
     var field = new Field(22, "Test field", null, null, null, null);
-    var requestPurpose = "Get preselected field for project details form";
+    var requestPurpose = ProjectDetailsFormService.PRESELECTED_FIELD_REQUEST_PURPOSE;
     when(fieldService.getFieldById(field.getFieldId(), requestPurpose)).thenReturn(Optional.of(field));
 
     var preselectedField = projectDetailsFormService.getPreselectedField(field.getFieldId());
@@ -107,11 +150,29 @@ class ProjectDetailsFormServiceTest {
   @Test
   void getPreselectedField_nonExistentField_assertEmpty() {
     var fieldId = 22;
-    var requestPurpose = "Get preselected field for project details form";
+    var requestPurpose = ProjectDetailsFormService.PRESELECTED_FIELD_REQUEST_PURPOSE;
     when(fieldService.getFieldById(fieldId, requestPurpose)).thenReturn(Optional.empty());
 
     var preselectedField = projectDetailsFormService.getPreselectedField(fieldId);
 
     assertThat(preselectedField).isEmpty();
+  }
+
+  @Test
+  void getPreselectedFacilities() {
+    var projectFacilityIds = List.of(14);
+    var facility = new Facility(14, "Test facility name", null, null, null);
+    var facilities = List.of(facility);
+
+    when(facilityService.findFacilitiesByIds(projectFacilityIds, ProjectDetailsFormService.PRESELECTED_FACILITIES_REQUEST_PURPOSE))
+        .thenReturn(facilities);
+
+    var preselectedFacilities = projectDetailsFormService.getPreselectedFacilities(projectFacilityIds);
+
+    assertThat(preselectedFacilities).extracting(
+        AddToListItem::getId, AddToListItem::getName, AddToListItem::isValid
+    ).containsExactly(
+        tuple(String.valueOf(facility.getId()), facility.getName(), true)
+    );
   }
 }

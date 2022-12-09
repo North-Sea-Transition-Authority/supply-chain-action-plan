@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +17,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+import uk.co.fivium.energyportalapi.generated.types.Facility;
+import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
+import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.utils.ValidatorTestingUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -23,6 +28,9 @@ class ProjectDetailsFormValidatorTest {
 
   @Mock
   FieldService fieldService;
+
+  @Mock
+  FacilityService facilityService;
 
   @InjectMocks
   ProjectDetailsFormValidator validator;
@@ -62,6 +70,7 @@ class ProjectDetailsFormValidatorTest {
         entry("projectCostEstimate.inputValue", Set.of("projectCostEstimate.required")),
         entry("estimatedValueLocalContent.inputValue", Set.of("estimatedValueLocalContent.required")),
         entry("fieldId.inputValue", Set.of("fieldId.required")),
+        entry("hasPlatforms", Set.of("hasPlatforms.required")),
         entry("startDay.inputValue", Set.of("startDay.required")),
         entry("startMonth.inputValue", Set.of("startMonth.required")),
         entry("startYear.inputValue", Set.of("startYear.required")),
@@ -155,6 +164,61 @@ class ProjectDetailsFormValidatorTest {
     );
   }
 
+  @Test
+  void validate_HasPlatforms_NoneSelected_AssertError() {
+    form.setHasPlatforms(YesNo.YES);
+    form.setInstallationIds(Collections.emptyList());
+
+    when(fieldService.doesFieldExist(VALID_FIELD_ID)).thenReturn(true);
+
+    validator.validate(form, bindingResult);
+
+    var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
+    var fieldName = ProjectDetailsFormValidator.INSTALLATION_SELECTOR_FIELD_NAME;
+
+    assertThat(extractedErrors).containsExactly(
+        entry(fieldName, Set.of("%s.required".formatted(fieldName)))
+    );
+  }
+
+  @Test
+  void validate_HasPlatforms_InvalidSelectedPlatforms() {
+    var facilityIds = List.of(1209);
+
+    form.setHasPlatforms(YesNo.YES);
+    form.setInstallationIds(facilityIds);
+
+    when(fieldService.doesFieldExist(VALID_FIELD_ID)).thenReturn(true);
+    when(facilityService.findFacilitiesByIds(facilityIds, ProjectDetailsFormValidator.INSTALLATIONS_REQUEST_PURPOSE))
+        .thenReturn(Collections.emptyList());
+
+    validator.validate(form, bindingResult);
+
+    var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
+    var fieldName = ProjectDetailsFormValidator.INSTALLATION_SELECTOR_FIELD_NAME;
+
+    assertThat(extractedErrors).containsExactly(
+        entry(fieldName, Set.of("%s.invalid".formatted(fieldName)))
+    );
+  }
+
+  @Test
+  void validate_HasPlatforms() {
+    var facilityIds = List.of(1209);
+    var facilities = List.of(new Facility(1209, "Test facility", null, null, null));
+
+    form.setHasPlatforms(YesNo.YES);
+    form.setInstallationIds(facilityIds);
+
+    when(fieldService.doesFieldExist(VALID_FIELD_ID)).thenReturn(true);
+    when(facilityService.findFacilitiesByIds(facilityIds, ProjectDetailsFormValidator.INSTALLATIONS_REQUEST_PURPOSE))
+        .thenReturn(facilities);
+
+    validator.validate(form, bindingResult);
+
+    assertFalse(bindingResult.hasErrors());
+  }
+
   private ProjectDetailsForm getValidProjectDetailsForm() {
     var form = new ProjectDetailsForm();
     form.setProjectName("Test project name");
@@ -162,6 +226,7 @@ class ProjectDetailsFormValidatorTest {
     form.setProjectCostEstimate("2.2");
     form.setEstimatedValueLocalContent("1.1");
     form.setFieldId(String.valueOf(VALID_FIELD_ID));
+    form.setHasPlatforms(YesNo.NO);
     form.setStartDay("22");
     form.setStartMonth("1");
     form.setStartYear("2022");

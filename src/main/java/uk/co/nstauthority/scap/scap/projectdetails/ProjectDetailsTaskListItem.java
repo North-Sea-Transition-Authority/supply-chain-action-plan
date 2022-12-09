@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.projectdetails;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Collections;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
@@ -49,9 +50,17 @@ class ProjectDetailsTaskListItem implements ScapTaskListItem {
   public boolean isValid(Integer target) {
     var scap = scapService.getScapById(target);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
-    return projectDetailsService.getProjectDetailsByScapDetail(scapDetail)
+    var projectDetailsOptional = projectDetailsService.getProjectDetailsByScapDetail(scapDetail);
+    var projectFacilities = projectDetailsOptional
+        .map(projectDetailsService::getProjectFacilities)
+        .orElse(Collections.emptyList());
+    var projectFacilityIds = projectFacilities
+        .stream()
+        .map(ProjectFacility::getFacilityId)
+        .toList();
+    return projectDetailsOptional
         .map(projectDetails -> {
-          var form = projectDetailsFormService.getForm(projectDetails);
+          var form = projectDetailsFormService.getForm(projectDetails, projectFacilityIds);
           var bindingResult = new BeanPropertyBindingResult(form, "form");
           return !projectDetailsFormService.validate(form, bindingResult).hasErrors();
         }).orElse(false);

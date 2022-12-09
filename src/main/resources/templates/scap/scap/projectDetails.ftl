@@ -46,6 +46,7 @@
       detailsTitle="How is 'local content' defined?"
       detailsText=localContentText
     />
+
     <@fdsSearchSelector.searchSelectorRest
       path="form.fieldId.inputValue"
       restUrl=springUrl(fieldSearchRestUrl)
@@ -53,6 +54,35 @@
       inputClass="govuk-!-width-one-half"
       preselectedItems=preselectedField!{}
     />
+
+    <@fdsRadio.radioGroup
+      path="form.hasPlatforms"
+      labelText="Are any installations or subsea infrastructure related to this project?"
+      hiddenContent=true
+    >
+      <#assign isFirstItem = true />
+      <#list hasInstallationsMap as value, text >
+        <@fdsRadio.radioItem
+          path="form.hasPlatforms"
+          itemMap={value:text}
+          isFirstItem=isFirstItem
+        >
+          <#if value == "YES">
+            <@fdsAddToList.addToList
+              pathForList="form.installationIds"
+              pathForSelector="form.installationSelector"
+              alreadyAdded=preselectedFacilities
+              itemName="Installations"
+              selectorNestingPath="form.hasPlatforms"
+              restUrl=springUrl(facilitiesSearchRestUrl)
+              selectorMinInputLength=3
+              noItemText="There are no selected installations"
+            />
+          </#if>
+        </@fdsRadio.radioItem>
+      </#list>
+    </@fdsRadio.radioGroup>
+
     <@fdsDateInput.dateInput
       formId="startDate"
       dayPath="form.startDay.inputValue"
@@ -72,3 +102,7 @@
     <@fdsAction.button buttonText="Save and complete"/>
   </@fdsForm.htmlForm>
 </@defaultPage>
+
+<#macro addInstallations>
+
+</#macro>

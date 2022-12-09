@@ -2,6 +2,8 @@ package uk.co.nstauthority.scap.scap.projectdetails;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
+import uk.co.nstauthority.scap.enumutil.YesNo;
+import uk.co.nstauthority.scap.fds.addtolist.AddToListItem;
 import uk.co.nstauthority.scap.fds.searchselector.SearchSelectorService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
@@ -45,13 +49,24 @@ class ProjectDetailsController {
   ModelAndView renderProjectDetailsForm(@PathVariable("scapId") Integer scapId) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
-    var form = projectDetailsService.getProjectDetailsByScapDetail(scapDetail)
-        .map(projectDetailsFormService::getForm)
+    var projectDetails = projectDetailsService.getProjectDetailsByScapDetail(scapDetail);
+    var projectFacilities = projectDetails
+        .map(projectDetailsService::getProjectFacilities)
+        .orElse(Collections.emptyList());
+    var projectFacilityIds = projectFacilities
+        .stream()
+        .map(ProjectFacility::getFacilityId)
+        .toList();
+    var form = projectDetails
+        .map(existingProjectDetails -> projectDetailsFormService.getForm(existingProjectDetails, projectFacilityIds))
         .orElse(new ProjectDetailsForm());
     var preselectedField = form.getFieldId().getAsInteger()
         .flatMap(projectDetailsFormService::getPreselectedField)
         .orElse(null);
-    return projectDetailsFormModelAndView(scapId, form, preselectedField);
+    var preselectedFacilities = projectDetailsFormService.getPreselectedFacilities(projectFacilityIds);
+
+    return projectDetailsFormModelAndView(scapId, preselectedField, preselectedFacilities)
+        .addObject("form", form);
   }
 
   @PostMapping
@@ -60,13 +75,18 @@ class ProjectDetailsController {
                                       BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    projectDetailsService.getProjectDetailsByScapDetail(scapDetail);
+    var projectFacilityIds = form.getInstallationIds();
+
     var preselectedField = form.getFieldId().getAsInteger()
         .flatMap(projectDetailsFormService::getPreselectedField)
         .orElse(null);
+    var preselectedFacilities = projectDetailsFormService.getPreselectedFacilities(projectFacilityIds);
+
     bindingResult = projectDetailsFormService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        projectDetailsFormModelAndView(scapId, form, preselectedField),
+        projectDetailsFormModelAndView(scapId, preselectedField, preselectedFacilities),
         form,
         () -> {
           projectDetailsService.saveProjectDetails(scapDetail, form);
@@ -74,16 +94,21 @@ class ProjectDetailsController {
         });
   }
 
-  private ModelAndView projectDetailsFormModelAndView(Integer scapId, ProjectDetailsForm form,
-                                                      @Nullable Map<String, String> preselectedField) {
+  private ModelAndView projectDetailsFormModelAndView(Integer scapId,
+                                                      @Nullable Map<String, String> preselectedField,
+                                                      List<AddToListItem> preselectedFacilities) {
     return new ModelAndView("scap/scap/projectDetails")
         .addObject("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
+        .addObject("projectTypesMap", ProjectType.getCheckboxItems())
+        .addObject("preselectedField", preselectedField)
+        .addObject("preselectedFacilities", preselectedFacilities)
+        .addObject("hasInstallationsMap", YesNo.getRadioOptions())
         .addObject("fieldSearchRestUrl",
             SearchSelectorService.route(on(ProjectDetailsRestController.class)
                 .getFieldSearchResults(null)))
-        .addObject("projectTypesMap", ProjectType.getCheckboxItems())
-        .addObject("form", form)
-        .addObject("preselectedField", preselectedField);
+        .addObject("facilitiesSearchRestUrl",
+            SearchSelectorService.route(on(ProjectDetailsRestController.class)
+                .getFacilitySearchResults(null)));
   }
 }

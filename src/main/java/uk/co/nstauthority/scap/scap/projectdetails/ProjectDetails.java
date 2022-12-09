@@ -38,6 +38,7 @@ class ProjectDetails {
 
   private LocalDate plannedCompletionDate;
 
+  private Boolean hasFacilities;
   private Instant createdTimestamp;
 
   public ProjectDetails() {
@@ -103,6 +104,14 @@ class ProjectDetails {
 
   void setPlannedCompletionDate(LocalDate plannedCompletionDate) {
     this.plannedCompletionDate = plannedCompletionDate;
+  }
+
+  public Boolean getHasFacilities() {
+    return hasFacilities;
+  }
+
+  public void setHasFacilities(Boolean hasFacilities) {
+    this.hasFacilities = hasFacilities;
   }
 
   Instant getCreatedTimestamp() {
