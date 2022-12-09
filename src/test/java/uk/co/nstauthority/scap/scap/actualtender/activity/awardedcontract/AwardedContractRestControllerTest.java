@@ -11,23 +11,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import uk.co.fivium.energyportalapi.generated.types.Country;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.energyportal.CountryService;
-import uk.co.nstauthority.scap.fds.searchselector.SearchSelectorService;
+import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
+import uk.co.nstauthority.scap.fds.searchselector.RestSearchResult;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 
 @ExtendWith(MockitoExtension.class)
 @WithMockUser
 @ContextConfiguration(classes = AwardedContractRestController.class)
 class AwardedContractRestControllerTest extends AbstractControllerTest {
-
-  @SpyBean
-  SearchSelectorService searchSelectorService;
 
   @MockBean
   CountryService countryService;
@@ -39,9 +36,14 @@ class AwardedContractRestControllerTest extends AbstractControllerTest {
         new Country(0, "United Kingdom", null, null),
         new Country(68, "Continental Shelf United Kingdom Sector", null, null)
     );
+    var countriesSearchResult = new RestSearchResult(List.of(
+        new RestSearchItem(countries.get(0).getCountryId().toString(), countries.get(0).getCountryName()),
+        new RestSearchItem(countries.get(1).getCountryId().toString(), countries.get(1).getCountryName())
+    ));
 
     when(countryService.searchCountries(searchTerm, AwardedContractRestController.SEARCH_PURPOSE))
         .thenReturn(countries);
+    when(countryService.getCountrySearchResults(countries)).thenReturn(countriesSearchResult);
 
     mockMvc.perform(get(
         ReverseRouter.route(on(AwardedContractRestController.class).getCountrySearchResults(searchTerm))))

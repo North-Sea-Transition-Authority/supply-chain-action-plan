@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.energyportal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,6 +26,7 @@ import uk.co.fivium.energyportalapi.generated.client.CountryProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.types.Country;
 import uk.co.fivium.energyportalapi.generated.types.PortalCountrySet;
 import uk.co.fivium.energyportalapi.generated.types.PortalCountryStatus;
+import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
 
 @ExtendWith(MockitoExtension.class)
 class CountryServiceTest {
@@ -190,5 +192,23 @@ class CountryServiceTest {
         entry("countryName", null)
     );
     assertThat(requestPurposeArgumentCaptor.getValue().purpose()).isEqualTo(purpose);
+  }
+
+  @Test
+  void getCountrySearchResults() {
+    var countries = List.of(
+        new Country(1, "country 1", null, null),
+        new Country(2, "country 2", null, null)
+    );
+
+    var countriesSearchResult = countryService.getCountrySearchResults(countries);
+
+    assertThat(countriesSearchResult.getResults()).extracting(
+        RestSearchItem::id,
+        RestSearchItem::text
+    ).containsExactly(
+        tuple(countries.get(0).getCountryId().toString(), countries.get(0).getCountryName()),
+        tuple(countries.get(1).getCountryId().toString(), countries.get(1).getCountryName())
+    );
   }
 }

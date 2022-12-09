@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.projectdetails;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,6 +26,7 @@ import uk.co.fivium.energyportalapi.generated.client.FieldsProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.fivium.energyportalapi.generated.types.FieldStatus;
 import uk.co.nstauthority.scap.energyportal.FieldService;
+import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
 
 @ExtendWith(MockitoExtension.class)
 class FieldServiceTest {
@@ -111,5 +113,23 @@ class FieldServiceTest {
         .thenReturn(Optional.empty());
 
     assertFalse(fieldService.doesFieldExist(3));
+  }
+
+  @Test
+  void getFieldSearchResults() {
+    var fields = List.of(
+        new Field(1, "field name 1", null, null, null, null),
+        new Field(2, "field name 2", null, null, null, null)
+    );
+
+    var fieldsSearchResult = fieldService.getFieldsSearchResult(fields);
+
+    assertThat(fieldsSearchResult.getResults()).extracting(
+        RestSearchItem::id,
+        RestSearchItem::text
+    ).containsExactly(
+        tuple(fields.get(0).getFieldId().toString(), fields.get(0).getFieldName()),
+        tuple(fields.get(1).getFieldId().toString(), fields.get(1).getFieldName())
+    );
   }
 }

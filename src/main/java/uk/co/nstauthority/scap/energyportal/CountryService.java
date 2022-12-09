@@ -11,6 +11,8 @@ import uk.co.fivium.energyportalapi.client.countries.CountryApi;
 import uk.co.fivium.energyportalapi.generated.client.CountriesProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.client.CountryProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.types.Country;
+import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
+import uk.co.nstauthority.scap.fds.searchselector.RestSearchResult;
 
 @Service
 public class CountryService {
@@ -51,10 +53,11 @@ public class CountryService {
         getLogCorrelationId());
   }
 
-  public static List<CountrySelectable> getCountrySearchableResults(List<Country> countries) {
-    return countries.stream()
-        .map(country -> new CountrySelectable(country.getCountryId(), country.getCountryName()))
-        .toList();
+  public RestSearchResult getCountrySearchResults(List<Country> countries) {
+    return new RestSearchResult(
+        countries.stream()
+            .map(country -> new RestSearchItem(String.valueOf(country.getCountryId()), country.getCountryName()))
+            .toList());
   }
 
   private LogCorrelationId getLogCorrelationId() {

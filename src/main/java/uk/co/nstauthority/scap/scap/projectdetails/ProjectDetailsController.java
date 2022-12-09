@@ -18,7 +18,6 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.fds.addtolist.AddToListItem;
-import uk.co.nstauthority.scap.fds.searchselector.SearchSelectorService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
@@ -105,10 +104,10 @@ class ProjectDetailsController {
         .addObject("preselectedFacilities", preselectedFacilities)
         .addObject("hasInstallationsMap", YesNo.getRadioOptions())
         .addObject("fieldSearchRestUrl",
-            SearchSelectorService.route(on(ProjectDetailsRestController.class)
+            ReverseRouter.route(on(ProjectDetailsRestController.class)
                 .getFieldSearchResults(null)))
         .addObject("facilitiesSearchRestUrl",
-            SearchSelectorService.route(on(ProjectDetailsRestController.class)
+            ReverseRouter.route(on(ProjectDetailsRestController.class)
                 .getFacilitySearchResults(null)));
   }
 }

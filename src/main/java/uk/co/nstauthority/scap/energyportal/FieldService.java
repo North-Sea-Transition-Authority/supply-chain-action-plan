@@ -10,6 +10,8 @@ import uk.co.fivium.energyportalapi.generated.client.FieldProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.client.FieldsProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.fivium.energyportalapi.generated.types.FieldStatus;
+import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
+import uk.co.nstauthority.scap.fds.searchselector.RestSearchResult;
 
 @Service
 public class FieldService {
@@ -29,6 +31,13 @@ public class FieldService {
         .fieldId()
         .fieldName();
     return fieldApi.searchFields(term, statuses, requestedFields, purpose);
+  }
+
+  public RestSearchResult getFieldsSearchResult(List<Field> fields) {
+    return new RestSearchResult(
+        fields.stream()
+            .map(field -> new RestSearchItem(String.valueOf(field.getFieldId()), field.getFieldName()))
+            .toList());
   }
 
   public Optional<Field> getFieldById(Integer id, String requestPurpose) {
