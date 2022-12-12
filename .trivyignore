@@ -25,3 +25,5 @@
 # Transient vulnerability from energy portal API and spring-boot-starter
   CVE-2022-41854
   CVE-2022-41946
+
+  CVE-2016-1000027
