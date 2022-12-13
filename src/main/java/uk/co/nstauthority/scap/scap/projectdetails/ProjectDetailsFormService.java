@@ -10,9 +10,13 @@ import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.fds.addtolist.AddToListItem;
+import uk.co.nstauthority.scap.file.FileUploadUtils;
+import uk.co.nstauthority.scap.file.UploadedFileView;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 
 @Service
-class ProjectDetailsFormService {
+public class ProjectDetailsFormService {
 
   static final String PRESELECTED_FIELD_REQUEST_PURPOSE = "Get preselected field for SCAP project details form";
   static final String PRESELECTED_FACILITIES_REQUEST_PURPOSE = "Get preselected facilities for SCAP project details form";
@@ -20,14 +24,17 @@ class ProjectDetailsFormService {
   private final ProjectDetailsService projectDetailsService;
   private final FieldService fieldService;
   private final FacilityService facilityService;
+  private final SupportingDocumentService supportingDocumentService;
 
   @Autowired
   ProjectDetailsFormService(ProjectDetailsFormValidator validator, ProjectDetailsService projectDetailsService,
-                            FieldService fieldService, FacilityService facilityService) {
+                            FieldService fieldService, FacilityService facilityService,
+                            SupportingDocumentService supportingDocumentService) {
     this.validator = validator;
     this.projectDetailsService = projectDetailsService;
     this.fieldService = fieldService;
     this.facilityService = facilityService;
+    this.supportingDocumentService = supportingDocumentService;
   }
 
   BindingResult validate(ProjectDetailsForm form, BindingResult bindingResult) {
@@ -64,6 +71,10 @@ class ProjectDetailsFormService {
     form.setEndMonth(String.valueOf(endDate.getMonthValue()));
     form.setEndYear(String.valueOf(endDate.getYear()));
 
+    var fileUploadForms = supportingDocumentService.getFileUploadFormListForScapDetailAndType(
+        projectDetails.getScapDetail(), SupportingDocumentType.ADDITIONAL_DOCUMENT);
+    form.setSupportingDocuments(fileUploadForms);
+
     return form;
   }
 
@@ -77,5 +88,10 @@ class ProjectDetailsFormService {
     return facilities.stream()
         .map(facility -> new AddToListItem(facility.getId().toString(), facility.getName(), true))
         .toList();
+  }
+
+  public List<UploadedFileView> getSupportingDocuments(ProjectDetailsForm form) {
+    var supportingDocumentUploadIdList = FileUploadUtils.getUploadIdList(form.getSupportingDocuments());
+    return supportingDocumentService.getUploadedFileViewList(supportingDocumentUploadIdList);
   }
 }

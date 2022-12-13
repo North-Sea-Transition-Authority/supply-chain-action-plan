@@ -34,11 +34,12 @@ import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.energyportal.FieldService;
 import uk.co.nstauthority.scap.fds.ErrorItem;
+import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
-import uk.co.nstauthority.scap.scap.scap.Scap;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
@@ -69,28 +70,34 @@ class ProjectDetailsControllerTest extends AbstractControllerTest {
   @MockBean
   FieldService fieldService;
 
-  private Scap scap;
+  @MockBean
+  SupportingDocumentService supportingDocumentService;
+
+  private Integer scapId;
   private ScapDetail scapDetail;
+  private FileUploadTemplate fileUploadTemplate;
 
   @BeforeEach
   void setup() {
-    scap = new Scap(19);
-    scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, clock.instant(), 1);
+    scapId = 19;
+    scapDetail = new ScapDetail(223);
+    fileUploadTemplate = new FileUploadTemplate("#", "#", "#", "1", ".txt");
   }
 
   @Test
   void renderProjectDetailsForm_noProjectDetails_assertCorrectResponse() throws Exception {
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId)).thenReturn(scapDetail);
     when(projectDetailsService.getProjectDetailsByScapDetail(scapDetail)).thenReturn(Optional.empty());
+    when(supportingDocumentService.buildFileUploadTemplate(scapId, SupportingDocumentType.ADDITIONAL_DOCUMENT))
+        .thenReturn(fileUploadTemplate);
 
     var model = mockMvc.perform(
         get(ReverseRouter.route(on(ProjectDetailsController.class)
-            .renderProjectDetailsForm(scap.getId()))))
+            .renderProjectDetailsForm(scapId))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/projectDetails"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId))))
         .andExpect(model().attribute("fieldSearchRestUrl",
             ReverseRouter.route(on(ProjectDetailsRestController.class)
                 .getFieldSearchResults(null))))
@@ -110,19 +117,20 @@ class ProjectDetailsControllerTest extends AbstractControllerTest {
     form.setFieldId(String.valueOf(field.getFieldId()));
     var preselectedItem = Map.of(String.valueOf(field.getFieldId()), field.getFieldName());
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId)).thenReturn(scapDetail);
     when(projectDetailsService.getProjectDetailsByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
     when(projectDetailsFormService.getForm(projectDetails, Collections.emptyList())).thenReturn(form);
     when(projectDetailsFormService.getPreselectedField(field.getFieldId())).thenReturn(Optional.of(preselectedItem));
+    when(supportingDocumentService.buildFileUploadTemplate(scapId, SupportingDocumentType.ADDITIONAL_DOCUMENT))
+        .thenReturn(fileUploadTemplate);
 
     mockMvc.perform(
         get(ReverseRouter.route(on(ProjectDetailsController.class)
-            .renderProjectDetailsForm(scap.getId()))))
+            .renderProjectDetailsForm(scapId))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/projectDetails"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId))))
         .andExpect(model().attribute("fieldSearchRestUrl",
             ReverseRouter.route(on(ProjectDetailsRestController.class)
                 .getFieldSearchResults(null))))
@@ -146,20 +154,23 @@ class ProjectDetailsControllerTest extends AbstractControllerTest {
         new ErrorItem(10, errorField, errorMessage)
     );
 
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId)).thenReturn(scapDetail);
     when(projectDetailsFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResult);
     when(validationErrorOrderingService.getErrorItemsFromBindingResult(form, bindingResult))
         .thenReturn(errorItems);
+    when(supportingDocumentService.buildFileUploadTemplate(scapId, SupportingDocumentType.ADDITIONAL_DOCUMENT))
+        .thenReturn(fileUploadTemplate);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ProjectDetailsController.class)
-            .renderProjectDetailsForm(scap.getId())))
+            .renderProjectDetailsForm(scapId)))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/projectDetails"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId))))
         .andExpect(model().attribute("fieldSearchRestUrl",
             ReverseRouter.route(on(ProjectDetailsRestController.class)
                 .getFieldSearchResults(null))))
@@ -173,16 +184,15 @@ class ProjectDetailsControllerTest extends AbstractControllerTest {
   void saveProjectDetailsForm_valid_verifySaves() throws Exception {
     var form = new ProjectDetailsForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
-    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()));
+    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId));
 
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId)).thenReturn(scapDetail);
     when(projectDetailsFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResult);
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ProjectDetailsController.class)
-            .renderProjectDetailsForm(scap.getId())))
+            .renderProjectDetailsForm(scapId)))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().is3xxRedirection())

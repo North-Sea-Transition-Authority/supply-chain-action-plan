@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.scap.detail;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -36,6 +37,11 @@ public class ScapDetail {
 
   public ScapDetail() {
 
+  }
+
+  @VisibleForTesting
+  public ScapDetail(Integer id) {
+    this.id = id;
   }
 
   public ScapDetail(Scap scap, Integer versionNumber, Boolean tipFlag, ScapDetailStatus status,

@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.scap.projectdetails;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import uk.co.fivium.formlibrary.input.DecimalInput;
@@ -7,6 +8,7 @@ import uk.co.fivium.formlibrary.input.IntegerInput;
 import uk.co.fivium.formlibrary.input.StringInput;
 import uk.co.fivium.formlibrary.input.ThreeFieldDateInput;
 import uk.co.nstauthority.scap.enumutil.YesNo;
+import uk.co.nstauthority.scap.file.FileUploadForm;
 
 class ProjectDetailsForm {
 
@@ -26,6 +28,7 @@ class ProjectDetailsForm {
   private final IntegerInput endYear;
   private final ThreeFieldDateInput expectedStartDate;
   private final ThreeFieldDateInput expectedEndDate;
+  private List<FileUploadForm> supportingDocuments = new ArrayList<>();
 
   public ProjectDetailsForm() {
     this.projectName = new StringInput("projectName", "Project name");
@@ -173,5 +176,13 @@ class ProjectDetailsForm {
 
   public void setEndYear(String endYear) {
     this.endYear.setInputValue(endYear);
+  }
+
+  public List<FileUploadForm> getSupportingDocuments() {
+    return supportingDocuments;
+  }
+
+  public void setSupportingDocuments(List<FileUploadForm> supportingDocuments) {
+    this.supportingDocuments = supportingDocuments;
   }
 }

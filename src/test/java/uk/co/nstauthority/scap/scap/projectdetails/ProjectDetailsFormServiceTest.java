@@ -6,11 +6,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,8 +23,11 @@ import uk.co.fivium.energyportalapi.generated.types.Facility;
 import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
+import uk.co.nstauthority.scap.file.FileUploadForm;
+import uk.co.nstauthority.scap.file.UploadedFileView;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.fds.addtolist.AddToListItem;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 
 @ExtendWith(MockitoExtension.class)
 class ProjectDetailsFormServiceTest {
@@ -38,6 +43,9 @@ class ProjectDetailsFormServiceTest {
 
   @Mock
   FacilityService facilityService;
+
+  @Mock
+  SupportingDocumentService supportingDocumentService;
 
   @InjectMocks
   ProjectDetailsFormService projectDetailsFormService;
@@ -174,5 +182,24 @@ class ProjectDetailsFormServiceTest {
     ).containsExactly(
         tuple(String.valueOf(facility.getId()), facility.getName(), true)
     );
+  }
+
+  @Test
+  void getSupportingDocuments() {
+    var form = new ProjectDetailsForm();
+    var fileUploadForm = new FileUploadForm();
+    var uploadedFileId = UUID.randomUUID();
+    fileUploadForm.setUploadedFileId(uploadedFileId);
+    form.setSupportingDocuments(List.of(fileUploadForm));
+    var uploadedFileView = new UploadedFileView(
+        uploadedFileId.toString(), "file name", "1", "file desc", Instant.now()
+    );
+
+    when(supportingDocumentService.getUploadedFileViewList(List.of(uploadedFileId)))
+        .thenReturn(List.of(uploadedFileView));
+
+    var views = projectDetailsFormService.getSupportingDocuments(form);
+
+    assertThat(views).containsExactly(uploadedFileView);
   }
 }

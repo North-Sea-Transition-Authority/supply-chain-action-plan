@@ -30,7 +30,7 @@ public class ScapService {
   public Scap getScapById(Integer id) {
     return scapRepository.findById(id)
         .orElseThrow(() ->
-            new ScapEntityNotFoundException(String.format("Could not find SCAP overview with id [%d]", id)));
+            new ScapEntityNotFoundException(String.format("Could not find SCAP with id [%d]", id)));
   }
 
   @Transactional

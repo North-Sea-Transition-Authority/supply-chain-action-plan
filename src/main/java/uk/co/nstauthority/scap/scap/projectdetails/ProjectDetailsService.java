@@ -12,27 +12,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.energyportal.FieldService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
+import uk.co.nstauthority.scap.file.FileUploadService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Service
 @Transactional
-class ProjectDetailsService {
+public class ProjectDetailsService {
 
   private final ProjectDetailsRepository projectDetailsRepository;
   private final ProjectDetailTypeRepository projectDetailTypeRepository;
   private final ProjectFacilityRepository projectFacilityRepository;
   private final Clock clock;
   private final FieldService fieldService;
+  private final FileUploadService fileUploadService;
 
   @Autowired
   ProjectDetailsService(ProjectDetailsRepository projectDetailsRepository,
                         ProjectDetailTypeRepository projectDetailTypeRepository,
-                        ProjectFacilityRepository projectFacilityRepository, Clock clock, FieldService fieldService) {
+                        ProjectFacilityRepository projectFacilityRepository, Clock clock, FieldService fieldService,
+                        FileUploadService fileUploadService) {
     this.projectDetailsRepository = projectDetailsRepository;
     this.projectDetailTypeRepository = projectDetailTypeRepository;
     this.projectFacilityRepository = projectFacilityRepository;
     this.clock = clock;
     this.fieldService = fieldService;
+    this.fileUploadService = fileUploadService;
   }
 
   Set<ProjectType> getProjectTypesByProjectDetails(ProjectDetails projectDetails) {
@@ -53,6 +57,7 @@ class ProjectDetailsService {
 
     updateProjectDetails(projectDetails, form);
     updateProjectDetailTypes(projectDetails, form.getProjectTypes(), createdTimestamp);
+    fileUploadService.updateFileUploadDescriptions(form.getSupportingDocuments());
 
     if (YesNo.YES.equals(form.getHasPlatforms())) {
       saveProjectFacilities(projectDetails, form.getInstallationIds(), createdTimestamp);

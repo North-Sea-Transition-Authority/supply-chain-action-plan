@@ -18,8 +18,11 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.fds.addtolist.AddToListItem;
+import uk.co.nstauthority.scap.file.UploadedFileView;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
@@ -29,25 +32,25 @@ class ProjectDetailsController {
 
   private final ProjectDetailsFormService projectDetailsFormService;
   private final ControllerHelperService controllerHelperService;
-  private final ScapService scapService;
   private final ScapDetailService scapDetailService;
   private final ProjectDetailsService projectDetailsService;
+  private final SupportingDocumentService supportingDocumentService;
 
   @Autowired
   ProjectDetailsController(ProjectDetailsFormService projectDetailsFormService,
                            ControllerHelperService controllerHelperService, ScapService scapService,
-                           ScapDetailService scapDetailService, ProjectDetailsService projectDetailsService) {
+                           ScapDetailService scapDetailService, ProjectDetailsService projectDetailsService,
+                           SupportingDocumentService supportingDocumentService) {
     this.projectDetailsFormService = projectDetailsFormService;
     this.controllerHelperService = controllerHelperService;
-    this.scapService = scapService;
     this.scapDetailService = scapDetailService;
     this.projectDetailsService = projectDetailsService;
+    this.supportingDocumentService = supportingDocumentService;
   }
 
   @GetMapping
   ModelAndView renderProjectDetailsForm(@PathVariable("scapId") Integer scapId) {
-    var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
     var projectDetails = projectDetailsService.getProjectDetailsByScapDetail(scapDetail);
     var projectFacilities = projectDetails
         .map(projectDetailsService::getProjectFacilities)
@@ -63,8 +66,9 @@ class ProjectDetailsController {
         .flatMap(projectDetailsFormService::getPreselectedField)
         .orElse(null);
     var preselectedFacilities = projectDetailsFormService.getPreselectedFacilities(projectFacilityIds);
+    var supportingDocuments = projectDetailsFormService.getSupportingDocuments(form);
 
-    return projectDetailsFormModelAndView(scapId, preselectedField, preselectedFacilities)
+    return projectDetailsFormModelAndView(scapId, preselectedField, preselectedFacilities, supportingDocuments)
         .addObject("form", form);
   }
 
@@ -72,20 +76,19 @@ class ProjectDetailsController {
   ModelAndView saveProjectDetailsForm(@PathVariable("scapId") Integer scapId,
                                       @ModelAttribute("form") ProjectDetailsForm form,
                                       BindingResult bindingResult) {
-    var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
     projectDetailsService.getProjectDetailsByScapDetail(scapDetail);
     var projectFacilityIds = form.getInstallationIds();
-
     var preselectedField = form.getFieldId().getAsInteger()
         .flatMap(projectDetailsFormService::getPreselectedField)
         .orElse(null);
     var preselectedFacilities = projectDetailsFormService.getPreselectedFacilities(projectFacilityIds);
+    var supportingDocuments = projectDetailsFormService.getSupportingDocuments(form);
 
     bindingResult = projectDetailsFormService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        projectDetailsFormModelAndView(scapId, preselectedField, preselectedFacilities),
+        projectDetailsFormModelAndView(scapId, preselectedField, preselectedFacilities, supportingDocuments),
         form,
         () -> {
           projectDetailsService.saveProjectDetails(scapDetail, form);
@@ -95,7 +98,8 @@ class ProjectDetailsController {
 
   private ModelAndView projectDetailsFormModelAndView(Integer scapId,
                                                       @Nullable Map<String, String> preselectedField,
-                                                      List<AddToListItem> preselectedFacilities) {
+                                                      List<AddToListItem> preselectedFacilities,
+                                                      List<UploadedFileView> supportingDocuments) {
     return new ModelAndView("scap/scap/projectDetails")
         .addObject("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
@@ -108,6 +112,11 @@ class ProjectDetailsController {
                 .getFieldSearchResults(null)))
         .addObject("facilitiesSearchRestUrl",
             ReverseRouter.route(on(ProjectDetailsRestController.class)
-                .getFacilitySearchResults(null)));
+                .getFacilitySearchResults(null)))
+        .addObject("supportingDocumentsUploads", supportingDocuments)
+        .addObject("supportingDocumentsTemplate",
+            supportingDocumentService.buildFileUploadTemplate(
+                scapId, SupportingDocumentType.ADDITIONAL_DOCUMENT
+            ));
   }
 }

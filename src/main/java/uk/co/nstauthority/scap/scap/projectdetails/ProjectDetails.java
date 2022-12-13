@@ -14,7 +14,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Entity
 @Table(name = "project_details")
-class ProjectDetails {
+public class ProjectDetails {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,6 +48,10 @@ class ProjectDetails {
   ProjectDetails(ScapDetail scapDetail, Instant createdTimestamp) {
     this.scapDetail = scapDetail;
     this.createdTimestamp = createdTimestamp;
+  }
+
+  public ScapDetail getScapDetail() {
+    return scapDetail;
   }
 
   String getProjectName() {

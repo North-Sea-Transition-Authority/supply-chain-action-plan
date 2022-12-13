@@ -26,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.nstauthority.scap.energyportal.FieldService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
+import uk.co.nstauthority.scap.file.FileUploadService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,6 +47,9 @@ class ProjectDetailsServiceTest {
 
   @Mock
   FieldService fieldService;
+
+  @Mock
+  FileUploadService fileUploadService;
 
   @InjectMocks
   ProjectDetailsService projectDetailsService;

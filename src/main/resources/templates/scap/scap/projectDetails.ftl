@@ -99,6 +99,25 @@
       labelText="Indicative planned commissioning or completion date"
       hintText="For example, 31 3 2024"
       />
+
+      <@fdsFieldset.fieldset
+        legendHeading="Supporting SCAP documents"
+        legendHeadingSize="h2"
+        legendHeadingClass="govuk-fieldset__legend--m"
+        optionalLabel=true
+      >
+        <@fdsFileUpload.fileUpload
+          id="supportingDocuments"
+          path="form.supportingDocuments"
+          downloadUrl=supportingDocumentsTemplate.downloadUrl()
+          uploadUrl=supportingDocumentsTemplate.uploadUrl()
+          deleteUrl=supportingDocumentsTemplate.deleteUrl()
+          maxAllowedSize=supportingDocumentsTemplate.maxAllowedSize()
+          allowedExtensions=supportingDocumentsTemplate.allowedExtensions()
+          existingFiles=supportingDocumentsUploads
+          multiFile=true
+        />
+      </@fdsFieldset.fieldset>
     <@fdsAction.button buttonText="Save and complete"/>
   </@fdsForm.htmlForm>
 </@defaultPage>
