@@ -32,4 +32,13 @@ public enum YesNo implements Displayable {
   public String getEnumName() {
     return this.name();
   }
+
+  public static YesNo fromBoolean(Boolean bool) {
+    if (Boolean.TRUE.equals(bool)) {
+      return YES;
+    } else if (Boolean.FALSE.equals(bool)) {
+      return NO;
+    }
+    return null;
+  }
 }

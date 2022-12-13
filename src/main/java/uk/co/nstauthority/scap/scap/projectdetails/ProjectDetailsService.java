@@ -10,8 +10,11 @@ import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.fivium.energyportalapi.generated.types.Facility;
+import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
+import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.file.FileUploadService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
@@ -19,27 +22,31 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 @Transactional
 public class ProjectDetailsService {
 
+  static final String PROJECT_FACILITIES_REQUEST_PURPOSE = "Get facility names for summary";
+
   private final ProjectDetailsRepository projectDetailsRepository;
   private final ProjectDetailTypeRepository projectDetailTypeRepository;
   private final ProjectFacilityRepository projectFacilityRepository;
   private final Clock clock;
   private final FieldService fieldService;
+  private final FacilityService facilityService;
   private final FileUploadService fileUploadService;
 
   @Autowired
   ProjectDetailsService(ProjectDetailsRepository projectDetailsRepository,
                         ProjectDetailTypeRepository projectDetailTypeRepository,
                         ProjectFacilityRepository projectFacilityRepository, Clock clock, FieldService fieldService,
-                        FileUploadService fileUploadService) {
+                        FacilityService facilityService, FileUploadService fileUploadService) {
     this.projectDetailsRepository = projectDetailsRepository;
     this.projectDetailTypeRepository = projectDetailTypeRepository;
     this.projectFacilityRepository = projectFacilityRepository;
     this.clock = clock;
     this.fieldService = fieldService;
+    this.facilityService = facilityService;
     this.fileUploadService = fileUploadService;
   }
 
-  Set<ProjectType> getProjectTypesByProjectDetails(ProjectDetails projectDetails) {
+  public Set<ProjectType> getProjectTypesByProjectDetails(ProjectDetails projectDetails) {
     return projectDetailTypeRepository.findAllByProjectDetails(projectDetails).stream()
         .map(ProjectDetailType::getProjectType)
         .collect(Collectors.toSet());
@@ -47,6 +54,12 @@ public class ProjectDetailsService {
 
   Optional<ProjectDetails> getProjectDetailsByScapDetail(ScapDetail scapDetail) {
     return projectDetailsRepository.findByScapDetail(scapDetail);
+  }
+
+  public ProjectDetails getProjectDetailsOrThrow(ScapDetail scapDetail) {
+    return getProjectDetailsByScapDetail(scapDetail).orElseThrow(
+        () -> new ScapEntityNotFoundException(
+            "Could not find ProjectDetails for ScapDetail with ID [%d]".formatted(scapDetail.getId())));
   }
 
   @Transactional
@@ -66,8 +79,24 @@ public class ProjectDetailsService {
     }
   }
 
-  List<ProjectFacility> getProjectFacilities(ProjectDetails projectDetails) {
+  public List<ProjectFacility> getProjectFacilities(ProjectDetails projectDetails) {
     return projectFacilityRepository.findAllByProjectDetails(projectDetails);
+  }
+
+  public List<String> getProjectFacilityNames(ProjectDetails projectDetails) {
+    var projectFacilities = getProjectFacilities(projectDetails);
+    if (projectFacilities.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    var projectFacilityIds = projectFacilities.stream()
+        .map(ProjectFacility::getFacilityId)
+        .toList();
+    var facilities = facilityService.findFacilitiesByIds(
+        projectFacilityIds, PROJECT_FACILITIES_REQUEST_PURPOSE);
+    return facilities.stream()
+        .map(Facility::getName)
+        .toList();
   }
 
   private void saveProjectFacilities(ProjectDetails projectDetails, List<Integer> facilityIds, Instant createdTimestamp) {

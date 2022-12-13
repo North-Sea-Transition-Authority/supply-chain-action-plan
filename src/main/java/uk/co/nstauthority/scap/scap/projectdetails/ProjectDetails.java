@@ -54,27 +54,27 @@ public class ProjectDetails {
     return scapDetail;
   }
 
-  String getProjectName() {
+  public String getProjectName() {
     return projectName;
   }
 
-  void setProjectName(String projectName) {
+  public void setProjectName(String projectName) {
     this.projectName = projectName;
   }
 
-  BigDecimal getProjectCostEstimate() {
+  public BigDecimal getProjectCostEstimate() {
     return projectCostEstimate;
   }
 
-  void setProjectCostEstimate(BigDecimal projectCostEstimate) {
+  public void setProjectCostEstimate(BigDecimal projectCostEstimate) {
     this.projectCostEstimate = projectCostEstimate;
   }
 
-  BigDecimal getEstimatedValueLocalContent() {
+  public BigDecimal getEstimatedValueLocalContent() {
     return estimatedValueLocalContent;
   }
 
-  void setEstimatedValueLocalContent(BigDecimal estimatedValueLocalContent) {
+  public void setEstimatedValueLocalContent(BigDecimal estimatedValueLocalContent) {
     this.estimatedValueLocalContent = estimatedValueLocalContent;
   }
 
@@ -94,19 +94,19 @@ public class ProjectDetails {
     this.fieldName = fieldName;
   }
 
-  LocalDate getPlannedExecutionStartDate() {
+  public LocalDate getPlannedExecutionStartDate() {
     return plannedExecutionStartDate;
   }
 
-  void setPlannedExecutionStartDate(LocalDate plannedExecutionStartDate) {
+  public void setPlannedExecutionStartDate(LocalDate plannedExecutionStartDate) {
     this.plannedExecutionStartDate = plannedExecutionStartDate;
   }
 
-  LocalDate getPlannedCompletionDate() {
+  public LocalDate getPlannedCompletionDate() {
     return plannedCompletionDate;
   }
 
-  void setPlannedCompletionDate(LocalDate plannedCompletionDate) {
+  public void setPlannedCompletionDate(LocalDate plannedCompletionDate) {
     this.plannedCompletionDate = plannedCompletionDate;
   }
 

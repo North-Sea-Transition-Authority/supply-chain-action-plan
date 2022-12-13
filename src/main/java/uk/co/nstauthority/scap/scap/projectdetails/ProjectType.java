@@ -4,7 +4,7 @@ import java.util.Map;
 import uk.co.nstauthority.scap.enumutil.Displayable;
 import uk.co.nstauthority.scap.enumutil.DisplayableEnumOptionUtil;
 
-enum ProjectType implements Displayable {
+public enum ProjectType implements Displayable {
   FIELD_DEVELOPMENT_PLAN("Field development plan", 10),
   FIELD_DEVELOPMENT_PLAN_ADDENDUM("Field development plan addendum", 20),
   DECOMMISSIONING_PROGRAMME("Decommissioning programme", 30),

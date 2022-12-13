@@ -12,7 +12,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "project_facilities")
-class ProjectFacility {
+public class ProjectFacility {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,12 +48,12 @@ class ProjectFacility {
     return projectDetails;
   }
 
-  Integer getFacilityId() {
+  public Integer getFacilityId() {
     return facilityId;
   }
 
   @VisibleForTesting
-  void setFacilityId(Integer facilityId) {
+  public void setFacilityId(Integer facilityId) {
     this.facilityId = facilityId;
   }
 

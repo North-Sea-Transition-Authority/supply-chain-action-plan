@@ -1,6 +1,7 @@
 package uk.co.nstauthority.scap.scap.projectdetails;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -11,6 +12,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -23,10 +25,13 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.fivium.energyportalapi.generated.types.Facility;
 import uk.co.fivium.energyportalapi.generated.types.Field;
+import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.file.FileUploadService;
+import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,6 +52,9 @@ class ProjectDetailsServiceTest {
 
   @Mock
   FieldService fieldService;
+
+  @Mock
+  FacilityService facilityService;
 
   @Mock
   FileUploadService fileUploadService;
@@ -95,6 +103,56 @@ class ProjectDetailsServiceTest {
     var returnedProjectDetails = projectDetailsService.getProjectDetailsByScapDetail(scapDetail);
 
     assertThat(returnedProjectDetails).contains(projectDetails);
+  }
+
+  @Test
+  void getProjectDetailsOrThrow() {
+    var projectDetails = new ProjectDetails(scapDetail, clock.instant());
+
+    when(projectDetailsRepository.findByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
+
+    var returnedProjectDetails = projectDetailsService.getProjectDetailsOrThrow(scapDetail);
+
+    assertThat(returnedProjectDetails).isEqualTo(projectDetails);
+  }
+
+  @Test
+  void getProjectDetailsOrThrow_WhenNotPresent_AssertThrows() {
+    when(projectDetailsRepository.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> projectDetailsService.getProjectDetailsOrThrow(scapDetail))
+        .isInstanceOf(ScapEntityNotFoundException.class);
+  }
+
+  @Test
+  void getProjectFacilityNames() {
+    var projectDetails = new ProjectDetails();
+    var projectFacilityId = 99;
+    var projectFacility = new ProjectFacility();
+    projectFacility.setFacilityId(projectFacilityId);
+    var facilities = List.of(
+        new Facility(projectFacilityId, "facility name", null, null, null)
+    );
+
+    when(projectFacilityRepository.findAllByProjectDetails(projectDetails)).thenReturn(List.of(projectFacility));
+    when(facilityService.findFacilitiesByIds(
+        List.of(projectFacilityId), ProjectDetailsService.PROJECT_FACILITIES_REQUEST_PURPOSE))
+        .thenReturn(facilities);
+
+    var facilityNames = projectDetailsService.getProjectFacilityNames(projectDetails);
+
+    assertThat(facilityNames).containsExactly(facilities.get(0).getName());
+  }
+
+  @Test
+  void getProjectFacilityNames_NoProjectFacilities() {
+    var projectDetails = new ProjectDetails();
+
+    when(projectFacilityRepository.findAllByProjectDetails(projectDetails)).thenReturn(Collections.emptyList());
+
+    var facilityNames = projectDetailsService.getProjectFacilityNames(projectDetails);
+
+    assertThat(facilityNames).isEmpty();
   }
 
   @Test
