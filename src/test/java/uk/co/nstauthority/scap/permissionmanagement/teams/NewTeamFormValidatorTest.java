@@ -66,7 +66,7 @@ class NewTeamFormValidatorTest {
     assertThat(bindingResult.getFieldError("organisationGroupId.inputValue")).isNotNull();
     assertThat(bindingResult.getFieldError("organisationGroupId.inputValue").getCodes()).contains("organisationGroupId.alreadyExists");
 
-    verify(teamService, times(1)).findByEnergyPortalOrgGroupId(1000);
+    verify(teamService).findByEnergyPortalOrgGroupId(1000);
     verify(organisationGroupService, times(0)).getOrganisationGroupById(any(), any());
   }
 
@@ -81,8 +81,8 @@ class NewTeamFormValidatorTest {
     assertThat(bindingResult.getFieldError("organisationGroupId.inputValue")).isNotNull();
     assertThat(bindingResult.getFieldError("organisationGroupId.inputValue").getCodes()).contains("organisationGroupId.doesNotExist");
 
-    verify(teamService, times(1)).findByEnergyPortalOrgGroupId(1000);
-    verify(organisationGroupService, times(1)).getOrganisationGroupById(any(), any());
+    verify(teamService).findByEnergyPortalOrgGroupId(1000);
+    verify(organisationGroupService).getOrganisationGroupById(any(), any());
   }
 
 
@@ -98,7 +98,7 @@ class NewTeamFormValidatorTest {
     validator.validate(form, bindingResult);
     assertThat(bindingResult.getFieldError("organisationGroupId.inputValue")).isNull();
 
-    verify(teamService, times(1)).findByEnergyPortalOrgGroupId(1000);
-    verify(organisationGroupService, times(1)).getOrganisationGroupById(any(), any());
+    verify(teamService).findByEnergyPortalOrgGroupId(1000);
+    verify(organisationGroupService).getOrganisationGroupById(any(), any());
   }
 }

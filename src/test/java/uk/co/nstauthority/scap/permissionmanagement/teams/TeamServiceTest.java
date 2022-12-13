@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.permissionmanagement;
+package uk.co.nstauthority.scap.permissionmanagement.teams;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -20,8 +20,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRoleService;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
+import uk.co.nstauthority.scap.permissionmanagement.TeamId;
+import uk.co.nstauthority.scap.permissionmanagement.TeamRepository;
+import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
+import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 
 @ExtendWith(MockitoExtension.class)
 class TeamServiceTest {
@@ -41,14 +44,14 @@ class TeamServiceTest {
     var team = TeamTestUtil.Builder().build();
 
     when(teamRepository.findByUuid(team.getUuid())).thenReturn(Optional.of(team));
-    var result = teamService.getTeam(TeamId.valueOf(team.getUuid()));
+    var result = teamService.findTeam(TeamId.valueOf(team.getUuid()));
 
-    assertThat(result).isEqualTo(team);
+    assertThat(result).contains(team);
     verify(teamRepository).findByUuid(team.getUuid());
   }
 
   @Test
-  void findTeam_whenNoMatch_thenEmptyOptionalReturned() {
+  void getTeam_whenNoMatch_thenEmptyOptionalReturned() {
 
     var team = TeamTestUtil.Builder().build();
 

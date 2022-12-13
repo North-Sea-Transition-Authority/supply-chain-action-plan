@@ -1,14 +1,13 @@
-<#include "../../layout/layout.ftl">
-<#import '../_addTeamMember.ftl' as teamMember>
+<#include "../layout/layout.ftl">
+<#import '_addTeamMember.ftl' as teamMember>
 
-<#-- @ftlvariable name="htmlTitle" type="java.lang.String" -->
 <#-- @ftlvariable name="backLinkUrl" type="java.lang.String" -->
 <#-- @ftlvariable name="submitUrl" type="java.lang.String" -->
 <#-- @ftlvariable name="registrationUrl" type="java.lang.String" -->
 <#-- @ftlvariable name="errorList" type="java.util.List<uk.co.nstauthority.scap.fds.ErrorItem>" -->
 
 <@defaultPage
-  htmlTitle=htmlTitle
+  htmlTitle="Add user to organisation group team"
   pageHeading=""
   errorItems=errorList
   pageSize=PageSize.TWO_THIRDS_COLUMN

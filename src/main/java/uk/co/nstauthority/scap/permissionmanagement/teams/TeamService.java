@@ -3,15 +3,18 @@ package uk.co.nstauthority.scap.permissionmanagement.teams;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
+import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
+import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
-import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRoleService;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRepository;
+import uk.co.nstauthority.scap.permissionmanagement.TeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 
 @Service
@@ -21,15 +24,25 @@ public class TeamService {
 
   private final TeamMemberRoleService teamMemberRoleService;
 
+  private final NewTeamFormvalidator newTeamFormvalidator;
 
   @Autowired
-  TeamService(TeamRepository teamRepository, TeamMemberRoleService teamMemberRoleService) {
+  protected TeamService(TeamRepository teamRepository, TeamMemberRoleService teamMemberRoleService,
+                        @Lazy NewTeamFormvalidator newTeamFormvalidator) {
     this.teamRepository = teamRepository;
     this.teamMemberRoleService = teamMemberRoleService;
+    this.newTeamFormvalidator = newTeamFormvalidator;
   }
 
-  public Optional<Team> getTeam(TeamId teamId, TeamType teamType) {
-    return teamRepository.findByUuidAndTeamType(teamId.uuid(), teamType);
+  public Optional<Team> findTeam(TeamId teamId) {
+    return teamRepository.findByUuid(teamId.uuid());
+  }
+
+  public Team getTeam(TeamId teamId) {
+    return findTeam(teamId)
+        .orElseThrow(() -> new ScapEntityNotFoundException(
+            "No team with ID %s found".formatted(teamId.uuid())
+        ));
   }
 
   public Optional<Team> findByEnergyPortalOrgGroupId(int epGroupId) {
@@ -53,5 +66,19 @@ public class TeamService {
 
   public List<Team> getTeamsThatUserBelongsTo(ServiceUserDetail user) {
     return teamRepository.findAllTeamsThatUserIsMemberOf(user.wuaId());
+  }
+
+  public BindingResult validate(NewTeamForm form, BindingResult bindingResult) {
+    newTeamFormvalidator.validate(form, bindingResult);
+    return bindingResult;
+  }
+
+  public void addUserTeamRoles(Team team, EnergyPortalUserDto userToAdd, Set<? extends TeamRole> roles) {
+    var rolesAsStrings = roles
+        .stream()
+        .map(TeamRole::name)
+        .collect(Collectors.toSet());
+
+    teamMemberRoleService.addUserTeamRoles(team, userToAdd, rolesAsStrings);
   }
 }

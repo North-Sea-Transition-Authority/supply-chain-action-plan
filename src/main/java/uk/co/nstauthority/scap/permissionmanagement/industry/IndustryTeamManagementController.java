@@ -9,14 +9,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
-import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.IsMemberOfTeam;
-import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
-import uk.co.nstauthority.scap.permissionmanagement.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamManagementController;
+
 
 @Controller
 @RequestMapping("/permission-management/industry")
@@ -39,10 +36,8 @@ public class IndustryTeamManagementController {
   @IsMemberOfTeam
   public ModelAndView renderMemberList(@PathVariable("teamId") TeamId teamId) {
 
-    var team = getIndustryTeam(teamId);
-
+    var team = industryTeamService.getTeam(teamId);
     var user = userDetailService.getUserDetail();
-
     var modelAndView = new ModelAndView("scap/permissionmanagement/teamMembers")
         .addObject("pageTitle", "Manage %s".formatted(team.getDisplayName()))
         .addObject("teamName", team.getDisplayName())
@@ -52,17 +47,10 @@ public class IndustryTeamManagementController {
     if (industryTeamService.isAccessManager(teamId, userDetailService.getUserDetail())) {
       modelAndView
           .addObject("addTeamMemberUrl",
-              //TODO: SCAP2022-116 Add, Add Member to Team Functionality
-              ReverseRouter.route(on(TeamManagementController.class).renderTeamList()))
+              ReverseRouter.route(on(IndustryAddMemberController.class).renderAddTeamMember(teamId)))
           .addObject("canRemoveUsers", industryTeamService.isAccessManager(teamId, user))
           .addObject("canEditUsers", industryTeamService.isAccessManager(teamId, user));
     }
-
     return modelAndView;
   }
-
-  private Team getIndustryTeam(TeamId teamId) {
-    return industryTeamService.getTeamOrThrow(teamId);
-  }
-
 }

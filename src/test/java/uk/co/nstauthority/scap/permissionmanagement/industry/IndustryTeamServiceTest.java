@@ -10,15 +10,19 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
-import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRoleService;
-import uk.co.nstauthority.scap.permissionmanagement.TeamMemberService;
+import uk.co.nstauthority.scap.permissionmanagement.TeamRepository;
+import uk.co.nstauthority.scap.permissionmanagement.teams.NewTeamFormvalidator;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRoleService;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
@@ -28,7 +32,7 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 class IndustryTeamServiceTest {
 
   @Mock
-  private TeamService teamService;
+  private TeamRepository teamRepository;
 
   @Mock
   private TeamMemberService teamMemberService;
@@ -36,8 +40,15 @@ class IndustryTeamServiceTest {
   @Mock
   private TeamMemberRoleService teamMemberRoleService;
 
-  @InjectMocks
+  @Mock
+  private NewTeamFormvalidator newTeamFormvalidator;
+
   private IndustryTeamService industryTeamService;
+
+  @BeforeEach
+  void setup() {
+    industryTeamService = new IndustryTeamService(teamMemberService, teamRepository, teamMemberRoleService, newTeamFormvalidator);
+  }
 
   @Test
   void getTeam_whenMatch_thenReturnTeam() {
@@ -48,15 +59,13 @@ class IndustryTeamServiceTest {
         .build();
 
     var teamId = new TeamId(team.getUuid());
+    when(teamRepository.findByUuid(teamId.uuid())).thenReturn(Optional.of(team));
 
-    when(teamService.getTeam(teamId, TeamType.INDUSTRY)).thenReturn(Optional.of(team));
-
-    assertThat(industryTeamService.getTeam(teamId)).contains(team);
-    verify(teamService, times(1)).getTeam(teamId, team.getTeamType());
+    assertThat(industryTeamService.getTeam(teamId)).isEqualTo(team);
   }
 
   @Test
-  void getTeam_whenNoMatch_thenEmptyOptional() {
+  void findTeam_whenNoMatch_thenEmptyOptional() {
 
     var team = TeamTestUtil
         .Builder()
@@ -64,11 +73,9 @@ class IndustryTeamServiceTest {
         .build();
 
     var teamId = new TeamId(team.getUuid());
+    when(teamRepository.findByUuid(teamId.uuid())).thenReturn(Optional.empty());
 
-    when(teamService.getTeam(teamId, TeamType.INDUSTRY)).thenReturn(Optional.empty());
-
-    assertThat(industryTeamService.getTeam(teamId)).isEmpty();
-    verify(teamService, times(1)).getTeam(teamId, team.getTeamType());
+    assertThat(industryTeamService.findTeam(teamId)).isEmpty();
   }
 
   @Test

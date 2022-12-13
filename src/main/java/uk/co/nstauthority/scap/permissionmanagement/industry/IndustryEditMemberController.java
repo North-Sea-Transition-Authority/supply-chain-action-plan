@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.permissionmanagement.regulator;
+package uk.co.nstauthority.scap.permissionmanagement.industry;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -14,7 +14,6 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.enumutil.DisplayableEnumOptionUtil;
-import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRolesForm;
@@ -23,66 +22,65 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRoleUtil;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRoleService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+
 
 @Controller
-@RequestMapping("/permission-management/regulator/{teamId}/edit")
-public class RegulatorEditMemberController {
+@RequestMapping("/permission-management/industry/{teamId}/edit/{wuaId}")
+public class IndustryEditMemberController {
   private final TeamMemberService teamMemberService;
   private final TeamMemberViewService teamMemberViewService;
-  private final ControllerHelperService controllerHelperService;
-  private final RegulatorTeamMemberEditRolesValidator regulatorTeamMemberEditRolesValidator;
-  private final TeamMemberRoleService teamMemberRoleService;
 
-  private final RegulatorTeamService regulatorTeamService;
+  private final TeamMemberRoleService teamMemberRoleService;
+  private final ControllerHelperService controllerHelperService;
+
+  private final IndustryTeamMemberEditRolesValidator industryTeamMemberEditRolesValidator;
+
+  private final TeamService teamService;
 
   @Autowired
-  RegulatorEditMemberController(
+  IndustryEditMemberController(
       TeamMemberService teamMemberService,
       TeamMemberViewService teamMemberViewService,
-      ControllerHelperService controllerHelperService,
-      RegulatorTeamMemberEditRolesValidator regulatorTeamMemberEditRolesValidator,
       TeamMemberRoleService teamMemberRoleService,
-      RegulatorTeamService regulatorTeamService) {
+      ControllerHelperService controllerHelperService,
+      IndustryTeamMemberEditRolesValidator industryTeamMemberEditRolesValidator,
+      TeamService teamService) {
+    this.teamService = teamService;
     this.teamMemberService = teamMemberService;
     this.teamMemberViewService = teamMemberViewService;
-    this.controllerHelperService = controllerHelperService;
-    this.regulatorTeamMemberEditRolesValidator = regulatorTeamMemberEditRolesValidator;
     this.teamMemberRoleService = teamMemberRoleService;
-    this.regulatorTeamService = regulatorTeamService;
+    this.controllerHelperService = controllerHelperService;
+    this.industryTeamMemberEditRolesValidator = industryTeamMemberEditRolesValidator;
   }
 
 
-  @GetMapping("/{wuaId}")
+  @GetMapping
   public ModelAndView renderEditMember(@PathVariable("teamId") TeamId teamId,
                                        @PathVariable("wuaId") WebUserAccountId wuaId) {
 
     var form = new TeamMemberRolesForm();
-    var team = regulatorTeamService.getTeam(teamId);
-
+    var team = teamService.getTeam(teamId);
     var teamMember = teamMemberService.getTeamMemberOrThrow(team, wuaId);
     var userView = teamMemberViewService.getTeamMemberViewOrThrow(teamMember);
-    form.setRoles(TeamRoleUtil.getRoleNames(teamMember.roles()));
 
+    form.setRoles(TeamRoleUtil.getRoleNames(teamMember.roles()));
     return getEditModelAndView(teamId, userView, form);
 
   }
 
-  @PostMapping("/{wuaId}")
+  @PostMapping
   public ModelAndView editMember(@PathVariable("teamId") TeamId teamId,
                                  @PathVariable("wuaId") WebUserAccountId wuaId,
                                  @ModelAttribute("form") TeamMemberRolesForm form,
                                  BindingResult bindingResult) {
 
-    var team = regulatorTeamService.getTeam(teamId);
-
-    var teamMember = teamMemberService.getTeamMember(team, wuaId)
-        .orElseThrow(() -> new ScapEntityNotFoundException(
-            "No user [%s] in team [%s]".formatted(wuaId, teamId)));
-
+    var team = teamService.getTeam(teamId);
+    var teamMember = teamMemberService.getTeamMemberOrThrow(team, wuaId);
     var userView = teamMemberViewService.getTeamMemberViewOrThrow(teamMember);
 
-    regulatorTeamMemberEditRolesValidator.validate(form, bindingResult,
-        new RegulatorTeamMemberEditRolesValidatorDto(team, teamMember));
+    industryTeamMemberEditRolesValidator.validate(form, bindingResult,
+        new IndustryTeamMemberEditRolesValidatorDto(team, teamMember));
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
@@ -90,20 +88,18 @@ public class RegulatorEditMemberController {
         form,
         () -> {
           teamMemberRoleService.updateUserTeamRoles(team, teamMember.wuaId().id(), form.getRoles());
-          return ReverseRouter.redirect(on(RegulatorTeamManagementController.class).renderMemberList(teamId));
+          return ReverseRouter.redirect(on(IndustryTeamManagementController.class).renderMemberList(teamId));
         });
 
   }
 
   private ModelAndView getEditModelAndView(TeamId teamId, TeamMemberView userView, TeamMemberRolesForm form) {
     return new ModelAndView("scap/permissionmanagement/AddTeamMemberRoles")
-        .addObject("pageTitle", userView.getDisplayName())
         .addObject("form", form)
-        .addObject("userDisplayName", userView.getDisplayName())
-        .addObject("roles", DisplayableEnumOptionUtil.getDisplayableOptionsWithDescription(RegulatorTeamRole.class))
+        .addObject("pageTitle", userView.getDisplayName())
+        .addObject("roles", DisplayableEnumOptionUtil.getDisplayableOptionsWithDescription(IndustryTeamRole.class))
         .addObject("backLinkUrl",
-          ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberList(teamId))
+          ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId))
         );
   }
-
 }

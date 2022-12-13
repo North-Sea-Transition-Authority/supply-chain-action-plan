@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.permissionmanagement.regulator;
+package uk.co.nstauthority.scap.permissionmanagement.industry;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -23,59 +23,62 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRolesForm;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.teams.AddRolesController;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 @Controller
-@RequestMapping("/permission-management/regulator/{teamId}")
-class RegulatorAddRolesController extends AddRolesController {
+@RequestMapping("/permission-management/industry/{teamId}")
+class IndustryAddRolesController extends AddRolesController {
 
   private final EnergyPortalUserService energyPortalUserService;
 
-  private final RegulatorTeamMemberRolesValidator regulatorTeamMemberRolesValidator;
+  private final IndustryTeamMemberRolesValidator industryTeamMemberRolesValidator;
 
   @Autowired
-  RegulatorAddRolesController(RegulatorTeamService regulatorTeamService,
-                              ControllerHelperService controllerHelperService,
-                              EnergyPortalUserService energyPortalUserService,
-                              RegulatorTeamMemberRolesValidator regulatorTeamMemberRolesValidator) {
+  protected IndustryAddRolesController(
+      TeamService regulatorTeamService,
+      ControllerHelperService controllerHelperService,
+      EnergyPortalUserService energyPortalUserService,
+      IndustryTeamMemberRolesValidator industryTeamMemberRolesValidator) {
     super(regulatorTeamService,
         controllerHelperService,
         energyPortalUserService);
     this.energyPortalUserService = energyPortalUserService;
-    this.regulatorTeamMemberRolesValidator = regulatorTeamMemberRolesValidator;
+    this.industryTeamMemberRolesValidator = industryTeamMemberRolesValidator;
   }
 
-  @GetMapping("/add-member/{webUserAccountId}/roles")
+  @GetMapping("/add-member/{wuaId}/roles")
   public ModelAndView renderAddTeamMemberRoles(@PathVariable("teamId") TeamId teamId,
-                                               @PathVariable("webUserAccountId") WebUserAccountId webUserAccountId) {
+                                               @PathVariable("wuaId") WebUserAccountId webUserAccountId) {
     var energyPortalUser = energyPortalUserService.getEnergyPortalUser(webUserAccountId);
     return getAddTeamMemberRolesModelAndView(energyPortalUser, new TeamMemberRolesForm())
-        .addObject("roles", DisplayableEnumOptionUtil.getDisplayableOptionsWithDescription(RegulatorTeamRole.class))
+        .addObject("roles", DisplayableEnumOptionUtil.getDisplayableOptionsWithDescription(IndustryTeamRole.class))
         .addObject(
             "backLinkUrl",
-            ReverseRouter.route(on(RegulatorAddMemberController.class).renderAddTeamMember(teamId)));
+            ReverseRouter.route(on(IndustryAddMemberController.class).renderAddTeamMember(teamId)))
+        ;
   }
 
   @Override
   protected Set<? extends TeamRole> getRolesToAdd(Set<String> rolesToAdd) {
     return rolesToAdd
         .stream()
-        .map(RegulatorTeamRole::getRoleFromString)
+        .map(IndustryTeamRole::getRoleFromString)
         .filter(Optional::isPresent)
         .map(Optional::get)
         .collect(Collectors.toSet());
   }
 
-  @PostMapping("/add-member/{webUserAccountId}/roles")
+  @PostMapping("/add-member/{wuaId}/roles")
   protected ModelAndView saveAddTeamMemberRoles(@PathVariable("teamId") TeamId teamId,
-                                      @PathVariable("webUserAccountId") WebUserAccountId webUserAccountId,
-                                      @ModelAttribute("form") TeamMemberRolesForm form,
-                                      BindingResult bindingResult) {
-    regulatorTeamMemberRolesValidator.validate(form, bindingResult);
+                                                @PathVariable("wuaId") WebUserAccountId webUserAccountId,
+                                                @ModelAttribute("form") TeamMemberRolesForm form,
+                                                BindingResult bindingResult) {
+    industryTeamMemberRolesValidator.validate(form, bindingResult);
     return super.saveAddTeamMemberRoles(teamId,
         webUserAccountId,
         form,
         bindingResult,
-        ReverseRouter.redirect(on(RegulatorTeamManagementController.class).renderMemberList(teamId)),
-        ReverseRouter.redirect(on(RegulatorAddRolesController.class).renderAddTeamMemberRoles(teamId, webUserAccountId)));
+        ReverseRouter.redirect(on(IndustryTeamManagementController.class).renderMemberList(teamId)),
+        ReverseRouter.redirect(on(IndustryAddRolesController.class).renderAddTeamMemberRoles(teamId, webUserAccountId)));
   }
 }

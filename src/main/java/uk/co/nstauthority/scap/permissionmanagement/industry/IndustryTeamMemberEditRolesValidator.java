@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.permissionmanagement.regulator;
+package uk.co.nstauthority.scap.permissionmanagement.industry;
 
 import com.google.common.collect.Sets;
 import java.util.Collection;
@@ -12,10 +12,12 @@ import org.springframework.validation.ValidationUtils;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRolesForm;
+import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRemovalService;
 
+
 @Service
-class RegulatorTeamMemberEditRolesValidator implements SmartValidator {
+class IndustryTeamMemberEditRolesValidator implements SmartValidator {
 
   public static final String ROLES_FIELD_NAME = "roles";
 
@@ -33,14 +35,14 @@ class RegulatorTeamMemberEditRolesValidator implements SmartValidator {
   private final TeamMemberRemovalService teamMemberRemovalService;
 
   @Autowired
-  RegulatorTeamMemberEditRolesValidator(TeamMemberRemovalService teamMemberRemovalService) {
+  IndustryTeamMemberEditRolesValidator(TeamMemberRemovalService teamMemberRemovalService) {
     this.teamMemberRemovalService = teamMemberRemovalService;
   }
 
   @Override
   public void validate(Object target, Errors errors, Object... validationHints) {
     var form = (TeamMemberRolesForm) target;
-    var validatorDto = (RegulatorTeamMemberEditRolesValidatorDto) validationHints[0];
+    var validatorDto = (IndustryTeamMemberEditRolesValidatorDto) validationHints[0];
 
     Set<String> formRoles = form.getRoles() != null ? form.getRoles() : Set.of();
 
@@ -54,7 +56,7 @@ class RegulatorTeamMemberEditRolesValidator implements SmartValidator {
 
     var validRolesFromForm = formRoles
         .stream()
-        .map(RegulatorTeamRole::getRoleFromString)
+        .map(IndustryTeamRole::getRoleFromString)
         .filter(Optional::isPresent)
         .map(Optional::get)
         .toList();
@@ -66,7 +68,7 @@ class RegulatorTeamMemberEditRolesValidator implements SmartValidator {
       );
     }
 
-    if (!hasAccessManagerRole(validatorDto.team(), validatorDto.teamMember(), validRolesFromForm)) {
+    if (!canUpdateTeamMemberWithNewRoles(validatorDto.team(), validatorDto.teamMember(), validRolesFromForm)) {
       errors.rejectValue(ROLES_FIELD_NAME, ROLES_NO_ACCESS_MANAGER_ERROR_CODE, ROLES_NO_ACCESS_MANAGER_ERROR_MESSAGE);
     }
   }
@@ -82,14 +84,15 @@ class RegulatorTeamMemberEditRolesValidator implements SmartValidator {
         "This validator [%s] requires a %s validation hint"
             .formatted(
                 this.getClass().getSimpleName(),
-                RegulatorTeamMemberEditRolesValidatorDto.class.getSimpleName()
+                IndustryTeamMemberEditRolesValidatorDto.class.getSimpleName()
             ));
   }
 
-  private boolean hasAccessManagerRole(Team team, TeamMember teamMember,
-                                       Collection<RegulatorTeamRole> newRoles) {
-    var isRemovingAccessManagerRole = Sets.difference(teamMember.roles(), Set.copyOf(newRoles))
-        .contains(RegulatorTeamRole.ACCESS_MANAGER);
+  private boolean canUpdateTeamMemberWithNewRoles(Team team, TeamMember teamMember,
+                                                  Collection<IndustryTeamRole> newRoles) {
+    var changingPermissions = Sets.difference(teamMember.roles(), Set.copyOf(newRoles));
+    var isRemovingAccessManagerRole = changingPermissions.contains(IndustryTeamRole.ACCESS_MANAGER)
+        || changingPermissions.contains(RegulatorTeamRole.ACCESS_MANAGER);
 
     return !isRemovingAccessManagerRole || teamMemberRemovalService.canRemoveTeamMember(team, teamMember);
   }

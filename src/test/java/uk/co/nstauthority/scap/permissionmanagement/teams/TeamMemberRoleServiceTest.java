@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.permissionmanagement;
+package uk.co.nstauthority.scap.permissionmanagement.teams;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -17,6 +17,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
+import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
+import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,8 +46,8 @@ class TeamMemberRoleServiceTest {
 
     teamMemberRoleService.addUserTeamRoles(team, userToAdd, Set.of(role));
 
-    verify(teamMemberRoleRepository, times(1)).deleteAllByTeamAndWuaId(team, userToAdd.webUserAccountId());
-    verify(teamMemberRoleRepository, times(1)).saveAll(teamMemberRoleCaptor.capture());
+    verify(teamMemberRoleRepository).deleteAllByTeamAndWuaId(team, userToAdd.webUserAccountId());
+    verify(teamMemberRoleRepository).saveAll(teamMemberRoleCaptor.capture());
 
     Assertions.assertThat(teamMemberRoleCaptor.getValue())
         .extracting(TeamMemberRole::getTeam, TeamMemberRole::getWuaId, TeamMemberRole::getRole)
@@ -65,8 +67,8 @@ class TeamMemberRoleServiceTest {
 
     teamMemberRoleService.updateUserTeamRoles(team, existingUser.wuaId().id(), Set.of(role));
 
-    verify(teamMemberRoleRepository, times(1)).deleteAllByTeamAndWuaId(team, existingUser.wuaId().id());
-    verify(teamMemberRoleRepository, times(1)).saveAll(teamMemberRoleCaptor.capture());
+    verify(teamMemberRoleRepository).deleteAllByTeamAndWuaId(team, existingUser.wuaId().id());
+    verify(teamMemberRoleRepository).saveAll(teamMemberRoleCaptor.capture());
 
     Assertions.assertThat(teamMemberRoleCaptor.getValue())
         .extracting(TeamMemberRole::getTeam, TeamMemberRole::getWuaId, TeamMemberRole::getRole)
@@ -91,8 +93,8 @@ class TeamMemberRoleServiceTest {
 
     teamMemberRoleService.updateUserTeamRoles(team, existingUser.wuaId().id(), rolesToGrant);
 
-    verify(teamMemberRoleRepository, times(1)).deleteAllByTeamAndWuaId(team, existingUser.wuaId().id());
-    verify(teamMemberRoleRepository, times(1)).saveAll(teamMemberRoleCaptor.capture());
+    verify(teamMemberRoleRepository).deleteAllByTeamAndWuaId(team, existingUser.wuaId().id());
+    verify(teamMemberRoleRepository).saveAll(teamMemberRoleCaptor.capture());
 
     Assertions.assertThat(teamMemberRoleCaptor.getValue())
         .extracting(TeamMemberRole::getTeam, TeamMemberRole::getWuaId, TeamMemberRole::getRole)

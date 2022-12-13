@@ -1,7 +1,9 @@
-package uk.co.nstauthority.scap.permissionmanagement;
+package uk.co.nstauthority.scap.permissionmanagement.teams;
 
 import java.util.UUID;
 import uk.co.nstauthority.scap.error.exception.IllegalUtilClassInstantiationException;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
+import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 
 public class TeamMemberRoleTestUtil {
 

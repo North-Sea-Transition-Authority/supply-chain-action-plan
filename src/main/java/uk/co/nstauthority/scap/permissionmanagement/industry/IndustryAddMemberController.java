@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.permissionmanagement.regulator;
+package uk.co.nstauthority.scap.permissionmanagement.industry;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -21,14 +21,14 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.AddMemberController;
 import uk.co.nstauthority.scap.permissionmanagement.teams.AddTeamMemberValidator;
 
 @Controller
-@RequestMapping("/permission-management/regulator/{teamId}")
-class RegulatorAddMemberController extends AddMemberController {
+@RequestMapping("/permission-management/industry/{teamId}")
+class IndustryAddMemberController extends AddMemberController {
 
   @Autowired
-  RegulatorAddMemberController(SamlProperties samlProperties,
-                               ControllerHelperService controllerHelperService,
-                               AddTeamMemberValidator addTeamMemberValidator,
-                               EnergyPortalUserService energyPortalUserService) {
+  IndustryAddMemberController(SamlProperties samlProperties,
+                              ControllerHelperService controllerHelperService,
+                              AddTeamMemberValidator addTeamMemberValidator,
+                              EnergyPortalUserService energyPortalUserService) {
     super(samlProperties,
         controllerHelperService,
         addTeamMemberValidator,
@@ -41,12 +41,12 @@ class RegulatorAddMemberController extends AddMemberController {
     return getAddTeamMemberModelAndView(form)
         .addObject(
             "submitUrl",
-            ReverseRouter.route(on(RegulatorAddMemberController.class)
+            ReverseRouter.route(on(IndustryAddMemberController.class)
                 .addMemberToTeamSubmission(teamId, form, ReverseRouter.emptyBindingResult()))
         )
         .addObject(
             "backLinkUrl",
-            ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberList(teamId))
+            ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId))
         );
   }
 
@@ -57,6 +57,6 @@ class RegulatorAddMemberController extends AddMemberController {
     return super.addMemberToTeamSubmission(teamId,
         form,
         bindingResult,
-        RegulatorAddRolesController.class);
+        IndustryAddRolesController.class);
   }
 }

@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,8 +23,10 @@ import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
-import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRoleService;
-import uk.co.nstauthority.scap.permissionmanagement.TeamMemberService;
+import uk.co.nstauthority.scap.permissionmanagement.TeamRepository;
+import uk.co.nstauthority.scap.permissionmanagement.teams.NewTeamFormvalidator;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRoleService;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
@@ -33,7 +36,7 @@ import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
 class RegulatorTeamServiceTest {
 
   @Mock
-  private TeamService teamService;
+  private TeamRepository teamRepository;
 
   @Mock
   private TeamMemberService teamMemberService;
@@ -41,38 +44,35 @@ class RegulatorTeamServiceTest {
   @Mock
   private TeamMemberRoleService teamMemberRoleService;
 
-  @InjectMocks
+  @Mock
+  private NewTeamFormvalidator newTeamFormvalidator;
+
   private RegulatorTeamService regulatorTeamService;
+
+  @BeforeEach
+  void setup() {
+    regulatorTeamService = new RegulatorTeamService(teamMemberService, teamRepository, teamMemberRoleService, newTeamFormvalidator);
+  }
 
   @Test
   void getRegulatorTeamForUser_whenUserBelongsToRegulatorTeam_thenReturnRegulatorTeam() {
     var user = ServiceUserDetailTestUtil.Builder().build();
     var team = new Team();
-    when(teamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR))
+    when(teamRepository.findAllTeamsOfTypeThatUserIsMemberOf(user.wuaId(), TeamType.REGULATOR))
         .thenReturn(List.of(team));
 
-    var result = regulatorTeamService.getRegulatorTeamForUser(user);
-
-    assertThat(result).contains(team);
+    var result = regulatorTeamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR);
+    assertThat(result).isEqualTo(List.of(team));
   }
 
   @Test
   void getRegulatorTeamForUser_whenUserDoesNotBelongToRegulatorTeam_thenReturnEmpty() {
     var user = ServiceUserDetailTestUtil.Builder().build();
-    when(teamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR)).thenReturn(List.of());
+    when(teamRepository.findAllTeamsOfTypeThatUserIsMemberOf(user.wuaId(), TeamType.REGULATOR)).thenReturn(List.of());
 
-    var result = regulatorTeamService.getRegulatorTeamForUser(user);
+    var result = regulatorTeamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR);
 
     assertThat(result).isEmpty();
-  }
-
-  @Test
-  void getRegulatorTeamForUser_whenUserDoesNotBelong_throwException() {
-    var user = ServiceUserDetailTestUtil.Builder().build();
-    when(teamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR)).thenReturn(List.of());
-
-    assertThatThrownBy(() -> regulatorTeamService.getRegulatorTeamForUserOrThrow(user)).isInstanceOf(
-        ScapEntityNotFoundException.class);
   }
 
   @Test
@@ -82,10 +82,10 @@ class RegulatorTeamServiceTest {
 
     var teamId = new TeamId(team.getUuid());
 
-    when(teamService.getTeam(teamId, TeamType.REGULATOR)).thenReturn(Optional.of(team));
+    when(teamRepository.findByUuid(teamId.uuid())).thenReturn(Optional.of(team));
 
-    assertThat(regulatorTeamService.getTeam(teamId)).contains(team);
-    verify(teamService, times(1)).getTeam(teamId, team.getTeamType());
+    assertThat(regulatorTeamService.getTeam(teamId)).isEqualTo(team);
+    verify(teamRepository).findByUuid(teamId.uuid());
   }
 
   @Test
@@ -95,10 +95,10 @@ class RegulatorTeamServiceTest {
 
     var teamId = new TeamId(team.getUuid());
 
-    when(teamService.getTeam(teamId, TeamType.REGULATOR)).thenReturn(Optional.empty());
+    when(teamRepository.findByUuid(teamId.uuid())).thenReturn(Optional.empty());
 
-    assertThat(regulatorTeamService.getTeam(teamId)).isEmpty();
-    verify(teamService, times(1)).getTeam(teamId, team.getTeamType());
+    assertThat(regulatorTeamService.findTeam(teamId)).isEmpty();
+    verify(teamRepository).findByUuid(teamId.uuid());
   }
 
   @Test
@@ -142,6 +142,6 @@ class RegulatorTeamServiceTest {
         .map(RegulatorTeamRole::name)
         .collect(Collectors.toSet());
 
-    verify(teamMemberRoleService, times(1)).addUserTeamRoles(team, userToAdd, rolesAsStrings);
+    verify(teamMemberRoleService).addUserTeamRoles(team, userToAdd, rolesAsStrings);
   }
 }

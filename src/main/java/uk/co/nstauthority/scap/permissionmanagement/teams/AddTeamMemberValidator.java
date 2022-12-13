@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.permissionmanagement;
+package uk.co.nstauthority.scap.permissionmanagement.teams;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -8,6 +8,7 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 import uk.co.fivium.formlibrary.validator.string.StringInputValidator;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
+import uk.co.nstauthority.scap.permissionmanagement.AddTeamMemberForm;
 
 @Service
 public class AddTeamMemberValidator implements Validator {

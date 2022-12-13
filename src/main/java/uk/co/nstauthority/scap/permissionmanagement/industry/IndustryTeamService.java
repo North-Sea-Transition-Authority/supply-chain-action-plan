@@ -1,38 +1,28 @@
 package uk.co.nstauthority.scap.permissionmanagement.industry;
 
-import java.util.Optional;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
-import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
-import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
-import uk.co.nstauthority.scap.permissionmanagement.TeamMemberService;
-import uk.co.nstauthority.scap.permissionmanagement.TeamType;
+import uk.co.nstauthority.scap.permissionmanagement.TeamRepository;
+import uk.co.nstauthority.scap.permissionmanagement.teams.NewTeamFormvalidator;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRoleService;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 @Service
-class IndustryTeamService {
-
-  private final TeamService teamService;
+class IndustryTeamService extends TeamService {
 
   private final TeamMemberService teamMemberService;
 
   @Autowired
-  IndustryTeamService(TeamService teamService, TeamMemberService teamMemberService) {
-    this.teamService = teamService;
+  IndustryTeamService(TeamMemberService teamMemberService,
+                      TeamRepository teamRepository,
+                      TeamMemberRoleService teamMemberRoleService,
+                      NewTeamFormvalidator newTeamFormvalidator) {
+    super(teamRepository, teamMemberRoleService, newTeamFormvalidator);
     this.teamMemberService = teamMemberService;
-  }
-
-  Optional<Team> getTeam(TeamId teamId) {
-    return teamService.getTeam(teamId, TeamType.INDUSTRY);
-  }
-
-  Team getTeamOrThrow(TeamId teamId) {
-    return teamService.getTeam(teamId, TeamType.INDUSTRY)
-        .orElseThrow(() -> new ScapEntityNotFoundException(
-            "Could not find Team with ID: %s".formatted(teamId)));
   }
 
   boolean isAccessManager(TeamId teamId, ServiceUserDetail user) {

@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.permissionmanagement;
+package uk.co.nstauthority.scap.permissionmanagement.teams;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -19,8 +19,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
+import uk.co.nstauthority.scap.permissionmanagement.TeamId;
+import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
+import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
+import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamView;
 
 @ExtendWith(MockitoExtension.class)
 class TeamMemberServiceTest {
@@ -76,7 +80,7 @@ class TeamMemberServiceTest {
     var user = ServiceUserDetailTestUtil.Builder().build();
     var teamId = new TeamId(UUID.randomUUID());
 
-    when(teamMemberRoleRepository.existsByWuaIdAndTeam_Uuid(user.wuaId(), teamId.uuid())).thenReturn(true);
+    when(teamMemberRoleRepository.existsByWuaIdAndTeamUuid(user.wuaId(), teamId.uuid())).thenReturn(true);
 
     assertTrue(teamMemberService.isMemberOfTeam(teamId, user));
   }
@@ -86,7 +90,7 @@ class TeamMemberServiceTest {
     var user = ServiceUserDetailTestUtil.Builder().build();
     var teamId = new TeamId(UUID.randomUUID());
 
-    when(teamMemberRoleRepository.existsByWuaIdAndTeam_Uuid(user.wuaId(), teamId.uuid())).thenReturn(false);
+    when(teamMemberRoleRepository.existsByWuaIdAndTeamUuid(user.wuaId(), teamId.uuid())).thenReturn(false);
 
     assertFalse(teamMemberService.isMemberOfTeam(teamId, user));
   }
@@ -97,7 +101,7 @@ class TeamMemberServiceTest {
     var teamId = new TeamId(UUID.randomUUID());
     var roles = Set.of("ROLE_NAME");
 
-    when(teamMemberRoleRepository.existsByWuaIdAndTeam_UuidAndRoleIn(user.wuaId(), teamId.uuid(), roles))
+    when(teamMemberRoleRepository.existsByWuaIdAndTeamUuidAndRoleIn(user.wuaId(), teamId.uuid(), roles))
         .thenReturn(true);
 
     assertTrue(teamMemberService.isMemberOfTeamWithAnyRoleOf(teamId, user, roles));
@@ -109,7 +113,7 @@ class TeamMemberServiceTest {
     var teamId = new TeamId(UUID.randomUUID());
     var roles = Set.of("ROLE_NAME");
 
-    when(teamMemberRoleRepository.existsByWuaIdAndTeam_UuidAndRoleIn(user.wuaId(), teamId.uuid(), roles))
+    when(teamMemberRoleRepository.existsByWuaIdAndTeamUuidAndRoleIn(user.wuaId(), teamId.uuid(), roles))
         .thenReturn(false);
 
     var result = teamMemberService.isMemberOfTeamWithAnyRoleOf(teamId, user, roles);

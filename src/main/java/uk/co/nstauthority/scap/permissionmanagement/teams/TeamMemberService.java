@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.permissionmanagement;
+package uk.co.nstauthority.scap.permissionmanagement.teams;
 
 import java.util.Collection;
 import java.util.List;
@@ -11,9 +11,12 @@ import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
+import uk.co.nstauthority.scap.permissionmanagement.TeamId;
+import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
+import uk.co.nstauthority.scap.permissionmanagement.TeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamView;
 
 @Service
 public class TeamMemberService {
@@ -65,11 +68,11 @@ public class TeamMemberService {
   }
 
   public boolean isMemberOfTeam(TeamId teamId, ServiceUserDetail user) {
-    return teamMemberRoleRepository.existsByWuaIdAndTeam_Uuid(user.wuaId(), teamId.uuid());
+    return teamMemberRoleRepository.existsByWuaIdAndTeamUuid(user.wuaId(), teamId.uuid());
   }
 
   public boolean isMemberOfTeamWithAnyRoleOf(TeamId teamId, ServiceUserDetail user, Set<String> roles) {
-    return teamMemberRoleRepository.existsByWuaIdAndTeam_UuidAndRoleIn(user.wuaId(), teamId.uuid(), roles);
+    return teamMemberRoleRepository.existsByWuaIdAndTeamUuidAndRoleIn(user.wuaId(), teamId.uuid(), roles);
   }
 
   private Set<TeamRole> mapMemberRolesToTeamRoles(Collection<TeamMemberRole> roles, Team team) {

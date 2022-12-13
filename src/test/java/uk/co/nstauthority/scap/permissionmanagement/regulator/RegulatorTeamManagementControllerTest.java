@@ -64,7 +64,7 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
     var teamId = new TeamId(team.getUuid());
 
     when(teamMemberService.isMemberOfTeam(teamId, user)).thenReturn(true);
-    when(regulatorTeamService.getTeamOrThrow(teamId)).thenReturn(team);
+    when(regulatorTeamService.getTeam(teamId)).thenReturn(team);
 
     mockMvc.perform(
       get(ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberList(teamId)))
@@ -78,7 +78,7 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
     var teamId = new TeamId(UUID.randomUUID());
 
     when(teamMemberService.isMemberOfTeam(teamId, user)).thenReturn(true);
-    when(regulatorTeamService.getTeamOrThrow(teamId)).thenThrow(ScapEntityNotFoundException.class);
+    when(regulatorTeamService.getTeam(teamId)).thenThrow(ScapEntityNotFoundException.class);
 
     mockMvc.perform(
       get(ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberList(teamId)))
@@ -95,7 +95,7 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
     var teamId = new TeamId(team.getUuid());
 
     when(teamMemberService.isMemberOfTeam(teamId, user)).thenReturn(true);
-    when(regulatorTeamService.getTeamOrThrow(teamId)).thenReturn(team);
+    when(regulatorTeamService.getTeam(teamId)).thenReturn(team);
 
     var teamMemberView = TeamMemberViewTestUtil.Builder()
       .withRole(RegulatorTeamRole.ACCESS_MANAGER)
@@ -126,7 +126,7 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
 
     when(regulatorTeamService.isAccessManager(teamId, user)).thenReturn(true);
     when(teamMemberService.isMemberOfTeam(teamId, user)).thenReturn(true);
-    when(regulatorTeamService.getTeamOrThrow(teamId)).thenReturn(team);
+    when(regulatorTeamService.getTeam(teamId)).thenReturn(team);
 
     var canRemoveUsers = true;
     var teamMemberView = TeamMemberViewTestUtil.Builder()

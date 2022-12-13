@@ -43,7 +43,6 @@ class TeamManagementControllerTest extends AbstractControllerTest {
   @MockBean
   private NewTeamFormvalidator newTeamFormvalidator;
 
-
   @Test
   void renderTeamList_notAuthorised_thenUnAuthorised() throws Exception {
     mockMvc.perform(
@@ -101,6 +100,7 @@ class TeamManagementControllerTest extends AbstractControllerTest {
     var form = new NewTeamForm();
     form.setOrganisationGroupId("10000");
 
+    when(teamService.validate(any(), any())).thenReturn(emptyBindingResult());
     when(organisationGroupService.getOrganisationGroupById(any(), any())).thenReturn(Optional.of(orgGroup));when(userDetailService.getUserDetail()).thenReturn(user);
     when(userDetailService.getUserDetail()).thenReturn(user);
 
@@ -120,6 +120,7 @@ class TeamManagementControllerTest extends AbstractControllerTest {
     var form = new NewTeamForm();
     form.setOrganisationGroupId("10000");
 
+    when(teamService.validate(any(), any())).thenReturn(emptyBindingResult());
     when(userDetailService.getUserDetail()).thenReturn(user);
 
     mockMvc.perform(

@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.permissionmanagement.regulator;
+package uk.co.nstauthority.scap.permissionmanagement.industry;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -21,11 +21,10 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 @Controller
-@RequestMapping("/permission-management/regulator/{teamId}/remove")
-public class RegulatorRemoveMemberController extends RemoveMemberController {
-
+@RequestMapping("/permission-management/industry/{teamId}/remove/{wuaId}")
+public class IndustryRemoveMemberController extends RemoveMemberController {
   @Autowired
-  public RegulatorRemoveMemberController(TeamService teamService,
+  public IndustryRemoveMemberController(TeamService teamService,
                                          TeamMemberService teamMemberService,
                                          CustomerConfigurationProperties customerConfigurationProperties,
                                          TeamMemberViewService teamMemberViewService,
@@ -38,23 +37,23 @@ public class RegulatorRemoveMemberController extends RemoveMemberController {
   }
 
   @Override
-  @GetMapping("/{wuaId}")
+  @GetMapping
   public ModelAndView renderRemoveMember(@PathVariable("teamId") TeamId teamId,
                                          @PathVariable("wuaId") WebUserAccountId wuaId) {
     return super.renderRemoveMember(teamId, wuaId)
-        .addObject("backLinkUrl", ReverseRouter.route(on(RegulatorTeamManagementController.class)
+        .addObject("backLinkUrl", ReverseRouter.route(on(IndustryTeamManagementController.class)
             .renderMemberList(teamId)))
-        .addObject("removeUrl", ReverseRouter.route(on(RegulatorRemoveMemberController.class)
+        .addObject("removeUrl", ReverseRouter.route(on(IndustryRemoveMemberController.class)
             .removeMember(teamId, wuaId, null)));
   }
 
-  @PostMapping("/{wuaId}")
+  @PostMapping
   public ModelAndView removeMember(@PathVariable("teamId") TeamId teamId,
                                    @PathVariable("wuaId") WebUserAccountId wuaId,
                                    RedirectAttributes redirectAttributes) {
     return super.removeMember(teamId,
         wuaId,
         redirectAttributes,
-        ReverseRouter.redirect(on(RegulatorTeamManagementController.class).renderMemberList(teamId)));
+        ReverseRouter.redirect(on(IndustryTeamManagementController.class).renderMemberList(teamId)));
   }
 }

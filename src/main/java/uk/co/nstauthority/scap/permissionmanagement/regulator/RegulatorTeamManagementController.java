@@ -13,10 +13,9 @@ import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.IsMemberOfTeam;
-import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
-import uk.co.nstauthority.scap.permissionmanagement.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 
 @Controller
 @RequestMapping("/permission-management/regulator")
@@ -44,8 +43,7 @@ public class RegulatorTeamManagementController {
   @GetMapping
   public ModelAndView renderMemberListRedirect() {
 
-    var team = regulatorTeamService
-        .getRegulatorTeamForUserOrThrow(userDetailService.getUserDetail());
+    var team = regulatorTeamService.getTeam(userDetailService.getUserDetail());
 
     return ReverseRouter.redirect(on(RegulatorTeamManagementController.class)
         .renderMemberList(new TeamId(team.getUuid())));
@@ -55,7 +53,7 @@ public class RegulatorTeamManagementController {
   @IsMemberOfTeam
   public ModelAndView renderMemberList(@PathVariable("teamId") TeamId teamId) {
 
-    var team = getRegulatorTeam(teamId);
+    var team = regulatorTeamService.getTeam(teamId);
 
     var user = userDetailService.getUserDetail();
 
@@ -76,9 +74,5 @@ public class RegulatorTeamManagementController {
     }
 
     return modelAndView;
-  }
-
-  private Team getRegulatorTeam(TeamId teamId) {
-    return regulatorTeamService.getTeamOrThrow(teamId);
   }
 }

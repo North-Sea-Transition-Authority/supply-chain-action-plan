@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryEditMemberController;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryRemoveMemberController;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorEditMemberController;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorRemoveMemberController;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamView;
@@ -29,8 +31,7 @@ public record TeamMemberView(WebUserAccountId wuaId, TeamView teamView, String t
     return switch (teamView.teamType()) {
       case REGULATOR -> ReverseRouter.route(on(RegulatorRemoveMemberController.class)
           .renderRemoveMember(teamView.teamId(), wuaId));
-      //TODO: SCAP2022-116 Add Industry Remove Team Member Functionality
-      case INDUSTRY -> ReverseRouter.route(on(RegulatorRemoveMemberController.class)
+      case INDUSTRY -> ReverseRouter.route(on(IndustryRemoveMemberController.class)
           .renderRemoveMember(teamView.teamId(), wuaId));
     };
   }
@@ -39,8 +40,7 @@ public record TeamMemberView(WebUserAccountId wuaId, TeamView teamView, String t
     return switch (teamView.teamType()) {
       case REGULATOR -> ReverseRouter.route(on(RegulatorEditMemberController.class)
           .renderEditMember(teamView.teamId(), wuaId));
-      //TODO: SCAP2022-116 Add Industry Edit Member Role functionality
-      case INDUSTRY -> ReverseRouter.route(on(RegulatorEditMemberController.class)
+      case INDUSTRY -> ReverseRouter.route(on(IndustryEditMemberController.class)
           .renderEditMember(teamView.teamId(), wuaId));
     };
   }

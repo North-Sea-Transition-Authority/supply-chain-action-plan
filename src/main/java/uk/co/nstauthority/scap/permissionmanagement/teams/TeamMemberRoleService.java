@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.permissionmanagement;
+package uk.co.nstauthority.scap.permissionmanagement.teams;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
 
 @Service
 public class TeamMemberRoleService {
@@ -22,6 +23,11 @@ public class TeamMemberRoleService {
   @Transactional
   public void addUserTeamRoles(Team team, EnergyPortalUserDto userToAdd, Set<String> roles) {
     updateUserTeamRoles(team, userToAdd.webUserAccountId(), roles);
+  }
+
+  @Transactional
+  public void addUserTeamRoles(Team team, long userToAdd, Set<String> roles) {
+    updateUserTeamRoles(team, userToAdd, roles);
   }
 
   @Transactional

@@ -32,7 +32,6 @@ public class TeamManagementController {
   private final OrganisationGroupService organisationGroupService;
 
   private final NewTeamFormvalidator newTeamFormvalidator;
-
   private final String organisationGroupSearchRestUrl =
       ReverseRouter.route(on(OrganisationGroupRestController.class).getOrganisationGroupSearchResults(null));
 
@@ -74,6 +73,7 @@ public class TeamManagementController {
   @PostMapping("/new-team")
   public ModelAndView addNewIndustryTeam(@ModelAttribute("form") NewTeamForm form,
                                          BindingResult bindingResult) {
+
     newTeamFormvalidator.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(bindingResult,
         renderNewIndustryTeamForm(form),

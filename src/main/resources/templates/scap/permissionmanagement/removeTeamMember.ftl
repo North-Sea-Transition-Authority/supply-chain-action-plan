@@ -1,4 +1,4 @@
-<#include "../../layout/layout.ftl">
+<#include "../layout/layout.ftl">
 
 <#-- @ftlvariable name="backLinkUrl" type="java.lang.String" -->
 <#-- @ftlvariable name="pageTitle" type="java.lang.String" -->
