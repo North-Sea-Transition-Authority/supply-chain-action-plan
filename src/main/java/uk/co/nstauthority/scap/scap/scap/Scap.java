@@ -58,4 +58,9 @@ public class Scap {
   public String getReference() {
     return reference;
   }
+
+  @VisibleForTesting
+  public void setReference(String reference) {
+    this.reference = reference;
+  }
 }

@@ -116,6 +116,23 @@ class ScapDetailServiceTest {
         .isInstanceOf(ScapEntityNotFoundException.class);
   }
 
+  @Test
+  void submitScap_VerifySaves() {
+    var scapDetail = new ScapDetail();
+    scapDetail.setStatus(ScapDetailStatus.DRAFT);
+    var argumentCaptor = ArgumentCaptor.forClass(ScapDetail.class);
+
+    scapDetailService.submitScap(scapDetail);
+
+    verify(scapDetailRepository).save(argumentCaptor.capture());
+
+    assertThat(argumentCaptor.getValue()).extracting(
+        ScapDetail::getStatus
+    ).isEqualTo(
+        ScapDetailStatus.SUBMITTED
+    );
+  }
+
   private ServiceUserDetail getUserDetail() {
     return new ServiceUserDetail(1000L, 1000L, "Test", "Testerson", "test@test.com");
   }

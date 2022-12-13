@@ -60,4 +60,10 @@ public class ScapDetailService {
             String.format("Could not find a ScapDetail for Scap with ID [%d]", scapId)
         ));
   }
+
+  @Transactional
+  public void submitScap(ScapDetail scapDetail) {
+    scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
+    scapDetailRepository.save(scapDetail);
+  }
 }
