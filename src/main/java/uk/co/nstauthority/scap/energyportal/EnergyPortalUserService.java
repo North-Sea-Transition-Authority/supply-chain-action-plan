@@ -2,10 +2,8 @@ package uk.co.nstauthority.scap.energyportal;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.co.fivium.energyportalapi.client.LogCorrelationId;
 import uk.co.fivium.energyportalapi.client.RequestPurpose;
 import uk.co.fivium.energyportalapi.client.user.UserApi;
 import uk.co.fivium.energyportalapi.generated.client.UserProjectionRoot;
@@ -51,8 +49,7 @@ public class EnergyPortalUserService {
     return userApi.searchUsersByEmail(
         username,
         USERS_PROJECTION_ROOT,
-        FIND_USERS_REQUEST_PURPOSE,
-        new LogCorrelationId(UUID.randomUUID().toString())
+        FIND_USERS_REQUEST_PURPOSE
     );
   }
 
@@ -71,8 +68,7 @@ public class EnergyPortalUserService {
     return userApi.searchUsersByIds(
         userIds,
         USERS_PROJECTION_ROOT,
-        FIND_USERS_REQUEST_PURPOSE,
-        new LogCorrelationId(UUID.randomUUID().toString())
+        FIND_USERS_REQUEST_PURPOSE
     );
   }
 
@@ -86,8 +82,7 @@ public class EnergyPortalUserService {
     return userApi.findUserById(
         webUserAccountId.toInt(),
         USER_PROJECTION_ROOT,
-        FIND_USER_REQUEST_PURPOSE,
-        new LogCorrelationId(UUID.randomUUID().toString())
+        FIND_USER_REQUEST_PURPOSE
     );
   }
 

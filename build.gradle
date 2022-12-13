@@ -47,7 +47,7 @@ dependencies {
   implementation 'org.springframework.session:spring-session-core'
 
   implementation 'uk.co.fivium.digitalformlibrary:digital-form-library:v1.0.1'
-  implementation 'uk.co.fivium.energyportalapi:client:v2.3.0'
+  implementation 'uk.co.fivium.energyportalapi:client:v2.4.0'
 
   implementation 'com.amazonaws:aws-java-sdk-s3:1.12.351'
   implementation 'fi.solita.clamav:clamav-client:1.0.1'

@@ -17,7 +17,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.co.fivium.energyportalapi.client.LogCorrelationId;
 import uk.co.fivium.energyportalapi.client.RequestPurpose;
 import uk.co.fivium.energyportalapi.client.organisation.OrganisationApi;
 import uk.co.fivium.energyportalapi.generated.client.OrganisationGroupProjectionRoot;
@@ -51,8 +50,7 @@ class OrganisationGroupServiceTest {
     when(organisationApi.searchOrganisationGroups(
         eq(searchTerm),
         any(OrganisationGroupsProjectionRoot.class),
-        any(RequestPurpose.class),
-        any(LogCorrelationId.class)
+        any(RequestPurpose.class)
     )).thenReturn(groupList);
 
     var organisationGroups =
@@ -63,8 +61,7 @@ class OrganisationGroupServiceTest {
     verify(organisationApi).searchOrganisationGroups(
         eq(searchTerm),
         argumentCaptor.capture(),
-        any(RequestPurpose.class),
-        any(LogCorrelationId.class)
+        any(RequestPurpose.class)
     );
 
     assertThat(organisationGroups).isEqualTo(groupList);
@@ -113,8 +110,7 @@ class OrganisationGroupServiceTest {
     when(organisationApi.findOrganisationGroup(
         eq(organisationGroup.getOrganisationGroupId()),
         any(OrganisationGroupProjectionRoot.class),
-        any(RequestPurpose.class),
-        any(LogCorrelationId.class)))
+        any(RequestPurpose.class)))
         .thenReturn(Optional.of(organisationGroup));
 
     var returnedOrganisation = organisationGroupService.getOrganisationGroupById(1, purpose);
@@ -122,8 +118,7 @@ class OrganisationGroupServiceTest {
     verify(organisationApi).findOrganisationGroup(
         eq(organisationGroup.getOrganisationGroupId()),
         argumentCaptor.capture(),
-        any(RequestPurpose.class),
-        any(LogCorrelationId.class));
+        any(RequestPurpose.class));
 
     assertThat(returnedOrganisation).contains(organisationGroup);
     assertThat(argumentCaptor.getValue().getFields())

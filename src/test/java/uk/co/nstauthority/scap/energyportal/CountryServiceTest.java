@@ -18,7 +18,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.co.fivium.energyportalapi.client.LogCorrelationId;
 import uk.co.fivium.energyportalapi.client.RequestPurpose;
 import uk.co.fivium.energyportalapi.client.countries.CountryApi;
 import uk.co.fivium.energyportalapi.generated.client.CountriesProjectionRoot;
@@ -51,17 +50,15 @@ class CountryServiceTest {
     when(countryApi.searchDefaultActiveCountriesByName(
         eq(searchTerm),
         any(CountriesProjectionRoot.class),
-        any(RequestPurpose.class),
-        any())
-    ).thenReturn(countries);
+        any(RequestPurpose.class)))
+        .thenReturn(countries);
 
     var returnedCountries = countryService.searchCountries(searchTerm, searchPurpose);
 
     verify(countryApi).searchDefaultActiveCountriesByName(
         eq(searchTerm),
         countryProjectionRootArgumentCaptor.capture(),
-        requestPurposeArgumentCaptor.capture(),
-        any());
+        requestPurposeArgumentCaptor.capture());
 
     assertThat(returnedCountries).isEqualTo(countries);
     assertThat(requestPurposeArgumentCaptor.getValue().purpose()).isEqualTo(searchPurpose);
@@ -82,17 +79,15 @@ class CountryServiceTest {
     when(countryApi.findCountryById(
         eq(searchId),
         any(CountryProjectionRoot.class),
-        any(RequestPurpose.class),
-        any())
-    ).thenReturn(Optional.of(country));
+        any(RequestPurpose.class)))
+        .thenReturn(Optional.of(country));
 
     var returnedCountry = countryService.findCountryById(searchId, searchPurpose);
 
     verify(countryApi).findCountryById(
         eq(searchId),
         countryProjectionRootArgumentCaptor.capture(),
-        requestPurposeArgumentCaptor.capture(),
-        any());
+        requestPurposeArgumentCaptor.capture());
 
     assertThat(returnedCountry).contains(country);
     assertThat(requestPurposeArgumentCaptor.getValue().purpose()).isEqualTo(searchPurpose);
@@ -112,17 +107,15 @@ class CountryServiceTest {
     when(countryApi.findCountryById(
         eq(searchId),
         any(CountryProjectionRoot.class),
-        any(RequestPurpose.class),
-        any())
-    ).thenReturn(Optional.empty());
+        any(RequestPurpose.class)))
+        .thenReturn(Optional.empty());
 
     var doesCountryExist = countryService.doesCountryExist(searchId);
 
     verify(countryApi).findCountryById(
         eq(searchId),
         countryProjectionRootArgumentCaptor.capture(),
-        requestPurposeArgumentCaptor.capture(),
-        any());
+        requestPurposeArgumentCaptor.capture());
 
     assertFalse(doesCountryExist);
     assertThat(requestPurposeArgumentCaptor.getValue().purpose()).isEqualTo(searchPurpose);
@@ -143,17 +136,15 @@ class CountryServiceTest {
     when(countryApi.findCountryById(
         eq(searchId),
         any(CountryProjectionRoot.class),
-        any(RequestPurpose.class),
-        any())
-    ).thenReturn(Optional.of(country));
+        any(RequestPurpose.class)))
+        .thenReturn(Optional.of(country));
 
     var doesCountryExist = countryService.doesCountryExist(searchId);
 
     verify(countryApi).findCountryById(
         eq(searchId),
         countryProjectionRootArgumentCaptor.capture(),
-        requestPurposeArgumentCaptor.capture(),
-        any());
+        requestPurposeArgumentCaptor.capture());
 
     assertTrue(doesCountryExist);
     assertThat(requestPurposeArgumentCaptor.getValue().purpose()).isEqualTo(searchPurpose);
@@ -175,7 +166,7 @@ class CountryServiceTest {
     var requestPurposeArgumentCaptor = ArgumentCaptor.forClass(RequestPurpose.class);
 
     when(countryApi.getAllCountriesByIds(
-        eq(countryIds), any(CountriesProjectionRoot.class), any(RequestPurpose.class), any(LogCorrelationId.class)))
+        eq(countryIds), any(CountriesProjectionRoot.class), any(RequestPurpose.class)))
         .thenReturn(countries);
 
     var returnedCountries = countryService.getCountriesByIds(countryIds, purpose);
@@ -183,8 +174,7 @@ class CountryServiceTest {
     verify(countryApi).getAllCountriesByIds(
         eq(countryIds),
         requestedFieldsArgumentCaptor.capture(),
-        requestPurposeArgumentCaptor.capture(),
-        any(LogCorrelationId.class));
+        requestPurposeArgumentCaptor.capture());
 
     assertThat(returnedCountries).isEqualTo(countries);
     assertThat(requestedFieldsArgumentCaptor.getValue().getFields()).containsExactly(

@@ -2,10 +2,8 @@ package uk.co.nstauthority.scap.energyportal;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.co.fivium.energyportalapi.client.LogCorrelationId;
 import uk.co.fivium.energyportalapi.client.RequestPurpose;
 import uk.co.fivium.energyportalapi.client.countries.CountryApi;
 import uk.co.fivium.energyportalapi.generated.client.CountriesProjectionRoot;
@@ -32,14 +30,14 @@ public class CountryService {
     var filters = new CountryProjectionRoot().countryId().countryName();
     var requestPurpose = new RequestPurpose(purpose);
 
-    return countryApi.findCountryById(id, filters, requestPurpose, getLogCorrelationId());
+    return countryApi.findCountryById(id, filters, requestPurpose);
   }
 
   public List<Country> getCountriesByIds(List<Integer> countryIds, String purpose) {
     var filters = new CountriesProjectionRoot().countryId().countryName();
     var requestPurpose = new RequestPurpose(purpose);
 
-    return countryApi.getAllCountriesByIds(countryIds, filters, requestPurpose, getLogCorrelationId());
+    return countryApi.getAllCountriesByIds(countryIds, filters, requestPurpose);
   }
 
   public List<Country> searchCountries(String term, String purpose) {
@@ -49,8 +47,7 @@ public class CountryService {
     return countryApi.searchDefaultActiveCountriesByName(
         term,
         filters,
-        requestPurpose,
-        getLogCorrelationId());
+        requestPurpose);
   }
 
   public RestSearchResult getCountrySearchResults(List<Country> countries) {
@@ -60,7 +57,4 @@ public class CountryService {
             .toList());
   }
 
-  private LogCorrelationId getLogCorrelationId() {
-    return new LogCorrelationId(String.valueOf(UUID.randomUUID()));
-  }
 }

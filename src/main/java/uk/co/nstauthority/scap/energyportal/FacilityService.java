@@ -1,10 +1,8 @@
 package uk.co.nstauthority.scap.energyportal;
 
 import java.util.List;
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.co.fivium.energyportalapi.client.LogCorrelationId;
 import uk.co.fivium.energyportalapi.client.RequestPurpose;
 import uk.co.fivium.energyportalapi.client.facility.FacilityApi;
 import uk.co.fivium.energyportalapi.generated.client.FacilitiesByIdsProjectionRoot;
@@ -28,7 +26,7 @@ public class FacilityService {
     var requestedFields = new FacilitiesByNameProjectionRoot()
         .id().name();
 
-    return facilityApi.searchFacilitiesByName(searchTerm, requestedFields, requestPurpose, getLogCorrelationId());
+    return facilityApi.searchFacilitiesByName(searchTerm, requestedFields, requestPurpose);
   }
 
   public List<Facility> findFacilitiesByIds(List<Integer> facilityIds, String purpose) {
@@ -39,8 +37,7 @@ public class FacilityService {
     return facilityApi.searchFacilitiesByIds(
         facilityIds,
         requestedFields,
-        requestPurpose,
-        getLogCorrelationId()
+        requestPurpose
     );
   }
 
@@ -50,9 +47,5 @@ public class FacilityService {
             .map(facility -> new RestSearchItem(String.valueOf(facility.getId()), facility.getName()))
             .toList()
     );
-  }
-
-  private LogCorrelationId getLogCorrelationId() {
-    return new LogCorrelationId(UUID.randomUUID().toString());
   }
 }

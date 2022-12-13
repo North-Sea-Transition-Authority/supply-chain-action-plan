@@ -2,10 +2,8 @@ package uk.co.nstauthority.scap.scap.organisationgroup;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.co.fivium.energyportalapi.client.LogCorrelationId;
 import uk.co.fivium.energyportalapi.client.RequestPurpose;
 import uk.co.fivium.energyportalapi.client.organisation.OrganisationApi;
 import uk.co.fivium.energyportalapi.generated.client.OrganisationGroupProjectionRoot;
@@ -29,7 +27,7 @@ public class OrganisationGroupService {
         .name();
     var requestPurpose = new RequestPurpose(purpose);
 
-    return organisationApi.searchOrganisationGroups(name, organisationGroupFilter, requestPurpose, getLogCorrelationId());
+    return organisationApi.searchOrganisationGroups(name, organisationGroupFilter, requestPurpose);
   }
 
   public RestSearchResult organisationGroupsToSearchResult(List<OrganisationGroup> queryResults) {
@@ -46,10 +44,7 @@ public class OrganisationGroupService {
         .name();
     var requestPurpose = new RequestPurpose(purpose);
 
-    return organisationApi.findOrganisationGroup(id, organisationGroupFilter, requestPurpose, getLogCorrelationId());
+    return organisationApi.findOrganisationGroup(id, organisationGroupFilter, requestPurpose);
   }
 
-  private LogCorrelationId getLogCorrelationId() {
-    return new LogCorrelationId(String.valueOf(UUID.randomUUID()));
-  }
 }

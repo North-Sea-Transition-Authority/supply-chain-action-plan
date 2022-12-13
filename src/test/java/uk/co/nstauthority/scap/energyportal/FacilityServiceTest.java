@@ -3,7 +3,6 @@ package uk.co.nstauthority.scap.energyportal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -14,7 +13,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.co.fivium.energyportalapi.client.LogCorrelationId;
 import uk.co.fivium.energyportalapi.client.RequestPurpose;
 import uk.co.fivium.energyportalapi.client.facility.FacilityApi;
 import uk.co.fivium.energyportalapi.generated.client.FacilitiesByIdsProjectionRoot;
@@ -47,8 +45,7 @@ class FacilityServiceTest {
     when(facilityApi.searchFacilitiesByName(
         eq(searchTerm),
         facilitiesByNameProjectionRootArgumentCaptor.capture(),
-        requestPurposeArgumentCaptor.capture(),
-        any(LogCorrelationId.class)))
+        requestPurposeArgumentCaptor.capture()))
         .thenReturn(facilities);
 
     var returnedFacilities = facilityService.searchFacilities(searchTerm, purpose);
@@ -75,8 +72,7 @@ class FacilityServiceTest {
     when(facilityApi.searchFacilitiesByIds(
         eq(ids),
         facilitiesByIdsProjectionRootArgumentCaptor.capture(),
-        requestPurposeArgumentCaptor.capture(),
-        any(LogCorrelationId.class)))
+        requestPurposeArgumentCaptor.capture()))
         .thenReturn(facilities);
 
     var returnedFacilities = facilityService.findFacilitiesByIds(ids, purpose);
