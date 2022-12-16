@@ -1,7 +1,9 @@
 <#include '../../layout/layout.ftl'>
-<#import 'projectDetailsSummary.ftl' as projectDetailsSummary>
+<#import '../summary/scapSummary.ftl' as scapSummary>
 
 <#assign pageTitle = "Check your answers before submitting your SCAP" />
+
+<#-- @ftlvariable name="projectDetailsSummaryView" type="uk.co.nstauthority.scap.scap.summary.ProjectDetailsSummaryView" -->
 
 <@defaultPage
   htmlTitle=pageTitle
@@ -9,11 +11,7 @@
   pageSize=PageSize.TWO_THIRDS_COLUMN
   backLinkUrl=springUrl(backLinkUrl)
 >
-  <@fdsAccordion.accordion accordionId="scap-summary">
-    <@fdsAccordion.accordionSection sectionHeading="Project details">
-      <@projectDetailsSummary.projectDetailsSummary projectDetailsView=projectDetailsView />
-    </@fdsAccordion.accordionSection>
-  </@fdsAccordion.accordion>
+  <@scapSummary.summary projectDetailsSummaryView=projectDetailsSummaryView />
 
   <@fdsForm.htmlForm>
     <@fdsAction.submitButtons

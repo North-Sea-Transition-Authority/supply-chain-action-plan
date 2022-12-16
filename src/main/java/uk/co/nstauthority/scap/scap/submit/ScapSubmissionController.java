@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.error.exception.ScapBadRequestException;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
-import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
+import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
@@ -24,14 +24,14 @@ class ScapSubmissionController {
 
   private final ScapService scapService;
   private final ScapDetailService scapDetailService;
-  private final SubmissionViewService submissionViewService;
+  private final ScapSummaryViewService scapSummaryViewService;
 
   @Autowired
   ScapSubmissionController(ScapService scapService, ScapDetailService scapDetailService,
-                           SubmissionViewService submissionViewService) {
+                           ScapSummaryViewService scapSummaryViewService) {
     this.scapService = scapService;
     this.scapDetailService = scapDetailService;
-    this.submissionViewService = submissionViewService;
+    this.scapSummaryViewService = scapSummaryViewService;
   }
 
   @GetMapping
@@ -42,7 +42,7 @@ class ScapSubmissionController {
       throw new ScapBadRequestException("SCAP with ID [%d] is not in DRAFT status");
     }
 
-    return scapSubmissionConfirmationModelAndView(scapDetail);
+    return scapSummaryViewService.addScapSummaryToModel(scapSubmissionConfirmationModelAndView(scapId), scapDetail);
   }
 
   @GetMapping("/success")
@@ -72,10 +72,9 @@ class ScapSubmissionController {
     return ReverseRouter.redirect(on(ScapSubmissionController.class).renderScapSubmissionSuccess(scapId));
   }
 
-  private ModelAndView scapSubmissionConfirmationModelAndView(ScapDetail scapDetail) {
+  private ModelAndView scapSubmissionConfirmationModelAndView(Integer scapId) {
     return new ModelAndView("scap/scap/submit/reviewAndSubmit")
         .addObject("backLinkUrl", ReverseRouter.route(on(TaskListController.class)
-            .renderTaskList(scapDetail.getScap().getId())))
-        .addObject("projectDetailsView", submissionViewService.getProjectDetailsSubmissionView(scapDetail));
+            .renderTaskList(scapId)));
   }
 }

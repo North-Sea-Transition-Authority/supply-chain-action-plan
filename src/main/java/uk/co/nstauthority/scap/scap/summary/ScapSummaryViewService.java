@@ -1,31 +1,40 @@
-package uk.co.nstauthority.scap.scap.submit;
+package uk.co.nstauthority.scap.scap.summary;
 
+import com.google.common.annotations.VisibleForTesting;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.ModelAndView;
 import uk.co.fivium.formlibrary.validator.date.DateUtils;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsService;
-import uk.co.nstauthority.scap.scap.submit.submissionviews.ProjectDetailsSubmissionView;
 
 @Service
-class SubmissionViewService {
+public class ScapSummaryViewService {
 
   private final ProjectDetailsService projectDetailsService;
 
   @Autowired
-  SubmissionViewService(ProjectDetailsService projectDetailsService) {
+  ScapSummaryViewService(ProjectDetailsService projectDetailsService) {
     this.projectDetailsService = projectDetailsService;
   }
 
-  ProjectDetailsSubmissionView getProjectDetailsSubmissionView(ScapDetail scapDetail) {
+  @Transactional
+  public ModelAndView addScapSummaryToModel(ModelAndView modelAndView, ScapDetail scapDetail) {
+    modelAndView.addObject("projectDetailsSummaryView", getProjectDetailsSummaryView(scapDetail));
+    return modelAndView;
+  }
+
+  @VisibleForTesting
+  public ProjectDetailsSummaryView getProjectDetailsSummaryView(ScapDetail scapDetail) {
     var projectDetails = projectDetailsService.getProjectDetailsOrThrow(scapDetail);
     var projectTypes = projectDetailsService.getProjectTypesByProjectDetails(projectDetails)
         .stream().toList();
     var projectFacilities = projectDetailsService.getProjectFacilityNames(projectDetails);
     var hasFacilities = YesNo.fromBoolean(projectDetails.getHasFacilities());
 
-    return new ProjectDetailsSubmissionView(
+    return new ProjectDetailsSummaryView(
         projectDetails.getProjectName(),
         projectTypes,
         projectDetails.getProjectCostEstimate(),

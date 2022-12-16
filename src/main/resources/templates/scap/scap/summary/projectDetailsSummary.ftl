@@ -1,7 +1,7 @@
 <#include '../../layout/layout.ftl'>
 
 <#macro projectDetailsSummary projectDetailsView>
-<#-- @ftlvariable name="projectDetailsView" type="uk.co.nstauthority.scap.scap.submit.submissionviews.ProjectDetailsSubmissionView" -->
+<#-- @ftlvariable name="projectDetailsView" type="uk.co.nstauthority.scap.scap.summary.ProjectDetailsSummaryView" -->
   <@fdsSummaryList.summaryListCard
     headingText="Project details"
     summaryListId="project-details-summary-card"

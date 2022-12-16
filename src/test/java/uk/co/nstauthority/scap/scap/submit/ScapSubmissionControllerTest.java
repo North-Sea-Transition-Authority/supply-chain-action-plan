@@ -11,9 +11,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.mockScapSummaryViewServiceMethods;
+import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.modelHasSummaryViews;
 
 import java.time.Instant;
-import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +29,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
-import uk.co.nstauthority.scap.scap.submit.submissionviews.ProjectDetailsSubmissionView;
+import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
@@ -48,7 +49,7 @@ class ScapSubmissionControllerTest extends AbstractControllerTest {
   ScapDetailService scapDetailService;
 
   @MockBean
-  SubmissionViewService submissionViewService;
+  ScapSummaryViewService scapSummaryViewService;
 
   @BeforeEach
   void setup() {
@@ -60,20 +61,16 @@ class ScapSubmissionControllerTest extends AbstractControllerTest {
 
   @Test
   void renderScapSubmissionConfirmation() throws Exception {
-    var projectDetailsView = new ProjectDetailsSubmissionView(
-        null, Collections.emptyList(), null, null, null,
-        null, Collections.emptyList(), null, null
-    );
-
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId)).thenReturn(scapDetail);
-    when(submissionViewService.getProjectDetailsSubmissionView(scapDetail)).thenReturn(projectDetailsView);
+    mockScapSummaryViewServiceMethods(scapSummaryViewService, scapDetail);
 
     mockMvc.perform(get(
         ReverseRouter.route(on(ScapSubmissionController.class).renderScapSubmissionConfirmation(scapId))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/submit/reviewAndSubmit"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId))));
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId))))
+        .andExpect(modelHasSummaryViews());
   }
 
   @Test
@@ -82,7 +79,7 @@ class ScapSubmissionControllerTest extends AbstractControllerTest {
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId)).thenReturn(scapDetail);
 
     mockMvc.perform(get(
-            ReverseRouter.route(on(ScapSubmissionController.class).renderScapSubmissionConfirmation(scapId))))
+        ReverseRouter.route(on(ScapSubmissionController.class).renderScapSubmissionConfirmation(scapId))))
         .andExpect(status().isBadRequest());
   }
 
@@ -108,7 +105,7 @@ class ScapSubmissionControllerTest extends AbstractControllerTest {
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId)).thenReturn(scapDetail);
 
     mockMvc.perform(post(
-            ReverseRouter.route(on(ScapSubmissionController.class).submitScap(scapId)))
+        ReverseRouter.route(on(ScapSubmissionController.class).submitScap(scapId)))
             .with(csrf()))
         .andExpect(status().isBadRequest());
 

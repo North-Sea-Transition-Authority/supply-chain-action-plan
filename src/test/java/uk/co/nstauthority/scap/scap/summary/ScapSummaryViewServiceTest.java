@@ -1,6 +1,10 @@
-package uk.co.nstauthority.scap.scap.submit;
+package uk.co.nstauthority.scap.scap.summary;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -9,34 +13,46 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetails;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsService;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectType;
-import uk.co.nstauthority.scap.scap.submit.submissionviews.ProjectDetailsSubmissionView;
 
 @ExtendWith(MockitoExtension.class)
-class SubmissionViewServiceTest {
+class ScapSummaryViewServiceTest {
 
   @Mock
   ProjectDetailsService projectDetailsService;
 
-  @InjectMocks
-  SubmissionViewService submissionViewService;
+  ScapSummaryViewService scapSummaryViewService;
 
   private ScapDetail scapDetail;
 
   @BeforeEach
   void setup() {
+    scapSummaryViewService = spy(new ScapSummaryViewService(projectDetailsService));
     scapDetail = new ScapDetail();
+  }
+
+  @Test
+  void addScapSummaryToModel_VerifyCalls() {
+    var modelAndView = mock(ModelAndView.class);
+    var scapDetail = mock(ScapDetail.class);
+
+    doReturn(null).when(scapSummaryViewService).getProjectDetailsSummaryView(scapDetail);
+
+    scapSummaryViewService.addScapSummaryToModel(modelAndView, scapDetail);
+
+    verify(scapSummaryViewService).getProjectDetailsSummaryView(scapDetail);
   }
 
   @ParameterizedTest
@@ -51,18 +67,18 @@ class SubmissionViewServiceTest {
     when(projectDetailsService.getProjectTypesByProjectDetails(projectDetails)).thenReturn(projectTypes);
     when(projectDetailsService.getProjectFacilityNames(projectDetails)).thenReturn(facilities);
 
-    var projectDetailsView = submissionViewService.getProjectDetailsSubmissionView(scapDetail);
+    var projectDetailsView = scapSummaryViewService.getProjectDetailsSummaryView(scapDetail);
 
     assertThat(projectDetailsView).extracting(
-        ProjectDetailsSubmissionView::projectName,
-        ProjectDetailsSubmissionView::projectTypes,
-        ProjectDetailsSubmissionView::projectCostEstimate,
-        ProjectDetailsSubmissionView::estimatedValueLocalContent,
-        ProjectDetailsSubmissionView::fieldName,
-        ProjectDetailsSubmissionView::hasFacilities,
-        ProjectDetailsSubmissionView::projectFacilities,
-        ProjectDetailsSubmissionView::plannedExecutionStartDate,
-        ProjectDetailsSubmissionView::plannedCompletionDate
+        ProjectDetailsSummaryView::projectName,
+        ProjectDetailsSummaryView::projectTypes,
+        ProjectDetailsSummaryView::projectCostEstimate,
+        ProjectDetailsSummaryView::estimatedValueLocalContent,
+        ProjectDetailsSummaryView::fieldName,
+        ProjectDetailsSummaryView::hasFacilities,
+        ProjectDetailsSummaryView::projectFacilities,
+        ProjectDetailsSummaryView::plannedExecutionStartDate,
+        ProjectDetailsSummaryView::plannedCompletionDate
     ).containsExactly(
         projectDetails.getProjectName(),
         projectTypes.stream().toList(),
