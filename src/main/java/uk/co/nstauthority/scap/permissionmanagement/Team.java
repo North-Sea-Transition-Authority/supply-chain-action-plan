@@ -27,7 +27,7 @@ public class Team {
   private String displayName;
 
   @Column(name = "organisation_group_id")
-  private int energyPortalOrgGroupId;
+  private Integer energyPortalOrgGroupId;
 
   public Team() {
   }
@@ -56,11 +56,11 @@ public class Team {
     this.displayName = displayName;
   }
 
-  public int getEnergyPortalOrgGroupId() {
+  public Integer getEnergyPortalOrgGroupId() {
     return energyPortalOrgGroupId;
   }
 
-  public void setEnergyPortalOrgGroupId(int groupId) {
+  public void setEnergyPortalOrgGroupId(Integer groupId) {
     this.energyPortalOrgGroupId = groupId;
   }
 }

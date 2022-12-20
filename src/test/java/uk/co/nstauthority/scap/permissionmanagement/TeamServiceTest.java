@@ -116,7 +116,10 @@ class TeamServiceTest {
 
   @Test
   void findTeamByOrgGroupId_NoMatch_EmptyOptional() {
-    var team = TeamTestUtil.Builder().build();
+    var team = TeamTestUtil
+        .Builder()
+        .withTeamType(TeamType.INDUSTRY)
+        .build();
 
     when(teamRepository.findByEnergyPortalOrgGroupId(team.getEnergyPortalOrgGroupId())).thenReturn(Optional.empty());
     var result = teamService.findByEnergyPortalOrgGroupId(team.getEnergyPortalOrgGroupId());
@@ -127,7 +130,10 @@ class TeamServiceTest {
 
   @Test
   void findTeamByOrgGroupId_Match_TeamReturend() {
-    var team = TeamTestUtil.Builder().build();
+    var team = TeamTestUtil
+        .Builder()
+        .withTeamType(TeamType.INDUSTRY)
+        .build();
 
     when(teamRepository.findByEnergyPortalOrgGroupId(team.getEnergyPortalOrgGroupId())).thenReturn(Optional.of(team));
     var result = teamService.findByEnergyPortalOrgGroupId(team.getEnergyPortalOrgGroupId());
@@ -138,7 +144,10 @@ class TeamServiceTest {
 
   @Test
   void createTeam_newTeam_newAccessManager() {
-    var team = TeamTestUtil.Builder().build();
+    var team = TeamTestUtil
+        .Builder()
+        .withTeamType(TeamType.INDUSTRY)
+        .build();
     var teamCaptor = ArgumentCaptor.forClass(Team.class);
     var userCaptor = ArgumentCaptor.forClass(EnergyPortalUserDto.class);
 
