@@ -25,6 +25,8 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRepository;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRoleService;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 @ExtendWith(MockitoExtension.class)
 class TeamServiceTest {
@@ -44,14 +46,14 @@ class TeamServiceTest {
     var team = TeamTestUtil.Builder().build();
 
     when(teamRepository.findByUuid(team.getUuid())).thenReturn(Optional.of(team));
-    var result = teamService.findTeam(TeamId.valueOf(team.getUuid()));
+    var result = teamService.getTeam(TeamId.valueOf(team.getUuid()));
 
-    assertThat(result).contains(team);
+    assertThat(result).isEqualTo(team);
     verify(teamRepository).findByUuid(team.getUuid());
   }
 
   @Test
-  void getTeam_whenNoMatch_thenEmptyOptionalReturned() {
+  void findTeam_whenNoMatch_thenEmptyOptionalReturned() {
 
     var team = TeamTestUtil.Builder().build();
 
@@ -119,7 +121,10 @@ class TeamServiceTest {
 
   @Test
   void findTeamByOrgGroupId_NoMatch_EmptyOptional() {
-    var team = TeamTestUtil.Builder().build();
+    var team = TeamTestUtil
+        .Builder()
+        .withTeamType(TeamType.INDUSTRY)
+        .build();
 
     when(teamRepository.findByEnergyPortalOrgGroupId(team.getEnergyPortalOrgGroupId())).thenReturn(Optional.empty());
     var result = teamService.findByEnergyPortalOrgGroupId(team.getEnergyPortalOrgGroupId());
@@ -130,7 +135,10 @@ class TeamServiceTest {
 
   @Test
   void findTeamByOrgGroupId_Match_TeamReturend() {
-    var team = TeamTestUtil.Builder().build();
+    var team = TeamTestUtil
+        .Builder()
+        .withTeamType(TeamType.INDUSTRY)
+        .build();
 
     when(teamRepository.findByEnergyPortalOrgGroupId(team.getEnergyPortalOrgGroupId())).thenReturn(Optional.of(team));
     var result = teamService.findByEnergyPortalOrgGroupId(team.getEnergyPortalOrgGroupId());
@@ -141,7 +149,10 @@ class TeamServiceTest {
 
   @Test
   void createTeam_newTeam_newAccessManager() {
-    var team = TeamTestUtil.Builder().build();
+    var team = TeamTestUtil
+        .Builder()
+        .withTeamType(TeamType.INDUSTRY)
+        .build();
     var teamCaptor = ArgumentCaptor.forClass(Team.class);
     var userCaptor = ArgumentCaptor.forClass(EnergyPortalUserDto.class);
 
