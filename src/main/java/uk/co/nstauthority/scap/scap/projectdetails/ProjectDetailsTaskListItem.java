@@ -50,7 +50,7 @@ class ProjectDetailsTaskListItem implements ScapTaskListItem {
   public boolean isValid(Integer target) {
     var scap = scapService.getScapById(target);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
-    var projectDetailsOptional = projectDetailsService.getProjectDetailsByScapDetail(scapDetail);
+    var projectDetailsOptional = projectDetailsService.getProjectDetails(scapDetail);
     var projectFacilities = projectDetailsOptional
         .map(projectDetailsService::getProjectFacilities)
         .orElse(Collections.emptyList());

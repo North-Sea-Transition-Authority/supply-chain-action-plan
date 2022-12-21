@@ -51,7 +51,7 @@ class ProjectDetailsController {
   @GetMapping
   ModelAndView renderProjectDetailsForm(@PathVariable("scapId") Integer scapId) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
-    var projectDetails = projectDetailsService.getProjectDetailsByScapDetail(scapDetail);
+    var projectDetails = projectDetailsService.getProjectDetails(scapDetail);
     var projectFacilities = projectDetails
         .map(projectDetailsService::getProjectFacilities)
         .orElse(Collections.emptyList());
@@ -77,7 +77,7 @@ class ProjectDetailsController {
                                       @ModelAttribute("form") ProjectDetailsForm form,
                                       BindingResult bindingResult) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
-    projectDetailsService.getProjectDetailsByScapDetail(scapDetail);
+    projectDetailsService.getProjectDetails(scapDetail);
     var projectFacilityIds = form.getInstallationIds();
     var preselectedField = form.getFieldId().getAsInteger()
         .flatMap(projectDetailsFormService::getPreselectedField)

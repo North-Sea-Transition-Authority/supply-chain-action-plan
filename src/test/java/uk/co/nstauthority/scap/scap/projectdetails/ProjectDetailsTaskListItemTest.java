@@ -66,7 +66,7 @@ class ProjectDetailsTaskListItemTest {
   void isValid_noProjectDetails_assertFalse() {
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
-    when(projectDetailsService.getProjectDetailsByScapDetail(scapDetail)).thenReturn(Optional.empty());
+    when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.empty());
 
     assertFalse(projectDetailsTaskListItem.isValid(scap.getId()));
   }
@@ -80,7 +80,7 @@ class ProjectDetailsTaskListItemTest {
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
-    when(projectDetailsService.getProjectDetailsByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
+    when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
     when(projectDetailsFormService.getForm(projectDetails, Collections.emptyList())).thenReturn(form);
     when(projectDetailsFormService.validate(eq(form), any(BindingResult.class))).thenReturn(bindingResult);
 
@@ -95,7 +95,7 @@ class ProjectDetailsTaskListItemTest {
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
-    when(projectDetailsService.getProjectDetailsByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
+    when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
     when(projectDetailsFormService.getForm(projectDetails, Collections.emptyList())).thenReturn(form);
     when(projectDetailsFormService.validate(eq(form), any(BindingResult.class))).thenReturn(bindingResult);
 

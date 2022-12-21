@@ -52,12 +52,12 @@ public class ProjectDetailsService {
         .collect(Collectors.toSet());
   }
 
-  Optional<ProjectDetails> getProjectDetailsByScapDetail(ScapDetail scapDetail) {
+  public Optional<ProjectDetails> getProjectDetails(ScapDetail scapDetail) {
     return projectDetailsRepository.findByScapDetail(scapDetail);
   }
 
   public ProjectDetails getProjectDetailsOrThrow(ScapDetail scapDetail) {
-    return getProjectDetailsByScapDetail(scapDetail).orElseThrow(
+    return getProjectDetails(scapDetail).orElseThrow(
         () -> new ScapEntityNotFoundException(
             "Could not find ProjectDetails for ScapDetail with ID [%d]".formatted(scapDetail.getId())));
   }

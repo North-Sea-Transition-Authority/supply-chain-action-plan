@@ -87,7 +87,7 @@ class ProjectDetailsControllerTest extends AbstractControllerTest {
   @Test
   void renderProjectDetailsForm_noProjectDetails_assertCorrectResponse() throws Exception {
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId)).thenReturn(scapDetail);
-    when(projectDetailsService.getProjectDetailsByScapDetail(scapDetail)).thenReturn(Optional.empty());
+    when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.empty());
     when(supportingDocumentService.buildFileUploadTemplate(scapId, SupportingDocumentType.ADDITIONAL_DOCUMENT))
         .thenReturn(fileUploadTemplate);
 
@@ -118,7 +118,7 @@ class ProjectDetailsControllerTest extends AbstractControllerTest {
     var preselectedItem = Map.of(String.valueOf(field.getFieldId()), field.getFieldName());
 
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId)).thenReturn(scapDetail);
-    when(projectDetailsService.getProjectDetailsByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
+    when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
     when(projectDetailsFormService.getForm(projectDetails, Collections.emptyList())).thenReturn(form);
     when(projectDetailsFormService.getPreselectedField(field.getFieldId())).thenReturn(Optional.of(preselectedItem));
     when(supportingDocumentService.buildFileUploadTemplate(scapId, SupportingDocumentType.ADDITIONAL_DOCUMENT))

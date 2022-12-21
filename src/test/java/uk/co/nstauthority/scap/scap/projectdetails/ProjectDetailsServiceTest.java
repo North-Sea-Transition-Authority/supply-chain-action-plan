@@ -30,8 +30,8 @@ import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
-import uk.co.nstauthority.scap.file.FileUploadService;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.file.FileUploadService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @ExtendWith(MockitoExtension.class)
@@ -100,7 +100,7 @@ class ProjectDetailsServiceTest {
 
     when(projectDetailsRepository.findByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
 
-    var returnedProjectDetails = projectDetailsService.getProjectDetailsByScapDetail(scapDetail);
+    var returnedProjectDetails = projectDetailsService.getProjectDetails(scapDetail);
 
     assertThat(returnedProjectDetails).contains(projectDetails);
   }
@@ -308,7 +308,7 @@ class ProjectDetailsServiceTest {
     form.setInstallationIds(List.of(addedFacilityId, keptExistingFacility.getFacilityId()));
     var projectDetails = new ProjectDetails();
 
-    when(projectDetailsService.getProjectDetailsByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
+    when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
     when(projectFacilityRepository.findAllByProjectDetails(projectDetails)).thenReturn(existingProjectFacilities);
 
     projectDetailsService.saveProjectDetails(scapDetail, form);
