@@ -33,10 +33,7 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 @ContextConfiguration(classes = RegulatorEditMemberController.class)
-class RegulatorEditMemberControllerTest extends AbstractControllerTest {
-
-  @MockBean
-  TeamMemberViewService teamMemberViewService;
+class RegulatorEditMemberControllerTest extends AbstractRegulatorTeamControllerTest {
 
   @MockBean
   TeamMemberRoleService teamMemberRoleService;
@@ -45,20 +42,14 @@ class RegulatorEditMemberControllerTest extends AbstractControllerTest {
   RegulatorTeamMemberEditRolesValidator regulatorTeamMemberEditRolesValidator;
 
   @MockBean
-  TeamService teamService;
-
-  @MockBean
   RegulatorTeamService regulatorTeamService;
 
   private TeamId teamId = new TeamId(UUID.randomUUID());
-
-  private WebUserAccountId wuaId = new WebUserAccountId(1000L);
 
   private ServiceUserDetail user;
 
   @BeforeEach
   void setup() {
-    var team = TeamTestUtil.Builder().build();
     var teamMember = TeamMemberTestUtil
         .Builder()
         .withRole(IndustryTeamRole.SCAP_SUBMITTER)
@@ -66,16 +57,14 @@ class RegulatorEditMemberControllerTest extends AbstractControllerTest {
     var teamMemberView = TeamMemberViewTestUtil.Builder().build();
     user = ServiceUserDetailTestUtil.Builder().build();
 
-    when(regulatorTeamService.getTeam(teamId)).thenReturn(team);
-    when(teamMemberService.getTeamMember(team, wuaId)).thenReturn(Optional.of(teamMember));
-    when(teamMemberService.getTeamMemberOrThrow(team, wuaId)).thenReturn(teamMember);
+    when(regulatorTeamService.getTeam(user)).thenReturn(team);
     when(teamMemberViewService.getTeamMemberViewOrThrow(teamMember)).thenReturn(teamMemberView);
   }
 
   @Test
   void renderEditMember() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(on(RegulatorEditMemberController.class)
-        .renderEditMember(teamId, wuaId)))
+        .renderEditMember(teamId, webUserAccountId)))
         .with(user(user)))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/AddTeamMemberRoles"));
@@ -88,7 +77,7 @@ class RegulatorEditMemberControllerTest extends AbstractControllerTest {
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
     mockMvc.perform(post(ReverseRouter.route(on(RegulatorEditMemberController.class)
-        .editMember(teamId, wuaId, form, bindingResult)))
+        .editMember(teamId, webUserAccountId, form, bindingResult)))
         .with(user(user))
         .with(csrf()))
         .andExpect(status().is3xxRedirection())

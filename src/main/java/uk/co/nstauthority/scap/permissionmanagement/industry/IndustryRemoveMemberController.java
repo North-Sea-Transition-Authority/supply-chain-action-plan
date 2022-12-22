@@ -13,6 +13,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.IsMemberOfTeamOrRegulator;
+import uk.co.nstauthority.scap.permissionmanagement.PermissionsRequired;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.RemoveMemberController;
@@ -21,7 +24,9 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 @Controller
+@IsMemberOfTeamOrRegulator
 @RequestMapping("/permission-management/industry/{teamId}/remove/{wuaId}")
+@PermissionsRequired(permissions = {RolePermission.MANAGE_ORGANISATIONS})
 public class IndustryRemoveMemberController extends RemoveMemberController {
   @Autowired
   public IndustryRemoveMemberController(TeamService teamService,

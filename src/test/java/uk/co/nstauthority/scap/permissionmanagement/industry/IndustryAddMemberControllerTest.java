@@ -1,6 +1,7 @@
 package uk.co.nstauthority.scap.permissionmanagement.industry;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -11,23 +12,19 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 
 import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.validation.BeanPropertyBindingResult;
-import uk.co.nstauthority.scap.AbstractControllerTest;
-import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.configuration.SamlProperties;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.AddTeamMemberForm;
-import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.teams.AddTeamMemberValidator;
 import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
 
 @ContextConfiguration(classes = IndustryAddMemberController.class)
-class IndustryAddMemberControllerTest extends AbstractControllerTest {
+class IndustryAddMemberControllerTest extends AbstractIndustryTeamControllerTest {
 
   @MockBean
   AddTeamMemberValidator addTeamMemberValidator;
@@ -40,29 +37,18 @@ class IndustryAddMemberControllerTest extends AbstractControllerTest {
 
   @Test
   void renderAddMember() throws Exception {
-    var teamId = new TeamId(UUID.randomUUID());
-    var user = ServiceUserDetailTestUtil.Builder()
-        .withWuaId(100L)
-        .build();
-
     when(samlProperties.getRegistrationUrl()).thenReturn("test-test.com");
 
     mockMvc.perform(get(ReverseRouter.route(on(IndustryAddMemberController.class)
         .renderAddTeamMember(teamId)))
-        .with(user(user))
-        .with(csrf()))
+        .with(user(user)))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/AddTeamMember"));
   }
 
   @Test
   void addMemberToTeam_ValidationSucceeds_rendersAddRoles() throws Exception {
-    var teamId = new TeamId(UUID.randomUUID());
-    var user = ServiceUserDetailTestUtil.Builder()
-        .withWuaId(100L)
-        .build();
     var energyPortalDto = EnergyPortalUserDtoTestUtil.Builder().build();
-
     var form = new AddTeamMemberForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
@@ -77,7 +63,5 @@ class IndustryAddMemberControllerTest extends AbstractControllerTest {
         .andExpect(view().name(
             "redirect:/permission-management/industry/%s/add-member/%s/roles"
                 .formatted(teamId.uuid().toString(), energyPortalDto.webUserAccountId())));
-
-
   }
 }

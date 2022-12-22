@@ -5,23 +5,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
-import uk.co.nstauthority.scap.permissionmanagement.TeamRepository;
-import uk.co.nstauthority.scap.permissionmanagement.teams.NewTeamFormvalidator;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRoleService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 @Service
-class IndustryTeamService extends TeamService {
+class IndustryTeamService {
 
   private final TeamMemberService teamMemberService;
 
   @Autowired
-  IndustryTeamService(TeamMemberService teamMemberService,
-                      TeamRepository teamRepository,
-                      TeamMemberRoleService teamMemberRoleService,
-                      NewTeamFormvalidator newTeamFormvalidator) {
-    super(teamRepository, teamMemberRoleService, newTeamFormvalidator);
+  IndustryTeamService(TeamMemberService teamMemberService) {
     this.teamMemberService = teamMemberService;
   }
 

@@ -11,23 +11,28 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.configuration.SamlProperties;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.AddTeamMemberForm;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
+import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.teams.AddTeamMemberValidator;
 import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
 
 @ContextConfiguration(classes = RegulatorAddMemberController.class)
-class RegulatorAddMemberControllerTest extends AbstractControllerTest {
+class RegulatorAddMemberControllerTest extends AbstractRegulatorTeamControllerTest {
 
   @MockBean
   AddTeamMemberValidator addTeamMemberValidator;
@@ -38,13 +43,9 @@ class RegulatorAddMemberControllerTest extends AbstractControllerTest {
   @MockBean
   SamlProperties samlProperties;
 
+
   @Test
   void renderAddMember() throws Exception {
-    var teamId = new TeamId(UUID.randomUUID());
-    var user = ServiceUserDetailTestUtil.Builder()
-        .withWuaId(100L)
-        .build();
-
     when(samlProperties.getRegistrationUrl()).thenReturn("test-test.com");
 
     mockMvc.perform(get(ReverseRouter.route(on(RegulatorAddMemberController.class)
@@ -57,12 +58,7 @@ class RegulatorAddMemberControllerTest extends AbstractControllerTest {
 
   @Test
   void addMemberToTeam_ValidationSucceeds_rendersAddRoles() throws Exception {
-    var teamId = new TeamId(UUID.randomUUID());
-    var user = ServiceUserDetailTestUtil.Builder()
-        .withWuaId(100L)
-        .build();
     var energyPortalDto = EnergyPortalUserDtoTestUtil.Builder().build();
-
     var form = new AddTeamMemberForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
@@ -79,5 +75,11 @@ class RegulatorAddMemberControllerTest extends AbstractControllerTest {
                 .formatted(teamId.uuid().toString(), energyPortalDto.webUserAccountId())));
 
 
+  }
+
+  private ServiceUserDetail getUser() {
+    return ServiceUserDetailTestUtil.Builder()
+        .withWuaId(100L)
+        .build();
   }
 }

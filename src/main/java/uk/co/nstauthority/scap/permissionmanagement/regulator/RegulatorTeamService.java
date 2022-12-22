@@ -7,28 +7,25 @@ import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
-import uk.co.nstauthority.scap.permissionmanagement.TeamRepository;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
-import uk.co.nstauthority.scap.permissionmanagement.teams.NewTeamFormvalidator;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRoleService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 @Service
-class RegulatorTeamService  extends TeamService {
+class RegulatorTeamService {
   private final TeamMemberService teamMemberService;
+
+  private final TeamService teamService;
 
   @Autowired
   RegulatorTeamService(TeamMemberService teamMemberService,
-                      TeamRepository teamRepository,
-                      TeamMemberRoleService teamMemberRoleService,
-                      NewTeamFormvalidator newTeamFormvalidator) {
-    super(teamRepository, teamMemberRoleService, newTeamFormvalidator);
+                       TeamService teamService) {
     this.teamMemberService = teamMemberService;
+    this.teamService = teamService;
   }
 
   Team getTeam(ServiceUserDetail user) {
-    return getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR)
+    return teamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR)
         .stream()
         .findFirst()
         .orElseThrow(() -> new ScapEntityNotFoundException("User is not a member of regulator team"));

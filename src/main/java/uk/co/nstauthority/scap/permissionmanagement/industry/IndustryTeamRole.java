@@ -12,7 +12,7 @@ public enum IndustryTeamRole implements TeamRole {
       "Access manager",
       "Can add, remove and update members of this team",
       10,
-      EnumSet.of(RolePermission.GRANT_ROLES)
+      EnumSet.of(RolePermission.MANAGE_ORGANISATIONS)
   ),
   SCAP_SUBMITTER(
       "SCAP submitter",

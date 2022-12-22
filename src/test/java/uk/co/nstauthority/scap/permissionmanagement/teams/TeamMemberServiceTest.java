@@ -24,6 +24,7 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 
 @ExtendWith(MockitoExtension.class)
@@ -140,6 +141,48 @@ class TeamMemberServiceTest {
     var secondRole = RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER;
 
     team.setTeamType(TeamType.REGULATOR);
+
+    var roleBuilder = TeamMemberRoleTestUtil.Builder()
+        .withTeam(team)
+        .withWebUserAccountId(webUserAccountId.id());
+
+    // GIVEN a user with multiple roles in the same team
+    var firstTeamMemberRole = roleBuilder
+        .withRole(firstRole.name())
+        .build();
+
+    var secondTeamMemberRole = roleBuilder
+        .withRole(secondRole.name())
+        .build();
+
+    when(teamMemberRoleRepository.findAllByTeam(team)).thenReturn(
+        List.of(firstTeamMemberRole, secondTeamMemberRole));
+
+    // WHEN we get the team members for that team
+    var resultingTeamMembers = teamMemberService.getTeamMembers(team);
+
+    // THEN one team member is returned with the multiple roles
+    assertThat(resultingTeamMembers)
+        .extracting(TeamMember::wuaId, TeamMember::roles)
+        .containsExactly(
+            tuple(
+                webUserAccountId,
+                Set.of(secondRole, firstRole)
+            )
+        );
+  }
+
+  @Test
+  void getTeamMembers_whenIndustryTeamMemberHasMultipleRoles_thenRolesMappedCorrectly() {
+
+    var team = TeamTestUtil.Builder().build();
+
+    var webUserAccountId = new WebUserAccountId(100L);
+
+    var firstRole = IndustryTeamRole.ACCESS_MANAGER;
+    var secondRole = IndustryTeamRole.SCAP_SUBMITTER;
+
+    team.setTeamType(TeamType.INDUSTRY);
 
     var roleBuilder = TeamMemberRoleTestUtil.Builder()
         .withTeam(team)

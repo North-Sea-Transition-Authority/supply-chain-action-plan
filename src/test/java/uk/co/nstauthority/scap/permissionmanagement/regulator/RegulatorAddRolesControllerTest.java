@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.permissionmanagement.regulator;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -9,6 +10,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,14 +28,12 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
 
 
 @ContextConfiguration(classes = RegulatorAddRolesController.class)
-class RegulatorAddRolesControllerTest extends AbstractControllerTest {
-
-  @MockBean
-  RegulatorTeamService teamService;
+class RegulatorAddRolesControllerTest extends AbstractRegulatorTeamControllerTest {
 
   @MockBean
   ControllerHelperService controllerHelperService;
@@ -43,17 +43,6 @@ class RegulatorAddRolesControllerTest extends AbstractControllerTest {
 
   @MockBean
   RegulatorTeamMemberRolesValidator industryTeamMemberRolesValidator;
-
-  private Team team;
-  private ServiceUserDetail serviceDetailUser;
-  private TeamMember user;
-
-  @BeforeEach
-  void setup() {
-    team = TeamTestUtil.Builder().build();
-    serviceDetailUser = ServiceUserDetailTestUtil.Builder().build();
-    user = TeamMemberTestUtil.Builder().build();
-  }
 
   @Test
   void industryAddController_renderAddRoles_noAuthorisation() throws Exception {
@@ -71,13 +60,13 @@ class RegulatorAddRolesControllerTest extends AbstractControllerTest {
   @Test
   void industryAddController_renderAddRoles_Authorisation() throws Exception {
     var energyPortalUserDto = EnergyPortalUserDtoTestUtil.Builder().build();
-    when(energyPortalUserService.getEnergyPortalUser(user.wuaId())).thenReturn(energyPortalUserDto);
+    when(energyPortalUserService.getEnergyPortalUser(webUserAccountId)).thenReturn(energyPortalUserDto);
 
     mockMvc.perform(
             get(ReverseRouter.route(on(RegulatorAddRolesController.class).renderAddTeamMemberRoles(
-                new TeamId(team.getUuid()),
-                user.wuaId())))
-                .with(user(serviceDetailUser)))
+                teamId,
+                webUserAccountId)))
+                .with(user(user)))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/teamMemberRoles"))
         .andExpect(model().attribute("roles", DisplayableEnumOptionUtil.getDisplayableOptionsWithDescription(RegulatorTeamRole.class)));

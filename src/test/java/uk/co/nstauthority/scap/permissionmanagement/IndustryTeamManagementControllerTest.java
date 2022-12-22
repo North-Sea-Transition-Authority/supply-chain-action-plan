@@ -15,27 +15,20 @@ import static uk.co.nstauthority.scap.mvc.ReverseRouter.emptyBindingResult;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
-import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.industry.AbstractIndustryTeamControllerTest;
 import uk.co.nstauthority.scap.permissionmanagement.teams.NewTeamForm;
 import uk.co.nstauthority.scap.permissionmanagement.teams.NewTeamFormvalidator;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamManagementController;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamView;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 
 @ContextConfiguration(classes = TeamManagementController.class)
-class TeamManagementControllerTest extends AbstractControllerTest {
-
-  @MockBean
-  private TeamService teamService;
+class IndustryTeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
 
   @MockBean
   private OrganisationGroupService organisationGroupService;

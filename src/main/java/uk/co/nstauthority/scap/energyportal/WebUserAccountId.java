@@ -16,6 +16,18 @@ public record WebUserAccountId(Long id) implements Serializable {
     return String.valueOf(id);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    WebUserAccountId that = (WebUserAccountId) o;
+    return id.equals(that.id);
+  }
+
   public static WebUserAccountId valueOf(String webUserAccountId) {
     return new WebUserAccountId(Long.valueOf(webUserAccountId));
   }

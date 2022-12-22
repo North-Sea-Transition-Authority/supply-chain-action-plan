@@ -36,69 +36,27 @@ import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
 class RegulatorTeamServiceTest {
 
   @Mock
-  private TeamRepository teamRepository;
-
-  @Mock
   private TeamMemberService teamMemberService;
 
   @Mock
-  private TeamMemberRoleService teamMemberRoleService;
-
-  @Mock
-  private NewTeamFormvalidator newTeamFormvalidator;
+  private TeamService teamService;
 
   private RegulatorTeamService regulatorTeamService;
 
   @BeforeEach
   void setup() {
-    regulatorTeamService = new RegulatorTeamService(teamMemberService, teamRepository, teamMemberRoleService, newTeamFormvalidator);
+    regulatorTeamService = new RegulatorTeamService(teamMemberService, teamService);
   }
 
   @Test
   void getRegulatorTeamForUser_whenUserBelongsToRegulatorTeam_thenReturnRegulatorTeam() {
     var user = ServiceUserDetailTestUtil.Builder().build();
     var team = new Team();
-    when(teamRepository.findAllTeamsOfTypeThatUserIsMemberOf(user.wuaId(), TeamType.REGULATOR))
+    when(teamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR))
         .thenReturn(List.of(team));
 
-    var result = regulatorTeamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR);
-    assertThat(result).isEqualTo(List.of(team));
-  }
-
-  @Test
-  void getRegulatorTeamForUser_whenUserDoesNotBelongToRegulatorTeam_thenReturnEmpty() {
-    var user = ServiceUserDetailTestUtil.Builder().build();
-    when(teamRepository.findAllTeamsOfTypeThatUserIsMemberOf(user.wuaId(), TeamType.REGULATOR)).thenReturn(List.of());
-
-    var result = regulatorTeamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR);
-
-    assertThat(result).isEmpty();
-  }
-
-  @Test
-  void getTeam_whenMatch_thenReturnTeam() {
-
-    var team = TeamTestUtil.Builder().build();
-
-    var teamId = new TeamId(team.getUuid());
-
-    when(teamRepository.findByUuid(teamId.uuid())).thenReturn(Optional.of(team));
-
-    assertThat(regulatorTeamService.getTeam(teamId)).isEqualTo(team);
-    verify(teamRepository).findByUuid(teamId.uuid());
-  }
-
-  @Test
-  void getTeam_whenNoMatch_thenEmptyOptional() {
-
-    var team = TeamTestUtil.Builder().build();
-
-    var teamId = new TeamId(team.getUuid());
-
-    when(teamRepository.findByUuid(teamId.uuid())).thenReturn(Optional.empty());
-
-    assertThat(regulatorTeamService.findTeam(teamId)).isEmpty();
-    verify(teamRepository).findByUuid(teamId.uuid());
+    var result = regulatorTeamService.getTeam(user);
+    assertThat(result).isEqualTo(team);
   }
 
   @Test
@@ -123,25 +81,5 @@ class RegulatorTeamServiceTest {
         .thenReturn(false);
 
     assertFalse(regulatorTeamService.isAccessManager(teamId, user));
-  }
-
-  @Test
-  void addUserTeamRoles_verifyRepositoryInteractions() {
-
-    var team = TeamTestUtil.Builder().build();
-    var userToAdd = EnergyPortalUserDtoTestUtil.Builder().build();
-    var regulatorRoles = Set.of(
-        RegulatorTeamRole.ACCESS_MANAGER,
-        RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER
-    );
-
-    regulatorTeamService.addUserTeamRoles(team, userToAdd, regulatorRoles);
-
-    var rolesAsStrings = regulatorRoles
-        .stream()
-        .map(RegulatorTeamRole::name)
-        .collect(Collectors.toSet());
-
-    verify(teamMemberRoleService).addUserTeamRoles(team, userToAdd, rolesAsStrings);
   }
 }

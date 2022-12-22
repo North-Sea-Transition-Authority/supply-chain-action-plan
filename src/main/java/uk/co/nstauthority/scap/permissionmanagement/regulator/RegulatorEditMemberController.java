@@ -14,8 +14,10 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.enumutil.DisplayableEnumOptionUtil;
-import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.IsMemberOfTeamOrRegulator;
+import uk.co.nstauthority.scap.permissionmanagement.PermissionsRequired;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRolesForm;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberView;
@@ -23,9 +25,12 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRoleUtil;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRoleService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 @Controller
+@IsMemberOfTeamOrRegulator
 @RequestMapping("/permission-management/regulator/{teamId}/edit")
+@PermissionsRequired(permissions = {RolePermission.GRANT_ROLES})
 public class RegulatorEditMemberController {
   private final TeamMemberService teamMemberService;
   private final TeamMemberViewService teamMemberViewService;
@@ -33,7 +38,7 @@ public class RegulatorEditMemberController {
   private final RegulatorTeamMemberEditRolesValidator regulatorTeamMemberEditRolesValidator;
   private final TeamMemberRoleService teamMemberRoleService;
 
-  private final RegulatorTeamService regulatorTeamService;
+  private final TeamService teamService;
 
   @Autowired
   RegulatorEditMemberController(
@@ -42,13 +47,13 @@ public class RegulatorEditMemberController {
       ControllerHelperService controllerHelperService,
       RegulatorTeamMemberEditRolesValidator regulatorTeamMemberEditRolesValidator,
       TeamMemberRoleService teamMemberRoleService,
-      RegulatorTeamService regulatorTeamService) {
+      TeamService teamService) {
     this.teamMemberService = teamMemberService;
     this.teamMemberViewService = teamMemberViewService;
     this.controllerHelperService = controllerHelperService;
     this.regulatorTeamMemberEditRolesValidator = regulatorTeamMemberEditRolesValidator;
     this.teamMemberRoleService = teamMemberRoleService;
-    this.regulatorTeamService = regulatorTeamService;
+    this.teamService = teamService;
   }
 
 
@@ -57,7 +62,7 @@ public class RegulatorEditMemberController {
                                        @PathVariable("wuaId") WebUserAccountId wuaId) {
 
     var form = new TeamMemberRolesForm();
-    var team = regulatorTeamService.getTeam(teamId);
+    var team = teamService.getTeam(teamId);
 
     var teamMember = teamMemberService.getTeamMemberOrThrow(team, wuaId);
     var userView = teamMemberViewService.getTeamMemberViewOrThrow(teamMember);
@@ -73,11 +78,9 @@ public class RegulatorEditMemberController {
                                  @ModelAttribute("form") TeamMemberRolesForm form,
                                  BindingResult bindingResult) {
 
-    var team = regulatorTeamService.getTeam(teamId);
+    var team = teamService.getTeam(teamId);
 
-    var teamMember = teamMemberService.getTeamMember(team, wuaId)
-        .orElseThrow(() -> new ScapEntityNotFoundException(
-            "No user [%s] in team [%s]".formatted(wuaId, teamId)));
+    var teamMember = teamMemberService.getTeamMemberOrThrow(team, wuaId);
 
     var userView = teamMemberViewService.getTeamMemberViewOrThrow(teamMember);
 

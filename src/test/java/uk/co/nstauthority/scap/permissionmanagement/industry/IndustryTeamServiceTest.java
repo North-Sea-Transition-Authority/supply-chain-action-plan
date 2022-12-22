@@ -32,50 +32,13 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 class IndustryTeamServiceTest {
 
   @Mock
-  private TeamRepository teamRepository;
-
-  @Mock
   private TeamMemberService teamMemberService;
-
-  @Mock
-  private TeamMemberRoleService teamMemberRoleService;
-
-  @Mock
-  private NewTeamFormvalidator newTeamFormvalidator;
 
   private IndustryTeamService industryTeamService;
 
   @BeforeEach
   void setup() {
-    industryTeamService = new IndustryTeamService(teamMemberService, teamRepository, teamMemberRoleService, newTeamFormvalidator);
-  }
-
-  @Test
-  void getTeam_whenMatch_thenReturnTeam() {
-
-    var team = TeamTestUtil
-        .Builder()
-        .withTeamType(TeamType.INDUSTRY)
-        .build();
-
-    var teamId = new TeamId(team.getUuid());
-    when(teamRepository.findByUuid(teamId.uuid())).thenReturn(Optional.of(team));
-
-    assertThat(industryTeamService.getTeam(teamId)).isEqualTo(team);
-  }
-
-  @Test
-  void findTeam_whenNoMatch_thenEmptyOptional() {
-
-    var team = TeamTestUtil
-        .Builder()
-        .withTeamType(TeamType.INDUSTRY)
-        .build();
-
-    var teamId = new TeamId(team.getUuid());
-    when(teamRepository.findByUuid(teamId.uuid())).thenReturn(Optional.empty());
-
-    assertThat(industryTeamService.findTeam(teamId)).isEmpty();
+    industryTeamService = new IndustryTeamService(teamMemberService);
   }
 
   @Test

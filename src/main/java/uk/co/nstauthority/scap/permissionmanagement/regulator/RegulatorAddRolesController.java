@@ -19,13 +19,19 @@ import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.enumutil.DisplayableEnumOptionUtil;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.IsMemberOfTeamOrRegulator;
+import uk.co.nstauthority.scap.permissionmanagement.PermissionsRequired;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRolesForm;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.teams.AddRolesController;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 @Controller
+@IsMemberOfTeamOrRegulator
 @RequestMapping("/permission-management/regulator/{teamId}")
+@PermissionsRequired(permissions = {RolePermission.GRANT_ROLES})
 class RegulatorAddRolesController extends AddRolesController {
 
   private final EnergyPortalUserService energyPortalUserService;
@@ -33,11 +39,11 @@ class RegulatorAddRolesController extends AddRolesController {
   private final RegulatorTeamMemberRolesValidator regulatorTeamMemberRolesValidator;
 
   @Autowired
-  RegulatorAddRolesController(RegulatorTeamService regulatorTeamService,
+  RegulatorAddRolesController(TeamService teamService,
                               ControllerHelperService controllerHelperService,
                               EnergyPortalUserService energyPortalUserService,
                               RegulatorTeamMemberRolesValidator regulatorTeamMemberRolesValidator) {
-    super(regulatorTeamService,
+    super(teamService,
         controllerHelperService,
         energyPortalUserService);
     this.energyPortalUserService = energyPortalUserService;

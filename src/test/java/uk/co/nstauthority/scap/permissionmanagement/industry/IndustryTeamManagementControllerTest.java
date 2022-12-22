@@ -1,6 +1,7 @@
 package uk.co.nstauthority.scap.permissionmanagement.industry;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -12,12 +13,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
+import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
@@ -28,21 +32,16 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 
 @ContextConfiguration(classes = IndustryTeamManagementController.class)
-class IndustryTeamManagementControllerTest extends AbstractControllerTest {
-
-  @MockBean
-  private TeamMemberViewService teamMemberViewService;
-
+class IndustryTeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
   @MockBean
   private IndustryTeamService industryTeamService;
 
   @Autowired
   private ApplicationContext applicationContext;
 
+
   @Test
   void renderMemberList_whenNotAuthenticated_thenUnauthorised() throws Exception {
-    var teamId = new TeamId(UUID.randomUUID());
-
     mockMvc.perform(
       get(ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId))))
       .andExpect(status().isUnauthorized());
@@ -50,28 +49,16 @@ class IndustryTeamManagementControllerTest extends AbstractControllerTest {
 
   @Test
   void renderMemberList_whenMemberOfTeam_thenOk() throws Exception {
-    var user = ServiceUserDetailTestUtil.Builder().build();
-    var team = TeamTestUtil.Builder()
-      .withTeamType(TeamType.INDUSTRY)
-      .build();
-    var teamId = new TeamId(team.getUuid());
-
-    when(teamMemberService.isMemberOfTeam(teamId, user)).thenReturn(true);
-    when(industryTeamService.getTeam(teamId)).thenReturn(team);
-
     mockMvc.perform(
       get(ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId)))
-        .with(user(user)))
+        .with(user(user))
+        .with(csrf()))
         .andExpect(status().isOk());
   }
 
   @Test
   void renderMemberList_whenNoTeamFound_thenNotFound() throws Exception {
-    var user = ServiceUserDetailTestUtil.Builder().build();
-    var teamId = new TeamId(UUID.randomUUID());
-
-    when(teamMemberService.isMemberOfTeam(teamId, user)).thenReturn(true);
-    when(industryTeamService.getTeam(teamId)).thenThrow(ScapEntityNotFoundException.class);
+    when(teamService.getTeam(teamId)).thenThrow(ScapEntityNotFoundException.class);
 
     mockMvc.perform(
       get(ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId)))
@@ -81,22 +68,10 @@ class IndustryTeamManagementControllerTest extends AbstractControllerTest {
 
   @Test
   void renderMemberList_whenNotAccessManager_assertModelProperties() throws Exception {
-    var user = ServiceUserDetailTestUtil.Builder().build();
-    var team = TeamTestUtil.Builder()
-      .withTeamType(TeamType.INDUSTRY)
-      .build();
-    var teamId = new TeamId(team.getUuid());
-
-    when(teamMemberService.isMemberOfTeam(teamId, user)).thenReturn(true);
-    when(industryTeamService.getTeam(teamId)).thenReturn(team);
-
     var teamMemberView = TeamMemberViewTestUtil.Builder()
       .withRole(IndustryTeamRole.ACCESS_MANAGER)
       .build();
-
     when(teamMemberViewService.getTeamMemberViewsForTeam(team)).thenReturn(List.of(teamMemberView));
-
-    var mnemonic = applicationContext.getBean(CustomerConfigurationProperties.class).mnemonic();
 
     mockMvc.perform(
       get(ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId)))
@@ -111,16 +86,6 @@ class IndustryTeamManagementControllerTest extends AbstractControllerTest {
 
   @Test
   void renderMemberList_whenAccessManager_assertModelProperties() throws Exception {
-    var user = ServiceUserDetailTestUtil.Builder().build();
-    var team = TeamTestUtil.Builder()
-      .withTeamType(TeamType.INDUSTRY)
-      .build();
-    var teamId = new TeamId(team.getUuid());
-
-    when(industryTeamService.isAccessManager(teamId, user)).thenReturn(true);
-    when(teamMemberService.isMemberOfTeam(teamId, user)).thenReturn(true);
-    when(industryTeamService.getTeam(teamId)).thenReturn(team);
-
     var canRemoveUsers = true;
     var teamMemberView = TeamMemberViewTestUtil.Builder()
       .withRoles(Set.of(IndustryTeamRole.ACCESS_MANAGER))
@@ -129,8 +94,6 @@ class IndustryTeamManagementControllerTest extends AbstractControllerTest {
     when(teamMemberViewService.getTeamMemberViewsForTeam(team)).thenReturn(List.of(teamMemberView));
     when(teamMemberService.isMemberOfTeamWithAnyRoleOf(teamId, user, Set.of(IndustryTeamRole.ACCESS_MANAGER.name())))
       .thenReturn(canRemoveUsers);
-
-    var mnemonic = applicationContext.getBean(CustomerConfigurationProperties.class).mnemonic();
 
     mockMvc.perform(
       get(ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId)))

@@ -12,12 +12,14 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
-import uk.co.nstauthority.scap.permissionmanagement.IsMemberOfTeam;
+import uk.co.nstauthority.scap.permissionmanagement.IsMemberOfTeamOrRegulator;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 @Controller
+@IsMemberOfTeamOrRegulator
 @RequestMapping("/permission-management/regulator")
 public class RegulatorTeamManagementController {
 
@@ -27,17 +29,21 @@ public class RegulatorTeamManagementController {
   private final CustomerConfigurationProperties customerConfigurationProperties;
   private final TeamMemberService teamMemberService;
 
+  private final TeamService teamService;
+
   @Autowired
   RegulatorTeamManagementController(TeamMemberViewService teamMemberViewService,
                                     RegulatorTeamService regulatorTeamService,
                                     UserDetailService userDetailService,
                                     CustomerConfigurationProperties customerConfigurationProperties,
-                                    TeamMemberService teamMemberService) {
+                                    TeamMemberService teamMemberService,
+                                    TeamService teamService) {
     this.teamMemberViewService = teamMemberViewService;
     this.regulatorTeamService = regulatorTeamService;
     this.userDetailService = userDetailService;
     this.customerConfigurationProperties = customerConfigurationProperties;
     this.teamMemberService = teamMemberService;
+    this.teamService = teamService;
   }
 
   @GetMapping
@@ -50,10 +56,10 @@ public class RegulatorTeamManagementController {
   }
 
   @GetMapping("/{teamId}")
-  @IsMemberOfTeam
+  @IsMemberOfTeamOrRegulator
   public ModelAndView renderMemberList(@PathVariable("teamId") TeamId teamId) {
 
-    var team = regulatorTeamService.getTeam(teamId);
+    var team = teamService.getTeam(teamId);
 
     var user = userDetailService.getUserDetail();
 

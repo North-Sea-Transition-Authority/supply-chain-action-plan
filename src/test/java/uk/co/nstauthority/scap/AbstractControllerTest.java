@@ -18,15 +18,23 @@ import uk.co.nstauthority.scap.branding.IncludeServiceBrandingConfigurationPrope
 import uk.co.nstauthority.scap.configuration.SamlProperties;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
+import uk.co.nstauthority.scap.mvc.WebMvcConfiguration;
 import uk.co.nstauthority.scap.mvc.WithDefaultPageControllerAdvice;
+import uk.co.nstauthority.scap.permissionmanagement.PermissionManagementHandlerInterceptor;
+import uk.co.nstauthority.scap.permissionmanagement.TeamManagementHandlerInterceptor;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.technicalsupport.IncludeTechnicalSupportConfigurationProperties;
 import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 
 @AutoConfigureMockMvc
 @IncludeServiceBrandingConfigurationProperties
 @IncludeTechnicalSupportConfigurationProperties
-@Import(AbstractControllerTest.TestConfig.class)
+@Import({
+    AbstractControllerTest.TestConfig.class,
+    WebMvcConfiguration.class,
+    PermissionManagementHandlerInterceptor.class,
+    TeamManagementHandlerInterceptor.class})
 @WithDefaultPageControllerAdvice
 @WebMvcTest
 public abstract class AbstractControllerTest {
@@ -35,14 +43,16 @@ public abstract class AbstractControllerTest {
   protected MockMvc mockMvc;
 
   @MockBean
-  protected
-  UserDetailService userDetailService;
+  protected UserDetailService userDetailService;
 
   @MockBean
   protected TeamMemberService teamMemberService;
 
   @MockBean
   TopNavigationService topNavigationService;
+
+  @MockBean
+  protected TeamService teamService;
 
   @TestConfiguration
   public static class TestConfig {
