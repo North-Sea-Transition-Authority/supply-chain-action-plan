@@ -1,14 +1,9 @@
 package uk.co.nstauthority.scap.scap.summary;
 
-import static java.util.Map.entry;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doReturn;
 
 import java.util.Collections;
-import org.springframework.test.web.servlet.ResultMatcher;
-import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryView;
 import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderSummaryView;
@@ -27,23 +22,33 @@ public class ScapSummaryControllerTestUtil {
       null, null
   );
 
-  public static void mockScapSummaryViewServiceMethods(ScapSummaryViewService scapSummaryViewService, ScapDetail scapDetail) {
-    when(scapSummaryViewService.addScapSummaryToModel(any(ModelAndView.class), eq(scapDetail))).thenCallRealMethod();
+  private static final ScapSummaryView SCAP_SUMMARY_VIEW = new ScapSummaryView(
+      PROJECT_DETAILS_SUMMARY_VIEW,
+      PLANNED_TENDER_SUMMARY_VIEW,
+      ACTUAL_TENDER_SUMMARY_VIEW
+  );
 
-    when(scapSummaryViewService.getProjectDetailsSummaryView(scapDetail)).thenReturn(PROJECT_DETAILS_SUMMARY_VIEW);
-    when(scapSummaryViewService.getPlannedTenderSummaryView(scapDetail)).thenReturn(PLANNED_TENDER_SUMMARY_VIEW);
-    when(scapSummaryViewService.getActualTenderSummaryView(scapDetail)).thenReturn(ACTUAL_TENDER_SUMMARY_VIEW);
+  public static void mockScapSummaryViewServiceMethods(ScapSummaryViewService scapSummaryViewService, ScapDetail scapDetail) {
+    doCallRealMethod().when(scapSummaryViewService).getScapSummaryView(scapDetail);
+
+    doReturn(PROJECT_DETAILS_SUMMARY_VIEW).when(scapSummaryViewService).getProjectDetailsSummaryView(scapDetail);
+    doReturn(PLANNED_TENDER_SUMMARY_VIEW).when(scapSummaryViewService).getPlannedTenderSummaryView(scapDetail);
+    doReturn(ACTUAL_TENDER_SUMMARY_VIEW).when(scapSummaryViewService).getActualTenderSummaryView(scapDetail);
   }
 
-  public static ResultMatcher modelHasSummaryViews() {
-    return result -> {
-      var modelAndView = result.getModelAndView();
-      assertThat(modelAndView).isNotNull();
-      assertThat(modelAndView.getModel()).contains(
-          entry(ScapSummaryViewService.PROJECT_DETAILS_OBJECT_NAME, PROJECT_DETAILS_SUMMARY_VIEW),
-          entry(ScapSummaryViewService.PLANNED_TENDER_OBJECT_NAME, PLANNED_TENDER_SUMMARY_VIEW),
-          entry(ScapSummaryViewService.ACTUAL_TENDER_OBJECT_NAME, ACTUAL_TENDER_SUMMARY_VIEW)
-      );
-    };
+  public static ProjectDetailsSummaryView getProjectDetailsSummaryView() {
+    return PROJECT_DETAILS_SUMMARY_VIEW;
+  }
+
+  public static PlannedTenderSummaryView getPlannedTenderSummaryView() {
+    return PLANNED_TENDER_SUMMARY_VIEW;
+  }
+
+  public static ActualTenderSummaryView getActualTenderSummaryView() {
+    return ACTUAL_TENDER_SUMMARY_VIEW;
+  }
+
+  public static ScapSummaryView getScapSummaryView() {
+    return SCAP_SUMMARY_VIEW;
   }
 }

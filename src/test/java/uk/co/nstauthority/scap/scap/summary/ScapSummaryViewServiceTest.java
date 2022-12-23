@@ -3,13 +3,14 @@ package uk.co.nstauthority.scap.scap.summary;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getActualTenderSummaryView;
+import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getPlannedTenderSummaryView;
+import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getProjectDetailsSummaryView;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,7 +28,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
@@ -85,18 +85,25 @@ class ScapSummaryViewServiceTest {
 
   @Test
   void addScapSummaryToModel_VerifyCalls() {
-    var modelAndView = mock(ModelAndView.class);
     var scapDetail = mock(ScapDetail.class);
 
-    doReturn(null).when(scapSummaryViewService).getProjectDetailsSummaryView(scapDetail);
+    ScapSummaryControllerTestUtil.mockScapSummaryViewServiceMethods(scapSummaryViewService, scapDetail);
 
-    scapSummaryViewService.addScapSummaryToModel(modelAndView, scapDetail);
+    var summaryView = scapSummaryViewService.getScapSummaryView(scapDetail);
 
-    var inOrder = inOrder(scapSummaryViewService);
+    verify(scapSummaryViewService).getProjectDetailsSummaryView(scapDetail);
+    verify(scapSummaryViewService).getPlannedTenderSummaryView(scapDetail);
+    verify(scapSummaryViewService).getActualTenderSummaryView(scapDetail);
 
-    inOrder.verify(scapSummaryViewService).getProjectDetailsSummaryView(scapDetail);
-    inOrder.verify(scapSummaryViewService).getPlannedTenderSummaryView(scapDetail);
-    inOrder.verify(scapSummaryViewService).getActualTenderSummaryView(scapDetail);
+    assertThat(summaryView).extracting(
+        ScapSummaryView::projectDetailsSummaryView,
+        ScapSummaryView::plannedTenderSummaryView,
+        ScapSummaryView::actualTenderSummaryView
+    ).containsExactly(
+        getProjectDetailsSummaryView(),
+        getPlannedTenderSummaryView(),
+        getActualTenderSummaryView()
+    );
   }
 
   @ParameterizedTest

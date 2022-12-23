@@ -11,8 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getScapSummaryView;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.mockScapSummaryViewServiceMethods;
-import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.modelHasSummaryViews;
 
 import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,7 +70,7 @@ class ScapSubmissionControllerTest extends AbstractControllerTest {
         .andExpect(view().name("scap/scap/submit/reviewAndSubmit"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId))))
-        .andExpect(modelHasSummaryViews());
+        .andExpect(model().attribute("scapSummaryView", getScapSummaryView()));
   }
 
   @Test

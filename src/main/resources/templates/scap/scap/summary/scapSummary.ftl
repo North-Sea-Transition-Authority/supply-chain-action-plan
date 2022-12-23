@@ -4,20 +4,18 @@
 <#import 'actualTenderSummary.ftl' as actualTenderSummary>
 
 
-<#macro summary projectDetailsSummaryView plannedTenderSummaryView>
-<#-- @ftlvariable name="projectDetailsSummaryView" type="uk.co.nstauthority.scap.scap.summary.ProjectDetailsSummaryView" -->
-<#-- @ftlvariable name="plannedTenderSummaryView" type="uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderSummaryView" -->
-<#-- @ftlvariable name="actualTenderSummaryView" type="uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryView" -->
+<#macro summary scapSummaryView>
+<#-- @ftlvariable name="scapSummaryView" type="uk.co.nstauthority.scap.scap.summary.ScapSummaryView" -->
 
     <@fdsAccordion.accordion accordionId="scap-summary">
     <@fdsAccordion.accordionSection sectionHeading="Project details">
-      <@projectDetailsSummary.projectDetailsSummary projectDetailsView=projectDetailsSummaryView />
+      <@projectDetailsSummary.projectDetailsSummary projectDetailsView=scapSummaryView.projectDetailsSummaryView() />
     </@fdsAccordion.accordionSection>
     <@fdsAccordion.accordionSection sectionHeading="Planned tender activities">
-      <@plannedTenderSummary.plannedTenderSummary plannedTenderSummaryView=plannedTenderSummaryView />
+      <@plannedTenderSummary.plannedTenderSummary plannedTenderSummaryView=scapSummaryView.plannedTenderSummaryView() />
     </@fdsAccordion.accordionSection>
     <@fdsAccordion.accordionSection sectionHeading="Actual tender activities">
-      <@actualTenderSummary.actualTenderSummary actualTenderSummaryView=actualTenderSummaryView />
+      <@actualTenderSummary.actualTenderSummary actualTenderSummaryView=scapSummaryView.actualTenderSummaryView() />
     </@fdsAccordion.accordionSection>
   </@fdsAccordion.accordion>
 </#macro>

@@ -42,7 +42,8 @@ class ScapSubmissionController {
       throw new ScapBadRequestException("SCAP with ID [%d] is not in DRAFT status");
     }
 
-    return scapSummaryViewService.addScapSummaryToModel(scapSubmissionConfirmationModelAndView(scapId), scapDetail);
+    return scapSubmissionConfirmationModelAndView(scapId)
+        .addObject("scapSummaryView", scapSummaryViewService.getScapSummaryView(scapDetail));
   }
 
   @GetMapping("/success")

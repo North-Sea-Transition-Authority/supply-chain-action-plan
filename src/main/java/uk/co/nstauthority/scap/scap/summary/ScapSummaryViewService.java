@@ -5,7 +5,6 @@ import java.util.Collections;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.ModelAndView;
 import uk.co.fivium.formlibrary.validator.date.DateUtils;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
@@ -50,11 +49,14 @@ public class ScapSummaryViewService {
   }
 
   @Transactional
-  public ModelAndView addScapSummaryToModel(ModelAndView modelAndView, ScapDetail scapDetail) {
-    modelAndView.addObject(PROJECT_DETAILS_OBJECT_NAME, getProjectDetailsSummaryView(scapDetail));
-    modelAndView.addObject(PLANNED_TENDER_OBJECT_NAME, getPlannedTenderSummaryView(scapDetail));
-    modelAndView.addObject(ACTUAL_TENDER_OBJECT_NAME, getActualTenderSummaryView(scapDetail));
-    return modelAndView;
+  public ScapSummaryView getScapSummaryView(ScapDetail scapDetail) {
+    var projectDetailsSummaryView = getProjectDetailsSummaryView(scapDetail);
+    var plannedTenderSummaryView = getPlannedTenderSummaryView(scapDetail);
+    var actualTenderSummaryView = getActualTenderSummaryView(scapDetail);
+
+    return new ScapSummaryView(
+        projectDetailsSummaryView, plannedTenderSummaryView, actualTenderSummaryView
+    );
   }
 
   @VisibleForTesting

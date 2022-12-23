@@ -3,8 +3,7 @@
 
 <#assign pageTitle = "Check your answers before submitting your SCAP" />
 
-<#-- @ftlvariable name="projectDetailsSummaryView" type="uk.co.nstauthority.scap.scap.summary.ProjectDetailsSummaryView" -->
-<#-- @ftlvariable name="plannedTenderSummaryView" type="uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderSummaryView" -->
+<#-- @ftlvariable name="scapSummaryView" type="uk.co.nstauthority.scap.scap.summary.ScapSummaryView" -->
 
 <@defaultPage
   htmlTitle=pageTitle
@@ -12,10 +11,7 @@
   pageSize=PageSize.TWO_THIRDS_COLUMN
   backLinkUrl=springUrl(backLinkUrl)
 >
-  <@scapSummary.summary
-    projectDetailsSummaryView=projectDetailsSummaryView
-    plannedTenderSummaryView=plannedTenderSummaryView
-  />
+  <@scapSummary.summary scapSummaryView=scapSummaryView />
 
   <@fdsForm.htmlForm>
     <@fdsAction.submitButtons
