@@ -20,6 +20,8 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivitySe
 import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTenderController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
+import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderActivitySummaryView;
+import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryViewService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @Controller
@@ -103,7 +105,7 @@ public class ActualTenderSummaryController {
     );
   }
 
-  private ModelAndView actualTenderSummaryModelAndView(Integer scapId, List<ActualTenderSummaryView> summaryViews) {
+  private ModelAndView actualTenderSummaryModelAndView(Integer scapId, List<ActualTenderActivitySummaryView> summaryViews) {
     return new ModelAndView("scap/scap/actualtender/actualTenderActivitySummary")
         .addObject("actualTenderActivities", summaryViews)
         .addObject("backLinkUrl",

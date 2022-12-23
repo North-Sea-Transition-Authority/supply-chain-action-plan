@@ -31,13 +31,13 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivitySe
 import uk.co.nstauthority.scap.scap.actualtender.activity.ContractStage;
 import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTenderController;
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
-import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryView;
-import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryViewService;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
+import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderActivitySummaryView;
+import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryViewService;
 import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -78,7 +78,7 @@ class DeleteActualTenderActivityControllerTest extends AbstractControllerTest {
 
   @Test
   void renderDeleteActualTenderActivityConfirmation() throws Exception {
-    var actualTenderSummaryView = new ActualTenderSummaryView(
+    var actualTenderSummaryView = new ActualTenderActivitySummaryView(
         scap.getId(),
         actualTenderActivity.getId(),
         "test scope title",
@@ -108,7 +108,7 @@ class DeleteActualTenderActivityControllerTest extends AbstractControllerTest {
 
   @Test
   void renderDeleteActualTenderActivityConfirmation_HasContractingPerformance() throws Exception {
-    var actualTenderSummaryView = new ActualTenderSummaryView(
+    var actualTenderSummaryView = new ActualTenderActivitySummaryView(
         scap.getId(),
         actualTenderActivity.getId(),
         "test scope title",

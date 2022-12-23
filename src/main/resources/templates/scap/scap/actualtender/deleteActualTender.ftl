@@ -3,7 +3,7 @@
 
 <#assign pageTitle = "Are you sure you want to delete this actual tender activity?"/>
 <#-- @ftlvariable name="actualTenderActivityView"
-type="uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryView"
+type="uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderActivitySummaryView"
 -->
 
 <@defaultPage

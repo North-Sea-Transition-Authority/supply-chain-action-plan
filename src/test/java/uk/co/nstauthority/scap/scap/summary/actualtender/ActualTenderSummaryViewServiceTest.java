@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.scap.actualtender.summary;
+package uk.co.nstauthority.scap.scap.summary.actualtender;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -60,16 +60,16 @@ class ActualTenderSummaryViewServiceTest {
     var view = actualTenderSummaryViewService.getSingleViewByActualTenderActivity(actualTenderActivity, scapId);
 
     assertThat(view).extracting(
-        ActualTenderSummaryView::scapId,
-        ActualTenderSummaryView::activityId,
-        ActualTenderSummaryView::scopeTitle,
-        ActualTenderSummaryView::scopeDescription,
-        ActualTenderSummaryView::remunerationModel,
-        ActualTenderSummaryView::remunerationModelName,
-        ActualTenderSummaryView::contractStage,
-        ActualTenderSummaryView::invitationToTenderParticipants,
-        ActualTenderSummaryView::bidParticipants,
-        ActualTenderSummaryView::awardedContract
+        ActualTenderActivitySummaryView::scapId,
+        ActualTenderActivitySummaryView::activityId,
+        ActualTenderActivitySummaryView::scopeTitle,
+        ActualTenderActivitySummaryView::scopeDescription,
+        ActualTenderActivitySummaryView::remunerationModel,
+        ActualTenderActivitySummaryView::remunerationModelName,
+        ActualTenderActivitySummaryView::contractStage,
+        ActualTenderActivitySummaryView::ittParticipants,
+        ActualTenderActivitySummaryView::bidParticipants,
+        ActualTenderActivitySummaryView::awardedContractSummaryView
     ).containsExactly(
         scapId,
         actualTenderActivity.getId(),
@@ -148,15 +148,15 @@ class ActualTenderSummaryViewServiceTest {
         .getByActualTenderActivities(actualTenderActivities, scapId);
 
     assertThat(returnedViews).extracting(
-        ActualTenderSummaryView::scapId,
-        ActualTenderSummaryView::activityId,
-        ActualTenderSummaryView::scopeTitle,
-        ActualTenderSummaryView::scopeDescription,
-        ActualTenderSummaryView::remunerationModel,
-        ActualTenderSummaryView::remunerationModelName,
-        ActualTenderSummaryView::contractStage,
-        ActualTenderSummaryView::invitationToTenderParticipants,
-        ActualTenderSummaryView::bidParticipants
+        ActualTenderActivitySummaryView::scapId,
+        ActualTenderActivitySummaryView::activityId,
+        ActualTenderActivitySummaryView::scopeTitle,
+        ActualTenderActivitySummaryView::scopeDescription,
+        ActualTenderActivitySummaryView::remunerationModel,
+        ActualTenderActivitySummaryView::remunerationModelName,
+        ActualTenderActivitySummaryView::contractStage,
+        ActualTenderActivitySummaryView::ittParticipants,
+        ActualTenderActivitySummaryView::bidParticipants
     ).containsExactly(
         tuple(
             scapId,
@@ -193,13 +193,13 @@ class ActualTenderSummaryViewServiceTest {
         )
     );
 
-    assertThat(returnedViews.get(0).awardedContract()).isNull();
-    assertThat(returnedViews.get(1).awardedContract()).isNull();
+    assertThat(returnedViews.get(0).awardedContractSummaryView()).isNull();
+    assertThat(returnedViews.get(1).awardedContractSummaryView()).isNull();
     assertThat(returnedViews.get(2)).extracting(
-        view -> view.awardedContract().preferredBidder(),
-        view -> view.awardedContract().awardValue(),
-        view -> view.awardedContract().awardRationale(),
-        view -> view.awardedContract().preferredBidderLocation()
+        view -> view.awardedContractSummaryView().preferredBidderName(),
+        view -> view.awardedContractSummaryView().awardValue(),
+        view -> view.awardedContractSummaryView().awardRationale(),
+        view -> view.awardedContractSummaryView().preferredBidderCountry()
     ).containsExactly(
           awardedContract.getPreferredBidder().getCompanyName(),
           awardedContract.getAwardValue(),

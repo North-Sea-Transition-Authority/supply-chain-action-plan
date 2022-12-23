@@ -45,6 +45,9 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
+import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderActivitySummaryView;
+import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryViewService;
+import uk.co.nstauthority.scap.scap.summary.actualtender.AwardedContractSummaryView;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
 
@@ -105,7 +108,7 @@ class ActualTenderSummaryControllerTest extends AbstractControllerTest {
     var awardedContractSummaryView = new AwardedContractSummaryView(
         "preferred bidder name", BigDecimal.valueOf(1.32),
         "award rationale", "preferred bidder location");
-    var actualTenderSummaryView = new ActualTenderSummaryView(
+    var actualTenderSummaryView = new ActualTenderActivitySummaryView(
         scap.getId(), actualTenderActivities.get(0).getId(),
         "scope title", "scope description",
         RemunerationModel.OTHER, "remuneration model name",
@@ -155,7 +158,7 @@ class ActualTenderSummaryControllerTest extends AbstractControllerTest {
     var awardedContractSummaryView = new AwardedContractSummaryView(
         "preferred bidder name", BigDecimal.valueOf(1.32),
         "award rationale", "preferred bidder location");
-    var actualTenderSummaryView = new ActualTenderSummaryView(
+    var actualTenderSummaryView = new ActualTenderActivitySummaryView(
         scap.getId(), actualTenderActivities.get(0).getId(),
         "scope title", "scope description",
         RemunerationModel.OTHER, "remuneration model name",
@@ -199,7 +202,7 @@ class ActualTenderSummaryControllerTest extends AbstractControllerTest {
     var awardedContractSummaryView = new AwardedContractSummaryView(
         "preferred bidder name", BigDecimal.valueOf(1.32),
         "award rationale", "preferred bidder location");
-    var actualTenderSummaryView = new ActualTenderSummaryView(
+    var actualTenderSummaryView = new ActualTenderActivitySummaryView(
         scap.getId(), actualTenderActivities.get(0).getId(),
         "scope title", "scope description",
         RemunerationModel.OTHER, "remuneration model name",
@@ -238,7 +241,7 @@ class ActualTenderSummaryControllerTest extends AbstractControllerTest {
     var awardedContractSummaryView = new AwardedContractSummaryView(
         "preferred bidder name", BigDecimal.valueOf(1.32),
         "award rationale", "preferred bidder location");
-    var actualTenderSummaryView = new ActualTenderSummaryView(
+    var actualTenderSummaryView = new ActualTenderActivitySummaryView(
         scap.getId(), actualTenderActivities.get(0).getId(),
         "scope title", "scope description",
         RemunerationModel.OTHER, "remuneration model name",

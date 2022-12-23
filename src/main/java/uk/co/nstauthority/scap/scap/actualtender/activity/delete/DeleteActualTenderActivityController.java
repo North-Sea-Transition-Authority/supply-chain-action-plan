@@ -16,10 +16,10 @@ import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
-import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryViewService;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
+import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryViewService;
 
 @Controller
 @RequestMapping("{scapId}/actual-tender/activity/{activityId}/delete")

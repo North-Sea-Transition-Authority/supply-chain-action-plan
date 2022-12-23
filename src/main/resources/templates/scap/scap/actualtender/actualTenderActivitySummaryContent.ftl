@@ -2,7 +2,7 @@
 
 <#macro actualTenderActivitySummaryContent actualTenderActivity>
 <#-- @ftlvariable name="actualTenderActivity"
-  type="uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryView"
+  type="uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderActivitySummaryView"
 -->
   <@fdsSummaryList.summaryListRowNoAction keyText="Scope title">
     ${actualTenderActivity.scopeTitle()!""}
@@ -25,7 +25,7 @@
       ${actualTenderActivity.contractStage().displayName!""}
     </#if>
   </@fdsSummaryList.summaryListRowNoAction>
-  <#list actualTenderActivity.invitationToTenderParticipants() as invitationToTenderParticipant>
+  <#list actualTenderActivity.ittParticipants() as invitationToTenderParticipant>
     <@fdsSummaryList.summaryListRowNoAction keyText="Invitation to tender participant ${invitationToTenderParticipant_index + 1}">
       ${invitationToTenderParticipant!""}
     </@fdsSummaryList.summaryListRowNoAction>
@@ -35,18 +35,18 @@
       ${bidParticipant}
     </@fdsSummaryList.summaryListRowNoAction>
   </#list>
-  <#if actualTenderActivity.awardedContract()?has_content>
-    <@awardedContractSummaryContent awardedContract=actualTenderActivity.awardedContract()/>
+  <#if actualTenderActivity.awardedContractSummaryView()?has_content>
+    <@awardedContractSummaryContent awardedContract=actualTenderActivity.awardedContractSummaryView()/>
   </#if>
 
 </#macro>
 
 <#macro awardedContractSummaryContent awardedContract>
 <#-- @ftlvariable name="awardedContract"
-  type="uk.co.nstauthority.scap.scap.actualtender.summary.AwardedContractSummaryView"
+  type="uk.co.nstauthority.scap.scap.summary.actualtender.AwardedContractSummaryView"
 -->
   <@fdsSummaryList.summaryListRowNoAction keyText="Preferred bidder">
-    ${awardedContract.preferredBidder()!""}
+    ${awardedContract.preferredBidderName()!""}
   </@fdsSummaryList.summaryListRowNoAction>
   <@fdsSummaryList.summaryListRowNoAction keyText="Award value">
     <#if awardedContract.awardValue()?has_content>
@@ -57,6 +57,6 @@
     ${awardedContract.awardRationale()!""}
   </@fdsSummaryList.summaryListRowNoAction>
   <@fdsSummaryList.summaryListRowNoAction keyText="Preferred bidder location">
-    ${awardedContract.preferredBidderLocation()!""}
+    ${awardedContract.preferredBidderCountry()!""}
   </@fdsSummaryList.summaryListRowNoAction>
 </#macro>

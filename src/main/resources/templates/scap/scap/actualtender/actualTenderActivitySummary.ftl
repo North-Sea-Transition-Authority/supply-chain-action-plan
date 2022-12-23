@@ -29,7 +29,7 @@ backLinkUrl=springUrl(backLinkUrl)
 
 <#macro actualTenderActivitySummary actualTenderActivity index>
 <#-- @ftlvariable name="actualTenderActivity"
-  type="uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryView"
+  type="uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderActivitySummaryView"
 -->
   <#assign cardActionsContent>
     <@fdsSummaryList.summaryListCardActionList>
