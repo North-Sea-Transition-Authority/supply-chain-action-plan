@@ -2,7 +2,9 @@ package uk.co.nstauthority.scap.scap.summary;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -28,6 +30,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
+import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
+import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
+import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityBuilder;
+import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTender;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderService;
@@ -36,6 +42,12 @@ import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivity
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetails;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsService;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectType;
+import uk.co.nstauthority.scap.scap.scap.Scap;
+import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderActivitySummaryView;
+import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryView;
+import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryViewService;
+import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderActivitySummaryView;
+import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderSummaryView;
 
 @ExtendWith(MockitoExtension.class)
 class ScapSummaryViewServiceTest {
@@ -49,6 +61,15 @@ class ScapSummaryViewServiceTest {
   @Mock
   PlannedTenderActivityService plannedTenderActivityService;
 
+  @Mock
+  ActualTenderService actualTenderService;
+
+  @Mock
+  ActualTenderActivityService actualTenderActivityService;
+
+  @Mock
+  ActualTenderSummaryViewService actualTenderSummaryViewService;
+
   @InjectMocks
   ScapSummaryViewService scapSummaryViewService;
 
@@ -57,7 +78,9 @@ class ScapSummaryViewServiceTest {
   @BeforeEach
   void setup() {
     scapSummaryViewService = spy(scapSummaryViewService);
+    var scap = new Scap(5482);
     scapDetail = new ScapDetail();
+    scapDetail.setScap(scap);
   }
 
   @Test
@@ -69,7 +92,11 @@ class ScapSummaryViewServiceTest {
 
     scapSummaryViewService.addScapSummaryToModel(modelAndView, scapDetail);
 
-    verify(scapSummaryViewService).getProjectDetailsSummaryView(scapDetail);
+    var inOrder = inOrder(scapSummaryViewService);
+
+    inOrder.verify(scapSummaryViewService).getProjectDetailsSummaryView(scapDetail);
+    inOrder.verify(scapSummaryViewService).getPlannedTenderSummaryView(scapDetail);
+    inOrder.verify(scapSummaryViewService).getActualTenderSummaryView(scapDetail);
   }
 
   @ParameterizedTest
@@ -200,6 +227,68 @@ class ScapSummaryViewServiceTest {
             plannedTenderActivity.getRemunerationModelName(),
             plannedTenderActivity.getScopeDescription()
         )
+    );
+  }
+
+  @Test
+  void getActualTenderSummaryView_NoActualTenderEntity() {
+    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.empty());
+
+    var actualTenderSummaryView = scapSummaryViewService.getActualTenderSummaryView(scapDetail);
+
+    assertThat(actualTenderSummaryView).extracting(
+        ActualTenderSummaryView::hasActualTenderActivities,
+        ActualTenderSummaryView::actualTenderActivitySummaryViews
+    ).containsExactly(
+        null, null
+    );
+  }
+
+  @Test
+  void getActualTenderSummaryView_HasNoActualTenderActivities() {
+    var actualTender = new ActualTender();
+    actualTender.setHasActualTenders(false);
+
+    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
+
+    var actualTenderSummaryView = scapSummaryViewService.getActualTenderSummaryView(scapDetail);
+
+    assertThat(actualTenderSummaryView).extracting(
+        ActualTenderSummaryView::hasActualTenderActivities,
+        ActualTenderSummaryView::actualTenderActivitySummaryViews
+    ).containsExactly(
+        false, Collections.emptyList()
+    );
+
+    verify(actualTenderActivityService, never()).getAllByActualTender(any());
+  }
+
+  @Test
+  void getActualTenderSummaryView_HasActualTenderActivities() {
+    var actualTender = new ActualTender();
+    actualTender.setHasActualTenders(true);
+    var actualTenderActivity = new ActualTenderActivityBuilder()
+        .withId(1)
+        .build();
+    var activityViews = List.of(
+        new ActualTenderActivitySummaryView(
+            null, null, null, null, null, null,
+            null, null, null, null
+        )
+    );
+
+    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
+    when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(List.of(actualTenderActivity));
+    when(actualTenderSummaryViewService.getByActualTenderActivities(List.of(actualTenderActivity), scapDetail.getScap().getId()))
+        .thenReturn(activityViews);
+
+    var actualTenderSummaryView = scapSummaryViewService.getActualTenderSummaryView(scapDetail);
+
+    assertThat(actualTenderSummaryView).extracting(
+        ActualTenderSummaryView::hasActualTenderActivities,
+        ActualTenderSummaryView::actualTenderActivitySummaryViews
+    ).containsExactly(
+        true, activityViews
     );
   }
 

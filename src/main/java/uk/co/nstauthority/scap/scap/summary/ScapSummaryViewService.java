@@ -8,10 +8,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.fivium.formlibrary.validator.date.DateUtils;
 import uk.co.nstauthority.scap.enumutil.YesNo;
+import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
+import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderService;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityService;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsService;
+import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryView;
+import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryViewService;
+import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderActivitySummaryView;
+import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderSummaryView;
 
 @Service
 public class ScapSummaryViewService {
@@ -19,23 +25,35 @@ public class ScapSummaryViewService {
   public static final String  PROJECT_DETAILS_OBJECT_NAME = "projectDetailsSummaryView";
   public static final String PLANNED_TENDER_OBJECT_NAME = "plannedTenderSummaryView";
 
+  public static final String ACTUAL_TENDER_OBJECT_NAME = "actualTenderSummaryView";
+
   private final ProjectDetailsService projectDetailsService;
   private final PlannedTenderService plannedTenderService;
   private final PlannedTenderActivityService plannedTenderActivityService;
+  private final ActualTenderSummaryViewService actualTenderSummaryViewService;
+  private final ActualTenderService actualTenderService;
+  private final ActualTenderActivityService actualTenderActivityService;
 
   @Autowired
   ScapSummaryViewService(ProjectDetailsService projectDetailsService,
                          PlannedTenderService plannedTenderService,
-                         PlannedTenderActivityService plannedTenderActivityService) {
+                         PlannedTenderActivityService plannedTenderActivityService,
+                         ActualTenderSummaryViewService actualTenderSummaryViewService,
+                         ActualTenderService actualTenderService,
+                         ActualTenderActivityService actualTenderActivityService) {
     this.projectDetailsService = projectDetailsService;
     this.plannedTenderService = plannedTenderService;
     this.plannedTenderActivityService = plannedTenderActivityService;
+    this.actualTenderSummaryViewService = actualTenderSummaryViewService;
+    this.actualTenderService = actualTenderService;
+    this.actualTenderActivityService = actualTenderActivityService;
   }
 
   @Transactional
   public ModelAndView addScapSummaryToModel(ModelAndView modelAndView, ScapDetail scapDetail) {
     modelAndView.addObject(PROJECT_DETAILS_OBJECT_NAME, getProjectDetailsSummaryView(scapDetail));
     modelAndView.addObject(PLANNED_TENDER_OBJECT_NAME, getPlannedTenderSummaryView(scapDetail));
+    modelAndView.addObject(ACTUAL_TENDER_OBJECT_NAME, getActualTenderSummaryView(scapDetail));
     return modelAndView;
   }
 
@@ -81,7 +99,20 @@ public class ScapSummaryViewService {
           return new PlannedTenderSummaryView(plannedTender.getHasPlannedTenders(), plannedTenderActivitySummaryViews);
         }
     ).orElse(new PlannedTenderSummaryView(null, null));
+  }
 
+  @VisibleForTesting
+  public ActualTenderSummaryView getActualTenderSummaryView(ScapDetail scapDetail) {
+    var actualTenderOpt = actualTenderService.getByScapDetail(scapDetail);
+    return actualTenderOpt.map(actualTender -> {
+      if (Boolean.FALSE.equals(actualTender.getHasActualTenders())) {
+        return new ActualTenderSummaryView(false, Collections.emptyList());
+      }
 
+      var actualTenderActivities = actualTenderActivityService.getAllByActualTender(actualTender);
+      return new ActualTenderSummaryView(
+          true,
+          actualTenderSummaryViewService.getByActualTenderActivities(actualTenderActivities, scapDetail.getScap().getId()));
+    }).orElse(new ActualTenderSummaryView(null, null));
   }
 }

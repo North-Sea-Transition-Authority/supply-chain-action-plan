@@ -3,7 +3,7 @@
 <#assign plannedTenderMissingData = "No information on planned tender activities has been provided">
 
 <#macro plannedTenderSummary plannedTenderSummaryView>
-  <#-- @ftlvariable name="plannedTenderSummaryView" type="uk.co.nstauthority.scap.scap.summary.PlannedTenderSummaryView" -->
+<#-- @ftlvariable name="plannedTenderSummaryView" type="uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderSummaryView" -->
   <#if plannedTenderSummaryView.hasPlannedTender()?has_content>
 
     <#if plannedTenderSummaryView.plannedTenderActivitySummaryViews()?has_content >
@@ -42,7 +42,7 @@
 </#macro>
 
 <#macro plannedTenderActivitySummaryContent plannedTenderActivitySummaryView>
-  <#-- @ftlvariable name="plannedTenderActivitySummaryView" type="uk.co.nstauthority.scap.scap.summary.PlannedTenderActivitySummaryView" -->
+<#-- @ftlvariable name="plannedTenderActivitySummaryView" type="uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderActivitySummaryView" -->
   <@fdsSummaryList.summaryListRowNoAction keyText="Scope description">
     ${plannedTenderActivitySummaryView.scopeDescription()!""}
   </@fdsSummaryList.summaryListRowNoAction>

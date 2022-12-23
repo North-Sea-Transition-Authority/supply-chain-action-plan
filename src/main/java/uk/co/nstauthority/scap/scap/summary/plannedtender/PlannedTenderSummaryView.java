@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.scap.summary;
+package uk.co.nstauthority.scap.scap.summary.plannedtender;
 
 import java.util.List;
 

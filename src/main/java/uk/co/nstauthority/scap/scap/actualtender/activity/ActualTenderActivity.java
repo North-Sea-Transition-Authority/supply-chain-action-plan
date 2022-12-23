@@ -58,6 +58,11 @@ public class ActualTenderActivity {
     return id;
   }
 
+  @VisibleForTesting
+  void setActualTender(ActualTender actualTender) {
+    this.actualTender = actualTender;
+  }
+
   public String getScopeTitle() {
     return scopeTitle;
   }
@@ -100,6 +105,11 @@ public class ActualTenderActivity {
 
   Instant getCreatedTimestamp() {
     return createdTimestamp;
+  }
+
+  @VisibleForTesting
+  void setCreatedTimestamp(Instant createdTimestamp) {
+    this.createdTimestamp = createdTimestamp;
   }
 
   @Override

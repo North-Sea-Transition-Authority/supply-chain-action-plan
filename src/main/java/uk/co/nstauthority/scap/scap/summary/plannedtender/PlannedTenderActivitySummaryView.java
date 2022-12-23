@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.scap.summary;
+package uk.co.nstauthority.scap.scap.summary.plannedtender;
 
 import java.math.BigDecimal;
 import uk.co.nstauthority.scap.scap.RemunerationModel;

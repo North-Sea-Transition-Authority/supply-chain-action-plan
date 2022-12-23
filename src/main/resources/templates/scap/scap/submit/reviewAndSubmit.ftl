@@ -4,7 +4,7 @@
 <#assign pageTitle = "Check your answers before submitting your SCAP" />
 
 <#-- @ftlvariable name="projectDetailsSummaryView" type="uk.co.nstauthority.scap.scap.summary.ProjectDetailsSummaryView" -->
-<#-- @ftlvariable name="plannedTenderSummaryView" type="uk.co.nstauthority.scap.scap.summary.PlannedTenderSummaryView" -->
+<#-- @ftlvariable name="plannedTenderSummaryView" type="uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderSummaryView" -->
 
 <@defaultPage
   htmlTitle=pageTitle
