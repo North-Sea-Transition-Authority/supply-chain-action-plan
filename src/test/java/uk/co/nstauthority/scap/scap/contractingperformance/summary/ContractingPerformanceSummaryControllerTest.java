@@ -17,7 +17,6 @@ import static uk.co.nstauthority.scap.utils.ControllerTestingUtil.redirectUrl;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +38,8 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
+import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryView;
+import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryViewService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,14 +60,13 @@ class ContractingPerformanceSummaryControllerTest extends AbstractControllerTest
   HasMoreContractingPerformanceFormService hasMoreContractingPerformanceFormService;
 
   @MockBean
-  ContractingPerformanceSummaryService contractingPerformanceSummaryService;
+  ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService;
 
   private Integer scapId;
   private Scap scap;
   private ScapDetail scapDetail;
   private ContractingPerformanceOverview contractingPerformanceOverview;
   private List<ContractingPerformanceSummaryView> summaryViews;
-  private Map<String, String> countryMap;
 
   @BeforeEach
   void setup() {
@@ -83,11 +83,10 @@ class ContractingPerformanceSummaryControllerTest extends AbstractControllerTest
         RemunerationModel.LUMP_SUM,
         null,
         "Some contractor name",
-        0,
+        "Untied Kingdom",
         BigDecimal.valueOf(1.3),
         "Some outturn rationale"
     ));
-    countryMap = Map.of("0", "United Kingdom");
   }
 
   @Test
@@ -96,9 +95,8 @@ class ContractingPerformanceSummaryControllerTest extends AbstractControllerTest
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
-    when(contractingPerformanceSummaryService.getContractingPerformanceSummaryViews(scapId))
+    when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(scapId))
         .thenReturn(summaryViews);
-    when(contractingPerformanceSummaryService.getCountryMap(summaryViews)).thenReturn(countryMap);
     when(hasMoreContractingPerformanceFormService.getForm(contractingPerformanceOverview))
         .thenReturn(new HasMoreContractingPerformanceForm());
 
@@ -109,8 +107,7 @@ class ContractingPerformanceSummaryControllerTest extends AbstractControllerTest
         .andExpect(view().name("scap/scap/contractingperformance/contractingPerformanceSummary"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId))))
-        .andExpect(model().attribute("summaryViews", summaryViews))
-        .andExpect(model().attribute("countryMap", countryMap));
+        .andExpect(model().attribute("summaryViews", summaryViews));
   }
 
   @Test
@@ -118,7 +115,7 @@ class ContractingPerformanceSummaryControllerTest extends AbstractControllerTest
     var expectedRedirectUrl = ReverseRouter.route(on(HasContractingPerformanceController.class)
         .renderHasContractingPerformanceForm(scapId));
 
-    when(contractingPerformanceSummaryService.getContractingPerformanceSummaryViews(scapId))
+    when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(scapId))
         .thenReturn(Collections.emptyList());
 
     mockMvc.perform(get(
@@ -133,7 +130,7 @@ class ContractingPerformanceSummaryControllerTest extends AbstractControllerTest
     var expectedRedirectUrl = ReverseRouter.route(on(HasContractingPerformanceController.class)
         .renderHasContractingPerformanceForm(scapId));
 
-    when(contractingPerformanceSummaryService.getContractingPerformanceSummaryViews(scapId))
+    when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(scapId))
         .thenReturn(Collections.emptyList());
 
     mockMvc.perform(post(
@@ -158,9 +155,8 @@ class ContractingPerformanceSummaryControllerTest extends AbstractControllerTest
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
-    when(contractingPerformanceSummaryService.getContractingPerformanceSummaryViews(scapId))
+    when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(scapId))
         .thenReturn(summaryViews);
-    when(contractingPerformanceSummaryService.getCountryMap(summaryViews)).thenReturn(countryMap);
     when(hasMoreContractingPerformanceFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResultWithErrors);
 
@@ -174,7 +170,6 @@ class ContractingPerformanceSummaryControllerTest extends AbstractControllerTest
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId))))
         .andExpect(model().attribute("summaryViews", summaryViews))
-        .andExpect(model().attribute("countryMap", countryMap))
         .andExpect(model().attributeExists("errorList"));
 
     verify(contractingPerformanceOverviewService, never()).updateHasMoreContractingPerformance(any(), any());
@@ -193,9 +188,8 @@ class ContractingPerformanceSummaryControllerTest extends AbstractControllerTest
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
-    when(contractingPerformanceSummaryService.getContractingPerformanceSummaryViews(scapId))
+    when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(scapId))
         .thenReturn(summaryViews);
-    when(contractingPerformanceSummaryService.getCountryMap(summaryViews)).thenReturn(countryMap);
     when(hasMoreContractingPerformanceFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResultWithoutErrors);
 
@@ -222,9 +216,8 @@ class ContractingPerformanceSummaryControllerTest extends AbstractControllerTest
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
-    when(contractingPerformanceSummaryService.getContractingPerformanceSummaryViews(scapId))
+    when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(scapId))
         .thenReturn(summaryViews);
-    when(contractingPerformanceSummaryService.getCountryMap(summaryViews)).thenReturn(countryMap);
     when(hasMoreContractingPerformanceFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResultWithoutErrors);
 

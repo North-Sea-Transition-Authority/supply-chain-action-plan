@@ -11,8 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,12 +29,12 @@ import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanc
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
 import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperformance.HasContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryController;
-import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryService;
-import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryView;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
+import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryView;
+import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryViewService;
 import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,7 +55,7 @@ class DeleteContractingPerformanceControllerTest extends AbstractControllerTest 
   ContractingPerformanceService contractingPerformanceService;
 
   @MockBean
-  ContractingPerformanceSummaryService contractingPerformanceSummaryService;
+  ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService;
 
   private Integer scapId = 51;
   private Integer contractingPerformanceId = 4357;
@@ -70,7 +68,7 @@ class DeleteContractingPerformanceControllerTest extends AbstractControllerTest 
 
   @Test
   void renderDeleteContractingPerformanceConfirmation_NoSummaryView_AssertNotFound() throws Exception{
-    when(contractingPerformanceSummaryService.getContractingPerformanceSummaryView(scapId, contractingPerformanceId))
+    when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryView(scapId, contractingPerformanceId))
         .thenReturn(Optional.empty());
 
     mockMvc.perform(get(
@@ -84,13 +82,11 @@ class DeleteContractingPerformanceControllerTest extends AbstractControllerTest 
     var view = new ContractingPerformanceSummaryView(
         scapId, contractingPerformanceId, "Test scope title", "Test scope description",
         BigDecimal.valueOf(47.59), RemunerationModel.LUMP_SUM, null, "contractor name",
-        0, BigDecimal.valueOf(48.29), "some outturn rationale"
+        "United Kingdom", BigDecimal.valueOf(48.29), "some outturn rationale"
     );
-    var countryMap = Map.of(String.valueOf(view.countryId()), "United Kingdom");
 
-    when(contractingPerformanceSummaryService.getContractingPerformanceSummaryView(scapId, contractingPerformanceId))
+    when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryView(scapId, contractingPerformanceId))
         .thenReturn(Optional.of(view));
-    when(contractingPerformanceSummaryService.getCountryMap(List.of(view))).thenReturn(countryMap);
 
     mockMvc.perform(get(
         ReverseRouter.route(on(DeleteContractingPerformanceController.class)
@@ -99,8 +95,7 @@ class DeleteContractingPerformanceControllerTest extends AbstractControllerTest 
         .andExpect(view().name("scap/scap/contractingperformance/deleteContractingPerformance"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(ContractingPerformanceSummaryController.class).renderContractingPerformanceSummary(scapId))))
-        .andExpect(model().attribute("summaryView", view))
-        .andExpect(model().attribute("countryMap", countryMap));
+        .andExpect(model().attribute("summaryView", view));
   }
 
   @Test

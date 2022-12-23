@@ -2,7 +2,7 @@
 <#import 'contractingPerformanceSummaryContent.ftl' as summaryContent>
 
 <#-- @ftlvariable name="errorList" type="java.util.List<uk.co.nstauthority.scap.fds.ErrorItem>" -->
-<#-- @ftlvariable name="summaryViews" type="java.util.List<uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryView>"-->
+<#-- @ftlvariable name="summaryViews" type="java.util.List<uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryView>"-->
 
 <#assign pageTitle = "Contracting performance" />
 
@@ -14,7 +14,7 @@ errorItems=errorList
 backLinkUrl=springUrl(backLinkUrl)
 >
   <#list summaryViews as summaryView>
-    <@contractingPerformanceSummaryCard summaryView=summaryView index=summaryView_index countryMap=countryMap/>
+    <@contractingPerformanceSummaryCard summaryView=summaryView index=summaryView_index/>
   </#list>
 
   <@fdsForm.htmlForm>
@@ -29,9 +29,8 @@ backLinkUrl=springUrl(backLinkUrl)
 
 </@defaultPage>
 
-<#macro contractingPerformanceSummaryCard summaryView index countryMap>
-  <#-- @ftlvariable name="summaryView" type="uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryView"-->
-  <#-- @ftlvariable name="countryMap" type="java.util.Map<String, String>"-->
+<#macro contractingPerformanceSummaryCard summaryView index>
+<#-- @ftlvariable name="summaryView" type="uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryView"-->
   <#assign cardActionsContent>
     <@contractingPerformanceSummaryCardActionsContent summaryView=summaryView />
   </#assign>
@@ -40,12 +39,12 @@ backLinkUrl=springUrl(backLinkUrl)
     headingText=summaryView.scopeTitle()
     cardActionsContent=cardActionsContent
   >
-    <@summaryContent.contractingPerformanceSummaryContent summaryView=summaryView countryMap=countryMap />
+    <@summaryContent.contractingPerformanceSummaryContent summaryView=summaryView />
   </@fdsSummaryList.summaryListCard>
 </#macro>
 
 <#macro contractingPerformanceSummaryCardActionsContent summaryView>
-  <#-- @ftlvariable name="summaryView" type="uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryView"-->
+<#-- @ftlvariable name="summaryView" type="uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryView"-->
   <@fdsSummaryList.summaryListCardActionList>
     <@fdsSummaryList.summaryListCardActionItem
       itemUrl=springUrl(summaryView.getChangeLinkUrl())

@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.scap.contractingperformance.summary;
+package uk.co.nstauthority.scap.scap.summary.contractingperformance;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -16,9 +16,9 @@ public record ContractingPerformanceSummaryView(Integer scapId,
                                                 RemunerationModel remunerationModel,
                                                 String remunerationModelName,
                                                 String contractor,
-                                                Integer countryId,
+                                                String location,
                                                 BigDecimal outturnCost,
-                                                String outturnRationale) {
+                                                String outturnCostRationale) {
 
   public String getChangeLinkUrl() {
     return ReverseRouter.route(on(ContractingPerformanceController.class)
@@ -29,5 +29,4 @@ public record ContractingPerformanceSummaryView(Integer scapId,
     return ReverseRouter.route(on(DeleteContractingPerformanceController.class)
         .renderDeleteContractingPerformanceConfirmation(scapId, contractingPerformanceId));
   }
-
 }

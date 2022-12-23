@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.scap.contractingperformance.summary;
+package uk.co.nstauthority.scap.scap.summary.contractingperformance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -16,12 +16,14 @@ import uk.co.nstauthority.scap.scap.contractingperformance.delete.DeleteContract
 @ExtendWith(MockitoExtension.class)
 class ContractingPerformanceSummaryViewTest {
 
+  private Integer scapId;
   private ContractingPerformanceSummaryView contractingPerformanceSummaryView;
 
   @BeforeEach
   void setup() {
+    scapId = 51;
     contractingPerformanceSummaryView = new ContractingPerformanceSummaryView(
-        51,
+        scapId,
         1813,
         "some scope title",
         "some scope description",
@@ -29,7 +31,7 @@ class ContractingPerformanceSummaryViewTest {
         RemunerationModel.OTHER,
         "Some other remuneration model",
         "contractors name",
-        0,
+        "United Kingdom",
         BigDecimal.valueOf(14),
         "Something went wrong"
     );
@@ -39,7 +41,7 @@ class ContractingPerformanceSummaryViewTest {
   void getChangeLinkUrl() {
     var expectedChangeLinkUrl = ReverseRouter.route(on(ContractingPerformanceController.class)
         .renderExistingContractingPerformanceForm(
-            contractingPerformanceSummaryView.scapId(), contractingPerformanceSummaryView.contractingPerformanceId()));
+            scapId, contractingPerformanceSummaryView.contractingPerformanceId()));
 
     assertThat(contractingPerformanceSummaryView.getChangeLinkUrl()).isEqualTo(expectedChangeLinkUrl);
   }

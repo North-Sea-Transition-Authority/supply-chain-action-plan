@@ -14,7 +14,7 @@
     headingText="Contracting performance"
   >
     <@fdsSummaryList.summaryList>
-      <@summaryContent.contractingPerformanceSummaryContent summaryView=summaryView countryMap=countryMap />
+      <@summaryContent.contractingPerformanceSummaryContent summaryView=summaryView />
     </@fdsSummaryList.summaryList>
   </@fdsSummaryList.summaryListWrapper>
   <@fdsForm.htmlForm>

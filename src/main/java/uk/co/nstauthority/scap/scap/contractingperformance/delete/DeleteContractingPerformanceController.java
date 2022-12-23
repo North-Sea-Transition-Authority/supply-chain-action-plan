@@ -2,7 +2,6 @@ package uk.co.nstauthority.scap.scap.contractingperformance.delete;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,9 +16,9 @@ import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanc
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
 import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperformance.HasContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryController;
-import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
+import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryViewService;
 import uk.co.nstauthority.scap.util.DeletionSuccessBannerUtil;
 
 @Controller
@@ -30,36 +29,35 @@ public class DeleteContractingPerformanceController {
   private final ScapDetailService scapDetailService;
   private final ContractingPerformanceOverviewService contractingPerformanceOverviewService;
   private final ContractingPerformanceService contractingPerformanceService;
-  private final ContractingPerformanceSummaryService contractingPerformanceSummaryService;
+  private final ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService;
 
   @Autowired
   DeleteContractingPerformanceController(ScapService scapService,
                                          ScapDetailService scapDetailService,
                                          ContractingPerformanceOverviewService contractingPerformanceOverviewService,
                                          ContractingPerformanceService contractingPerformanceService,
-                                         ContractingPerformanceSummaryService contractingPerformanceSummaryService) {
+                                         ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService) {
     this.scapService = scapService;
     this.scapDetailService = scapDetailService;
     this.contractingPerformanceOverviewService = contractingPerformanceOverviewService;
     this.contractingPerformanceService = contractingPerformanceService;
-    this.contractingPerformanceSummaryService = contractingPerformanceSummaryService;
+    this.contractingPerformanceSummaryViewService = contractingPerformanceSummaryViewService;
   }
 
   @GetMapping
   public ModelAndView renderDeleteContractingPerformanceConfirmation(@PathVariable("scapId") Integer scapId,
                                                                      @PathVariable("contractingPerformanceId")
                                                                      Integer contractingPerformanceId) {
-    var summaryView = contractingPerformanceSummaryService.getContractingPerformanceSummaryView(scapId, contractingPerformanceId)
+    var summaryView = contractingPerformanceSummaryViewService
+        .getContractingPerformanceSummaryView(scapId, contractingPerformanceId)
         .orElseThrow(() -> new ScapEntityNotFoundException(
-            "Could not get ContractingPerformanceSummaryView for scapId: [%d] and contractingPerformanceId: [%d]"
+            "Could not get ContractingPerformanceSummaryDto for scapId: [%d] and contractingPerformanceId: [%d]"
                 .formatted(scapId, contractingPerformanceId)));
-    var countryMap = contractingPerformanceSummaryService.getCountryMap(List.of(summaryView));
 
     return new ModelAndView("scap/scap/contractingperformance/deleteContractingPerformance")
         .addObject("backLinkUrl", ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
             .renderContractingPerformanceSummary(scapId)))
-        .addObject("summaryView", summaryView)
-        .addObject("countryMap", countryMap);
+        .addObject("summaryView", summaryView);
   }
 
   @PostMapping
