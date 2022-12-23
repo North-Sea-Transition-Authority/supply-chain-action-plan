@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
@@ -260,4 +261,67 @@ class TeamMemberServiceTest {
     assertTrue(result.isEmpty());
   }
 
+  @Test
+  void findAllPermissionsForUser_HasNoRoles() {
+    var user = ServiceUserDetailTestUtil.Builder().build();
+
+    var roles = teamMemberService.listAllPermissionsForUserInAllTeams(user);
+    assertThat(roles).isEmpty();
+  }
+
+  @Test
+  void findAllPermissionsByUser_UserHasRoles() {
+    var user = ServiceUserDetailTestUtil.Builder().build();
+    var industryTeam = TeamTestUtil.Builder().withTeamType(TeamType.INDUSTRY).build();
+    var industryRole = TeamMemberRoleTestUtil
+        .Builder()
+        .withRole(IndustryTeamRole.SCAP_VIEWER.name())
+        .withTeam(industryTeam)
+        .build();
+    var regulatorRole = TeamMemberRoleTestUtil
+        .Builder()
+        .withRole(RegulatorTeamRole.SCAP_CASE_OFFICER.name())
+        .build();
+    when(teamMemberRoleRepository.findAllByWuaId(user.wuaId())).thenReturn(List.of(industryRole, regulatorRole));
+
+    var roles = teamMemberService.listAllPermissionsForUserInAllTeams(user);
+    assertThat(roles).contains(RolePermission.VIEW_SCAP, RolePermission.REVIEW_SCAP);
+  }
+
+  @Test
+  void findAllPermissionsByUser_UserHasIndustryRoles() {
+    var industryTeam = TeamTestUtil.Builder().withTeamType(TeamType.INDUSTRY).build();
+    var user = ServiceUserDetailTestUtil.Builder().build();
+    var industryRole = TeamMemberRoleTestUtil
+        .Builder()
+        .withRole(IndustryTeamRole.SCAP_VIEWER.name())
+        .withTeam(industryTeam)
+        .build();
+    var industryRole2 = TeamMemberRoleTestUtil
+        .Builder()
+        .withRole(IndustryTeamRole.SCAP_SUBMITTER.name())
+        .withTeam(industryTeam)
+        .build();
+    when(teamMemberRoleRepository.findAllByWuaId(user.wuaId())).thenReturn(List.of(industryRole, industryRole2));
+
+    var roles = teamMemberService.listAllPermissionsForUserInAllTeams(user);
+    assertThat(roles).contains(RolePermission.VIEW_SCAP, RolePermission.SUBMIT_SCAP);
+  }
+
+  @Test
+  void findAllPermissionsByUser_UserHasRegulatorRoles() {
+    var user = ServiceUserDetailTestUtil.Builder().build();
+    var regulatorRole1 = TeamMemberRoleTestUtil
+        .Builder()
+        .withRole(RegulatorTeamRole.SCAP_VIEWER.name())
+        .build();
+    var regulatorRole2 = TeamMemberRoleTestUtil
+        .Builder()
+        .withRole(RegulatorTeamRole.SCAP_CASE_OFFICER.name())
+        .build();
+    when(teamMemberRoleRepository.findAllByWuaId(user.wuaId())).thenReturn(List.of(regulatorRole1, regulatorRole2));
+
+    var roles = teamMemberService.listAllPermissionsForUserInAllTeams(user);
+    assertThat(roles).contains(RolePermission.VIEW_SCAP, RolePermission.REVIEW_SCAP);
+  }
 }

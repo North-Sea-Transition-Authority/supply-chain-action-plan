@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
@@ -40,7 +41,7 @@ public class TeamMemberService {
     return wuaIdToRolesMap.entrySet()
         .stream()
         .map(entry -> new TeamMember(entry.getKey(), teamView,
-            mapMemberRolesToTeamRoles(entry.getValue(), team)))
+            mapMemberRolesToTeamRoles(entry.getValue())))
         .toList();
   }
 
@@ -52,7 +53,7 @@ public class TeamMemberService {
       return Optional.empty();
     }
 
-    var teamMember = new TeamMember(wuaId, createTeamView(team), mapMemberRolesToTeamRoles(teamMemberRoles, team));
+    var teamMember = new TeamMember(wuaId, createTeamView(team), mapMemberRolesToTeamRoles(teamMemberRoles));
     return Optional.of(teamMember);
   }
 
@@ -75,9 +76,16 @@ public class TeamMemberService {
     return teamMemberRoleRepository.existsByWuaIdAndTeamUuidAndRoleIn(user.wuaId(), teamId.uuid(), roles);
   }
 
-  private Set<TeamRole> mapMemberRolesToTeamRoles(Collection<TeamMemberRole> roles, Team team) {
+  public List<RolePermission> listAllPermissionsForUserInAllTeams(ServiceUserDetail user) {
+    return mapMemberRolesToTeamRoles(teamMemberRoleRepository.findAllByWuaId(user.wuaId()))
+        .stream()
+        .flatMap(roles -> roles.getRolePermissions().stream())
+        .toList();
+  }
+
+  private Set<TeamRole> mapMemberRolesToTeamRoles(Collection<TeamMemberRole> roles) {
     return roles.stream()
-        .map(teamMemberRole -> switch (team.getTeamType()) {
+        .map(teamMemberRole -> switch (teamMemberRole.getTeam().getTeamType()) {
           case REGULATOR -> RegulatorTeamRole.valueOf(teamMemberRole.getRole());
           case INDUSTRY -> IndustryTeamRole.valueOf(teamMemberRole.getRole());
         })

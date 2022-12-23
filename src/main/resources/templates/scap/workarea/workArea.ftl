@@ -1,5 +1,7 @@
 <#include '../layout/layout.ftl'>
 
+<#-- @ftlvariable name="canStartScap" type="java.lang.Boolean" -->
+
 <#assign pageTitle = "Work area" />
 
 <@defaultPage
@@ -7,5 +9,7 @@
   pageHeading=pageTitle
   pageSize=PageSize.TWO_THIRDS_COLUMN
 >
-  <@fdsAction.link linkText="Start new SCAP" linkClass="govuk-button" linkUrl=springUrl(startScapUrl)/>
+  <#if canStartScap>
+    <@fdsAction.link linkText="Start new SCAP" linkClass="govuk-button" linkUrl=springUrl(startScapUrl)/>
+  </#if>
 </@defaultPage>
