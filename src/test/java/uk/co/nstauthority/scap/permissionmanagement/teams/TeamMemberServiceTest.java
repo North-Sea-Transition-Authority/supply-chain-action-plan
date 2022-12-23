@@ -265,7 +265,7 @@ class TeamMemberServiceTest {
   void findAllPermissionsForUser_HasNoRoles() {
     var user = ServiceUserDetailTestUtil.Builder().build();
 
-    var roles = teamMemberService.listAllPermissionsForUserInAllTeams(user);
+    var roles = teamMemberService.getAllPermissionsForUser(user);
     assertThat(roles).isEmpty();
   }
 
@@ -284,7 +284,7 @@ class TeamMemberServiceTest {
         .build();
     when(teamMemberRoleRepository.findAllByWuaId(user.wuaId())).thenReturn(List.of(industryRole, regulatorRole));
 
-    var roles = teamMemberService.listAllPermissionsForUserInAllTeams(user);
+    var roles = teamMemberService.getAllPermissionsForUser(user);
     assertThat(roles).contains(RolePermission.VIEW_SCAP, RolePermission.REVIEW_SCAP);
   }
 
@@ -304,7 +304,7 @@ class TeamMemberServiceTest {
         .build();
     when(teamMemberRoleRepository.findAllByWuaId(user.wuaId())).thenReturn(List.of(industryRole, industryRole2));
 
-    var roles = teamMemberService.listAllPermissionsForUserInAllTeams(user);
+    var roles = teamMemberService.getAllPermissionsForUser(user);
     assertThat(roles).contains(RolePermission.VIEW_SCAP, RolePermission.SUBMIT_SCAP);
   }
 
@@ -321,7 +321,7 @@ class TeamMemberServiceTest {
         .build();
     when(teamMemberRoleRepository.findAllByWuaId(user.wuaId())).thenReturn(List.of(regulatorRole1, regulatorRole2));
 
-    var roles = teamMemberService.listAllPermissionsForUserInAllTeams(user);
+    var roles = teamMemberService.getAllPermissionsForUser(user);
     assertThat(roles).contains(RolePermission.VIEW_SCAP, RolePermission.REVIEW_SCAP);
   }
 }

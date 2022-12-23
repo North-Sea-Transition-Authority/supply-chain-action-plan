@@ -14,7 +14,7 @@ import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.IsMemberOfTeamOrRegulator;
-import uk.co.nstauthority.scap.permissionmanagement.PermissionsRequired;
+import uk.co.nstauthority.scap.permissionmanagement.PermissionsRequiredForTeam;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
@@ -26,7 +26,7 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 @Controller
 @IsMemberOfTeamOrRegulator
 @RequestMapping("/permission-management/regulator/{teamId}/remove")
-@PermissionsRequired(permissions = {RolePermission.GRANT_ROLES})
+@PermissionsRequiredForTeam(permissions = RolePermission.GRANT_ROLES)
 public class RegulatorRemoveMemberController extends RemoveMemberController {
 
   @Autowired

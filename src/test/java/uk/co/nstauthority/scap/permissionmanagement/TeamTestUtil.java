@@ -38,6 +38,11 @@ public class TeamTestUtil {
       return this;
     }
 
+    public TeamBuilder withOrgGroupId(Integer orgGroupId) {
+      this.orgGroupId = orgGroupId;
+      return this;
+    }
+
     public Team build() {
       var team = new Team(uuid);
       team.setTeamType(teamType);

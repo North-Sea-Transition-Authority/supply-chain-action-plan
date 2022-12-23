@@ -16,7 +16,7 @@ import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.enumutil.DisplayableEnumOptionUtil;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.IsMemberOfTeamOrRegulator;
-import uk.co.nstauthority.scap.permissionmanagement.PermissionsRequired;
+import uk.co.nstauthority.scap.permissionmanagement.PermissionsRequiredForTeam;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRolesForm;
@@ -30,7 +30,7 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 @Controller
 @IsMemberOfTeamOrRegulator
 @RequestMapping("/permission-management/regulator/{teamId}/edit")
-@PermissionsRequired(permissions = {RolePermission.GRANT_ROLES})
+@PermissionsRequiredForTeam(permissions = RolePermission.GRANT_ROLES)
 public class RegulatorEditMemberController {
   private final TeamMemberService teamMemberService;
   private final TeamMemberViewService teamMemberViewService;

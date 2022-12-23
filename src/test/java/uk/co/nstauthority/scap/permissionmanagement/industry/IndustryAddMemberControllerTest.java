@@ -41,7 +41,7 @@ class IndustryAddMemberControllerTest extends AbstractIndustryTeamControllerTest
 
     mockMvc.perform(get(ReverseRouter.route(on(IndustryAddMemberController.class)
         .renderAddTeamMember(teamId)))
-        .with(user(user)))
+        .with(user(testUser)))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/AddTeamMember"));
   }
@@ -57,7 +57,7 @@ class IndustryAddMemberControllerTest extends AbstractIndustryTeamControllerTest
 
     mockMvc.perform(post(ReverseRouter.route(on(IndustryAddMemberController.class)
             .addMemberToTeamSubmission(teamId, form, bindingResult)))
-            .with(user(user))
+            .with(user(testUser))
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name(

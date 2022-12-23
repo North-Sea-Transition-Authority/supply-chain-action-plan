@@ -68,6 +68,12 @@ public class TeamService {
     return teamRepository.findAllTeamsThatUserIsMemberOf(user.wuaId());
   }
 
+  public boolean userIsMemberOfOrganisationGroupTeam(Integer organisationGroupId, ServiceUserDetail user) {
+    return getTeamsThatUserBelongsTo(user)
+        .stream()
+        .anyMatch(team -> team.getEnergyPortalOrgGroupId().equals(organisationGroupId));
+  }
+
   public BindingResult validate(NewTeamForm form, BindingResult bindingResult) {
     newTeamFormvalidator.validate(form, bindingResult);
     return bindingResult;

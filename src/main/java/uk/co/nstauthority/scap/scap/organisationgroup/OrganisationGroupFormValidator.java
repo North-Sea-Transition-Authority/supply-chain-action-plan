@@ -7,15 +7,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import uk.co.fivium.formlibrary.validator.decimal.DecimalInputValidator;
+import uk.co.nstauthority.scap.authentication.UserDetailService;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 @Service
 public class OrganisationGroupFormValidator implements Validator {
 
   private final OrganisationGroupService organisationGroupService;
 
+  private final UserDetailService userDetailService;
+
+  private final TeamService teamService;
+
   @Autowired
-  public OrganisationGroupFormValidator(OrganisationGroupService organisationGroupService) {
+  public OrganisationGroupFormValidator(OrganisationGroupService organisationGroupService,
+                                        UserDetailService userDetailService, TeamService teamService) {
     this.organisationGroupService = organisationGroupService;
+    this.userDetailService = userDetailService;
+    this.teamService = teamService;
   }
 
   @Override
@@ -42,5 +51,14 @@ public class OrganisationGroupFormValidator implements Validator {
           "That operator does not exist");
     }
 
+    if (!errors.hasErrors() && !teamService
+        .userIsMemberOfOrganisationGroupTeam(Integer.parseInt(form.getOrganisationGroupId().getInputValue()),
+            userDetailService.getUserDetail())) {
+      errors.rejectValue(
+          "organisationGroupId.inputValue",
+          "organisationGroupId.invalidTeamAuthentication",
+          "You must be a member of this organisation to generate a new SCAP for this organisation"
+      );
+    }
   }
 }

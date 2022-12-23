@@ -17,7 +17,7 @@ import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.AddTeamMemberForm;
 import uk.co.nstauthority.scap.permissionmanagement.IsMemberOfTeamOrRegulator;
-import uk.co.nstauthority.scap.permissionmanagement.PermissionsRequired;
+import uk.co.nstauthority.scap.permissionmanagement.PermissionsRequiredForTeam;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.teams.AddMemberController;
@@ -26,7 +26,7 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.AddTeamMemberValidator
 @Controller
 @IsMemberOfTeamOrRegulator
 @RequestMapping("/permission-management/industry/{teamId}")
-@PermissionsRequired(permissions = {RolePermission.MANAGE_ORGANISATIONS})
+@PermissionsRequiredForTeam(permissions = RolePermission.MANAGE_ORGANISATIONS)
 class IndustryAddMemberController extends AddMemberController {
 
   @Autowired

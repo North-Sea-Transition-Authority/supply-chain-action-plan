@@ -12,23 +12,30 @@ import org.springframework.web.servlet.resource.ResourceUrlEncodingFilter;
 import org.springframework.web.servlet.resource.VersionResourceResolver;
 import uk.co.nstauthority.scap.permissionmanagement.PermissionManagementHandlerInterceptor;
 import uk.co.nstauthority.scap.permissionmanagement.TeamManagementHandlerInterceptor;
+import uk.co.nstauthority.scap.permissionmanagement.TeamPermissionManagementHandlerInterceptor;
 
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
 
-  private final PermissionManagementHandlerInterceptor permissionManagementHandlerInterceptor;
+  private static final String ASSET_EXCLUSION_PATH = "/assets/**";
+
+  private final TeamPermissionManagementHandlerInterceptor teamPermissionManagementHandlerInterceptor;
   private final TeamManagementHandlerInterceptor teamManagementHandlerInterceptor;
 
+  private final PermissionManagementHandlerInterceptor permissionManagementHandlerInterceptor;
+
   @Autowired
-  WebMvcConfiguration(PermissionManagementHandlerInterceptor permissionManagementHandlerInterceptor,
-                      TeamManagementHandlerInterceptor teamManagementHandlerInterceptor) {
-    this.permissionManagementHandlerInterceptor = permissionManagementHandlerInterceptor;
+  WebMvcConfiguration(TeamPermissionManagementHandlerInterceptor teamPermissionManagementHandlerInterceptor,
+                      TeamManagementHandlerInterceptor teamManagementHandlerInterceptor,
+                      PermissionManagementHandlerInterceptor permissionManagementHandlerInterceptor) {
+    this.teamPermissionManagementHandlerInterceptor = teamPermissionManagementHandlerInterceptor;
     this.teamManagementHandlerInterceptor = teamManagementHandlerInterceptor;
+    this.permissionManagementHandlerInterceptor = permissionManagementHandlerInterceptor;
   }
 
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    registry.addResourceHandler("/assets/**")
+    registry.addResourceHandler(ASSET_EXCLUSION_PATH)
         .addResourceLocations("classpath:/public/assets/")
         .setCacheControl(CacheControl.maxAge(365, TimeUnit.DAYS))
         .resourceChain(false)
@@ -38,11 +45,14 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addInterceptor(new ResponseBufferSizeHandlerInterceptor())
-        .excludePathPatterns("/assets/**");
+        .excludePathPatterns(ASSET_EXCLUSION_PATH);
     registry.addInterceptor(permissionManagementHandlerInterceptor)
+        .excludePathPatterns(ASSET_EXCLUSION_PATH);
+    registry.addInterceptor(teamPermissionManagementHandlerInterceptor)
         .addPathPatterns("/permission-management/**");
     registry.addInterceptor(teamManagementHandlerInterceptor)
         .addPathPatterns("/permission-management/**");
+
   }
 
   @Bean

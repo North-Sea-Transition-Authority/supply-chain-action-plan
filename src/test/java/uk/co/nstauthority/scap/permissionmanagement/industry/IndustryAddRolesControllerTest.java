@@ -52,7 +52,7 @@ class IndustryAddRolesControllerTest extends AbstractIndustryTeamControllerTest 
         get(ReverseRouter.route(on(IndustryAddRolesController.class).renderAddTeamMemberRoles(
             teamId,
             webUserAccountId)))
-            .with(user(user)))
+            .with(user(testUser)))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/teamMemberRoles"))
         .andExpect(model().attribute("roles", DisplayableEnumOptionUtil.getDisplayableOptionsWithDescription(IndustryTeamRole.class)));

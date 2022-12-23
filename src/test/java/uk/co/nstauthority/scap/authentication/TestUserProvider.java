@@ -28,4 +28,10 @@ public class TestUserProvider {
 
     return authentication(authentication);
   }
+
+  public static ServiceUserDetail getUser() {
+    return ServiceUserDetailTestUtil.Builder()
+        .withWuaId(100L)
+        .build();
+  }
 }

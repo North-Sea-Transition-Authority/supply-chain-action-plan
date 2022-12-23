@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.PermissionsRequired;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
@@ -23,6 +25,7 @@ import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 
 @Controller
+@PermissionsRequired(permissions = RolePermission.SUBMIT_SCAP)
 public class OrganisationGroupController {
 
   private final String newScapBackLinkUrl =

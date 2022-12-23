@@ -51,7 +51,8 @@ class DefaultPageControllerAdviceTest extends AbstractControllerTest {
         "serviceHomeUrl",
         "loggedInUser",
         "navigationItems",
-        "currentEndPoint"
+        "currentEndPoint",
+        "org.springframework.validation.BindingResult.loggedInUser"
     );
 
     assertThat((CustomerConfigurationProperties) modelMap.get("customerBranding")).hasNoNullFieldsOrProperties();

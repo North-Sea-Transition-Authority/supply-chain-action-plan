@@ -30,7 +30,7 @@ class IndustryEditMemberControllerTest extends AbstractIndustryTeamControllerTes
   void renderEditMember() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(on(IndustryEditMemberController.class)
         .renderEditMember(teamId, webUserAccountId)))
-        .with(user(user)))
+        .with(user(testUser)))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/AddTeamMemberRoles"));
   }
@@ -43,7 +43,7 @@ class IndustryEditMemberControllerTest extends AbstractIndustryTeamControllerTes
 
     mockMvc.perform(post(ReverseRouter.route(on(IndustryEditMemberController.class)
         .editMember(teamId, webUserAccountId, form, bindingResult)))
-        .with(user(user))
+        .with(user(testUser))
         .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name("redirect:/permission-management/industry/%s"

@@ -91,7 +91,7 @@ class TeamManagementHandlerInterceptorTest extends AbstractControllerTest {
     }
 
     @GetMapping("/permission-management/other-annotation/{teamId}")
-    @PermissionsRequired(permissions = {RolePermission.GRANT_ROLES})
+    @PermissionsRequiredForTeam(permissions = {RolePermission.GRANT_ROLES})
     ModelAndView otherAnnotations(@PathVariable TeamId teamId) {
       return new ModelAndView(VIEW_NAME);
     }

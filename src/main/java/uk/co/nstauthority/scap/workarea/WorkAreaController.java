@@ -29,7 +29,7 @@ public class WorkAreaController {
   @GetMapping
   public ModelAndView getWorkArea() {
     var user = userDetailService.getUserDetail();
-    var userPermissions = teamMemberService.listAllPermissionsForUserInAllTeams(user);
+    var userPermissions = teamMemberService.getAllPermissionsForUser(user);
 
     return new ModelAndView("scap/workarea/workArea")
         .addObject("startScapUrl",

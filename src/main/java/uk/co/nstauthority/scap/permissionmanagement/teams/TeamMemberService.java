@@ -76,7 +76,7 @@ public class TeamMemberService {
     return teamMemberRoleRepository.existsByWuaIdAndTeamUuidAndRoleIn(user.wuaId(), teamId.uuid(), roles);
   }
 
-  public List<RolePermission> listAllPermissionsForUserInAllTeams(ServiceUserDetail user) {
+  public List<RolePermission> getAllPermissionsForUser(ServiceUserDetail user) {
     return mapMemberRolesToTeamRoles(teamMemberRoleRepository.findAllByWuaId(user.wuaId()))
         .stream()
         .flatMap(roles -> roles.getRolePermissions().stream())

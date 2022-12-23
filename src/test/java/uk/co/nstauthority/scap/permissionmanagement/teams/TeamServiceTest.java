@@ -1,9 +1,11 @@
 package uk.co.nstauthority.scap.permissionmanagement.teams;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -25,8 +27,6 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRepository;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRoleService;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 @ExtendWith(MockitoExtension.class)
 class TeamServiceTest {
@@ -171,5 +171,20 @@ class TeamServiceTest {
     capturedTeam = teamCaptor.getAllValues().get(1);
     assertThat(capturedTeam.getDisplayName()).isEqualTo(team.getDisplayName());
     assertThat(capturedTeam.getEnergyPortalOrgGroupId()).isEqualTo(team.getEnergyPortalOrgGroupId());
+  }
+
+  @Test
+  void userIsMemberofTeam_notMemberofTeam() {
+    var user = ServiceUserDetailTestUtil.Builder().build();
+    when(teamRepository.findAllTeamsThatUserIsMemberOf(user.wuaId())).thenReturn(emptyList());
+    assertFalse(teamService.userIsMemberOfOrganisationGroupTeam(1000, user));
+  }
+
+  @Test
+  void userIsMemberofTeam_MemberofTeam() {
+    var user = ServiceUserDetailTestUtil.Builder().build();
+    var team = TeamTestUtil.Builder().withTeamType(TeamType.INDUSTRY).withOrgGroupId(5000).build();
+    when(teamRepository.findAllTeamsThatUserIsMemberOf(user.wuaId())).thenReturn(List.of(team));
+    assertTrue(teamService.userIsMemberOfOrganisationGroupTeam(team.getEnergyPortalOrgGroupId(), user));
   }
 }

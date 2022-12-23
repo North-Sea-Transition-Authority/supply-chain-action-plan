@@ -20,7 +20,7 @@ import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.enumutil.DisplayableEnumOptionUtil;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.IsMemberOfTeamOrRegulator;
-import uk.co.nstauthority.scap.permissionmanagement.PermissionsRequired;
+import uk.co.nstauthority.scap.permissionmanagement.PermissionsRequiredForTeam;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRolesForm;
@@ -31,7 +31,7 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 @Controller
 @IsMemberOfTeamOrRegulator
 @RequestMapping("/permission-management/industry/{teamId}")
-@PermissionsRequired(permissions = {RolePermission.MANAGE_ORGANISATIONS})
+@PermissionsRequiredForTeam(permissions = RolePermission.MANAGE_ORGANISATIONS)
 class IndustryAddRolesController extends AddRolesController {
 
   private final EnergyPortalUserService energyPortalUserService;

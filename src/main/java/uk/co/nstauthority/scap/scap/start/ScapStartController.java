@@ -33,7 +33,7 @@ public class ScapStartController {
   @GetMapping
   public ModelAndView renderStartNewScap() {
     var user = userDetailService.getUserDetail();
-    var userPermissions = teamMemberService.listAllPermissionsForUserInAllTeams(user);
+    var userPermissions = teamMemberService.getAllPermissionsForUser(user);
     if (!(userPermissions.contains(SUBMIT_SCAP))) {
       return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea());
     }
