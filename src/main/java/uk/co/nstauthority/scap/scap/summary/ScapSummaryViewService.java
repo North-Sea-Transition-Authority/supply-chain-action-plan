@@ -9,12 +9,15 @@ import uk.co.fivium.formlibrary.validator.date.DateUtils;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
+import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverviewService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderService;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityService;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsService;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryView;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryViewService;
+import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceOverviewSummaryView;
+import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryViewService;
 import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderActivitySummaryView;
 import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderSummaryView;
 
@@ -32,6 +35,8 @@ public class ScapSummaryViewService {
   private final ActualTenderSummaryViewService actualTenderSummaryViewService;
   private final ActualTenderService actualTenderService;
   private final ActualTenderActivityService actualTenderActivityService;
+  private final ContractingPerformanceOverviewService contractingPerformanceOverviewService;
+  private final ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService;
 
   @Autowired
   ScapSummaryViewService(ProjectDetailsService projectDetailsService,
@@ -39,13 +44,17 @@ public class ScapSummaryViewService {
                          PlannedTenderActivityService plannedTenderActivityService,
                          ActualTenderSummaryViewService actualTenderSummaryViewService,
                          ActualTenderService actualTenderService,
-                         ActualTenderActivityService actualTenderActivityService) {
+                         ActualTenderActivityService actualTenderActivityService,
+                         ContractingPerformanceOverviewService contractingPerformanceOverviewService,
+                         ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService) {
     this.projectDetailsService = projectDetailsService;
     this.plannedTenderService = plannedTenderService;
     this.plannedTenderActivityService = plannedTenderActivityService;
     this.actualTenderSummaryViewService = actualTenderSummaryViewService;
     this.actualTenderService = actualTenderService;
     this.actualTenderActivityService = actualTenderActivityService;
+    this.contractingPerformanceOverviewService = contractingPerformanceOverviewService;
+    this.contractingPerformanceSummaryViewService = contractingPerformanceSummaryViewService;
   }
 
   @Transactional
@@ -53,9 +62,10 @@ public class ScapSummaryViewService {
     var projectDetailsSummaryView = getProjectDetailsSummaryView(scapDetail);
     var plannedTenderSummaryView = getPlannedTenderSummaryView(scapDetail);
     var actualTenderSummaryView = getActualTenderSummaryView(scapDetail);
+    var contractingPerformanceOverviewSummaryView = getContractingPerformanceOverviewSummaryView(scapDetail);
 
     return new ScapSummaryView(
-        projectDetailsSummaryView, plannedTenderSummaryView, actualTenderSummaryView
+        projectDetailsSummaryView, plannedTenderSummaryView, actualTenderSummaryView, contractingPerformanceOverviewSummaryView
     );
   }
 
@@ -116,5 +126,19 @@ public class ScapSummaryViewService {
           true,
           actualTenderSummaryViewService.getByActualTenderActivities(actualTenderActivities, scapDetail.getScap().getId()));
     }).orElse(new ActualTenderSummaryView(null, null));
+  }
+
+  @VisibleForTesting
+  public ContractingPerformanceOverviewSummaryView getContractingPerformanceOverviewSummaryView(ScapDetail scapDetail) {
+    var contractingPerformanceOverviewOpt = contractingPerformanceOverviewService.getByScapDetail(scapDetail);
+    return contractingPerformanceOverviewOpt.map(contractingPerformanceOverview -> {
+      if (Boolean.FALSE.equals(contractingPerformanceOverview.getHasContractingPerformance())) {
+        return new ContractingPerformanceOverviewSummaryView(false, Collections.emptyList());
+      }
+      var contractingPerformanceSummaryViews = contractingPerformanceSummaryViewService
+          .getContractingPerformanceSummaryViews(scapDetail.getScap().getId());
+      return new ContractingPerformanceOverviewSummaryView(true, contractingPerformanceSummaryViews);
+    }
+    ).orElse(new ContractingPerformanceOverviewSummaryView(null, null));
   }
 }

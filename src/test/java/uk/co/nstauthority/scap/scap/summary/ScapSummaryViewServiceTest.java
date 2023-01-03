@@ -9,6 +9,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getActualTenderSummaryView;
+import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getContractingPerformanceOverviewSummaryView;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getPlannedTenderSummaryView;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getProjectDetailsSummaryView;
 
@@ -34,6 +35,8 @@ import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityBuilder;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
+import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverview;
+import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverviewService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTender;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderService;
@@ -46,6 +49,9 @@ import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderActivitySummaryView;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryView;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryViewService;
+import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceOverviewSummaryView;
+import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryView;
+import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryViewService;
 import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderActivitySummaryView;
 import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderSummaryView;
 
@@ -70,6 +76,12 @@ class ScapSummaryViewServiceTest {
   @Mock
   ActualTenderSummaryViewService actualTenderSummaryViewService;
 
+  @Mock
+  ContractingPerformanceOverviewService contractingPerformanceOverviewService;
+
+  @Mock
+  ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService;
+
   @InjectMocks
   ScapSummaryViewService scapSummaryViewService;
 
@@ -84,7 +96,7 @@ class ScapSummaryViewServiceTest {
   }
 
   @Test
-  void addScapSummaryToModel_VerifyCalls() {
+  void getScapSummaryView_VerifyCalls() {
     var scapDetail = mock(ScapDetail.class);
 
     ScapSummaryControllerTestUtil.mockScapSummaryViewServiceMethods(scapSummaryViewService, scapDetail);
@@ -94,15 +106,18 @@ class ScapSummaryViewServiceTest {
     verify(scapSummaryViewService).getProjectDetailsSummaryView(scapDetail);
     verify(scapSummaryViewService).getPlannedTenderSummaryView(scapDetail);
     verify(scapSummaryViewService).getActualTenderSummaryView(scapDetail);
+    verify(scapSummaryViewService).getContractingPerformanceOverviewSummaryView(scapDetail);
 
     assertThat(summaryView).extracting(
         ScapSummaryView::projectDetailsSummaryView,
         ScapSummaryView::plannedTenderSummaryView,
-        ScapSummaryView::actualTenderSummaryView
+        ScapSummaryView::actualTenderSummaryView,
+        ScapSummaryView::contractingPerformanceOverviewSummaryView
     ).containsExactly(
         getProjectDetailsSummaryView(),
         getPlannedTenderSummaryView(),
-        getActualTenderSummaryView()
+        getActualTenderSummaryView(),
+        getContractingPerformanceOverviewSummaryView()
     );
   }
 
@@ -296,6 +311,67 @@ class ScapSummaryViewServiceTest {
         ActualTenderSummaryView::actualTenderActivitySummaryViews
     ).containsExactly(
         true, activityViews
+    );
+  }
+
+  @Test
+  void getContractingPerformanceOverviewSummaryView_NoContractingPerformanceOverview() {
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail)).thenReturn(Optional.empty());
+
+    var contractingPerformanceOverviewSummaryView = scapSummaryViewService.getContractingPerformanceOverviewSummaryView(scapDetail);
+
+    assertThat(contractingPerformanceOverviewSummaryView).extracting(
+        ContractingPerformanceOverviewSummaryView::hasContractingPerformance,
+        ContractingPerformanceOverviewSummaryView::contractingPerformanceSummaryViews
+    ).containsExactly(
+        null,
+        null
+    );
+
+    verify(contractingPerformanceSummaryViewService, never()).getContractingPerformanceSummaryViews(any());
+  }
+
+  @Test
+  void getContractingPerformanceOverviewSummaryView_HasNoContractingPerformance() {
+    var contractingPerformanceOverview = new ContractingPerformanceOverview();
+    contractingPerformanceOverview.setHasContractingPerformance(false);
+
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail)).thenReturn(Optional.of(contractingPerformanceOverview));
+
+    var contractingPerformanceOverviewSummaryView = scapSummaryViewService.getContractingPerformanceOverviewSummaryView(scapDetail);
+
+    assertThat(contractingPerformanceOverviewSummaryView).extracting(
+        ContractingPerformanceOverviewSummaryView::hasContractingPerformance,
+        ContractingPerformanceOverviewSummaryView::contractingPerformanceSummaryViews
+    ).containsExactly(
+        false,
+        Collections.emptyList()
+    );
+
+    verify(contractingPerformanceSummaryViewService, never()).getContractingPerformanceSummaryViews(any());
+  }
+
+  @Test
+  void getContractingPerformanceOverviewSummaryView_HasContractingPerformance() {
+    var contractingPerformanceOverview = new ContractingPerformanceOverview();
+    contractingPerformanceOverview.setHasContractingPerformance(true);
+    var contractingPerformanceViews = List.of(new ContractingPerformanceSummaryView(
+        null, null, null, null, null, null,
+        null, null, null, null, null
+    ));
+
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail)).thenReturn(Optional.of(contractingPerformanceOverview));
+    when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(scapDetail.getScap().getId()))
+        .thenReturn(contractingPerformanceViews);
+
+    var contractingPerformanceOverviewSummaryView = scapSummaryViewService.getContractingPerformanceOverviewSummaryView(scapDetail);
+
+    assertThat(contractingPerformanceOverviewSummaryView).extracting(
+        ContractingPerformanceOverviewSummaryView::hasContractingPerformance,
+        ContractingPerformanceOverviewSummaryView::contractingPerformanceSummaryViews
+    ).containsExactly(
+        true,
+        contractingPerformanceViews
     );
   }
 
