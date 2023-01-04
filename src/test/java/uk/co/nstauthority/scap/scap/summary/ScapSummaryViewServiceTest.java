@@ -15,6 +15,7 @@ import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.fivium.formlibrary.validator.date.DateUtils;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
@@ -45,6 +47,8 @@ import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivity
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetails;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsService;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectType;
+import uk.co.nstauthority.scap.scap.projectperformance.ProjectPerformance;
+import uk.co.nstauthority.scap.scap.projectperformance.ProjectPerformanceService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderActivitySummaryView;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryView;
@@ -81,6 +85,9 @@ class ScapSummaryViewServiceTest {
 
   @Mock
   ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService;
+
+  @Mock
+  ProjectPerformanceService projectPerformanceService;
 
   @InjectMocks
   ScapSummaryViewService scapSummaryViewService;
@@ -372,6 +379,47 @@ class ScapSummaryViewServiceTest {
     ).containsExactly(
         true,
         contractingPerformanceViews
+    );
+  }
+
+  @Test
+  void getProjectPerformanceSummaryView_NoProjectPerformanceExists() {
+    when(projectPerformanceService.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
+
+    var projectPerformanceSummaryView = scapSummaryViewService.getProjectPerformanceSummaryView(scapDetail);
+
+    assertThat(projectPerformanceSummaryView).extracting(
+        ProjectPerformanceSummaryView::isProjectCompleted,
+        ProjectPerformanceSummaryView::startDate,
+        ProjectPerformanceSummaryView::completionDate,
+        ProjectPerformanceSummaryView::outturnCost
+    ).containsOnlyNulls();
+  }
+
+  @Test
+  void getProjectPerformanceSummaryView_ProjectPerformanceExists() {
+    var projectPerformance = new ProjectPerformance();
+    projectPerformance.setProjectCompleted(true);
+    var startDate = LocalDate.of(2000, Month.JANUARY, 1);
+    projectPerformance.setStartDate(startDate);
+    var completionDate = LocalDate.of(2010, Month.DECEMBER, 31);
+    projectPerformance.setCompletionDate(completionDate);
+    projectPerformance.setOutturnCost(BigDecimal.TEN);
+
+    when(projectPerformanceService.findByScapDetail(scapDetail)).thenReturn(Optional.of(projectPerformance));
+
+    var projectPerformanceSummaryView = scapSummaryViewService.getProjectPerformanceSummaryView(scapDetail);
+
+    assertThat(projectPerformanceSummaryView).extracting(
+        ProjectPerformanceSummaryView::isProjectCompleted,
+        ProjectPerformanceSummaryView::startDate,
+        ProjectPerformanceSummaryView::completionDate,
+        ProjectPerformanceSummaryView::outturnCost
+    ).containsExactly(
+        projectPerformance.getProjectCompleted(),
+        DateUtils.format(startDate),
+        DateUtils.format(completionDate),
+        projectPerformance.getOutturnCost()
     );
   }
 

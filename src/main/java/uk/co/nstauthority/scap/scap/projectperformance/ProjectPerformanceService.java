@@ -9,7 +9,7 @@ import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Service
-class ProjectPerformanceService {
+public class ProjectPerformanceService {
 
   private final ProjectPerformanceRepository projectPerformanceRepository;
   private final Clock clock;
@@ -20,7 +20,7 @@ class ProjectPerformanceService {
     this.clock = clock;
   }
 
-  Optional<ProjectPerformance> findByScapDetail(ScapDetail scapDetail) {
+  public Optional<ProjectPerformance> findByScapDetail(ScapDetail scapDetail) {
     return projectPerformanceRepository.findByScapDetail(scapDetail);
   }
 

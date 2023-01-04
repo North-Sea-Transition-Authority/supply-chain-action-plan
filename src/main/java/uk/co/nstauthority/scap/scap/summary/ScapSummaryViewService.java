@@ -14,6 +14,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderService;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityService;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsService;
+import uk.co.nstauthority.scap.scap.projectperformance.ProjectPerformanceService;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryView;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryViewService;
 import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceOverviewSummaryView;
@@ -37,6 +38,7 @@ public class ScapSummaryViewService {
   private final ActualTenderActivityService actualTenderActivityService;
   private final ContractingPerformanceOverviewService contractingPerformanceOverviewService;
   private final ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService;
+  private final ProjectPerformanceService projectPerformanceService;
 
   @Autowired
   ScapSummaryViewService(ProjectDetailsService projectDetailsService,
@@ -46,7 +48,8 @@ public class ScapSummaryViewService {
                          ActualTenderService actualTenderService,
                          ActualTenderActivityService actualTenderActivityService,
                          ContractingPerformanceOverviewService contractingPerformanceOverviewService,
-                         ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService) {
+                         ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService,
+                         ProjectPerformanceService projectPerformanceService) {
     this.projectDetailsService = projectDetailsService;
     this.plannedTenderService = plannedTenderService;
     this.plannedTenderActivityService = plannedTenderActivityService;
@@ -55,6 +58,7 @@ public class ScapSummaryViewService {
     this.actualTenderActivityService = actualTenderActivityService;
     this.contractingPerformanceOverviewService = contractingPerformanceOverviewService;
     this.contractingPerformanceSummaryViewService = contractingPerformanceSummaryViewService;
+    this.projectPerformanceService = projectPerformanceService;
   }
 
   @Transactional
@@ -63,9 +67,11 @@ public class ScapSummaryViewService {
     var plannedTenderSummaryView = getPlannedTenderSummaryView(scapDetail);
     var actualTenderSummaryView = getActualTenderSummaryView(scapDetail);
     var contractingPerformanceOverviewSummaryView = getContractingPerformanceOverviewSummaryView(scapDetail);
+    var projectPerformanceSummaryView = getProjectPerformanceSummaryView(scapDetail);
 
     return new ScapSummaryView(
-        projectDetailsSummaryView, plannedTenderSummaryView, actualTenderSummaryView, contractingPerformanceOverviewSummaryView
+        projectDetailsSummaryView, plannedTenderSummaryView, actualTenderSummaryView,
+        contractingPerformanceOverviewSummaryView, projectPerformanceSummaryView
     );
   }
 
@@ -140,5 +146,17 @@ public class ScapSummaryViewService {
       return new ContractingPerformanceOverviewSummaryView(true, contractingPerformanceSummaryViews);
     }
     ).orElse(new ContractingPerformanceOverviewSummaryView(null, null));
+  }
+
+  @VisibleForTesting
+  public ProjectPerformanceSummaryView getProjectPerformanceSummaryView(ScapDetail scapDetail) {
+    var projectPerformanceOpt = projectPerformanceService.findByScapDetail(scapDetail);
+    return projectPerformanceOpt.map(projectPerformance -> new ProjectPerformanceSummaryView(
+        projectPerformance.getProjectCompleted(),
+        DateUtils.format(projectPerformance.getStartDate()),
+        DateUtils.format(projectPerformance.getCompletionDate()),
+        projectPerformance.getOutturnCost()
+        ))
+        .orElse(new ProjectPerformanceSummaryView(null, null, null, null));
   }
 }

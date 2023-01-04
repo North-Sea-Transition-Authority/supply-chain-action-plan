@@ -15,7 +15,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Entity
 @Table(name = "project_performances")
-class ProjectPerformance {
+public class ProjectPerformance {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

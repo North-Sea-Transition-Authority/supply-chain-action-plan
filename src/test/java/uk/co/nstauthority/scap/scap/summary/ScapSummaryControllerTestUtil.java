@@ -24,12 +24,16 @@ public class ScapSummaryControllerTestUtil {
   );
   private static final ContractingPerformanceOverviewSummaryView CONTRACTING_PERFORMANCE_OVERVIEW_SUMMARY_VIEW =
       new ContractingPerformanceOverviewSummaryView(null, null);
+  private static final ProjectPerformanceSummaryView PROJECT_PERFORMANCE_SUMMARY_VIEW =
+      new ProjectPerformanceSummaryView(null, null, null, null);
 
   private static final ScapSummaryView SCAP_SUMMARY_VIEW = new ScapSummaryView(
       PROJECT_DETAILS_SUMMARY_VIEW,
       PLANNED_TENDER_SUMMARY_VIEW,
       ACTUAL_TENDER_SUMMARY_VIEW,
-      CONTRACTING_PERFORMANCE_OVERVIEW_SUMMARY_VIEW);
+      CONTRACTING_PERFORMANCE_OVERVIEW_SUMMARY_VIEW,
+      PROJECT_PERFORMANCE_SUMMARY_VIEW
+  );
 
   public static void mockScapSummaryViewServiceMethods(ScapSummaryViewService scapSummaryViewService, ScapDetail scapDetail) {
     doCallRealMethod().when(scapSummaryViewService).getScapSummaryView(scapDetail);
@@ -39,6 +43,7 @@ public class ScapSummaryControllerTestUtil {
     doReturn(ACTUAL_TENDER_SUMMARY_VIEW).when(scapSummaryViewService).getActualTenderSummaryView(scapDetail);
     doReturn(CONTRACTING_PERFORMANCE_OVERVIEW_SUMMARY_VIEW).when(scapSummaryViewService)
         .getContractingPerformanceOverviewSummaryView(scapDetail);
+    doReturn(PROJECT_PERFORMANCE_SUMMARY_VIEW).when(scapSummaryViewService).getProjectPerformanceSummaryView(scapDetail);
   }
 
   public static ProjectDetailsSummaryView getProjectDetailsSummaryView() {
@@ -55,6 +60,10 @@ public class ScapSummaryControllerTestUtil {
 
   public static ContractingPerformanceOverviewSummaryView getContractingPerformanceOverviewSummaryView() {
     return CONTRACTING_PERFORMANCE_OVERVIEW_SUMMARY_VIEW;
+  }
+
+  public static ProjectPerformanceSummaryView getProjectPerformanceSummaryView() {
+    return PROJECT_PERFORMANCE_SUMMARY_VIEW;
   }
 
   public static ScapSummaryView getScapSummaryView() {
