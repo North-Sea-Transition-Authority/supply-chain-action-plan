@@ -423,6 +423,114 @@ class ScapSummaryViewServiceTest {
     );
   }
 
+  @Test
+  void inferStatus_WhenProjectCompleted_ExpectIsComplete() {
+    var projectPerformanceSummaryView =
+        new ProjectPerformanceSummaryView(true, "11-05-2023", "11-05-204", new BigDecimal("5000"));
+
+    var contractingPerformanceSummaryView =
+        new ContractingPerformanceOverviewSummaryView(true, Collections.emptyList());
+    var actualTenderSummaryView =
+        new ActualTenderSummaryView(true, Collections.emptyList());
+    var plannedTenderSummaryView =
+        new PlannedTenderSummaryView(true, Collections.emptyList());
+
+    var scapSummary = new ScapSummaryView(getMockedProjectDetailsView(),
+        plannedTenderSummaryView,
+        actualTenderSummaryView,
+        contractingPerformanceSummaryView,
+        projectPerformanceSummaryView);
+
+    var status = scapSummaryViewService.inferSubmissionStatusFromSummary(scapSummary);
+    assertThat(status).isEqualTo(ScapSubmissionStage.PROJECT_COMPLETED);
+  }
+
+  @Test
+  void inferStatus_WhenHasContractingPerformance_ExpectIsContractingPerformance() {
+    var projectPerformanceSummaryView =
+        new ProjectPerformanceSummaryView(false, "11-05-2023", "11-05-204", new BigDecimal("5000"));
+
+    var contractingPerformanceSummaryView =
+        new ContractingPerformanceOverviewSummaryView(true, Collections.emptyList());
+    var actualTenderSummaryView =
+        new ActualTenderSummaryView(true, Collections.emptyList());
+    var plannedTenderSummaryView =
+        new PlannedTenderSummaryView(true, Collections.emptyList());
+
+    var scapSummary = new ScapSummaryView(getMockedProjectDetailsView(),
+        plannedTenderSummaryView,
+        actualTenderSummaryView,
+        contractingPerformanceSummaryView,
+        projectPerformanceSummaryView);
+
+    var status = scapSummaryViewService.inferSubmissionStatusFromSummary(scapSummary);
+    assertThat(status).isEqualTo(ScapSubmissionStage.CONTRACTING_PERFORMANCE);
+  }
+
+  @Test
+  void inferStatus_WhenHasActualTender_ExpectIsActualTender() {
+    var projectPerformanceSummaryView =
+        new ProjectPerformanceSummaryView(false, "11-05-2023", "11-05-204", new BigDecimal("5000"));
+    var contractingPerformanceSummaryView =
+        new ContractingPerformanceOverviewSummaryView(false, Collections.emptyList());
+    var actualTenderSummaryView =
+        new ActualTenderSummaryView(true, Collections.emptyList());
+    var plannedTenderSummaryView =
+        new PlannedTenderSummaryView(true, Collections.emptyList());
+
+    var scapSummary = new ScapSummaryView(getMockedProjectDetailsView(),
+        plannedTenderSummaryView,
+        actualTenderSummaryView,
+        contractingPerformanceSummaryView,
+        projectPerformanceSummaryView);
+
+    var status = scapSummaryViewService.inferSubmissionStatusFromSummary(scapSummary);
+    assertThat(status).isEqualTo(ScapSubmissionStage.ACTUAL_TENDER);
+  }
+
+  @Test
+  void inferStatus_WhenHasPlannedTender_ExpectIsPlannedTender() {
+    var projectPerformanceSummaryView =
+        new ProjectPerformanceSummaryView(false, "11-05-2023", "11-05-204", new BigDecimal("5000"));
+    var contractingPerformanceSummaryView =
+        new ContractingPerformanceOverviewSummaryView(false, Collections.emptyList());
+    var actualTenderSummaryView =
+        new ActualTenderSummaryView(false, Collections.emptyList());
+    var plannedTenderSummaryView =
+        new PlannedTenderSummaryView(true, Collections.emptyList());
+
+    var scapSummary = new ScapSummaryView(getMockedProjectDetailsView(),
+        plannedTenderSummaryView,
+        actualTenderSummaryView,
+        contractingPerformanceSummaryView,
+        projectPerformanceSummaryView);
+
+    var status = scapSummaryViewService.inferSubmissionStatusFromSummary(scapSummary);
+    assertThat(status).isEqualTo(ScapSubmissionStage.PLANNED_TENDER);
+  }
+
+  @Test
+  void inferStatus_WhenHasProjectDetails_ExpectStratergyPending() {
+    var projectPerformanceSummaryView =
+        new ProjectPerformanceSummaryView(false, "11-05-2023", "11-05-204", new BigDecimal("5000"));
+    var contractingPerformanceSummaryView =
+        new ContractingPerformanceOverviewSummaryView(false, Collections.emptyList());
+    var actualTenderSummaryView =
+        new ActualTenderSummaryView(false, Collections.emptyList());
+    var plannedTenderSummaryView =
+        new PlannedTenderSummaryView(false, Collections.emptyList());
+
+    var scapSummary = new ScapSummaryView(getMockedProjectDetailsView(),
+        plannedTenderSummaryView,
+        actualTenderSummaryView,
+        contractingPerformanceSummaryView,
+        projectPerformanceSummaryView);
+
+    var status = scapSummaryViewService.inferSubmissionStatusFromSummary(scapSummary);
+    assertThat(status).isEqualTo(ScapSubmissionStage.CONTRACTING_STRATEGY_PENDING);
+
+  }
+
   private static Stream<Arguments> yesNoBooleanParameters() {
     return Stream.of(
         Arguments.of(true, YesNo.YES),
@@ -463,5 +571,17 @@ class ScapSummaryViewServiceTest {
 
   private Set<ProjectType> getValidProjectTypes() {
     return Set.of(ProjectType.DECOMMISSIONING_PROGRAMME, ProjectType.CARBON_STORAGE_PERMIT);
+  }
+
+  private ProjectDetailsSummaryView getMockedProjectDetailsView() {
+    return new ProjectDetailsSummaryView("Test Project",
+        List.of(ProjectType.DECOMMISSIONING_PROGRAMME),
+        new BigDecimal("50000"),
+        new BigDecimal("50000"),
+        "44/02",
+        YesNo.NO,
+        Collections.emptyList(),
+        "11-05-2023",
+        "11-06-2023");
   }
 }

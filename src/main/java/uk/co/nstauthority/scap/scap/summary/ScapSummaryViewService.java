@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.summary;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Collections;
+import java.util.Objects;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -158,5 +159,24 @@ public class ScapSummaryViewService {
         projectPerformance.getOutturnCost()
         ))
         .orElse(new ProjectPerformanceSummaryView(null, null, null, null));
+  }
+
+  public ScapSubmissionStage inferSubmissionStatusFromSummary(ScapSummaryView scapSummaryView) {
+    if (Boolean.TRUE.equals(scapSummaryView.projectPerformanceSummaryView().isProjectCompleted())) {
+      return ScapSubmissionStage.PROJECT_COMPLETED;
+    }
+    if (Boolean.TRUE.equals(scapSummaryView.contractingPerformanceOverviewSummaryView().hasContractingPerformance())) {
+      return ScapSubmissionStage.CONTRACTING_PERFORMANCE;
+    }
+    if (Boolean.TRUE.equals(scapSummaryView.actualTenderSummaryView().hasActualTenderActivities())) {
+      return ScapSubmissionStage.ACTUAL_TENDER;
+    }
+    if (Boolean.TRUE.equals(scapSummaryView.plannedTenderSummaryView().hasPlannedTender())) {
+      return ScapSubmissionStage.PLANNED_TENDER;
+    }
+    if (Objects.nonNull(scapSummaryView.projectDetailsSummaryView().projectName())) {
+      return ScapSubmissionStage.CONTRACTING_STRATEGY_PENDING;
+    }
+    return ScapSubmissionStage.DRAFT;
   }
 }

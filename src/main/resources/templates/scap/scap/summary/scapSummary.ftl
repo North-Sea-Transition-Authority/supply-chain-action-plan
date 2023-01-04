@@ -8,7 +8,6 @@
 
 <#macro summary scapSummaryView>
 <#-- @ftlvariable name="scapSummaryView" type="uk.co.nstauthority.scap.scap.summary.ScapSummaryView" -->
-
     <@fdsAccordion.accordion accordionId="scap-summary">
     <@fdsAccordion.accordionSection sectionHeading="Project details">
       <@projectDetailsSummary.projectDetailsSummary projectDetailsView=scapSummaryView.projectDetailsSummaryView() />
