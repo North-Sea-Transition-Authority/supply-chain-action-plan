@@ -49,6 +49,12 @@ public class TeamService {
     return teamRepository.findByEnergyPortalOrgGroupId(epGroupId);
   }
 
+  public Team getByEnergyPortalOrgGroupId(int epGroupId) {
+    return teamRepository.findByEnergyPortalOrgGroupId(epGroupId)
+        .orElseThrow(() -> new ScapEntityNotFoundException(
+            "Could not find Team associated with energy portal organisation group ID: %s".formatted(epGroupId)));
+  }
+
   public Team createTeam(String groupName, int energyPortalGroupId, long wuaId) {
     var team = new Team();
     team.setTeamType(TeamType.INDUSTRY);

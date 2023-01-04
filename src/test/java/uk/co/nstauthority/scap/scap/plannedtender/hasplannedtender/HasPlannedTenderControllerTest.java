@@ -48,9 +48,6 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 class HasPlannedTenderControllerTest extends AbstractControllerTest {
 
   @MockBean
-  ScapService scapService;
-
-  @MockBean
   ScapDetailService scapDetailService;
 
   @MockBean

@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.authentication;
 
 import java.io.Serializable;
 import org.springframework.security.core.AuthenticatedPrincipal;
+import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 
 public record ServiceUserDetail(Long wuaId,
                                 Long personId,
@@ -17,5 +18,9 @@ public record ServiceUserDetail(Long wuaId,
 
   public String displayName() {
     return "%s %s".formatted(forename, surname);
+  }
+
+  public WebUserAccountId getWebUserAccountId() {
+    return new WebUserAccountId(wuaId);
   }
 }

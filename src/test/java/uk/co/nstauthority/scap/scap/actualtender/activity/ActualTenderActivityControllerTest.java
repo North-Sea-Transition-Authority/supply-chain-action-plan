@@ -55,9 +55,6 @@ class ActualTenderActivityControllerTest extends AbstractControllerTest {
   Clock clock;
 
   @MockBean
-  ScapService scapService;
-
-  @MockBean
   ScapDetailService scapDetailService;
 
   @MockBean

@@ -13,7 +13,6 @@ import static uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRemov
 
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,19 +20,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
-import uk.co.nstauthority.scap.AbstractControllerTest;
-import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
-import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
-import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
-import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewTestUtil;
-import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
-import uk.co.nstauthority.scap.permissionmanagement.TeamType;
-import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRemovalService;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 @WithMockUser
 @ExtendWith(MockitoExtension.class)
@@ -46,7 +36,7 @@ class RegulatorRemoveMemberControllerTest extends AbstractRegulatorTeamControlle
   @Test
   void renderRemoveMember_noTeamFound_RedirectsToMemberList() throws Exception {
     var wuaId = new WebUserAccountId(1000L);
-    when(teamMemberService.getTeamMember(team, wuaId)).thenReturn(Optional.empty());
+    when(teamMemberService.findTeamMember(team, wuaId)).thenReturn(Optional.empty());
 
     mockMvc.perform(get(
             ReverseRouter.route(on(RegulatorRemoveMemberController.class)
@@ -95,7 +85,7 @@ class RegulatorRemoveMemberControllerTest extends AbstractRegulatorTeamControlle
 
   @Test
   void removeMember_noTeam_redirectsToMemberList() throws Exception {
-    when(teamMemberService.getTeamMember(any(), any())).thenReturn(Optional.of(teamMember),Optional.empty());
+    when(teamMemberService.findTeamMember(any(), any())).thenReturn(Optional.of(teamMember),Optional.empty());
     mockMvc.perform(post(
             ReverseRouter.route(on(RegulatorRemoveMemberController.class)
                 .removeMember(teamId,

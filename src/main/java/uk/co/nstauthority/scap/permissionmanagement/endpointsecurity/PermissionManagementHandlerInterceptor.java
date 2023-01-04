@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.permissionmanagement;
+package uk.co.nstauthority.scap.permissionmanagement.endpointsecurity;
 
 import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +13,7 @@ import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.error.exception.InvalidAuthenticationException;
 import uk.co.nstauthority.scap.mvc.AbstractHandlerInterceptor;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 
 @Component

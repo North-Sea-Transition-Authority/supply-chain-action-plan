@@ -46,9 +46,6 @@ import uk.co.nstauthority.scap.scap.scap.ScapService;
 class BidParticipantsControllerTest extends AbstractControllerTest {
 
   @MockBean
-  ScapService scapService;
-
-  @MockBean
   ActualTenderActivityService actualTenderActivityService;
 
   @MockBean

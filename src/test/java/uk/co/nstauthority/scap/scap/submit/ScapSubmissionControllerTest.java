@@ -43,9 +43,6 @@ class ScapSubmissionControllerTest extends AbstractControllerTest {
   private ScapDetail scapDetail;
 
   @MockBean
-  ScapService scapService;
-
-  @MockBean
   ScapDetailService scapDetailService;
 
   @MockBean

@@ -46,9 +46,6 @@ import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
 class HasContractingPerformanceControllerTest extends AbstractControllerTest {
 
   @MockBean
-  ScapService scapService;
-
-  @MockBean
   ScapDetailService scapDetailService;
 
   @MockBean

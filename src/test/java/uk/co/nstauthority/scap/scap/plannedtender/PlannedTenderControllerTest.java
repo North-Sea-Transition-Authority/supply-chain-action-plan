@@ -52,9 +52,6 @@ import uk.co.nstauthority.scap.utils.EntityTestingUtil;
 class PlannedTenderControllerTest extends AbstractControllerTest {
 
   @MockBean
-  ScapService scapService;
-
-  @MockBean
   ScapDetailService scapDetailService;
 
   @MockBean

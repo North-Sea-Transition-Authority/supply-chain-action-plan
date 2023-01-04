@@ -20,19 +20,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
-import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
-import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerType;
-import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerView;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
-import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
-import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
-import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRemovalService;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 @WithMockUser
 @ExtendWith(MockitoExtension.class)
@@ -45,7 +38,7 @@ class IndustryRemoveMemberControllerTest extends AbstractIndustryTeamControllerT
   @Test
   void renderRemoveMember_noTeamFound_RedirectsToMemberList() throws Exception {
     var wuaId = new WebUserAccountId(1000L);
-    when(teamMemberService.getTeamMember(team, wuaId)).thenReturn(Optional.empty());
+    when(teamMemberService.findTeamMember(team, wuaId)).thenReturn(Optional.empty());
 
     mockMvc.perform(get(
             ReverseRouter.route(on(IndustryRemoveMemberController.class)
@@ -57,7 +50,7 @@ class IndustryRemoveMemberControllerTest extends AbstractIndustryTeamControllerT
   @Test
   void renderRemoveMember_teamFound_RenderRemoveForm() throws Exception {
     var wuaId = new WebUserAccountId(1000L);
-    when(teamMemberService.getTeamMember(team, wuaId)).thenReturn(Optional.of(teamMember));
+    when(teamMemberService.findTeamMember(team, wuaId)).thenReturn(Optional.of(teamMember));
 
     mockMvc.perform(get(
         ReverseRouter.route(on(IndustryRemoveMemberController.class)
@@ -69,7 +62,7 @@ class IndustryRemoveMemberControllerTest extends AbstractIndustryTeamControllerT
   @Test
   void removeMember_cannotRemoveTeamMember_AddsErrorMessageToRenderRemoveMember() throws Exception {
     var wuaId = new WebUserAccountId(1000L);
-    when(teamMemberService.getTeamMember(team, wuaId)).thenReturn(Optional.of(teamMember));
+    when(teamMemberService.findTeamMember(team, wuaId)).thenReturn(Optional.of(teamMember));
 
     mockMvc.perform(post(
             ReverseRouter.route(on(IndustryRemoveMemberController.class)

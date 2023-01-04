@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.permissionmanagement;
+package uk.co.nstauthority.scap.permissionmanagement.endpointsecurity;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -20,6 +20,11 @@ import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.TeamId;
+import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
+import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
+import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 
 @ContextConfiguration(classes = TeamManagementHandlerInterceptorTest.TestController.class)
 class TeamManagementHandlerInterceptorTest extends AbstractControllerTest {
@@ -39,7 +44,7 @@ class TeamManagementHandlerInterceptorTest extends AbstractControllerTest {
     when(teamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR))
         .thenReturn(List.of(TeamTestUtil.Builder().build()));
     when(userDetailService.getUserDetail()).thenReturn(user);
-    when(teamMemberService.getTeamMember(any(), any()))
+    when(teamMemberService.findTeamMember(any(), any()))
         .thenReturn(Optional.of(TeamMemberTestUtil.Builder().build()));
 
     mockMvc.perform(get(ReverseRouter.route(on(TeamManagementHandlerInterceptorTest.TestController.class)

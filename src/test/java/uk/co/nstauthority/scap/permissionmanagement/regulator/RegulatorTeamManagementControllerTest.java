@@ -50,7 +50,7 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
   @BeforeEach
   void setup() {
     when(userDetailService.getUserDetail()).thenReturn(user);
-    when(teamMemberService.getTeamMember(any(), any()))
+    when(teamMemberService.findTeamMember(any(), any()))
         .thenReturn(Optional.of(TeamMemberTestUtil.Builder()
             .withRole(IndustryTeamRole.ACCESS_MANAGER)
             .build()));

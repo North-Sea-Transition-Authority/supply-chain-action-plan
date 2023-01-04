@@ -48,9 +48,6 @@ import uk.co.nstauthority.scap.scap.scap.ScapService;
 class ContractingPerformanceControllerTest extends AbstractControllerTest {
 
   @MockBean
-  ScapService scapService;
-
-  @MockBean
   ScapDetailService scapDetailService;
 
   @MockBean

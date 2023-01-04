@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.permissionmanagement;
+package uk.co.nstauthority.scap.permissionmanagement.endpointsecurity;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,6 +15,10 @@ import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.error.exception.InvalidAuthenticationException;
 import uk.co.nstauthority.scap.mvc.AbstractHandlerInterceptor;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.TeamId;
+import uk.co.nstauthority.scap.permissionmanagement.TeamRole;
+import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
@@ -74,7 +78,7 @@ public class TeamPermissionManagementHandlerInterceptor extends AbstractHandlerI
     var webUserAccountId = new WebUserAccountId(user.wuaId());
     var regulatorTeams = teamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR);
     if (!regulatorTeams.isEmpty()) {
-      var teamMember = teamMemberService.getTeamMember(regulatorTeams.get(0), webUserAccountId);
+      var teamMember = teamMemberService.findTeamMember(regulatorTeams.get(0), webUserAccountId);
       if (teamMember.isPresent()) {
         var teamMemberPermissions = teamMember.get()
             .roles()
@@ -96,7 +100,7 @@ public class TeamPermissionManagementHandlerInterceptor extends AbstractHandlerI
     // Roles assigned in other non-Regulator teams have no effect.
     var webUserAccountId = new WebUserAccountId(user.wuaId());
     var industryTeam = teamService.getTeam(teamId);
-    var teamMember = teamMemberService.getTeamMember(industryTeam, webUserAccountId);
+    var teamMember = teamMemberService.findTeamMember(industryTeam, webUserAccountId);
     if (teamMember.isPresent()) {
       var teamMemberPermissions = teamMember.get()
           .roles()

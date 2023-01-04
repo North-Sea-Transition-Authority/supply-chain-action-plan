@@ -42,7 +42,7 @@ public abstract class RemoveMemberController {
                                          @PathVariable("wuaId") WebUserAccountId wuaId) {
 
     var team = teamService.getTeam(teamId);
-    var teamMemberOptional = teamMemberService.getTeamMember(team, wuaId);
+    var teamMemberOptional = teamMemberService.findTeamMember(team, wuaId);
 
     if (teamMemberOptional.isEmpty()) {
       switch (team.getTeamType()) {
@@ -82,7 +82,7 @@ public abstract class RemoveMemberController {
                                    ModelAndView successUrl) {
 
     var team = teamService.getTeam(teamId);
-    var teamMember = teamMemberService.getTeamMemberOrThrow(team, wuaId);
+    var teamMember = teamMemberService.getTeamMember(team, wuaId);
 
     if (teamMemberRemovalService.canRemoveTeamMember(team, teamMember)) {
       teamMemberRemovalService.removeTeamMember(team, teamMember);

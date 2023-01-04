@@ -27,12 +27,14 @@ import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
 import uk.co.nstauthority.scap.mvc.WebMvcConfiguration;
 import uk.co.nstauthority.scap.mvc.WithDefaultPageControllerAdvice;
-import uk.co.nstauthority.scap.permissionmanagement.PermissionManagementHandlerInterceptor;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionManagementHandlerInterceptor;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
-import uk.co.nstauthority.scap.permissionmanagement.TeamPermissionManagementHandlerInterceptor;
-import uk.co.nstauthority.scap.permissionmanagement.TeamManagementHandlerInterceptor;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.ScapPermissionManagementHandlerInterceptor;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.TeamPermissionManagementHandlerInterceptor;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.TeamManagementHandlerInterceptor;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.technicalsupport.IncludeTechnicalSupportConfigurationProperties;
 import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 
@@ -44,7 +46,8 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
     WebMvcConfiguration.class,
     PermissionManagementHandlerInterceptor.class,
     TeamPermissionManagementHandlerInterceptor.class,
-    TeamManagementHandlerInterceptor.class})
+    TeamManagementHandlerInterceptor.class,
+    ScapPermissionManagementHandlerInterceptor.class})
 @WithDefaultPageControllerAdvice
 @WebMvcTest
 public abstract class AbstractControllerTest {
@@ -65,6 +68,9 @@ public abstract class AbstractControllerTest {
 
   @MockBean
   protected TeamService teamService;
+
+  @MockBean
+  protected ScapService scapService;
 
   @BeforeEach
   void setup() {

@@ -128,7 +128,7 @@ class TeamMemberServiceTest {
     var team = TeamTestUtil.Builder().build();
     var webUserAccountId = new WebUserAccountId(100L);
     assertThrows(ScapEntityNotFoundException.class,
-        () -> teamMemberService.getTeamMemberOrThrow(team, webUserAccountId));
+        () -> teamMemberService.getTeamMember(team, webUserAccountId));
   }
 
   @Test
@@ -231,7 +231,7 @@ class TeamMemberServiceTest {
     when(teamMemberRoleRepository.findAllByTeamAndWuaId(team, wuaId.id()))
         .thenReturn(List.of(role));
 
-    var result = teamMemberService.getTeamMember(team, wuaId);
+    var result = teamMemberService.findTeamMember(team, wuaId);
 
     assertTrue(result.isPresent());
     assertThat(result.get()).extracting(
@@ -256,7 +256,7 @@ class TeamMemberServiceTest {
 
     when(teamMemberRoleRepository.findAllByTeamAndWuaId(team, wuaId.id())).thenReturn(List.of());
 
-    var result = teamMemberService.getTeamMember(team, wuaId);
+    var result = teamMemberService.findTeamMember(team, wuaId);
 
     assertTrue(result.isEmpty());
   }

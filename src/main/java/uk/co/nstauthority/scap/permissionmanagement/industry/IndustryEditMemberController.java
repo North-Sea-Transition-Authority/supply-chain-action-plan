@@ -15,14 +15,14 @@ import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.enumutil.DisplayableEnumOptionUtil;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
-import uk.co.nstauthority.scap.permissionmanagement.IsMemberOfTeamOrRegulator;
-import uk.co.nstauthority.scap.permissionmanagement.PermissionsRequiredForTeam;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRolesForm;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberView;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRoleUtil;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.IsMemberOfTeamOrRegulator;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForTeam;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRoleService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
@@ -66,7 +66,7 @@ public class IndustryEditMemberController {
 
     var form = new TeamMemberRolesForm();
     var team = teamService.getTeam(teamId);
-    var teamMember = teamMemberService.getTeamMemberOrThrow(team, wuaId);
+    var teamMember = teamMemberService.getTeamMember(team, wuaId);
     var userView = teamMemberViewService.getTeamMemberViewOrThrow(teamMember);
 
     form.setRoles(TeamRoleUtil.getRoleNames(teamMember.roles()));
@@ -81,7 +81,7 @@ public class IndustryEditMemberController {
                                  BindingResult bindingResult) {
 
     var team = teamService.getTeam(teamId);
-    var teamMember = teamMemberService.getTeamMemberOrThrow(team, wuaId);
+    var teamMember = teamMemberService.getTeamMember(team, wuaId);
     var userView = teamMemberViewService.getTeamMemberViewOrThrow(teamMember);
 
     industryTeamMemberEditRolesValidator.validate(form, bindingResult,

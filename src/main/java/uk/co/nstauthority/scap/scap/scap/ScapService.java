@@ -27,6 +27,10 @@ public class ScapService {
     return scap;
   }
 
+  public Scap getScapById(ScapId scapId) {
+    return getScapById(scapId.scapId());
+  }
+
   public Scap getScapById(Integer id) {
     return scapRepository.findById(id)
         .orElseThrow(() ->

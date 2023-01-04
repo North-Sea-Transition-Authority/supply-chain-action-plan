@@ -23,7 +23,6 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
-import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 
 public abstract class AbstractRegulatorTeamControllerTest extends AbstractControllerTest {
 
@@ -47,8 +46,8 @@ public abstract class AbstractRegulatorTeamControllerTest extends AbstractContro
     when(teamService.getTeamsOfTypeThatUserBelongsTo(any(), eq(TeamType.REGULATOR))).thenReturn(List.of(team));
     when(teamService.getTeamsThatUserBelongsTo(user)).thenReturn(List.of(team));
     when(userDetailService.getUserDetail()).thenReturn(user);
-    when(teamMemberService.getTeamMember(any(Team.class), any())).thenReturn(Optional.of(teamMember));
-    when(teamMemberService.getTeamMemberOrThrow(any(Team.class), eq(webUserAccountId))).thenReturn(teamMember);
+    when(teamMemberService.findTeamMember(any(Team.class), any())).thenReturn(Optional.of(teamMember));
+    when(teamMemberService.getTeamMember(any(Team.class), eq(webUserAccountId))).thenReturn(teamMember);
     when(teamMemberService.isMemberOfTeam(any(TeamId.class), eq(user))).thenReturn(true);
     when(teamMemberViewService.getTeamMemberViewOrThrow(any(TeamMember.class))).thenReturn(getTeamMemberView());
   }

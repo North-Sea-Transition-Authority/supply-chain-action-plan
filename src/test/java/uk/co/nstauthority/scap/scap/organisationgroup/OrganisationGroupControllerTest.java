@@ -41,9 +41,6 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 class OrganisationGroupControllerTest extends AbstractControllerTest {
 
   @MockBean
-  ScapService scapService;
-
-  @MockBean
   ScapDetailService scapDetailService;
 
   @MockBean

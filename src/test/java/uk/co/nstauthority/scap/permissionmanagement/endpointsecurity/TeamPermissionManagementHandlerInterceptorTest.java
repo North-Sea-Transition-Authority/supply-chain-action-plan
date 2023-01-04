@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.permissionmanagement;
+package uk.co.nstauthority.scap.permissionmanagement.endpointsecurity;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -21,6 +21,11 @@ import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.TeamId;
+import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
+import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
+import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 
 @ContextConfiguration(classes = TeamPermissionManagementHandlerInterceptorTest.TestController.class)
@@ -68,7 +73,7 @@ class TeamPermissionManagementHandlerInterceptorTest extends AbstractControllerT
     when(userDetailService.getUserDetail()).thenReturn(USER);
     when(teamService.getTeamsOfTypeThatUserBelongsTo(USER, TeamType.REGULATOR))
         .thenReturn(List.of(team));
-    when(teamMemberService.getTeamMember(team, new WebUserAccountId(USER.wuaId())))
+    when(teamMemberService.findTeamMember(team, new WebUserAccountId(USER.wuaId())))
         .thenReturn(Optional.of(teamMember));
 
     mockMvc.perform(get(ReverseRouter.route(on(TestController.class)
@@ -88,7 +93,7 @@ class TeamPermissionManagementHandlerInterceptorTest extends AbstractControllerT
     when(userDetailService.getUserDetail()).thenReturn(USER);
     when(teamService.getTeamsOfTypeThatUserBelongsTo(USER, TeamType.REGULATOR))
         .thenReturn(List.of(team));
-    when(teamMemberService.getTeamMember(team, new WebUserAccountId(USER.wuaId())))
+    when(teamMemberService.findTeamMember(team, new WebUserAccountId(USER.wuaId())))
         .thenReturn(Optional.empty());
 
     mockMvc.perform(get(ReverseRouter.route(on(TestController.class)
@@ -108,7 +113,7 @@ class TeamPermissionManagementHandlerInterceptorTest extends AbstractControllerT
     when(userDetailService.getUserDetail()).thenReturn(USER);
     when(teamService.getTeamsOfTypeThatUserBelongsTo(USER, TeamType.REGULATOR))
         .thenReturn(List.of(team));
-    when(teamMemberService.getTeamMember(team, new WebUserAccountId(USER.wuaId())))
+    when(teamMemberService.findTeamMember(team, new WebUserAccountId(USER.wuaId())))
         .thenReturn(Optional.of(teamMember));
 
     mockMvc.perform(get(ReverseRouter.route(on(TestController.class)
@@ -127,7 +132,7 @@ class TeamPermissionManagementHandlerInterceptorTest extends AbstractControllerT
     when(teamService.findTeam(teamId)).thenReturn(Optional.of(team));
     when(userDetailService.getUserDetail()).thenReturn(USER);
     when(teamService.getTeam(teamId)).thenReturn(team).thenReturn(team);
-    when(teamMemberService.getTeamMember(team, new WebUserAccountId(USER.wuaId())))
+    when(teamMemberService.findTeamMember(team, new WebUserAccountId(USER.wuaId())))
         .thenReturn(Optional.of(teamMember));
 
     mockMvc.perform(get(ReverseRouter.route(on(TestController.class)
@@ -146,7 +151,7 @@ class TeamPermissionManagementHandlerInterceptorTest extends AbstractControllerT
     when(teamService.findTeam(teamId)).thenReturn(Optional.of(team));
     when(userDetailService.getUserDetail()).thenReturn(USER);
     when(teamService.getTeam(teamId)).thenReturn(team).thenReturn(team);
-    when(teamMemberService.getTeamMember(team, new WebUserAccountId(USER.wuaId())))
+    when(teamMemberService.findTeamMember(team, new WebUserAccountId(USER.wuaId())))
         .thenReturn(Optional.of(teamMember));
 
     mockMvc.perform(get(ReverseRouter.route(on(TestController.class)

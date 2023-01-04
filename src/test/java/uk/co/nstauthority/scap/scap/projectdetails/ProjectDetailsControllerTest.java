@@ -59,9 +59,6 @@ class ProjectDetailsControllerTest extends AbstractControllerTest {
   ValidationErrorOrderingService validationErrorOrderingService;
 
   @MockBean
-  ScapService scapService;
-
-  @MockBean
   ScapDetailService scapDetailService;
 
   @MockBean
