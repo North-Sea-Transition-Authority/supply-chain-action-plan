@@ -6,10 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import uk.co.fivium.digital.energyportalteamaccesslibrary.team.EnergyPortalAccessService;
+import uk.co.fivium.digital.energyportalteamaccesslibrary.team.InstigatingWebUserAccountId;
+import uk.co.fivium.digital.energyportalteamaccesslibrary.team.ResourceType;
+import uk.co.fivium.digital.energyportalteamaccesslibrary.team.TargetWebUserAccountId;
+import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
+import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamManagementController;
@@ -24,18 +30,26 @@ public abstract class RemoveMemberController {
   private final TeamMemberRemovalService teamMemberRemovalService;
   private final TeamService teamService;
 
+  private final UserDetailService userDetailService;
+
+  private final EnergyPortalAccessService energyPortalAccessService;
+
   @Autowired
   protected RemoveMemberController(
       TeamService teamService,
       TeamMemberService teamMemberService,
       CustomerConfigurationProperties customerConfigurationProperties,
       TeamMemberViewService teamMemberViewService,
-      TeamMemberRemovalService teamMemberRemovalService) {
+      TeamMemberRemovalService teamMemberRemovalService,
+      UserDetailService userDetailService,
+      EnergyPortalAccessService energyPortalAccessService) {
     this.teamMemberService = teamMemberService;
     this.customerConfigurationProperties = customerConfigurationProperties;
     this.teamMemberViewService = teamMemberViewService;
     this.teamMemberRemovalService = teamMemberRemovalService;
     this.teamService = teamService;
+    this.userDetailService = userDetailService;
+    this.energyPortalAccessService = energyPortalAccessService;
   }
 
   public ModelAndView renderRemoveMember(@PathVariable("teamId") TeamId teamId,
@@ -86,6 +100,7 @@ public abstract class RemoveMemberController {
 
     if (teamMemberRemovalService.canRemoveTeamMember(team, teamMember)) {
       teamMemberRemovalService.removeTeamMember(team, teamMember);
+      revokeEnergyPortalAccess(teamMember);
     } else {
       return renderRemoveMember(teamId, wuaId)
           .addObject("singleErrorMessage", TeamMemberRemovalService.LAST_ACCESS_MANAGER_ERROR_MESSAGE);
@@ -95,5 +110,17 @@ public abstract class RemoveMemberController {
     DeletionSuccessBannerUtil.addRedirectionNotification(redirectAttributes,
         "%s has been removed from the team".formatted(userView.getDisplayName()));
     return successUrl;
+  }
+
+  private void revokeEnergyPortalAccess(TeamMember userToRemove) {
+    if (teamMemberService.getAllPermissionsForUser(userToRemove.wuaId().id()).isEmpty()) {
+      //A user who has no more roles in the system should have the scap access role removed.
+      var loggedInUser = userDetailService.getUserDetail();
+
+      energyPortalAccessService.removeUserFromAccessTeam(
+          new ResourceType("SCAP_ACCESS_TEAM"),
+          new TargetWebUserAccountId(userToRemove.wuaId().id()),
+          new InstigatingWebUserAccountId(loggedInUser.wuaId()));
+    }
   }
 }

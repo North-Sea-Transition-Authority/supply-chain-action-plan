@@ -15,6 +15,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
+import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupController;
@@ -27,7 +29,7 @@ class ScapStartControllerTest extends AbstractControllerTest {
 
   @Test
   void renderStartNewScap_HasPermission_renderStartNewScap() throws Exception {
-    when(teamMemberService.getAllPermissionsForUser(any())).thenReturn(List.of(RolePermission.SUBMIT_SCAP));
+    when(teamMemberService.getAllPermissionsForUser(any(ServiceUserDetail.class))).thenReturn(List.of(RolePermission.SUBMIT_SCAP));
 
     mockMvc.perform(get(
             ReverseRouter.route(on(ScapStartController.class).renderStartNewScap())))

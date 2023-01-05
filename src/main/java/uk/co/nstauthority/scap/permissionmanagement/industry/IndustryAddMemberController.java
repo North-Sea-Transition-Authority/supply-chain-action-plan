@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.fivium.digital.energyportalteamaccesslibrary.team.EnergyPortalAccessService;
+import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.configuration.SamlProperties;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
@@ -22,6 +24,7 @@ import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.IsMemberOfT
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForTeam;
 import uk.co.nstauthority.scap.permissionmanagement.teams.AddMemberController;
 import uk.co.nstauthority.scap.permissionmanagement.teams.AddTeamMemberValidator;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 
 @Controller
 @IsMemberOfTeamOrRegulator
@@ -33,11 +36,17 @@ class IndustryAddMemberController extends AddMemberController {
   IndustryAddMemberController(SamlProperties samlProperties,
                               ControllerHelperService controllerHelperService,
                               AddTeamMemberValidator addTeamMemberValidator,
-                              EnergyPortalUserService energyPortalUserService) {
+                              EnergyPortalUserService energyPortalUserService,
+                              EnergyPortalAccessService energyPortalAccessService,
+                              UserDetailService userDetailService,
+                              TeamMemberService teamMemberService) {
     super(samlProperties,
         controllerHelperService,
         addTeamMemberValidator,
-        energyPortalUserService);
+        energyPortalUserService,
+        energyPortalAccessService,
+        userDetailService,
+        teamMemberService);
   }
 
   @GetMapping("/add-member")

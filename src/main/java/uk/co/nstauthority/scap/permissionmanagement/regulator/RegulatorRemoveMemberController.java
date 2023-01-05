@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import uk.co.fivium.digital.energyportalteamaccesslibrary.team.EnergyPortalAccessService;
+import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
@@ -34,12 +36,16 @@ public class RegulatorRemoveMemberController extends RemoveMemberController {
                                          TeamMemberService teamMemberService,
                                          CustomerConfigurationProperties customerConfigurationProperties,
                                          TeamMemberViewService teamMemberViewService,
-                                         TeamMemberRemovalService teamMemberRemovalService) {
+                                         TeamMemberRemovalService teamMemberRemovalService,
+                                         UserDetailService userDetailService,
+                                         EnergyPortalAccessService energyPortalAccessService) {
     super(teamService,
         teamMemberService,
         customerConfigurationProperties,
         teamMemberViewService,
-        teamMemberRemovalService);
+        teamMemberRemovalService,
+        userDetailService,
+        energyPortalAccessService);
   }
 
   @Override

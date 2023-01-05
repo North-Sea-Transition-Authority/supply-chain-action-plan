@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.start.ScapStartController;
@@ -38,7 +39,7 @@ class WorkAreaControllerTest extends AbstractControllerTest {
 
   @Test
   void teamMemberNotScapSubmitter_cannotStartScap() throws Exception {
-    when(teamMemberService.getAllPermissionsForUser(any()))
+    when(teamMemberService.getAllPermissionsForUser(any(ServiceUserDetail.class)))
         .thenReturn(List.of(RolePermission.VIEW_SCAP));
 
     mockMvc.perform(
@@ -52,7 +53,7 @@ class WorkAreaControllerTest extends AbstractControllerTest {
 
   @Test
   void teamMemberScapSubmitter_canStartScap() throws Exception {
-    when(teamMemberService.getAllPermissionsForUser(any()))
+    when(teamMemberService.getAllPermissionsForUser(any(ServiceUserDetail.class)))
         .thenReturn(List.of(RolePermission.SUBMIT_SCAP));
 
     mockMvc.perform(
