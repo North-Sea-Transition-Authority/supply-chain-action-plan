@@ -5,7 +5,7 @@
 
 <@defaultPage
 htmlTitle=pageTitle
-pageHeading=pageTitle
+pageHeading=""
 pageSize=PageSize.TWO_THIRDS_COLUMN
 errorItems=errorList
 backLinkUrl=springUrl(backLinkUrl)
@@ -13,9 +13,11 @@ backLinkUrl=springUrl(backLinkUrl)
   <@fdsForm.htmlForm>
     <@fdsCheckbox.checkboxes
       path="form.selectedBidParticipantIds"
+      fieldsetHeadingClass="govuk-fieldset__legend--xl"
       checkboxes=bidParticipantCheckboxes
+      fieldsetHeadingText=pageTitle
     />
 
-  <@fdsAction.button buttonText="Save and continue"/>
+    <@fdsAction.button buttonText="Save and continue"/>
   </@fdsForm.htmlForm>
 </@defaultPage>

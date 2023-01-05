@@ -91,6 +91,8 @@ public class ActualTenderActivityController {
         () -> {
           var actualTenderActivity = actualTenderActivityService
               .createActualTenderActivity(actualTender, form);
+          invitationToTenderParticipantService.updateInvitationToTenderParticipants(
+              actualTenderActivity, form.getInvitationToTenderParticipants());
           return actualTenderControllerRedirectionService
               .redirectFromActualTenderActivityForm(scapId, actualTenderActivity);
         }
@@ -137,6 +139,8 @@ public class ActualTenderActivityController {
         form,
         () -> {
           updateActualTenderActivityService.updateActualTenderActivity(actualTenderActivity, form);
+          invitationToTenderParticipantService.updateInvitationToTenderParticipants(
+              actualTenderActivity, form.getInvitationToTenderParticipants());
           return actualTenderControllerRedirectionService.redirectFromActualTenderActivityForm(scapId, actualTenderActivity);
         }
     );

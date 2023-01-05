@@ -42,10 +42,17 @@ backLinkUrl=springUrl(backLinkUrl)
       labelText="Contract stage"
       radioItems=contractStages
     />
-    <@fdsTextInput.textInput
-      path="form.invitationToTenderParticipants.inputValue"
-      labelText="Invitation to tender participants"
-      inputClass="govuk-!-width-two-thirds"
+
+    <#if form.getInvitationToTenderParticipants()?has_content>
+      <#assign fieldListSize = form.getInvitationToTenderParticipants()?size>
+    <#else>
+      <#assign fieldListSize = 0>
+    </#if>
+    <@fdsAddAField.addAField
+      path="form.invitationToTenderParticipants"
+      fieldListSize=fieldListSize
+      fieldLabelText="Invitation to tender participants"
+      actionLinkText="Add another invitation to tender participant"
     />
 
     <#if contractingPerformanceWarning?has_content>

@@ -2,7 +2,6 @@ package uk.co.nstauthority.scap.scap.actualtender.activity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -13,6 +12,7 @@ import static org.mockito.Mockito.when;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,7 +57,7 @@ class ActualTenderActivityServiceTest {
     form.setRemunerationModel(RemunerationModel.OTHER);
     form.setRemunerationModelName("test remuneration model name");
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
-    form.setInvitationToTenderParticipants("test ITT participant");
+    form.setInvitationToTenderParticipants(Collections.singletonList("test ITT participant"));
   }
 
   @Test
@@ -116,7 +116,6 @@ class ActualTenderActivityServiceTest {
     actualTenderActivityService.createActualTenderActivity(actualTender, form);
 
     verify(actualTenderActivityRepository).save(actualTenderDetailArgumentCaptor.capture());
-    verify(invitationToTenderParticipantRepository).saveAll(invitationToTenderParticipantCaptor.capture());
     verify(invitationToTenderParticipantRepository, never()).deleteAll(any());
 
     assertThat(actualTenderDetailArgumentCaptor.getValue()).extracting(
@@ -133,13 +132,6 @@ class ActualTenderActivityServiceTest {
         form.getRemunerationModelName().getInputValue(),
         form.getContractStage(),
         clock.instant()
-    );
-
-    assertThat(invitationToTenderParticipantCaptor.getValue()).extracting(
-        InvitationToTenderParticipant::getCompanyName,
-        InvitationToTenderParticipant::getCreatedTimestamp
-    ).containsExactly(
-        tuple(form.getInvitationToTenderParticipants().getInputValue(), clock.instant())
     );
   }
 

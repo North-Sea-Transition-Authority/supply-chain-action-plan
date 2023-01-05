@@ -20,6 +20,8 @@ class ActualTenderActivityFormValidator implements SmartValidator {
   public static final Integer MAX_SCOPE_TITLE_LENGTH = 40;
   private static final String MISSING_REMUNERATION_MODEL_ERROR =  "Select a remuneration model";
   private static final String MISSING_CONTRACT_STAGE_ERROR = "Select the stage the contract is at";
+  private static final String ITT_PARTICIPANTS_FIELD_NAME = "invitationToTenderParticipants";
+  private static final String MISSING_ITT_PARTICIPANTS_ERROR = "Enter at least one invitation to tender participant";
 
   private final ActualTenderActivityService actualTenderActivityService;
 
@@ -71,7 +73,16 @@ class ActualTenderActivityFormValidator implements SmartValidator {
         errors, "contractStage",
         "contractStage.required",
         MISSING_CONTRACT_STAGE_ERROR);
-    StringInputValidator.builder().validate(form.getInvitationToTenderParticipants(), errors);
+
+    // If FDS is updated or for some reason the Add a list returns a truly empty list - as opposed to a List.of(null),
+    // the below will still work as Collections.emptyList().stream().noneMatch(Objects::nonNull) returns true
+    if (form.getInvitationToTenderParticipants().stream().noneMatch(Objects::nonNull)) {
+      errors.rejectValue(
+          "%s[0]".formatted(ITT_PARTICIPANTS_FIELD_NAME),
+          "%s.required".formatted(ITT_PARTICIPANTS_FIELD_NAME),
+          MISSING_ITT_PARTICIPANTS_ERROR
+      );
+    }
   }
 
   private void validateScopeTitle(ActualTenderActivityForm form, Errors errors, ActualTender actualTender,

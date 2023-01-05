@@ -34,15 +34,17 @@ class ActualTenderActivityFormService {
   }
 
   ActualTenderActivityForm getForm(ActualTenderActivity actualTenderActivity,
-                                          List<InvitationToTenderParticipant> invitationToTenderParticipants) {
+                                   List<InvitationToTenderParticipant> invitationToTenderParticipants) {
     var form = new ActualTenderActivityForm();
     form.setScopeTitle(actualTenderActivity.getScopeTitle());
     form.setScopeDescription(actualTenderActivity.getScopeDescription());
     form.setRemunerationModel(actualTenderActivity.getRemunerationModel());
     form.setRemunerationModelName(actualTenderActivity.getRemunerationModelName());
     form.setContractStage(actualTenderActivity.getContractStage());
-    // TODO SCAP2022-41: Replace with however the "Add to list" component is going to be handled on the form
-    form.setInvitationToTenderParticipants(invitationToTenderParticipants.get(0).getCompanyName());
+    var participantNames = invitationToTenderParticipants.stream()
+        .map(InvitationToTenderParticipant::getCompanyName)
+        .toList();
+    form.setInvitationToTenderParticipants(participantNames);
     return form;
   }
 }

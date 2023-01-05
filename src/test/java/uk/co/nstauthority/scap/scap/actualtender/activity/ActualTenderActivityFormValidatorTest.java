@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +39,8 @@ class ActualTenderActivityFormValidatorTest {
   @BeforeEach
   void setup() {
     form = new ActualTenderActivityForm();
+    // The 'Add a field' FDS component returns a list containing a null if nothing is entered
+    form.setInvitationToTenderParticipants(Collections.singletonList(null));
     bindingResult = new BeanPropertyBindingResult(form, "form");
     actualTender = new ActualTender(156);
   }
@@ -70,7 +73,7 @@ class ActualTenderActivityFormValidatorTest {
     form.setRemunerationModel(RemunerationModel.OTHER);
     form.setRemunerationModelName("test remuneration model");
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
-    form.setInvitationToTenderParticipants("test participant");
+    form.setInvitationToTenderParticipants(Collections.singletonList("test participant"));
 
     validator.validate(form, bindingResult, new ActualTenderFormValidatorHint(actualTender));
 
@@ -88,7 +91,7 @@ class ActualTenderActivityFormValidatorTest {
         entry("scopeDescription.inputValue", Set.of("scopeDescription.required")),
         entry("remunerationModel", Set.of("remunerationModel.required")),
         entry("contractStage", Set.of("contractStage.required")),
-        entry("invitationToTenderParticipants.inputValue", Set.of("invitationToTenderParticipants.required"))
+        entry("invitationToTenderParticipants[0]", Set.of("invitationToTenderParticipants.required"))
     );
   }
 
@@ -98,7 +101,7 @@ class ActualTenderActivityFormValidatorTest {
     form.setScopeDescription("test scope description");
     form.setRemunerationModel(RemunerationModel.OTHER);
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
-    form.setInvitationToTenderParticipants("test participant");
+    form.setInvitationToTenderParticipants(Collections.singletonList("test participant"));
 
     validator.validate(form, bindingResult, new ActualTenderFormValidatorHint(actualTender));
     var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
@@ -114,7 +117,7 @@ class ActualTenderActivityFormValidatorTest {
     form.setScopeDescription("test scope description");
     form.setRemunerationModel(RemunerationModel.LUMP_SUM);
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
-    form.setInvitationToTenderParticipants("test participant");
+    form.setInvitationToTenderParticipants(Collections.singletonList("test participant"));
     var existingActualTenderActivity = new ActualTenderActivity(156);
     existingActualTenderActivity.setScopeTitle("Test SCOPE title");
 
@@ -135,7 +138,7 @@ class ActualTenderActivityFormValidatorTest {
     form.setScopeDescription("test scope description");
     form.setRemunerationModel(RemunerationModel.LUMP_SUM);
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
-    form.setInvitationToTenderParticipants("test participant");
+    form.setInvitationToTenderParticipants(Collections.singletonList("test participant"));
     var existingActualTenderActivity = new ActualTenderActivity(156);
     existingActualTenderActivity.setScopeTitle("Test SCOPE title");
 
@@ -154,7 +157,7 @@ class ActualTenderActivityFormValidatorTest {
     form.setScopeDescription("test scope description");
     form.setRemunerationModel(RemunerationModel.LUMP_SUM);
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
-    form.setInvitationToTenderParticipants("test participant");
+    form.setInvitationToTenderParticipants(Collections.singletonList("test participant"));
     var existingActualTenderActivity = new ActualTenderActivity(156);
     existingActualTenderActivity.setScopeTitle("Test SCOPE title");
 
@@ -176,7 +179,7 @@ class ActualTenderActivityFormValidatorTest {
     form.setScopeDescription("test scope description");
     form.setRemunerationModel(RemunerationModel.LUMP_SUM);
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
-    form.setInvitationToTenderParticipants("test participant");
+    form.setInvitationToTenderParticipants(Collections.singletonList("test participant"));
     var existingActualTenderActivity = new ActualTenderActivity(156);
     existingActualTenderActivity.setScopeTitle("Test SCOPE title");
 
@@ -199,7 +202,7 @@ class ActualTenderActivityFormValidatorTest {
     form.setScopeDescription("test scope description");
     form.setRemunerationModel(RemunerationModel.LUMP_SUM);
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
-    form.setInvitationToTenderParticipants("test participant");
+    form.setInvitationToTenderParticipants(Collections.singletonList("test participant"));
 
     validator.validate(form, bindingResult, new ActualTenderFormValidatorHint(actualTender));
     var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);

@@ -13,15 +13,11 @@ import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 public class ActualTenderActivityService {
 
   private final ActualTenderActivityRepository actualTenderActivityRepository;
-  private final InvitationToTenderParticipantRepository invitationToTenderParticipantRepository;
   private final Clock clock;
 
   @Autowired
-  ActualTenderActivityService(ActualTenderActivityRepository actualTenderActivityRepository,
-                              InvitationToTenderParticipantRepository invitationToTenderParticipantRepository,
-                              Clock clock) {
+  ActualTenderActivityService(ActualTenderActivityRepository actualTenderActivityRepository, Clock clock) {
     this.actualTenderActivityRepository = actualTenderActivityRepository;
-    this.invitationToTenderParticipantRepository = invitationToTenderParticipantRepository;
     this.clock = clock;
   }
 
@@ -66,12 +62,7 @@ public class ActualTenderActivityService {
     actualTenderActivity.setRemunerationModelName(form.getRemunerationModelName().getInputValue());
     actualTenderActivity.setContractStage(form.getContractStage());
 
-    var invitationToTenderParticipant = new InvitationToTenderParticipant(actualTenderActivity, clock.instant());
-    invitationToTenderParticipant.setCompanyName(form.getInvitationToTenderParticipants().getInputValue());
-    var newInvitationToTenderParticipants = List.of(invitationToTenderParticipant);
-
     actualTenderActivityRepository.save(actualTenderActivity);
-    invitationToTenderParticipantRepository.saveAll(newInvitationToTenderParticipants);
   }
 
   @Transactional

@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.scap.actualtender.activity;
 
+import java.util.List;
 import uk.co.fivium.formlibrary.input.StringInput;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 
@@ -10,10 +11,9 @@ public class ActualTenderActivityForm {
   private RemunerationModel remunerationModel;
   private final StringInput remunerationModelName;
   private ContractStage contractStage;
-  private final StringInput invitationToTenderParticipants;
+  private List<String> invitationToTenderParticipants;
 
   public ActualTenderActivityForm() {
-    this.invitationToTenderParticipants = new StringInput("invitationToTenderParticipants", "Invitation to tender participants");
     this.scopeTitle = new StringInput("scopeTitle", "Scope title");
     this.scopeDescription = new StringInput("scopeDescription", "Scope description");
     this.remunerationModelName = new StringInput("remunerationModelName", "Remuneration model name");
@@ -59,11 +59,11 @@ public class ActualTenderActivityForm {
     this.contractStage = contractStage;
   }
 
-  public StringInput getInvitationToTenderParticipants() {
+  public List<String> getInvitationToTenderParticipants() {
     return invitationToTenderParticipants;
   }
 
-  public void setInvitationToTenderParticipants(String invitationToTenderParticipants) {
-    this.invitationToTenderParticipants.setInputValue(invitationToTenderParticipants);
+  public void setInvitationToTenderParticipants(List<String> invitationToTenderParticipants) {
+    this.invitationToTenderParticipants = invitationToTenderParticipants;
   }
 }

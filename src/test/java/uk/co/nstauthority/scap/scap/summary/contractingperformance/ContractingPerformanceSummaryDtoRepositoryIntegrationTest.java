@@ -78,12 +78,10 @@ class ContractingPerformanceSummaryDtoRepositoryIntegrationTest {
     entityManager.persistAndFlush(actualTenderActivity2);
     entityManager.persistAndFlush(otherActualTenderActivity);
 
-    contractor1 = new InvitationToTenderParticipant(actualTenderActivity1, Instant.now());
-    contractor1.setCompanyName("company name 1");
-    contractor2 = new InvitationToTenderParticipant(actualTenderActivity2, Instant.now());
-    contractor2.setCompanyName("company name 2");
+    contractor1 = new InvitationToTenderParticipant(actualTenderActivity1, Instant.now(), "company name 1");
+    contractor2 = new InvitationToTenderParticipant(actualTenderActivity2, Instant.now(), "company name 2");
     var otherContractor = new InvitationToTenderParticipant(otherActualTenderActivity,
-        Instant.now());
+        Instant.now(), "other company name");
 
     entityManager.persistAndFlush(contractor1);
     entityManager.persistAndFlush(contractor2);

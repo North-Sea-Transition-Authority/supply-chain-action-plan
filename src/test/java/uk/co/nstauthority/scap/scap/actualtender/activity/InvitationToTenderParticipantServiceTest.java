@@ -5,8 +5,10 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -21,17 +23,25 @@ class InvitationToTenderParticipantServiceTest {
   @Mock
   InvitationToTenderParticipantRepository invitationToTenderParticipantRepository;
 
+  @Mock
+  Clock clock;
+
   @InjectMocks
   InvitationToTenderParticipantService invitationToTenderParticipantService;
 
   @Captor
   ArgumentCaptor<List<InvitationToTenderParticipant>> participantListArgumentCaptor;
 
+  @Captor
+  ArgumentCaptor<Set<InvitationToTenderParticipant>> participantSetArgumentCaptor;
+
+  @Captor
+  ArgumentCaptor<Set<InvitationToTenderParticipant>> participantSetArgumentCaptor2;
+
   @Test
   void getInvitationToTenderParticipants() {
     var actualTenderActivity = new ActualTenderActivity(37);
-    var participant = new InvitationToTenderParticipant(actualTenderActivity, Instant.now());
-    participant.setCompanyName("test company name");
+    var participant = new InvitationToTenderParticipant(actualTenderActivity, Instant.now(), "test company name");
 
     when(invitationToTenderParticipantRepository.findAllByActualTenderActivity(actualTenderActivity))
         .thenReturn(List.of(participant));
@@ -45,11 +55,9 @@ class InvitationToTenderParticipantServiceTest {
   @Test
   void getBidParticipants() {
     var actualTenderActivity = new ActualTenderActivity(141);
-    var participant1 = new InvitationToTenderParticipant(actualTenderActivity, Instant.now());
-    participant1.setCompanyName("test company name");
+    var participant1 = new InvitationToTenderParticipant(actualTenderActivity, Instant.now(), "test company name");
     participant1.setBidParticipant(true);
-    var participant2 = new InvitationToTenderParticipant(actualTenderActivity, Instant.now());
-    participant2.setCompanyName("test company name");
+    var participant2 = new InvitationToTenderParticipant(actualTenderActivity, Instant.now(), "test company name");
     participant2.setBidParticipant(false);
 
     when(invitationToTenderParticipantRepository.findAllByActualTenderActivity(actualTenderActivity))
@@ -119,5 +127,44 @@ class InvitationToTenderParticipantServiceTest {
     var returnedParticipants = invitationToTenderParticipantService.getInvitationToTenderParticipantsForActivities(actualTenderingActivities);
 
     assertThat(returnedParticipants).isEqualTo(participants);
+  }
+
+  @Test
+  void updateInvitationToTenderParticipants_VerifySaveAndDelete() {
+    var actualTenderActivity = new ActualTenderActivityBuilder().build();
+    var keptParticipant = new InvitationToTenderParticipantBuilder()
+        .withActualTenderActivity(actualTenderActivity)
+        .withCompanyName("existing company name")
+        .build();
+    var removedParticipant = new InvitationToTenderParticipantBuilder()
+        .withActualTenderActivity(actualTenderActivity)
+        .withCompanyName("removed company name")
+        .build();
+    var addedParticipantName = "new company name";
+
+    var participantsFromForm = List.of(
+        keptParticipant.getCompanyName(),
+        addedParticipantName
+    );
+    var currentInstant = Instant.now();
+
+    when(clock.instant()).thenReturn(currentInstant);
+    when(invitationToTenderParticipantRepository.findAllByActualTenderActivity(actualTenderActivity))
+        .thenReturn(List.of(keptParticipant, removedParticipant));
+
+    invitationToTenderParticipantService.updateInvitationToTenderParticipants(actualTenderActivity, participantsFromForm);
+
+    verify(invitationToTenderParticipantRepository).saveAll(participantSetArgumentCaptor.capture());
+    verify(invitationToTenderParticipantRepository).deleteAll(participantSetArgumentCaptor2.capture());
+
+    assertThat(participantSetArgumentCaptor2.getValue()).containsExactly(
+        removedParticipant
+    );
+    assertThat(participantSetArgumentCaptor.getValue()).extracting(
+        InvitationToTenderParticipant::getCompanyName,
+        InvitationToTenderParticipant::getCreatedTimestamp
+    ).containsExactly(
+        tuple(addedParticipantName, currentInstant)
+    );
   }
 }

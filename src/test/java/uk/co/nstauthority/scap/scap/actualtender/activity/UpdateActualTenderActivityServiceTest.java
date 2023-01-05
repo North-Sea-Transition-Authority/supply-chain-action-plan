@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.actualtender.activity;
 
 import static org.mockito.Mockito.never;
 
+import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -74,7 +75,7 @@ class UpdateActualTenderActivityServiceTest {
     form.setRemunerationModel(RemunerationModel.OTHER);
     form.setRemunerationModelName("test remuneration model name");
     form.setContractStage(contractStage);
-    form.setInvitationToTenderParticipants("test ITT participant");
+    form.setInvitationToTenderParticipants(Collections.singletonList("test ITT participant"));
     return form;
   }
 }

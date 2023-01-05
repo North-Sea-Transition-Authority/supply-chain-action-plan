@@ -78,14 +78,14 @@ class ActualTenderActivityFormServiceTest {
         ActualTenderActivityForm::getRemunerationModel,
         form1 -> form1.getRemunerationModelName().getInputValue(),
         ActualTenderActivityForm::getContractStage,
-        form1 -> form1.getInvitationToTenderParticipants().getInputValue()
+        ActualTenderActivityForm::getInvitationToTenderParticipants
     ).containsExactly(
         actualTenderActivity.getScopeTitle(),
         actualTenderActivity.getScopeDescription(),
         actualTenderActivity.getRemunerationModel(),
         actualTenderActivity.getRemunerationModelName(),
         actualTenderActivity.getContractStage(),
-        invitationToTenderParticipant1.getCompanyName()
+        List.of(invitationToTenderParticipant1.getCompanyName())
     );
   }
 }

@@ -36,10 +36,12 @@ public class InvitationToTenderParticipant {
     this.id = id;
   }
 
-  public InvitationToTenderParticipant(ActualTenderActivity actualTenderActivity, Instant createdTimestamp) {
+  public InvitationToTenderParticipant(ActualTenderActivity actualTenderActivity, Instant createdTimestamp,
+                                       String companyName) {
     this.actualTenderActivity = actualTenderActivity;
     this.createdTimestamp = createdTimestamp;
     this.isBidParticipant = false;
+    this.companyName = companyName;
   }
 
   public Integer getId() {
@@ -66,6 +68,11 @@ public class InvitationToTenderParticipant {
 
   public Instant getCreatedTimestamp() {
     return createdTimestamp;
+  }
+
+  @VisibleForTesting
+  void setCreatedTimestamp(Instant createdTimestamp) {
+    this.createdTimestamp = createdTimestamp;
   }
 
   public Boolean getBidParticipant() {
