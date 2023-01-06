@@ -35,6 +35,8 @@ public class ScapDetail {
 
   private Integer createdByUserId;
 
+  private Instant submittedTimestamp;
+
   public ScapDetail() {
 
   }
@@ -100,5 +102,13 @@ public class ScapDetail {
 
   public Integer getCreatedByUserId() {
     return createdByUserId;
+  }
+
+  public Instant getSubmittedTimestamp() {
+    return submittedTimestamp;
+  }
+
+  public void setSubmittedTimestamp(Instant submittedTimestamp) {
+    this.submittedTimestamp = submittedTimestamp;
   }
 }

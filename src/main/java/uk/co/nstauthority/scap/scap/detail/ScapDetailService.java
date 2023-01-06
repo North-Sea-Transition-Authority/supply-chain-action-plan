@@ -64,6 +64,7 @@ public class ScapDetailService {
   @Transactional
   public void submitScap(ScapDetail scapDetail) {
     scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
+    scapDetail.setSubmittedTimestamp(clock.instant());
     scapDetailRepository.save(scapDetail);
   }
 }

@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.scap.organisationgroup;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,11 @@ import uk.co.nstauthority.scap.fds.searchselector.RestSearchResult;
 
 @Service
 public class OrganisationGroupService {
+
+  @VisibleForTesting
+  static final OrganisationGroupsProjectionRoot ORGANISATION_GROUPS_PROJECTION_ROOT =
+      new OrganisationGroupsProjectionRoot().organisationGroupId().name();
+
   private final OrganisationApi organisationApi;
 
   @Autowired
@@ -22,12 +28,9 @@ public class OrganisationGroupService {
   }
 
   public List<OrganisationGroup> getOrganisationGroupsByName(String name, String purpose) {
-    var organisationGroupFilter = new OrganisationGroupsProjectionRoot()
-        .organisationGroupId()
-        .name();
     var requestPurpose = new RequestPurpose(purpose);
 
-    return organisationApi.searchOrganisationGroups(name, organisationGroupFilter, requestPurpose);
+    return organisationApi.searchOrganisationGroups(name, ORGANISATION_GROUPS_PROJECTION_ROOT, requestPurpose);
   }
 
   public RestSearchResult organisationGroupsToSearchResult(List<OrganisationGroup> queryResults) {
@@ -45,6 +48,11 @@ public class OrganisationGroupService {
     var requestPurpose = new RequestPurpose(purpose);
 
     return organisationApi.findOrganisationGroup(id, organisationGroupFilter, requestPurpose);
+  }
+
+  public List<OrganisationGroup> getOrganisationGroupsByIds(List<Integer> ids, String purpose) {
+    var requestPurpose = new RequestPurpose(purpose);
+    return organisationApi.getAllOrganisationGroupsByIds(ids, ORGANISATION_GROUPS_PROJECTION_ROOT, requestPurpose);
   }
 
 }

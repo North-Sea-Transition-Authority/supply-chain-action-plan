@@ -2,7 +2,7 @@ package uk.co.nstauthority.scap.scap.summary;
 
 import uk.co.nstauthority.scap.enumutil.Displayable;
 
-enum ScapSubmissionStage implements Displayable {
+public enum ScapSubmissionStage implements Displayable {
   PROJECT_COMPLETED("Project completed", 10),
   CONTRACTING_PERFORMANCE("Contracting performance", 20),
   ACTUAL_TENDER("Actual tender", 30),

@@ -127,9 +127,11 @@ class ScapDetailServiceTest {
     verify(scapDetailRepository).save(argumentCaptor.capture());
 
     assertThat(argumentCaptor.getValue()).extracting(
-        ScapDetail::getStatus
-    ).isEqualTo(
-        ScapDetailStatus.SUBMITTED
+        ScapDetail::getStatus,
+        ScapDetail::getSubmittedTimestamp
+    ).containsExactly(
+        ScapDetailStatus.SUBMITTED,
+        clock.instant()
     );
   }
 

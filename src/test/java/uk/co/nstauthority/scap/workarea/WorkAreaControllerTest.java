@@ -12,28 +12,47 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.start.ScapStartController;
+import uk.co.nstauthority.scap.scap.summary.ScapSubmissionStage;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = WorkAreaController.class)
 @WithMockUser
 class WorkAreaControllerTest extends AbstractControllerTest {
 
+  @MockBean
+  WorkAreaService workAreaService;
+
   @Test
   void getWorkArea() throws Exception {
+    var workAreaItems = List.of(
+        new WorkAreaItem(
+            1,
+            1,
+            "ref",
+            "operator",
+            "projectName",
+            ScapDetailStatus.DRAFT,
+            ScapSubmissionStage.CONTRACTING_STRATEGY_PENDING
+        ));
+
+    when(workAreaService.getWorkAreaItems()).thenReturn(workAreaItems);
 
     mockMvc.perform(
         get(ReverseRouter.route(on(WorkAreaController.class).getWorkArea())))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/workarea/workArea"))
         .andExpect(model().attribute("startScapUrl",
-            ReverseRouter.route(on(ScapStartController.class).renderStartNewScap())));
+            ReverseRouter.route(on(ScapStartController.class).renderStartNewScap())))
+        .andExpect(model().attribute("workAreaItems", workAreaItems));
 
   }
 

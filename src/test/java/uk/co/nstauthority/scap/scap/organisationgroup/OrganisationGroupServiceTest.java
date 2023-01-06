@@ -126,4 +126,33 @@ class OrganisationGroupServiceTest {
             entry("organisationGroupId", null),
             entry("name", null));
   }
+
+  @Test
+  void getOrganisationGroupsByIds_VerifyApiCall() {
+    var purpose = "TEST: get organisation groups by IDs";
+    var argumentCaptor = ArgumentCaptor.forClass(RequestPurpose.class);
+    var organisationGroup = new OrganisationGroup(
+        55,
+        "CENTRICA",
+        null,
+        null,
+        null,
+        null
+    );
+
+    when(organisationApi.getAllOrganisationGroupsByIds(any(), any(), any()))
+        .thenReturn(List.of(organisationGroup));
+
+    var organisationGroups = organisationGroupService.getOrganisationGroupsByIds(
+        List.of(organisationGroup.getOrganisationGroupId()), purpose);
+
+    verify(organisationApi).getAllOrganisationGroupsByIds(
+        eq(List.of(organisationGroup.getOrganisationGroupId())),
+        eq(OrganisationGroupService.ORGANISATION_GROUPS_PROJECTION_ROOT),
+        argumentCaptor.capture()
+    );
+
+    assertThat(organisationGroups).containsExactly(organisationGroup);
+    assertThat(argumentCaptor.getValue().purpose()).isEqualTo(purpose);
+  }
 }
