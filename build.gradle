@@ -46,7 +46,7 @@ dependencies {
   implementation 'org.springframework.security:spring-security-saml2-service-provider'
   implementation 'org.springframework.session:spring-session-core'
 
-  implementation 'uk.co.fivium.digital.energyportalteamaccesslibrary:energy-portal-team-access-libray:1.0.0-20221027.105035-2'
+  implementation 'uk.co.fivium.digital.energyportalteamaccesslibrary:energy-portal-team-access-libray:develop-SNAPSHOT'
   implementation 'uk.co.fivium.digitalformlibrary:digital-form-library:v1.0.1'
   implementation 'uk.co.fivium.energyportalapi:client:v2.4.0'
 
