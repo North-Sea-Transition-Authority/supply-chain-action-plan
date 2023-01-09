@@ -105,8 +105,8 @@ class WorkAreaItemDtoRepositoryIntegrationTest {
   }
 
   @Test
-  void getAll() {
-    var workAreaItemDtoList = workAreaItemDtoRepository.getAll();
+  void getAllByScapStatusNotIn() {
+    var workAreaItemDtoList = workAreaItemDtoRepository.getAllByScapStatusNotIn(ScapDetailStatus.DRAFT);
 
     assertThat(workAreaItemDtoList).extracting(
         WorkAreaItemDto::scapId,
@@ -120,17 +120,6 @@ class WorkAreaItemDtoRepositoryIntegrationTest {
         WorkAreaItemDto::hasActualTender,
         WorkAreaItemDto::hasPlannedTender
     ).containsExactly(
-        tuple(
-            scap.getId(),
-            scapDetail.getVersionNumber(),
-            scap.getReference(),
-            projectDetails.getProjectName(),
-            scap.getOrganisationGroupId(),
-            scapDetail.getStatus(),
-            projectPerformance.getProjectCompleted(),
-            contractingPerformanceOverview.getHasContractingPerformance(),
-            actualTender.getHasActualTenders(),
-            plannedTender.getHasPlannedTenders()),
         tuple(
             otherOrganisationScap.getId(),
             otherScapDetail.getVersionNumber(),

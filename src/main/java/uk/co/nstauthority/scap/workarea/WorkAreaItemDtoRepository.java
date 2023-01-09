@@ -1,8 +1,8 @@
 package uk.co.nstauthority.scap.workarea;
 
 import static org.jooq.impl.DSL.field;
-import static org.jooq.impl.DSL.trueCondition;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.jooq.Condition;
@@ -10,6 +10,7 @@ import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import uk.co.nstauthority.scap.jooq.JooqService;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 
 @Repository
 class WorkAreaItemDtoRepository {
@@ -25,8 +26,10 @@ class WorkAreaItemDtoRepository {
 
   // Using trueCondition to get all results
   // TODO: SCAP2022-69, replace with filters for only SCAPs the regulator wants to see
-  List<WorkAreaItemDto> getAll() {
-    return performQuery(Collections.singletonList(trueCondition()));
+  List<WorkAreaItemDto> getAllByScapStatusNotIn(ScapDetailStatus... statuses) {
+    var statusStrings = Arrays.stream(statuses).map(ScapDetailStatus::getEnumName).toList();
+    var condition = field("sd.status").notIn(statusStrings);
+    return performQuery(Collections.singletonList(condition));
   }
 
   // Using in to get the results for the given organisation groups

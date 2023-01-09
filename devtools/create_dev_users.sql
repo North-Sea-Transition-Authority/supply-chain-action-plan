@@ -4,7 +4,8 @@
 SET SEARCH_PATH = 'scap';
 
 BEGIN TRANSACTION;
--- Create regulator team
+
+  -- Create regulator team
 
   INSERT INTO teams(uuid, type, display_name) VALUES ('00000000-0000-0000-0000-000000000000', 'REGULATOR', 'NSTA');
 

@@ -74,7 +74,7 @@ class WorkAreaServiceTest {
 
     when(userDetailService.getUserDetail()).thenReturn(userDetail);
     when(teamService.getTeamsThatUserBelongsTo(userDetail)).thenReturn(List.of(team));
-    when(workAreaItemDtoRepository.getAll()).thenReturn(List.of(workAreaItemDto));
+    when(workAreaItemDtoRepository.getAllByScapStatusNotIn(ScapDetailStatus.DRAFT)).thenReturn(List.of(workAreaItemDto));
     when(organisationGroupService.getOrganisationGroupsByIds(
         List.of(workAreaItemDto.organisationGroupId()), WorkAreaService.ORGANISATION_GROUPS_REQUEST_PURPOSE))
         .thenReturn(List.of(organisationGroup));
@@ -100,6 +100,7 @@ class WorkAreaServiceTest {
             ScapSubmissionStage.CONTRACTING_STRATEGY_PENDING
         )
     );
+    verify(workAreaItemDtoRepository, never()).getAllByOrganisationGroups(any());
   }
 
   @Test
@@ -151,6 +152,8 @@ class WorkAreaServiceTest {
             ScapSubmissionStage.CONTRACTING_STRATEGY_PENDING
         )
     );
+
+    verify(workAreaItemDtoRepository, never()).getAllByScapStatusNotIn(any());
   }
 
   @Test
@@ -216,7 +219,7 @@ class WorkAreaServiceTest {
 
     assertThat(views).isEmpty();
 
-    verify(workAreaItemDtoRepository, never()).getAll();
+    verify(workAreaItemDtoRepository, never()).getAllByScapStatusNotIn();
     verify(workAreaItemDtoRepository, never()).getAllByOrganisationGroups(any());
     verify(organisationGroupService, never()).getOrganisationGroupsByIds(any(), any());
   }

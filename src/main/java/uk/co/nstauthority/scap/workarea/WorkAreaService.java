@@ -15,6 +15,7 @@ import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.summary.ScapSubmissionStage;
 
@@ -40,18 +41,28 @@ class WorkAreaService {
   public List<WorkAreaItem> getWorkAreaItems() {
     var user = userDetailService.getUserDetail();
     var teams = teamService.getTeamsThatUserBelongsTo(user);
-    var regulatorTeam = teams.stream()
-        .filter(team -> TeamType.REGULATOR.equals(team.getTeamType()))
-        .findFirst();
-    List<WorkAreaItemDto> workAreaItemDtoList = regulatorTeam
-        .map(regTeam -> workAreaItemDtoRepository.getAll())
-        .orElseGet(() -> {
-          var organisationGroupIds = teams.stream().map(Team::getEnergyPortalOrgGroupId).toList();
-          if (organisationGroupIds.isEmpty()) {
-            return Collections.emptyList();
-          }
-          return workAreaItemDtoRepository.getAllByOrganisationGroups(organisationGroupIds);
-        });
+    var isRegulator = teams.stream()
+        .anyMatch(team -> TeamType.REGULATOR.equals(team.getTeamType()));
+
+    if (isRegulator) {
+      return getRegulatorWorkAreaItems();
+    }
+
+    return getIndustryWorkAreaItems(teams);
+  }
+
+  private List<WorkAreaItem> getRegulatorWorkAreaItems() {
+    var workAreaItemDtoList = workAreaItemDtoRepository.getAllByScapStatusNotIn(ScapDetailStatus.DRAFT);
+
+    return getItemsFromDtoList(workAreaItemDtoList);
+  }
+
+  private List<WorkAreaItem> getIndustryWorkAreaItems(List<Team> teams) {
+    var organisationGroupIds = teams.stream().map(Team::getEnergyPortalOrgGroupId).toList();
+    if (organisationGroupIds.isEmpty()) {
+      return Collections.emptyList();
+    }
+    var workAreaItemDtoList = workAreaItemDtoRepository.getAllByOrganisationGroups(organisationGroupIds);
     return getItemsFromDtoList(workAreaItemDtoList);
   }
 
