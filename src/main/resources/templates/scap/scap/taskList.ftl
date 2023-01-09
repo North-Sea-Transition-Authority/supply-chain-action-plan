@@ -5,6 +5,7 @@
 htmlTitle=pageTitle
 pageHeading=pageTitle
 pageSize=PageSize.TWO_THIRDS_COLUMN
+backLinkUrl=springUrl(backLinkUrl)
 >
   <@standardTaskList taskListSections=taskListSections />
 </@defaultPage>

@@ -16,7 +16,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
-import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = TaskListController.class)
@@ -35,8 +34,7 @@ class TaskListControllerTest extends AbstractControllerTest {
         get(ReverseRouter.route(on(TaskListController.class).renderTaskList(22))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/taskList"))
-        .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(WorkAreaController.class).getWorkArea())))
+        .andExpect(model().attribute("backLinkUrl", TaskListController.WORK_AREA_URL))
         .andExpect(model().attribute("taskListSections", Collections.emptyList()));
   }
 

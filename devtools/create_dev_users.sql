@@ -7,8 +7,6 @@ BEGIN TRANSACTION;
 
   -- Create regulator team
 
-  INSERT INTO teams(uuid, type, display_name) VALUES ('00000000-0000-0000-0000-000000000000', 'REGULATOR', 'NSTA');
-
   INSERT INTO team_member_roles VALUES (gen_random_uuid(), 53235, '00000000-0000-0000-0000-000000000000', 'ACCESS_MANAGER'),
                                        (gen_random_uuid(), 53236, '00000000-0000-0000-0000-000000000000', 'SCAP_VIEWER'),
                                        (gen_random_uuid(), 53237, '00000000-0000-0000-0000-000000000000', 'SCAP_CASE_OFFICER'),

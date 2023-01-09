@@ -17,6 +17,8 @@ import uk.co.nstauthority.scap.workarea.WorkAreaController;
 @RequestMapping("/{scapOverviewId}/tasks")
 public class TaskListController {
 
+  static final String WORK_AREA_URL = ReverseRouter.route(on(WorkAreaController.class).getWorkArea());
+
   private final List<ScapTaskListSection> scapTaskListSections;
   private final List<ScapTaskListItem> scapTaskListItems;
 
@@ -30,7 +32,7 @@ public class TaskListController {
   public ModelAndView renderTaskList(@PathVariable("scapOverviewId") Integer scapId) {
 
     return new ModelAndView("scap/scap/taskList")
-        .addObject("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea()))
+        .addObject("backLinkUrl", WORK_AREA_URL)
         .addObject("taskListSections", TaskListSectionUtil.createSectionViews(scapTaskListSections, scapTaskListItems, scapId));
   }
 
