@@ -13,17 +13,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTender;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderController;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderService;
 import uk.co.nstauthority.scap.scap.plannedtender.hasplannedtender.HasPlannedTenderController;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 
 @Controller
 @RequestMapping("{scapId}/planned-tender/activity")
+@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
 public class PlannedTenderActivityController {
 
   private final ScapService scapService;
@@ -48,7 +52,7 @@ public class PlannedTenderActivityController {
   }
 
   @GetMapping
-  public ModelAndView renderPlannedTenderDetailForm(@PathVariable("scapId") Integer scapId,
+  public ModelAndView renderPlannedTenderDetailForm(@PathVariable("scapId") ScapId scapId,
                                                     @ModelAttribute("form") PlannedTenderActivityForm form) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
@@ -59,7 +63,7 @@ public class PlannedTenderActivityController {
   }
 
   @PostMapping
-  public ModelAndView savePlannedTenderDetailForm(@PathVariable("scapId") Integer scapId,
+  public ModelAndView savePlannedTenderDetailForm(@PathVariable("scapId") ScapId scapId,
                                                   @ModelAttribute("form") PlannedTenderActivityForm form,
                                                   BindingResult bindingResult) {
     bindingResult = plannedTenderActivityFormService.validate(bindingResult, form);
@@ -76,14 +80,14 @@ public class PlannedTenderActivityController {
     return ReverseRouter.redirect(on(PlannedTenderController.class).renderPlannedTenderActivities(scapId));
   }
 
-  private String getBackLinkUrl(Integer scapId, PlannedTender plannedTender) {
+  private String getBackLinkUrl(ScapId scapId, PlannedTender plannedTender) {
     if (plannedTenderActivityService.hasExistingTenderDetails(plannedTender)) {
       return ReverseRouter.route(on(PlannedTenderController.class).renderPlannedTenderActivities(scapId));
     }
     return ReverseRouter.route(on(HasPlannedTenderController.class).renderHasPlannedTenderActivityForm(scapId));
   }
 
-  private ModelAndView plannedTenderDetailFormModelAndView(Integer scapId, String backLinkUrl) {
+  private ModelAndView plannedTenderDetailFormModelAndView(ScapId scapId, String backLinkUrl) {
     return new ModelAndView("scap/scap/plannedtender/plannedTenderActivityDetails")
         .addObject("backLinkUrl", backLinkUrl)
         .addObject("submitPostUrl",

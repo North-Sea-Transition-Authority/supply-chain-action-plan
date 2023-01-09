@@ -8,6 +8,7 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.plannedtender.hasplannedtender.HasPlannedTenderController;
 import uk.co.nstauthority.scap.scap.scap.ScapFormTaskListSection;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.tasklist.ScapTaskListItem;
 import uk.co.nstauthority.scap.tasklist.TaskListSection;
@@ -35,7 +36,7 @@ public class PlannedTenderTaskListItem implements ScapTaskListItem {
 
   @Override
   public String getActionUrl(Integer target) {
-    return ReverseRouter.route(on(HasPlannedTenderController.class).renderHasPlannedTenderActivityForm(target));
+    return ReverseRouter.route(on(HasPlannedTenderController.class).renderHasPlannedTenderActivityForm(new ScapId(target)));
   }
 
   @Override

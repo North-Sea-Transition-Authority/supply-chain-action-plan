@@ -24,7 +24,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
@@ -35,15 +35,13 @@ import uk.co.nstauthority.scap.scap.plannedtender.PlannedTender;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderController;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderService;
 import uk.co.nstauthority.scap.scap.plannedtender.hasplannedtender.HasPlannedTenderController;
-import uk.co.nstauthority.scap.scap.scap.Scap;
-import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.utils.EntityTestingUtil;
 import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = PlannedTenderActivityController.class)
 @WithMockUser
-class PlannedTenderActivityControllerTest extends AbstractControllerTest {
+class PlannedTenderActivityControllerTest extends AbstractScapSubmitterControllerTest {
 
   @MockBean
   ScapDetailService scapDetailService;
@@ -59,60 +57,55 @@ class PlannedTenderActivityControllerTest extends AbstractControllerTest {
 
   @MockBean
   ValidationErrorOrderingService validationErrorOrderingService;
-
-  private Scap scap;
   private ScapDetail scapDetail;
   private PlannedTender plannedTender;
 
+
   @BeforeEach
   void setup() {
-    scap = new Scap(1664);
     scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, EntityTestingUtil.dateToInstant(2000, 4, 23), 1);
     plannedTender = new PlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 4, 23));
   }
 
   @Test
   void renderPlannedTenderDetailForm() throws Exception {
-    when(scapService.getScapById(32)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail)).thenReturn(plannedTender);
     when(plannedTenderActivityService.hasExistingTenderDetails(plannedTender)).thenReturn(false);
 
     mockMvc.perform(
         get(ReverseRouter.route(on(PlannedTenderActivityController.class)
-            .renderPlannedTenderDetailForm(32, null))))
+            .renderPlannedTenderDetailForm(SCAP_ID, null))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/plannedtender/plannedTenderActivityDetails"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(HasPlannedTenderController.class).renderHasPlannedTenderActivityForm(32))))
+            ReverseRouter.route(on(HasPlannedTenderController.class).renderHasPlannedTenderActivityForm(SCAP_ID))))
         .andExpect(model().attribute("submitPostUrl",
             ReverseRouter.route(on(PlannedTenderActivityController.class)
-                .savePlannedTenderDetailForm(32, null, emptyBindingResult()))))
+                .savePlannedTenderDetailForm(SCAP_ID, null, emptyBindingResult()))))
         .andExpect(model().attribute("remunerationModels", RemunerationModel.getRemunerationModels()));
   }
 
   @Test
   void renderPlannedTenderDetailForm_noScapDetail_expectNotFound() throws Exception {
-    when(scapService.getScapById(33)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap))
         .thenThrow(new ScapEntityNotFoundException("No scap detail found for SCAP with ID [33]"));
 
     mockMvc.perform(
         get(ReverseRouter.route(on(PlannedTenderActivityController.class)
-            .renderPlannedTenderDetailForm(33, null))))
+            .renderPlannedTenderDetailForm(SCAP_ID, null))))
         .andExpect(status().isNotFound());
   }
 
   @Test
   void renderPlannedTenderDetailForm_noScapPlannedTender_expectNotFound() throws Exception {
-    when(scapService.getScapById(34)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
-        .thenThrow(new ScapEntityNotFoundException("No scap planned tender found for SCAP with ID [34]"));
+        .thenThrow(new ScapEntityNotFoundException("No scap planned tender found for SCAP with ID [32]"));
 
     mockMvc.perform(
             get(ReverseRouter.route(on(PlannedTenderActivityController.class)
-                .renderPlannedTenderDetailForm(34, null))))
+                .renderPlannedTenderDetailForm(SCAP_ID, null))))
         .andExpect(status().isNotFound());
   }
 
@@ -120,9 +113,8 @@ class PlannedTenderActivityControllerTest extends AbstractControllerTest {
   void savePlannedTenderDetailForm_valid_verifySaves() throws Exception {
     var form = new PlannedTenderActivityForm();
     var expectedRedirectUrl = ReverseRouter.route(on(PlannedTenderController.class)
-        .renderPlannedTenderActivities(34));
+        .renderPlannedTenderActivities(SCAP_ID));
 
-    when(scapService.getScapById(34)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail)).thenReturn(plannedTender);
     when(plannedTenderActivityFormService.validate(any(BindingResult.class), eq(form)))
@@ -130,7 +122,7 @@ class PlannedTenderActivityControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
         post(ReverseRouter.route(on(PlannedTenderActivityController.class)
-            .savePlannedTenderDetailForm(34, null, emptyBindingResult())))
+            .savePlannedTenderDetailForm(SCAP_ID, null, emptyBindingResult())))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().is3xxRedirection())
@@ -146,7 +138,6 @@ class PlannedTenderActivityControllerTest extends AbstractControllerTest {
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("form", "scopeDescription.inputValue", "Required"));
 
-    when(scapService.getScapById(35)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail)).thenReturn(plannedTender);
     when(plannedTenderActivityFormService.validate(any(BindingResult.class), eq(form)))
@@ -154,17 +145,17 @@ class PlannedTenderActivityControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
             post(ReverseRouter.route(on(PlannedTenderActivityController.class)
-                .savePlannedTenderDetailForm(35, null, emptyBindingResult())))
+                .savePlannedTenderDetailForm(SCAP_ID, null, emptyBindingResult())))
                 .with(csrf())
                 .flashAttr("form", form))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/plannedtender/plannedTenderActivityDetails"))
         .andExpect(model().attributeExists("errorItems"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(HasPlannedTenderController.class).renderHasPlannedTenderActivityForm(35))))
+            ReverseRouter.route(on(HasPlannedTenderController.class).renderHasPlannedTenderActivityForm(SCAP_ID))))
         .andExpect(model().attribute("submitPostUrl",
             ReverseRouter.route(on(PlannedTenderActivityController.class)
-                .savePlannedTenderDetailForm(35, null, emptyBindingResult()))))
+                .savePlannedTenderDetailForm(SCAP_ID, null, emptyBindingResult()))))
         .andExpect(model().attribute("remunerationModels", RemunerationModel.getRemunerationModels()));
 
     verify(plannedTenderActivityService, never()).createPlannedTenderDetail(any(), any());
@@ -174,13 +165,12 @@ class PlannedTenderActivityControllerTest extends AbstractControllerTest {
   void savePlannedTenderDetailForm_noScapDetail_expectNotFound() throws Exception {
     var form = new PlannedTenderActivityForm();
 
-    when(scapService.getScapById(36)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap))
         .thenThrow(new ScapEntityNotFoundException("No scap detail found for SCAP with ID [36]"));
 
     mockMvc.perform(
         post(ReverseRouter.route(on(PlannedTenderActivityController.class)
-            .savePlannedTenderDetailForm(36, null, emptyBindingResult())))
+            .savePlannedTenderDetailForm(SCAP_ID, null, emptyBindingResult())))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().isNotFound());
@@ -192,14 +182,13 @@ class PlannedTenderActivityControllerTest extends AbstractControllerTest {
   void savePlannedTenderDetailForm_noPlannedTender_expectNotFound() throws Exception {
     var form = new PlannedTenderActivityForm();
 
-    when(scapService.getScapById(37)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
         .thenThrow(new ScapEntityNotFoundException("No scap planned tender found for SCAP with ID [37]"));
 
     mockMvc.perform(
             post(ReverseRouter.route(on(PlannedTenderActivityController.class)
-                .savePlannedTenderDetailForm(37, null, emptyBindingResult())))
+                .savePlannedTenderDetailForm(SCAP_ID, null, emptyBindingResult())))
                 .with(csrf())
                 .flashAttr("form", form))
         .andExpect(status().isNotFound());

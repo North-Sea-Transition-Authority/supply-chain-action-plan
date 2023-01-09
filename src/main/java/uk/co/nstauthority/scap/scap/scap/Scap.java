@@ -43,6 +43,10 @@ public class Scap {
     return id;
   }
 
+  public ScapId getScapId() {
+    return new ScapId(id);
+  }
+
   public Instant getCreatedTimestamp() {
     return createdTimestamp;
   }

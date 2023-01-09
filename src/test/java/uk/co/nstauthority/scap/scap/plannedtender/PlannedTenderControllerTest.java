@@ -42,7 +42,6 @@ import uk.co.nstauthority.scap.scap.plannedtender.hasplannedtender.HasPlannedTen
 import uk.co.nstauthority.scap.scap.plannedtender.list.PlannedTenderActivityListItem;
 import uk.co.nstauthority.scap.scap.plannedtender.list.PlannedTenderActivityListService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
-import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.utils.EntityTestingUtil;
 
@@ -104,18 +103,18 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
     );
     var form = new PlannedTenderForm();
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapService.getScapById(scap.getScapId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
         .thenReturn(plannedTender);
     when(plannedTenderActivityService.getTenderDetailsByPlannedTender(plannedTender))
         .thenReturn(existingTenderDetails);
-    when(plannedTenderActivityListService.plannedTenderDetailsToListItems(scap.getId(), existingTenderDetails))
+    when(plannedTenderActivityListService.plannedTenderDetailsToListItems(scap.getScapId(), existingTenderDetails))
         .thenReturn(listItems);
     when(plannedTenderFormService.getForm(plannedTender)).thenReturn(form);
 
     mockMvc.perform(
-        get(ReverseRouter.route(on(PlannedTenderController.class).renderPlannedTenderActivities(scap.getId()))))
+        get(ReverseRouter.route(on(PlannedTenderController.class).renderPlannedTenderActivities(scap.getScapId()))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/plannedtender/plannedTenderActivityList"))
         .andExpect(model().attribute("backLinkUrl",
@@ -128,7 +127,7 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
   @Test
   void renderPlannedTenderActivities_noActivityDetails_expectRedirection() throws Exception {
     var expectedRedirectUrl = ReverseRouter.route(on(HasPlannedTenderController.class)
-        .renderHasPlannedTenderActivityForm(scap.getId()));
+        .renderHasPlannedTenderActivityForm(scap.getScapId()));
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
@@ -138,7 +137,7 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
         .thenReturn(Collections.emptyList());
 
     mockMvc.perform(
-        get(ReverseRouter.route(on(PlannedTenderController.class).renderPlannedTenderActivities(scap.getId()))))
+        get(ReverseRouter.route(on(PlannedTenderController.class).renderPlannedTenderActivities(scap.getScapId()))))
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
   }
@@ -149,7 +148,7 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
     form.setHasMorePlannedTenderActivities(HasMorePlannedTenderActivities.YES_NOW);
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     var expectedRedirectUrl = ReverseRouter.route(on(PlannedTenderActivityController.class)
-            .renderPlannedTenderDetailForm(scap.getId(), null));
+            .renderPlannedTenderDetailForm(scap.getScapId(), null));
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
@@ -163,7 +162,7 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
     mockMvc.perform(
         post(
             ReverseRouter.route(on(PlannedTenderController.class)
-                .saveAnotherPlannedTenderActivity(scap.getId(), null, emptyBindingResult())))
+                .saveAnotherPlannedTenderActivity(scap.getScapId(), null, emptyBindingResult())))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().is3xxRedirection())
@@ -180,7 +179,7 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()));
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapService.getScapById(scap.getScapId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
         .thenReturn(plannedTender);
@@ -192,7 +191,7 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
     mockMvc.perform(
             post(
                 ReverseRouter.route(on(PlannedTenderController.class)
-                    .saveAnotherPlannedTenderActivity(scap.getId(), null, emptyBindingResult())))
+                    .saveAnotherPlannedTenderActivity(scap.getScapId(), null, emptyBindingResult())))
                 .with(csrf())
                 .flashAttr("form", form))
         .andExpect(status().is3xxRedirection())
@@ -209,7 +208,7 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()));
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapService.getScapById(scap.getScapId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
         .thenReturn(plannedTender);
@@ -221,7 +220,7 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
     mockMvc.perform(
         post(
             ReverseRouter.route(on(PlannedTenderController.class)
-                .saveAnotherPlannedTenderActivity(scap.getId(), null, emptyBindingResult())))
+                .saveAnotherPlannedTenderActivity(scap.getScapId(), null, emptyBindingResult())))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().is3xxRedirection())
@@ -251,7 +250,7 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
     mockMvc.perform(
             post(
                 ReverseRouter.route(on(PlannedTenderController.class)
-                    .saveAnotherPlannedTenderActivity(scap.getId(), null, emptyBindingResult())))
+                    .saveAnotherPlannedTenderActivity(scap.getScapId(), null, emptyBindingResult())))
                 .with(csrf())
                 .flashAttr("form", form))
         .andExpect(status().isOk())

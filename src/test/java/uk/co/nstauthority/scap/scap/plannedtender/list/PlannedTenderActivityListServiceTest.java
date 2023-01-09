@@ -13,6 +13,7 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivity;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.delete.DeletePlannedTenderActivityController;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.update.UpdatePlannedTenderActivityController;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @ExtendWith(MockitoExtension.class)
 class PlannedTenderActivityListServiceTest {
@@ -26,7 +27,7 @@ class PlannedTenderActivityListServiceTest {
 
   @Test
   void plannedTenderDetailsToListItems() {
-    var scapId = 17;
+    var scapId = new ScapId(17);
     var detail1 = new PlannedTenderActivity(22);
     var detail2 = new PlannedTenderActivity(23);
     var plannedTenderDetails = List.of(detail1, detail2);

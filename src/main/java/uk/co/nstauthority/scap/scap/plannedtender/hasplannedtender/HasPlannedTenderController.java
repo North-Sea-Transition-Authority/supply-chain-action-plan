@@ -19,6 +19,7 @@ import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderController;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderService;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityController;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityService;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
@@ -50,7 +51,7 @@ public class HasPlannedTenderController {
   }
 
   @GetMapping
-  public ModelAndView renderHasPlannedTenderActivityForm(@PathVariable("scapId") Integer scapId) {
+  public ModelAndView renderHasPlannedTenderActivityForm(@PathVariable("scapId") ScapId scapId) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
     var form = hasPlannedTenderFormService.getForm(scapDetail);
@@ -62,7 +63,7 @@ public class HasPlannedTenderController {
   }
 
   @PostMapping
-  public ModelAndView saveHasPlannedTenderActivity(@PathVariable("scapId") Integer scapId,
+  public ModelAndView saveHasPlannedTenderActivity(@PathVariable("scapId") ScapId scapId,
                                                    @ModelAttribute("form") HasPlannedTenderForm form,
                                                    BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
@@ -83,16 +84,17 @@ public class HasPlannedTenderController {
         .orElseGet(() -> plannedTenderService.createPlannedTenderForScapDetail(scapDetail));
     if (YesNo.NO.equals(form.getHasPlannedTender())) {
       plannedTenderService.updatePlannedTenderHasPlannedTenders(plannedTender, false);
-      return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
+      return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId.scapId()));
     }
 
     plannedTenderService.updatePlannedTenderHasPlannedTenders(plannedTender, true);
     return ReverseRouter.redirect(on(PlannedTenderActivityController.class).renderPlannedTenderDetailForm(scapId, null));
   }
 
-  private ModelAndView hasPlannedTenderActivityModelAndView(Integer scapId, HasPlannedTenderForm form) {
+  private ModelAndView hasPlannedTenderActivityModelAndView(ScapId scapId, HasPlannedTenderForm form) {
     return new ModelAndView("scap/scap/plannedtender/hasPlannedTender")
-        .addObject("backLinkUrl", ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
+        .addObject("backLinkUrl",
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId.scapId())))
         .addObject("hasPlannedTender", YesNo.getRadioOptions())
         .addObject("form", form)
         .addObject("submitPostUrl",

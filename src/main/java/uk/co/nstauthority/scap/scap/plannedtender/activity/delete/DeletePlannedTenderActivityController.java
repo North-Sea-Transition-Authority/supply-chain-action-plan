@@ -11,17 +11,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderController;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderService;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivity;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityService;
 import uk.co.nstauthority.scap.scap.plannedtender.hasplannedtender.HasPlannedTenderController;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.util.DeletionSuccessBannerUtil;
 
 @Controller
 @RequestMapping("{scapId}/planned-tender/{plannedTenderDetailId}/delete")
+@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
 public class DeletePlannedTenderActivityController {
 
   private final ScapService scapService;
@@ -40,7 +44,7 @@ public class DeletePlannedTenderActivityController {
   }
 
   @GetMapping
-  public ModelAndView renderPlannedTenderRemoval(@PathVariable("scapId") Integer scapId,
+  public ModelAndView renderPlannedTenderRemoval(@PathVariable("scapId") ScapId scapId,
                                                  @PathVariable("plannedTenderDetailId") Integer plannedTenderDetailId) {
     scapService.getScapById(scapId);
     var plannedTenderDetail = plannedTenderActivityService.getPlannedTenderDetailById(plannedTenderDetailId);
@@ -48,7 +52,7 @@ public class DeletePlannedTenderActivityController {
   }
 
   @PostMapping
-  public ModelAndView deletePlannedTenderDetail(@PathVariable("scapId") Integer scapId,
+  public ModelAndView deletePlannedTenderDetail(@PathVariable("scapId") ScapId scapId,
                                                 @PathVariable("plannedTenderDetailId") Integer plannedTenderDetailId,
                                                 RedirectAttributes redirectAttributes) {
     var scap = scapService.getScapById(scapId);
@@ -66,7 +70,7 @@ public class DeletePlannedTenderActivityController {
     return ReverseRouter.redirect(on(HasPlannedTenderController.class).renderHasPlannedTenderActivityForm(scapId));
   }
 
-  private ModelAndView plannedTenderRemovalModelAndView(Integer scapId, PlannedTenderActivity plannedTenderDetail) {
+  private ModelAndView plannedTenderRemovalModelAndView(ScapId scapId, PlannedTenderActivity plannedTenderDetail) {
     return new ModelAndView("scap/scap/plannedtender/plannedTenderActivityDelete")
         .addObject("backLinkUrl",
             ReverseRouter.route(on(PlannedTenderController.class).renderPlannedTenderActivities(scapId)))

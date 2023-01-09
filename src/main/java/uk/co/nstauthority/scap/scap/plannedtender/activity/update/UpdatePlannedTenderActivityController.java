@@ -12,15 +12,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderController;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityForm;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityFormService;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityService;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 
 @Controller
 @RequestMapping("{scapId}/planned-tender/{plannedTenderDetailId}/update")
+@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
 public class UpdatePlannedTenderActivityController {
 
   private final ScapService scapService;
@@ -37,7 +41,7 @@ public class UpdatePlannedTenderActivityController {
   }
 
   @GetMapping
-  public ModelAndView renderUpdatePlannedTenderDetail(@PathVariable("scapId") Integer scapId,
+  public ModelAndView renderUpdatePlannedTenderDetail(@PathVariable("scapId") ScapId scapId,
                                                       @PathVariable("plannedTenderDetailId") Integer plannedTenderDetailId) {
     scapService.getScapById(scapId);
     var plannedTenderDetail = plannedTenderActivityService.getPlannedTenderDetailById(plannedTenderDetailId);
@@ -47,7 +51,7 @@ public class UpdatePlannedTenderActivityController {
   }
 
   @PostMapping
-  public ModelAndView saveUpdatedPlannedTenderDetail(@PathVariable("scapId") Integer scapId,
+  public ModelAndView saveUpdatedPlannedTenderDetail(@PathVariable("scapId") ScapId scapId,
                                                     @PathVariable("plannedTenderDetailId") Integer plannedTenderDetailId,
                                                     @ModelAttribute("form") PlannedTenderActivityForm form,
                                                     BindingResult bindingResult) {
@@ -67,7 +71,7 @@ public class UpdatePlannedTenderActivityController {
   }
 
 
-  private ModelAndView plannedTenderDetailFormModelAndView(Integer scapId, PlannedTenderActivityForm form) {
+  private ModelAndView plannedTenderDetailFormModelAndView(ScapId scapId, PlannedTenderActivityForm form) {
     return new ModelAndView("scap/scap/plannedtender/plannedTenderActivityDetails")
         .addObject("backLinkUrl",
             ReverseRouter.route(on(PlannedTenderController.class).renderPlannedTenderActivities(scapId)))

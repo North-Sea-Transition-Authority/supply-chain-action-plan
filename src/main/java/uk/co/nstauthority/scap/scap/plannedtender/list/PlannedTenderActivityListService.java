@@ -8,11 +8,12 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivity;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.delete.DeletePlannedTenderActivityController;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.update.UpdatePlannedTenderActivityController;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @Service
 public class PlannedTenderActivityListService {
 
-  public List<PlannedTenderActivityListItem> plannedTenderDetailsToListItems(Integer scapId,
+  public List<PlannedTenderActivityListItem> plannedTenderDetailsToListItems(ScapId scapId,
                                                                              List<PlannedTenderActivity> details) {
     return details.stream()
         .map(scapPlannedTenderDetail -> new PlannedTenderActivityListItem(scapPlannedTenderDetail,
