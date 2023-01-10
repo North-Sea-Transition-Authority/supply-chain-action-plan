@@ -1,5 +1,7 @@
 package uk.co.nstauthority.scap.scap.submit;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,9 +30,11 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.Scap;
-import uk.co.nstauthority.scap.scap.scap.ScapService;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
+import uk.co.nstauthority.scap.scap.timeline.TimelineEventService;
+import uk.co.nstauthority.scap.scap.timeline.TimelineEventSubject;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,6 +51,9 @@ class ScapSubmissionControllerTest extends AbstractControllerTest {
 
   @MockBean
   ScapSummaryViewService scapSummaryViewService;
+
+  @MockBean
+  TimelineEventService timelineEventService;
 
   @BeforeEach
   void setup() {
@@ -81,7 +88,7 @@ class ScapSubmissionControllerTest extends AbstractControllerTest {
   }
 
   @Test
-  void submitScap_VerifySubmits() throws Exception {
+  void submitScap_VerifySubmitsAndRecords() throws Exception {
     var expectedRedirectUrl = ReverseRouter.route(on(ScapSubmissionController.class)
         .renderScapSubmissionSuccess(scapId));
 
@@ -94,6 +101,9 @@ class ScapSubmissionControllerTest extends AbstractControllerTest {
         .andExpect(redirectedUrl(expectedRedirectUrl));
 
     verify(scapDetailService).submitScap(scapDetail);
+    verify(timelineEventService).recordNewEvent(eq(TimelineEventSubject.SCAP_SUBMITTED),
+        any(ScapId.class),
+        eq(scapDetail.getVersionNumber()));
   }
 
   @Test

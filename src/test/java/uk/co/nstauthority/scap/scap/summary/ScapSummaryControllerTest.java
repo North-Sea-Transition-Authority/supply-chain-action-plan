@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
@@ -28,8 +29,10 @@ import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetails;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryView;
 import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderSummaryView;
+import uk.co.nstauthority.scap.scap.timeline.TimelineEventService;
 
 @ContextConfiguration(classes = ScapSummaryController.class)
 class ScapSummaryControllerTest extends AbstractControllerTest {
@@ -46,7 +49,13 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
   @MockBean
   OrganisationGroupService organisationGroupService;
 
-  private static Integer SCAP_ID = 1000;
+  @MockBean
+  TimelineEventService timelineEventService;
+
+  @MockBean
+  EnergyPortalUserService energyPortalUserService;
+
+  private static ScapId SCAP_ID = new ScapId(1000);
 
   @Test
   void renderSummary_fullSCAPDetails() throws Exception {
@@ -60,7 +69,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     var projectDetails = new ProjectDetails();
     projectDetails.setFieldName("TESTING FIELD");
 
-    when(scapDetailService.getLatestScapDetailByScapId(SCAP_ID)).thenReturn(Optional.of(detail));
+    when(scapDetailService.getLatestScapDetailByScapId(SCAP_ID.scapId())).thenReturn(Optional.of(detail));
     when(projectDetailsService.getProjectDetails(detail)).thenReturn(Optional.of(projectDetails));
     when(scapSummaryViewService.getScapSummaryView(detail)).thenReturn(getSummaryView());
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);

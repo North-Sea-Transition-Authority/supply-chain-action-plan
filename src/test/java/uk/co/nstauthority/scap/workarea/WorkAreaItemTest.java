@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSubmissionStage;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
@@ -42,7 +43,8 @@ class WorkAreaItemTest {
         ScapDetailStatus.DRAFT,
         ScapSubmissionStage.CONTRACTING_STRATEGY_PENDING
     );
-    var expectedUrl = ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(workAreaItem.scapId()));
+    var expectedUrl = ReverseRouter.route(on(ScapSummaryController.class)
+        .getScapSummary(new ScapId(workAreaItem.scapId())));
 
     assertThat(workAreaItem.url()).isEqualTo(expectedUrl);
   }
@@ -58,7 +60,8 @@ class WorkAreaItemTest {
         ScapDetailStatus.SUBMITTED,
         ScapSubmissionStage.CONTRACTING_STRATEGY_PENDING
     );
-    var expectedUrl = ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(workAreaItem.scapId()));
+    var expectedUrl = ReverseRouter.route(on(ScapSummaryController.class)
+        .getScapSummary(new ScapId(workAreaItem.scapId())));
 
     assertThat(workAreaItem.url()).isEqualTo(expectedUrl);
   }
@@ -74,7 +77,8 @@ class WorkAreaItemTest {
         ScapDetailStatus.SUBMITTED,
         ScapSubmissionStage.CONTRACTING_STRATEGY_PENDING
     );
-    var expectedUrl = ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(workAreaItem.scapId()));
+    var expectedUrl = ReverseRouter.route(on(ScapSummaryController.class)
+        .getScapSummary(new ScapId(workAreaItem.scapId())));
 
     assertThat(workAreaItem.url()).isEqualTo(expectedUrl);
   }

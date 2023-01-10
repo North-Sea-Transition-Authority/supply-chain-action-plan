@@ -22,7 +22,7 @@ public enum IndustryTeamRole implements TeamRole {
   ),
   SCAP_VIEWER(
       "SCAP viewer",
-      "can view an open SCAP",
+      "Can view an open SCAP",
       40,
       EnumSet.of(RolePermission.VIEW_SCAP)
   );
