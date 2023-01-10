@@ -17,7 +17,7 @@ import uk.co.nstauthority.scap.scap.scap.ScapId;
 @ExtendWith(MockitoExtension.class)
 class ContractingPerformanceSummaryViewTest {
 
-  private Integer scapId;
+  private ScapId scapId;
   private ContractingPerformanceSummaryView contractingPerformanceSummaryView;
 
   private static final ScapId SCAP_ID = new ScapId(51);

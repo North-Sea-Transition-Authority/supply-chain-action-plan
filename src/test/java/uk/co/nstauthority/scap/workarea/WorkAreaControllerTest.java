@@ -20,6 +20,7 @@ import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.start.ScapStartController;
 import uk.co.nstauthority.scap.scap.summary.ScapSubmissionStage;
 
@@ -35,7 +36,7 @@ class WorkAreaControllerTest extends AbstractControllerTest {
   void getWorkArea() throws Exception {
     var workAreaItems = List.of(
         new WorkAreaItem(
-            1,
+            new ScapId(1),
             1,
             "ref",
             "operator",

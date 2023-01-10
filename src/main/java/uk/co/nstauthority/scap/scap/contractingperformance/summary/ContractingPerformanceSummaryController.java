@@ -96,7 +96,7 @@ public class ContractingPerformanceSummaryController {
           }
           contractingPerformanceOverviewService.updateHasMoreContractingPerformance(
               contractingPerformanceOverview, form.getHasMoreContractingPerformance());
-          return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId.scapId()));
+          return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
         }
     );
   }
@@ -104,7 +104,7 @@ public class ContractingPerformanceSummaryController {
   private ModelAndView contractingPerformanceSummaryModelAndView(ScapId scapId,
                                                                  List<ContractingPerformanceSummaryView> summaryViews) {
     return new ModelAndView("scap/scap/contractingperformance/contractingPerformanceSummary")
-        .addObject("backLinkUrl", ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId.scapId())))
+        .addObject("backLinkUrl", ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
         .addObject("summaryViews", summaryViews)
         .addObject("radioItems", HasMoreContractingPerformance.getRadioItems());
   }

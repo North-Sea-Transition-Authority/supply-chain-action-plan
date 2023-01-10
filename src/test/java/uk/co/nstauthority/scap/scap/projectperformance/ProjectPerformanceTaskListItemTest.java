@@ -22,6 +22,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapFormTaskListSection;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,11 +51,11 @@ class ProjectPerformanceTaskListItemTest {
 
   @Test
   void getActionUrl() {
-    var scapId = 48;
+    var scapId = new ScapId(48);
     var expectedActionUrl = ReverseRouter.route(on(ProjectPerformanceController.class)
         .renderProjectPerformanceForm(scapId));
 
-    assertThat(projectPerformanceTaskListItem.getActionUrl(scapId)).isEqualTo(expectedActionUrl);
+    assertThat(projectPerformanceTaskListItem.getActionUrl(scapId.scapId())).isEqualTo(expectedActionUrl);
   }
 
   @Test

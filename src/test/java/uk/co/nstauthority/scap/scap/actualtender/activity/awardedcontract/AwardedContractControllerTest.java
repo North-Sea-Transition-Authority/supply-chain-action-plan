@@ -28,6 +28,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
@@ -41,7 +42,7 @@ import uk.co.nstauthority.scap.scap.scap.ScapService;
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = AwardedContractController.class)
 @WithMockUser
-class AwardedContractControllerTest extends AbstractControllerTest {
+class AwardedContractControllerTest extends AbstractScapSubmitterControllerTest {
 
   @MockBean
   ActualTenderActivityService actualTenderActivityService;
@@ -55,14 +56,12 @@ class AwardedContractControllerTest extends AbstractControllerTest {
   @MockBean
   AwardedContractService awardedContractService;
 
-  private Scap scap;
   private ActualTenderActivity actualTenderActivity;
   private List<InvitationToTenderParticipant> bidParticipants;
   private Map<String, String> bidParticipantsMap;
 
   @BeforeEach
   void setup() {
-    scap = new Scap(141);
     actualTenderActivity = new ActualTenderActivity(1410);
     var participant1 = new InvitationToTenderParticipant(1411);
     participant1.setCompanyName("Company 1");
@@ -84,13 +83,13 @@ class AwardedContractControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(get(
         ReverseRouter.route(on(AwardedContractController.class)
-            .renderAwardedContractForm(scap.getId(), actualTenderActivity.getId()))))
+            .renderAwardedContractForm(scap.getScapId(), actualTenderActivity.getId()))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/actualtender/actualContractAward"))
         .andExpect(model().attributeExists("form"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(BidParticipantsController.class)
-                .renderBidParticipantsForm(scap.getId(), actualTenderActivity.getId(), null))))
+                .renderBidParticipantsForm(scap.getScapId(), actualTenderActivity.getId(), null))))
         .andExpect(model().attribute("bidParticipantsMap", bidParticipantsMap))
         .andExpect(model().attribute("countrySearchRestUrl",
             ReverseRouter.route(on(AwardedContractRestController.class).getCountrySearchResults(null))));
@@ -115,13 +114,13 @@ class AwardedContractControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(get(
             ReverseRouter.route(on(AwardedContractController.class)
-                .renderAwardedContractForm(scap.getId(), actualTenderActivity.getId()))))
+                .renderAwardedContractForm(scap.getScapId(), actualTenderActivity.getId()))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/actualtender/actualContractAward"))
         .andExpect(model().attribute("form", form))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(BidParticipantsController.class)
-                .renderBidParticipantsForm(scap.getId(), actualTenderActivity.getId(), null))))
+                .renderBidParticipantsForm(scap.getScapId(), actualTenderActivity.getId(), null))))
         .andExpect(model().attribute("bidParticipantsMap", bidParticipantsMap))
         .andExpect(model().attribute("countrySearchRestUrl",
             ReverseRouter.route(on(AwardedContractRestController.class).getCountrySearchResults(null))))
@@ -148,7 +147,7 @@ class AwardedContractControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(post(
         ReverseRouter.route(on(AwardedContractController.class)
-            .saveAwardedContractForm(scap.getId(), actualTenderActivity.getId(), null, emptyBindingResult())))
+            .saveAwardedContractForm(scap.getScapId(), actualTenderActivity.getId(), null, emptyBindingResult())))
             .flashAttr("form", form)
             .with(csrf()))
         .andExpect(status().isOk())
@@ -156,7 +155,7 @@ class AwardedContractControllerTest extends AbstractControllerTest {
         .andExpect(model().attribute("form", form))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(BidParticipantsController.class)
-                .renderBidParticipantsForm(scap.getId(), actualTenderActivity.getId(), null))))
+                .renderBidParticipantsForm(scap.getScapId(), actualTenderActivity.getId(), null))))
         .andExpect(model().attribute("bidParticipantsMap", bidParticipantsMap))
         .andExpect(model().attribute("countrySearchRestUrl",
             ReverseRouter.route(on(AwardedContractRestController.class).getCountrySearchResults(null))))
@@ -170,7 +169,7 @@ class AwardedContractControllerTest extends AbstractControllerTest {
     var form = new AwardedContractForm();
     var bindingResultWithoutErrors = new BeanPropertyBindingResult(form, "form");
     var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderSummaryController.class)
-        .renderActualTenderSummary(scap.getId()));
+        .renderActualTenderSummary(scap.getScapId()));
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
@@ -180,7 +179,7 @@ class AwardedContractControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(post(
         ReverseRouter.route(on(AwardedContractController.class)
-            .saveAwardedContractForm(scap.getId(), actualTenderActivity.getId(), null, emptyBindingResult())))
+            .saveAwardedContractForm(scap.getScapId(), actualTenderActivity.getId(), null, emptyBindingResult())))
         .flashAttr("form", form)
         .with(csrf()))
         .andExpect(status().is3xxRedirection())

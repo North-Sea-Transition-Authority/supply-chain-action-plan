@@ -20,14 +20,19 @@ import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.fds.addtolist.AddToListItem;
 import uk.co.nstauthority.scap.file.UploadedFileView;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
+import uk.co.nstauthority.scap.scap.scap.Scap;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @Controller
 @RequestMapping("{scapId}/project-details")
+@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
 class ProjectDetailsController {
 
   private final ProjectDetailsFormService projectDetailsFormService;
@@ -49,7 +54,7 @@ class ProjectDetailsController {
   }
 
   @GetMapping
-  ModelAndView renderProjectDetailsForm(@PathVariable("scapId") Integer scapId) {
+  ModelAndView renderProjectDetailsForm(@PathVariable("scapId") ScapId scapId) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
     var projectDetails = projectDetailsService.getProjectDetails(scapDetail);
     var projectFacilities = projectDetails
@@ -73,7 +78,7 @@ class ProjectDetailsController {
   }
 
   @PostMapping
-  ModelAndView saveProjectDetailsForm(@PathVariable("scapId") Integer scapId,
+  ModelAndView saveProjectDetailsForm(@PathVariable("scapId") ScapId scapId,
                                       @ModelAttribute("form") ProjectDetailsForm form,
                                       BindingResult bindingResult) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
@@ -96,7 +101,7 @@ class ProjectDetailsController {
         });
   }
 
-  private ModelAndView projectDetailsFormModelAndView(Integer scapId,
+  private ModelAndView projectDetailsFormModelAndView(ScapId scapId,
                                                       @Nullable Map<String, String> preselectedField,
                                                       List<AddToListItem> preselectedFacilities,
                                                       List<UploadedFileView> supportingDocuments) {

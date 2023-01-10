@@ -14,11 +14,15 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @Controller
 @RequestMapping("{scapId}/project-performance")
+@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
 public class ProjectPerformanceController {
 
   private final ScapDetailService scapDetailService;
@@ -38,7 +42,7 @@ public class ProjectPerformanceController {
   }
 
   @GetMapping
-  public ModelAndView renderProjectPerformanceForm(@PathVariable("scapId") Integer scapId) {
+  public ModelAndView renderProjectPerformanceForm(@PathVariable("scapId") ScapId scapId) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
     var projectPerformance = projectPerformanceService.findByScapDetail(scapDetail);
 
@@ -50,7 +54,7 @@ public class ProjectPerformanceController {
   }
 
   @PostMapping
-  public ModelAndView saveProjectPerformanceForm(@PathVariable("scapId") Integer scapId,
+  public ModelAndView saveProjectPerformanceForm(@PathVariable("scapId") ScapId scapId,
                                                  @ModelAttribute("form") ProjectPerformanceForm form,
                                                  BindingResult bindingResult) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
@@ -72,7 +76,7 @@ public class ProjectPerformanceController {
     );
   }
 
-  private ModelAndView projectPerformanceModelAndView(Integer scapId) {
+  private ModelAndView projectPerformanceModelAndView(ScapId scapId) {
     return new ModelAndView("scap/scap/projectPerformance")
         .addObject("backLinkUrl", ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
         .addObject("radioItems", YesNo.getRadioOptions());

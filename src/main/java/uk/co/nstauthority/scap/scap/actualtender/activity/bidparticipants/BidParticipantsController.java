@@ -14,15 +14,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderControllerRedirectionService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityController;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipantService;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 
 @Controller
 @RequestMapping("{scapId}/actual-tender/activity/{activityId}/bid-participants")
+@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
 public class BidParticipantsController {
 
   private final ScapService scapService;
@@ -48,7 +52,7 @@ public class BidParticipantsController {
   }
 
   @GetMapping
-  public ModelAndView renderBidParticipantsForm(@PathVariable("scapId") Integer scapId,
+  public ModelAndView renderBidParticipantsForm(@PathVariable("scapId") ScapId scapId,
                                                 @PathVariable("activityId") Integer activityId,
                                                 @ModelAttribute("form") BidParticipantsForm form) {
     scapService.getScapById(scapId);
@@ -63,7 +67,7 @@ public class BidParticipantsController {
   }
 
   @PostMapping
-  public ModelAndView saveBidParticipantsForm(@PathVariable("scapId") Integer scapId,
+  public ModelAndView saveBidParticipantsForm(@PathVariable("scapId") ScapId scapId,
                                               @PathVariable("activityId") Integer activityId,
                                               @ModelAttribute("form") BidParticipantsForm form,
                                               BindingResult bindingResult) {
@@ -86,7 +90,7 @@ public class BidParticipantsController {
     );
   }
 
-  private ModelAndView bidParticipantsFormModelAndView(Integer scapId, List<InvitationToTenderParticipant> participants,
+  private ModelAndView bidParticipantsFormModelAndView(ScapId scapId, List<InvitationToTenderParticipant> participants,
                                                        Integer activityId) {
     return new ModelAndView("scap/scap/actualtender/bidParticipants")
         .addObject("backLinkUrl", ReverseRouter.route(on(ActualTenderActivityController.class)

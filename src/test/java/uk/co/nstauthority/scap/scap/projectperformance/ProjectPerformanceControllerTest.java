@@ -26,6 +26,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
@@ -35,7 +36,7 @@ import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = ProjectPerformanceController.class)
 @WithMockUser
-class ProjectPerformanceControllerTest extends AbstractControllerTest {
+class ProjectPerformanceControllerTest extends AbstractScapSubmitterControllerTest {
 
   @MockBean
   ScapDetailService scapDetailService;
@@ -46,26 +47,24 @@ class ProjectPerformanceControllerTest extends AbstractControllerTest {
   @MockBean
   ProjectPerformanceService projectPerformanceService;
 
-  private Integer scapId;
   private ScapDetail scapDetail;
 
   @BeforeEach
   void setup() {
-    scapId = 48;
     scapDetail = new ScapDetail();
   }
 
   @Test
   void renderProjectPerformanceForm_NoExistingProjectPerformance() throws Exception {
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
     when(projectPerformanceService.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
     mockMvc.perform(get(
-        ReverseRouter.route(on(ProjectPerformanceController.class).renderProjectPerformanceForm(scapId))))
+        ReverseRouter.route(on(ProjectPerformanceController.class).renderProjectPerformanceForm(SCAP_ID))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/projectPerformance"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID))))
         .andExpect(model().attribute("radioItems", YesNo.getRadioOptions()))
         .andExpect(model().attributeExists("form"));
   }
@@ -75,17 +74,17 @@ class ProjectPerformanceControllerTest extends AbstractControllerTest {
     var projectPerformance = new ProjectPerformance();
     var form = new ProjectPerformanceForm();
 
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
     when(projectPerformanceService.findByScapDetail(scapDetail))
         .thenReturn(Optional.of(projectPerformance));
     when(projectPerformanceFormService.getForm(projectPerformance)).thenReturn(form);
 
     mockMvc.perform(get(
-        ReverseRouter.route(on(ProjectPerformanceController.class).renderProjectPerformanceForm(scapId))))
+        ReverseRouter.route(on(ProjectPerformanceController.class).renderProjectPerformanceForm(SCAP_ID))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/projectPerformance"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID))))
         .andExpect(model().attribute("radioItems", YesNo.getRadioOptions()))
         .andExpect(model().attribute("form", form));
   }
@@ -98,20 +97,20 @@ class ProjectPerformanceControllerTest extends AbstractControllerTest {
         "form", "testField", "Test error message"
     ));
 
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
     when(projectPerformanceService.findByScapDetail(scapDetail))
         .thenReturn(Optional.empty());
     when(projectPerformanceFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResultWithErrors);
 
     mockMvc.perform(post(
-        ReverseRouter.route(on(ProjectPerformanceController.class).renderProjectPerformanceForm(scapId)))
+        ReverseRouter.route(on(ProjectPerformanceController.class).renderProjectPerformanceForm(SCAP_ID)))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/projectPerformance"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID))))
         .andExpect(model().attribute("radioItems", YesNo.getRadioOptions()))
         .andExpect(model().attribute("form", form))
         .andExpect(model().attributeExists("errorList"));
@@ -125,16 +124,16 @@ class ProjectPerformanceControllerTest extends AbstractControllerTest {
     var form = new ProjectPerformanceForm();
     var bindingResultWithoutErrors = new BeanPropertyBindingResult(form, "form");
     var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class)
-        .renderTaskList(scapId));
+        .renderTaskList(SCAP_ID));
 
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
     when(projectPerformanceService.findByScapDetail(scapDetail))
         .thenReturn(Optional.empty());
     when(projectPerformanceFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResultWithoutErrors);
 
     mockMvc.perform(post(
-        ReverseRouter.route(on(ProjectPerformanceController.class).renderProjectPerformanceForm(scapId)))
+        ReverseRouter.route(on(ProjectPerformanceController.class).renderProjectPerformanceForm(SCAP_ID)))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().is3xxRedirection())
@@ -148,17 +147,17 @@ class ProjectPerformanceControllerTest extends AbstractControllerTest {
     var form = new ProjectPerformanceForm();
     var bindingResultWithoutErrors = new BeanPropertyBindingResult(form, "form");
     var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class)
-        .renderTaskList(scapId));
+        .renderTaskList(SCAP_ID));
     var projectPerformance = new ProjectPerformance();
 
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
     when(projectPerformanceService.findByScapDetail(scapDetail))
         .thenReturn(Optional.of(projectPerformance));
     when(projectPerformanceFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResultWithoutErrors);
 
     mockMvc.perform(post(
-        ReverseRouter.route(on(ProjectPerformanceController.class).renderProjectPerformanceForm(scapId)))
+        ReverseRouter.route(on(ProjectPerformanceController.class).renderProjectPerformanceForm(SCAP_ID)))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().is3xxRedirection())

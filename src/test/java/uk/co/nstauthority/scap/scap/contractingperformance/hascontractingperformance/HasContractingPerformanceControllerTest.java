@@ -73,7 +73,7 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/contractingperformance/hasContractingPerformance"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getScapId()))))
         .andExpect(model().attribute("radioItems", YesNo.getRadioOptions()))
         .andExpect(model().attributeExists("form"));
   }
@@ -94,7 +94,7 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/contractingperformance/hasContractingPerformance"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getScapId()))))
         .andExpect(model().attribute("radioItems", YesNo.getRadioOptions()))
         .andExpect(model().attribute("form", filledForm));
   }
@@ -160,7 +160,7 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/contractingperformance/hasContractingPerformance"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getScapId()))))
         .andExpect(model().attribute("radioItems", YesNo.getRadioOptions()))
         .andExpect(model().attribute("form", form));
 
@@ -196,7 +196,7 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
     form.setHasContractingPerformance(YesNo.NO);
     var bindingResultWithoutErrors = new BeanPropertyBindingResult(form, "form");
     var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class)
-        .renderTaskList(scap.getId()));
+        .renderTaskList(scap.getScapId()));
 
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceFormService.validate(eq(form), any(BindingResult.class)))

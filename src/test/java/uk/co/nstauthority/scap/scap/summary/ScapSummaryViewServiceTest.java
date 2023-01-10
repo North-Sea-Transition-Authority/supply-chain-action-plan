@@ -308,7 +308,7 @@ class ScapSummaryViewServiceTest {
 
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(List.of(actualTenderActivity));
-    when(actualTenderSummaryViewService.getByActualTenderActivities(List.of(actualTenderActivity), scapDetail.getScap().getId()))
+    when(actualTenderSummaryViewService.getByActualTenderActivities(List.of(actualTenderActivity), scapDetail.getScap().getScapId()))
         .thenReturn(activityViews);
 
     var actualTenderSummaryView = scapSummaryViewService.getActualTenderSummaryView(scapDetail);

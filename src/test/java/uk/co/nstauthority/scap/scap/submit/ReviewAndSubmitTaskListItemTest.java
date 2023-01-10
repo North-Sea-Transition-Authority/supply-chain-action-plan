@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewAndSubmitTaskListItemTest {
@@ -24,11 +25,11 @@ class ReviewAndSubmitTaskListItemTest {
 
   @Test
   void getActionUrl() {
-    var scapId = 56;
+    var scapId = new ScapId(56);
     var expectedUrl = ReverseRouter.route(on(ScapSubmissionController.class)
         .renderScapSubmissionConfirmation(scapId));
 
-    assertThat(reviewAndSubmitTaskListItem.getActionUrl(scapId)).isEqualTo(expectedUrl);
+    assertThat(reviewAndSubmitTaskListItem.getActionUrl(scapId.scapId())).isEqualTo(expectedUrl);
   }
 
   @Test

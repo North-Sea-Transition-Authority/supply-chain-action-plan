@@ -51,6 +51,7 @@ class DeleteContractingPerformanceControllerTest extends AbstractScapSubmitterCo
 
   @MockBean
   ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService;
+
   private Integer contractingPerformanceId = 4357;
 
   @BeforeEach

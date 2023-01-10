@@ -14,11 +14,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderControllerRedirectionService;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTenderController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderActivitySummaryView;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryViewService;
@@ -26,6 +29,7 @@ import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @Controller
 @RequestMapping("{scapId}/actual-tender/summary")
+@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
 public class ActualTenderSummaryController {
 
   private final ScapService scapService;
@@ -56,7 +60,7 @@ public class ActualTenderSummaryController {
 
   @GetMapping
   @Transactional
-  public ModelAndView renderActualTenderSummary(@PathVariable("scapId") Integer scapId) {
+  public ModelAndView renderActualTenderSummary(@PathVariable("scapId") ScapId scapId) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
     var actualTender = actualTenderService.getByScapDetailOrThrow(scapDetail);
@@ -75,7 +79,7 @@ public class ActualTenderSummaryController {
   }
 
   @PostMapping
-  public ModelAndView saveActualTenderSummary(@PathVariable("scapId") Integer scapId,
+  public ModelAndView saveActualTenderSummary(@PathVariable("scapId") ScapId scapId,
                                               @ModelAttribute("form") ActualTenderSummaryForm form,
                                               BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
@@ -105,7 +109,7 @@ public class ActualTenderSummaryController {
     );
   }
 
-  private ModelAndView actualTenderSummaryModelAndView(Integer scapId, List<ActualTenderActivitySummaryView> summaryViews) {
+  private ModelAndView actualTenderSummaryModelAndView(ScapId scapId, List<ActualTenderActivitySummaryView> summaryViews) {
     return new ModelAndView("scap/scap/actualtender/actualTenderActivitySummary")
         .addObject("actualTenderActivities", summaryViews)
         .addObject("backLinkUrl",

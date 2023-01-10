@@ -28,6 +28,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
@@ -45,7 +46,7 @@ import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = HasActualTenderController.class)
 @WithMockUser
-class HasActualTenderControllerTest extends AbstractControllerTest {
+class HasActualTenderControllerTest extends AbstractScapSubmitterControllerTest {
 
   @Autowired
   Clock clock;
@@ -62,28 +63,25 @@ class HasActualTenderControllerTest extends AbstractControllerTest {
   @MockBean
   ActualTenderActivityService actualTenderActivityService;
 
-  private Scap scap;
   private ScapDetail scapDetail;
 
   @BeforeEach
   void setup() {
-    scap = new Scap(42);
     scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, clock.instant(), 1);
   }
 
   @Test
   void renderHasActualTenderForm_expectIsOk() throws Exception {
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
     mockMvc.perform(
-        get(ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scap.getId()))))
+        get(ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scap.getScapId()))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/actualtender/hasActualTender"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getScapId()))))
         .andExpect(model().attribute("hasActualTender", YesNo.getRadioOptions()))
         .andExpect(model().attributeExists("form"));
   }
@@ -100,11 +98,11 @@ class HasActualTenderControllerTest extends AbstractControllerTest {
     when(hasActualTenderFormService.getForm(actualTender)).thenReturn(form);
 
     mockMvc.perform(
-            get(ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scap.getId()))))
+            get(ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scap.getScapId()))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/actualtender/hasActualTender"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getScapId()))))
         .andExpect(model().attribute("hasActualTender", YesNo.getRadioOptions()))
         .andExpect(model().attribute("form", form));
   }
@@ -115,16 +113,15 @@ class HasActualTenderControllerTest extends AbstractControllerTest {
     var form = new HasActualTenderForm();
     form.setHasActualTender(YesNo.NO);
     var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderSummaryController.class)
-        .renderActualTenderSummary(scap.getId()));
+        .renderActualTenderSummary(scap.getScapId()));
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(hasActualTenderFormService.getForm(actualTender)).thenReturn(form);
     when(actualTenderActivityService.hasActualTenderActivity(actualTender)).thenReturn(true);
 
     mockMvc.perform(
-            get(ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scap.getId()))))
+            get(ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scap.getScapId()))))
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
   }
@@ -132,7 +129,7 @@ class HasActualTenderControllerTest extends AbstractControllerTest {
   @Test
   void saveHasActualTenderForm_validForm_verifySaves() throws Exception {
     var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderActivityController.class)
-        .renderActualTenderActivityForm(scap.getId(), null));
+        .renderActualTenderActivityForm(scap.getScapId(), null));
     var form = new HasActualTenderForm();
     form.setHasActualTender(YesNo.YES);
     var bindingResult = new BeanPropertyBindingResult(form, "form");
@@ -144,7 +141,7 @@ class HasActualTenderControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
         post(ReverseRouter.route(on(HasActualTenderController.class)
-            .saveHasActualTenderForm(scap.getId(), null, emptyBindingResult())))
+            .saveHasActualTenderForm(scap.getScapId(), null, emptyBindingResult())))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().is3xxRedirection())
@@ -155,7 +152,7 @@ class HasActualTenderControllerTest extends AbstractControllerTest {
 
   @Test
   void saveHasActualTenderForm_existingActualTender_valid_verifyUpdates() throws Exception {
-    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()));
+    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getScapId()));
     var form = new HasActualTenderForm();
     form.setHasActualTender(YesNo.NO);
     var bindingResult = new BeanPropertyBindingResult(form, "form");
@@ -168,7 +165,7 @@ class HasActualTenderControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
         post(ReverseRouter.route(on(HasActualTenderController.class)
-            .saveHasActualTenderForm(scap.getId(), null, emptyBindingResult())))
+            .saveHasActualTenderForm(scap.getScapId(), null, emptyBindingResult())))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().is3xxRedirection())
@@ -190,13 +187,13 @@ class HasActualTenderControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
         post(ReverseRouter.route(on(HasActualTenderController.class)
-            .saveHasActualTenderForm(scap.getId(), null, emptyBindingResult())))
+            .saveHasActualTenderForm(scap.getScapId(), null, emptyBindingResult())))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/actualtender/hasActualTender"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getScapId()))))
         .andExpect(model().attribute("hasActualTender", YesNo.getRadioOptions()))
         .andExpect(model().attribute("form", form))
         .andExpect(model().attributeExists("errorList"));
@@ -210,7 +207,7 @@ class HasActualTenderControllerTest extends AbstractControllerTest {
     var form = new HasActualTenderForm();
     form.setHasActualTender(YesNo.NO);
     var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderSummaryController.class)
-        .renderActualTenderSummary(scap.getId()));
+        .renderActualTenderSummary(scap.getScapId()));
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
@@ -219,7 +216,7 @@ class HasActualTenderControllerTest extends AbstractControllerTest {
     when(actualTenderActivityService.hasActualTenderActivity(actualTender)).thenReturn(true);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scap.getId())))
+        post(ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scap.getScapId())))
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));

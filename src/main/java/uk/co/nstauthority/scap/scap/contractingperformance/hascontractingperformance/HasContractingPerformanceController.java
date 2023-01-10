@@ -92,7 +92,7 @@ public class HasContractingPerformanceController {
         () -> {
           contractingPerformanceOverviewService.saveContractingPerformance(scapDetail, form.getHasContractingPerformance());
           if (YesNo.NO.equals(form.getHasContractingPerformance())) {
-            return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId.scapId()));
+            return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
           }
           return ReverseRouter.redirect(on(ContractingPerformanceController.class)
               .renderNewContractingPerformanceForm(scapId, null));
@@ -102,7 +102,7 @@ public class HasContractingPerformanceController {
 
   private ModelAndView hasContractingPerformanceModelAndView(ScapId scapId) {
     return new ModelAndView("scap/scap/contractingperformance/hasContractingPerformance")
-        .addObject("backLinkUrl", ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId.scapId())))
+        .addObject("backLinkUrl", ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
         .addObject("radioItems", YesNo.getRadioOptions());
   }
 }

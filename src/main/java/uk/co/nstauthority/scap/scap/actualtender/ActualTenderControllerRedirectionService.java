@@ -23,7 +23,7 @@ public class ActualTenderControllerRedirectionService {
   private static final Set<ContractStage> BID_PARTICIPANT_ALLOWED_STAGES =
       Set.of(ContractStage.CONTRACT_AWARDED, ContractStage.INVITATION_TO_TENDER);
 
-  public ModelAndView redirectFromActualTenderActivityForm(Integer scapId, ActualTenderActivity actualTenderDetail) {
+  public ModelAndView redirectFromActualTenderActivityForm(ScapId scapId, ActualTenderActivity actualTenderDetail) {
     if (BID_PARTICIPANT_ALLOWED_STAGES.contains(actualTenderDetail.getContractStage())) {
       return ReverseRouter.redirect(on(BidParticipantsController.class)
           .renderBidParticipantsForm(scapId, actualTenderDetail.getId(), null));
@@ -31,7 +31,7 @@ public class ActualTenderControllerRedirectionService {
     return ReverseRouter.redirect(on(ActualTenderSummaryController.class).renderActualTenderSummary(scapId));
   }
 
-  public ModelAndView redirectFromBidParticipantsForm(Integer scapId, ActualTenderActivity actualTenderActivity) {
+  public ModelAndView redirectFromBidParticipantsForm(ScapId scapId, ActualTenderActivity actualTenderActivity) {
     if (ContractStage.CONTRACT_AWARDED.equals(actualTenderActivity.getContractStage())) {
       return ReverseRouter.redirect(on(AwardedContractController.class)
           .renderAwardedContractForm(scapId, actualTenderActivity.getId()));
@@ -39,7 +39,7 @@ public class ActualTenderControllerRedirectionService {
     return ReverseRouter.redirect(on(ActualTenderSummaryController.class).renderActualTenderSummary(scapId));
   }
 
-  public ModelAndView redirectFromActualTenderDeletion(Integer scapId, Boolean hasActualTenderDetails) {
+  public ModelAndView redirectFromActualTenderDeletion(ScapId scapId, Boolean hasActualTenderDetails) {
     if (Boolean.TRUE.equals(hasActualTenderDetails)) {
       return ReverseRouter.redirect(on(ActualTenderSummaryController.class).renderActualTenderSummary(scapId));
     }
@@ -47,7 +47,7 @@ public class ActualTenderControllerRedirectionService {
     return ReverseRouter.redirect(on(HasActualTenderController.class).renderHasActualTenderForm(scapId));
   }
 
-  public ModelAndView redirectFromActualTenderSummary(Integer scapId,
+  public ModelAndView redirectFromActualTenderSummary(ScapId scapId,
                                                       HasMoreActualTenderActivities hasMoreActualTenderActivities) {
     if (HasMoreActualTenderActivities.YES_NOW.equals(hasMoreActualTenderActivities)) {
       return ReverseRouter.redirect(on(ActualTenderActivityController.class).renderActualTenderActivityForm(scapId, null));

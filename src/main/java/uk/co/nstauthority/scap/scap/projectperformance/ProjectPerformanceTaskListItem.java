@@ -9,6 +9,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapFormTaskListSection;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.tasklist.ScapTaskListItem;
 import uk.co.nstauthority.scap.tasklist.TaskListSection;
@@ -41,7 +42,7 @@ public class ProjectPerformanceTaskListItem implements ScapTaskListItem {
 
   @Override
   public String getActionUrl(Integer target) {
-    return ReverseRouter.route(on(ProjectPerformanceController.class).renderProjectPerformanceForm(target));
+    return ReverseRouter.route(on(ProjectPerformanceController.class).renderProjectPerformanceForm(new ScapId(target)));
   }
 
   @Override

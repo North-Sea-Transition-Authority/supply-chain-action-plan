@@ -32,6 +32,7 @@ import uk.co.nstauthority.scap.file.UploadedFile;
 import uk.co.nstauthority.scap.file.VirtualFolder;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @ExtendWith(MockitoExtension.class)
 class SupportingDocumentServiceTest {
@@ -51,14 +52,14 @@ class SupportingDocumentServiceTest {
   private static final VirtualFolder virtualFolder = FileTestUtil.VALID_VIRTUAL_FOLDER;
   private static final UploadedFile uploadedFile = FileTestUtil.createValidUploadedFile();
   private static MultipartFile multipartFile;
-  private static Integer scapId;
+  private static ScapId scapId;
   private static ScapDetail scapDetail;
 
   @BeforeAll
   static void beforeAll() throws IOException {
     multipartFile = FileTestUtil.createMultipartFileMock();
     scapDetail = new ScapDetail(35);
-    scapId = 12;
+    scapId = new ScapId(12);
   }
 
   @ParameterizedTest

@@ -16,10 +16,12 @@ import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 @ExtendWith(SpringExtension.class)
 class WorkAreaItemTest {
 
+  private static final ScapId SCAP_ID = new ScapId(1);
+
   @Test
   void url_WhenFirstDraft_AssertTaskListUrl() {
     var workAreaItem = new WorkAreaItem(
-        1,
+        SCAP_ID,
         1,
         "SCAP/2023/1",
         "CENTRICA",
@@ -35,7 +37,7 @@ class WorkAreaItemTest {
   @Test
   void url_WhenNotFirstDraft_AssertSummaryUrl() {
     var workAreaItem = new WorkAreaItem(
-        1,
+        SCAP_ID,
         2,
         "SCAP/2023/1",
         "CENTRICA",
@@ -44,7 +46,7 @@ class WorkAreaItemTest {
         ScapSubmissionStage.CONTRACTING_STRATEGY_PENDING
     );
     var expectedUrl = ReverseRouter.route(on(ScapSummaryController.class)
-        .getScapSummary(new ScapId(workAreaItem.scapId())));
+        .getScapSummary(workAreaItem.scapId()));
 
     assertThat(workAreaItem.url()).isEqualTo(expectedUrl);
   }
@@ -52,7 +54,7 @@ class WorkAreaItemTest {
   @Test
   void url_WhenFirstSubmission_AssertSummaryUrl() {
     var workAreaItem = new WorkAreaItem(
-        1,
+        SCAP_ID,
         1,
         "SCAP/2023/1",
         "CENTRICA",
@@ -61,7 +63,7 @@ class WorkAreaItemTest {
         ScapSubmissionStage.CONTRACTING_STRATEGY_PENDING
     );
     var expectedUrl = ReverseRouter.route(on(ScapSummaryController.class)
-        .getScapSummary(new ScapId(workAreaItem.scapId())));
+        .getScapSummary(workAreaItem.scapId()));
 
     assertThat(workAreaItem.url()).isEqualTo(expectedUrl);
   }
@@ -69,7 +71,7 @@ class WorkAreaItemTest {
   @Test
   void url_WhenNotFirstSubmission_AssertSummaryUrl() {
     var workAreaItem = new WorkAreaItem(
-        1,
+        SCAP_ID,
         2,
         "SCAP/2023/1",
         "CENTRICA",
@@ -78,7 +80,7 @@ class WorkAreaItemTest {
         ScapSubmissionStage.CONTRACTING_STRATEGY_PENDING
     );
     var expectedUrl = ReverseRouter.route(on(ScapSummaryController.class)
-        .getScapSummary(new ScapId(workAreaItem.scapId())));
+        .getScapSummary(workAreaItem.scapId()));
 
     assertThat(workAreaItem.url()).isEqualTo(expectedUrl);
   }

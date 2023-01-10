@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.scap.scap.Scap;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @Service
 public class ScapDetailService {
@@ -50,14 +51,14 @@ public class ScapDetailService {
         ));
   }
 
-  public Optional<ScapDetail> getLatestScapDetailByScapId(Integer scapId) {
-    return scapDetailRepository.findFirstByScapIdAndTipFlag(scapId, true);
+  public Optional<ScapDetail> getLatestScapDetailByScapId(ScapId scapId) {
+    return scapDetailRepository.findFirstByScapIdAndTipFlag(scapId.scapId(), true);
   }
 
-  public ScapDetail getLatestScapDetailByScapIdOrThrow(Integer scapId) {
+  public ScapDetail getLatestScapDetailByScapIdOrThrow(ScapId scapId) {
     return getLatestScapDetailByScapId(scapId).orElseThrow(
         () -> new ScapEntityNotFoundException(
-            String.format("Could not find a ScapDetail for Scap with ID [%d]", scapId)
+            String.format("Could not find a ScapDetail for Scap with ID [%d]", scapId.scapId())
         ));
   }
 

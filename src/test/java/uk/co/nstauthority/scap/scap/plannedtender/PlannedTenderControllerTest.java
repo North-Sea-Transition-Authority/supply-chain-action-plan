@@ -118,7 +118,7 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/plannedtender/plannedTenderActivityList"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getScapId()))))
         .andExpect(model().attribute("plannedTenderDetailsList", listItems))
         .andExpect(model().attribute("form", form))
         .andExpect(model().attribute("radioItems", HasMorePlannedTenderActivities.getRadioItems()));
@@ -177,7 +177,7 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
     var form = new PlannedTenderForm();
     form.setHasMorePlannedTenderActivities(HasMorePlannedTenderActivities.YES_LATER);
     var bindingResult = new BeanPropertyBindingResult(form, "form");
-    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()));
+    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getScapId()));
 
     when(scapService.getScapById(scap.getScapId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
@@ -206,7 +206,7 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
     var form = new PlannedTenderForm();
     form.setHasMorePlannedTenderActivities(HasMorePlannedTenderActivities.NO);
     var bindingResult = new BeanPropertyBindingResult(form, "form");
-    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()));
+    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getScapId()));
 
     when(scapService.getScapById(scap.getScapId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
@@ -257,7 +257,7 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
         .andExpect(view().name("scap/scap/plannedtender/plannedTenderActivityList"))
         .andExpect(model().attribute("form", form))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getId()))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getScapId()))))
         .andExpect(model().attribute("plannedTenderDetailsList", Collections.emptyList()))
         .andExpect(model().attribute("radioItems",
             HasMorePlannedTenderActivities.getRadioItems()));

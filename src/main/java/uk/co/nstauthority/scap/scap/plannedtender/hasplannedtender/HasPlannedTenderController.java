@@ -84,7 +84,7 @@ public class HasPlannedTenderController {
         .orElseGet(() -> plannedTenderService.createPlannedTenderForScapDetail(scapDetail));
     if (YesNo.NO.equals(form.getHasPlannedTender())) {
       plannedTenderService.updatePlannedTenderHasPlannedTenders(plannedTender, false);
-      return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId.scapId()));
+      return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
     }
 
     plannedTenderService.updatePlannedTenderHasPlannedTenders(plannedTender, true);
@@ -94,7 +94,7 @@ public class HasPlannedTenderController {
   private ModelAndView hasPlannedTenderActivityModelAndView(ScapId scapId, HasPlannedTenderForm form) {
     return new ModelAndView("scap/scap/plannedtender/hasPlannedTender")
         .addObject("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId.scapId())))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
         .addObject("hasPlannedTender", YesNo.getRadioOptions())
         .addObject("form", form)
         .addObject("submitPostUrl",

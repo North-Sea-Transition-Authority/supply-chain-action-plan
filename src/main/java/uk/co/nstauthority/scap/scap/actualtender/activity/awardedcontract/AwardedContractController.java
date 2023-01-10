@@ -15,15 +15,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipantService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.bidparticipants.BidParticipantsController;
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 
 @Controller
 @RequestMapping("{scapId}/actual-tender/activity/{activityId}/actual-contract-award")
+@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
 public class AwardedContractController {
 
   private final ScapService scapService;
@@ -49,7 +53,7 @@ public class AwardedContractController {
   }
 
   @GetMapping
-  public ModelAndView renderAwardedContractForm(@PathVariable("scapId") Integer scapId,
+  public ModelAndView renderAwardedContractForm(@PathVariable("scapId") ScapId scapId,
                                                 @PathVariable("activityId") Integer activityId) {
     scapService.getScapById(scapId);
     var actualTenderActivity = actualTenderActivityService.getById(activityId);
@@ -67,7 +71,7 @@ public class AwardedContractController {
   }
 
   @PostMapping
-  public ModelAndView saveAwardedContractForm(@PathVariable("scapId") Integer scapId,
+  public ModelAndView saveAwardedContractForm(@PathVariable("scapId") ScapId scapId,
                                               @PathVariable("activityId") Integer activityId,
                                               @ModelAttribute("form") AwardedContractForm form,
                                               BindingResult bindingResult) {
@@ -95,7 +99,7 @@ public class AwardedContractController {
     );
   }
 
-  private ModelAndView awardedContractModelAndView(Integer scapId, Integer activityId,
+  private ModelAndView awardedContractModelAndView(ScapId scapId, Integer activityId,
                                                    List<InvitationToTenderParticipant> bidParticipants,
                                                    Map<String, String> preselectedCountry) {
     return new ModelAndView("scap/scap/actualtender/actualContractAward")

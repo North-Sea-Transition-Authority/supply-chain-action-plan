@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Objects;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 public record WorkAreaItemDto(Integer scapId,
                               Integer scapVersionNumber,

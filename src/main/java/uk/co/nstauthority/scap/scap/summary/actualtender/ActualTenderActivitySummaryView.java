@@ -8,8 +8,9 @@ import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityController;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ContractStage;
 import uk.co.nstauthority.scap.scap.actualtender.activity.delete.DeleteActualTenderActivityController;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 
-public record ActualTenderActivitySummaryView(Integer scapId,
+public record ActualTenderActivitySummaryView(ScapId scapId,
                                               Integer activityId,
                                               String scopeTitle,
                                               String scopeDescription,

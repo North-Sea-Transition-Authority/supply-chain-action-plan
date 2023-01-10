@@ -131,7 +131,7 @@ public class ScapSummaryViewService {
       var actualTenderActivities = actualTenderActivityService.getAllByActualTender(actualTender);
       return new ActualTenderSummaryView(
           true,
-          actualTenderSummaryViewService.getByActualTenderActivities(actualTenderActivities, scapDetail.getScap().getId()));
+          actualTenderSummaryViewService.getByActualTenderActivities(actualTenderActivities, scapDetail.getScap().getScapId()));
     }).orElse(new ActualTenderSummaryView(null, null));
   }
 

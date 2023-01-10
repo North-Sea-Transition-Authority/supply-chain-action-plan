@@ -52,7 +52,7 @@ class ContractingPerformanceSummaryViewServiceTest {
   void getContractingPerformanceSummaryView() {
     when(countryService.findCountryById(country.getCountryId(), ContractingPerformanceSummaryViewService.REQUEST_PURPOSE))
         .thenReturn(Optional.of(country));
-    when(contractingPerformanceSummaryDtoRepository.findByScapIdAndContractingPerformanceId(scapId.scapId(), contractingPerformanceId))
+    when(contractingPerformanceSummaryDtoRepository.findByScapIdAndContractingPerformanceId(scapId, contractingPerformanceId))
         .thenReturn(Optional.of(contractingPerformanceSummaryDto));
 
     var view =
@@ -88,7 +88,7 @@ class ContractingPerformanceSummaryViewServiceTest {
 
   @Test
   void getContractingPerformanceSummaryView_WhenNotFound_AssertEmpty() {
-    when(contractingPerformanceSummaryDtoRepository.findByScapIdAndContractingPerformanceId(scapId.scapId(), contractingPerformanceId))
+    when(contractingPerformanceSummaryDtoRepository.findByScapIdAndContractingPerformanceId(scapId, contractingPerformanceId))
         .thenReturn(Optional.empty());
 
     var view =
@@ -101,7 +101,7 @@ class ContractingPerformanceSummaryViewServiceTest {
   void getContractingPerformanceSummaryViews() {
     when(countryService.getCountriesByIds(List.of(country.getCountryId()), ContractingPerformanceSummaryViewService.REQUEST_PURPOSE))
         .thenReturn(List.of(country));
-    when(contractingPerformanceSummaryDtoRepository.getAllByScapId(scapId.scapId()))
+    when(contractingPerformanceSummaryDtoRepository.getAllByScapId(scapId))
         .thenReturn(List.of(contractingPerformanceSummaryDto));
 
     var views = contractingPerformanceSummaryViewService

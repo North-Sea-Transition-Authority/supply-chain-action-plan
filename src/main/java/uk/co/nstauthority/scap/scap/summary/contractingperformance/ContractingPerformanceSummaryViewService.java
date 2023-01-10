@@ -28,7 +28,7 @@ public class ContractingPerformanceSummaryViewService {
   public Optional<ContractingPerformanceSummaryView> getContractingPerformanceSummaryView(ScapId scapId,
                                                                                           Integer contractingPerformanceId) {
     var contractingPerformanceSummaryDtoOpt = contractingPerformanceSummaryDtoRepository
-        .findByScapIdAndContractingPerformanceId(scapId.scapId(), contractingPerformanceId);
+        .findByScapIdAndContractingPerformanceId(scapId, contractingPerformanceId);
     return contractingPerformanceSummaryDtoOpt.map(contractingPerformanceSummaryDto -> {
       var country = countryService.findCountryById(contractingPerformanceSummaryDto.countryId(), REQUEST_PURPOSE);
       return new ContractingPerformanceSummaryView(
@@ -47,7 +47,7 @@ public class ContractingPerformanceSummaryViewService {
   }
 
   public List<ContractingPerformanceSummaryView> getContractingPerformanceSummaryViews(ScapId scapId) {
-    var contractingPerformanceSummaryDtoList = contractingPerformanceSummaryDtoRepository.getAllByScapId(scapId.scapId());
+    var contractingPerformanceSummaryDtoList = contractingPerformanceSummaryDtoRepository.getAllByScapId(scapId);
     var countryMap = getCountryMap(contractingPerformanceSummaryDtoList);
     return contractingPerformanceSummaryDtoList.stream()
         .map(contractingPerformanceSummaryDto -> new ContractingPerformanceSummaryView(

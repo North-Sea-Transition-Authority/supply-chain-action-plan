@@ -69,7 +69,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     var projectDetails = new ProjectDetails();
     projectDetails.setFieldName("TESTING FIELD");
 
-    when(scapDetailService.getLatestScapDetailByScapId(SCAP_ID.scapId())).thenReturn(Optional.of(detail));
+    when(scapDetailService.getLatestScapDetailByScapId(SCAP_ID)).thenReturn(Optional.of(detail));
     when(projectDetailsService.getProjectDetails(detail)).thenReturn(Optional.of(projectDetails));
     when(scapSummaryViewService.getScapSummaryView(detail)).thenReturn(getSummaryView());
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);

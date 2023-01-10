@@ -88,7 +88,7 @@ class HasPlannedTenderControllerTest extends AbstractControllerTest {
         .andExpect(view().name("scap/scap/plannedtender/hasPlannedTender"))
         .andExpect(model().attribute("form", form))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(22))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID))))
         .andExpect(model().attributeExists("hasPlannedTender"))
         .andExpect(model().attribute("submitPostUrl",
             ReverseRouter.route(on(HasPlannedTenderController.class)
@@ -126,7 +126,7 @@ class HasPlannedTenderControllerTest extends AbstractControllerTest {
 
   @Test
   void saveHasPlannedTenderActivity_noPlannedTender_verifySaveAndUpdate() throws Exception {
-    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(22));
+    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID));
     var form = new HasPlannedTenderForm();
     form.setHasPlannedTender(YesNo.NO);
     var createdPlannedTender = new PlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 4, 23));
@@ -174,7 +174,7 @@ class HasPlannedTenderControllerTest extends AbstractControllerTest {
         .andExpect(view().name("scap/scap/plannedtender/hasPlannedTender"))
         .andExpect(model().attributeExists("errorItems"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(22))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID))))
         .andExpect(model().attributeExists("hasPlannedTender"))
         .andExpect(model().attribute("form", form))
         .andExpect(model().attribute("submitPostUrl",

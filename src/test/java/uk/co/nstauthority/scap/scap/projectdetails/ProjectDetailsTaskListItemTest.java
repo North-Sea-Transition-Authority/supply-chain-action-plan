@@ -28,6 +28,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapFormTaskListSection;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 
 @ExtendWith(MockitoExtension.class)
@@ -110,7 +111,7 @@ class ProjectDetailsTaskListItemTest {
   @Test
   void getActionUrl() {
     assertThat(projectDetailsTaskListItem.getActionUrl(scapId)).isEqualTo(
-        ReverseRouter.route(on(ProjectDetailsController.class).renderProjectDetailsForm(scapId)));
+        ReverseRouter.route(on(ProjectDetailsController.class).renderProjectDetailsForm(new ScapId(scapId))));
   }
 
   @Test

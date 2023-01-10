@@ -119,7 +119,7 @@ class ContractingPerformanceSummaryDtoRepositoryIntegrationTest {
   @Test
   void getAllByScapId() {
     var summaryViews = contractingPerformanceSummaryDtoRepository
-        .getAllByScapId(scap.getId());
+        .getAllByScapId(scap.getScapId());
 
     assertThat(summaryViews).extracting(
         ContractingPerformanceSummaryDto::contractingPerformanceId,
@@ -164,7 +164,7 @@ class ContractingPerformanceSummaryDtoRepositoryIntegrationTest {
   @Test
   void findByScapIdAndContractingPerformanceId() {
     var summaryView = contractingPerformanceSummaryDtoRepository
-        .findByScapIdAndContractingPerformanceId(scap.getId(), contractingPerformance1.getId());
+        .findByScapIdAndContractingPerformanceId(scap.getScapId(), contractingPerformance1.getId());
 
     assertThat(summaryView).isNotEmpty();
     assertThat(summaryView.get()).extracting(

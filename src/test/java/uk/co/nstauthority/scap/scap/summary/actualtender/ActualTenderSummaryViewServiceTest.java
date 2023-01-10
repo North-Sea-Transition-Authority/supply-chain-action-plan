@@ -22,6 +22,7 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderPart
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipantService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContract;
 import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContractService;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @ExtendWith(MockitoExtension.class)
 class ActualTenderSummaryViewServiceTest {
@@ -41,7 +42,7 @@ class ActualTenderSummaryViewServiceTest {
 
   @Test
   void getSingleViewByActualTenderActivity() {
-    var scapId = 173;
+    var scapId = new ScapId(173);
 
     var actualTenderActivity = new ActualTenderActivity(10);
     actualTenderActivity.setScopeTitle("test scope title 1");
@@ -86,7 +87,7 @@ class ActualTenderSummaryViewServiceTest {
 
   @Test
   void getByActualTenderActivities() {
-    var scapId = 11;
+    var scapId = new ScapId(11);
 
     var actualTenderActivity1 = new ActualTenderActivity(10);
     actualTenderActivity1.setScopeTitle("test scope title 1");

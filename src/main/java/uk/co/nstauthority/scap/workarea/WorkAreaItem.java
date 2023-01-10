@@ -9,7 +9,7 @@ import uk.co.nstauthority.scap.scap.summary.ScapSubmissionStage;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
-public record WorkAreaItem(Integer scapId,
+public record WorkAreaItem(ScapId scapId,
                            Integer scapVersion,
                            String reference,
                            String operator,
@@ -21,6 +21,6 @@ public record WorkAreaItem(Integer scapId,
     if (ScapDetailStatus.DRAFT.equals(status) && scapVersion == 1) {
       return ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId));
     }
-    return ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(new ScapId(scapId)));
+    return ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(scapId));
   }
 }

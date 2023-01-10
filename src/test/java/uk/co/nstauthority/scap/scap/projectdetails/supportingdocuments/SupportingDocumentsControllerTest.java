@@ -22,6 +22,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
 import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.file.FileTestUtil;
@@ -32,7 +33,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 
 @ContextConfiguration(classes = SupportingDocumentsController.class)
-class SupportingDocumentsControllerTest extends AbstractControllerTest {
+class SupportingDocumentsControllerTest extends AbstractScapSubmitterControllerTest {
 
   private static final ServiceUserDetail USER = ServiceUserDetailTestUtil.Builder().build();
 
@@ -53,7 +54,6 @@ class SupportingDocumentsControllerTest extends AbstractControllerTest {
   @BeforeEach
   void setUp() {
     scapDetail = new ScapDetail(35);
-    scapDetailId = scapDetail.getId();
     uploadedFile = FileTestUtil.createValidUploadedFile();
 
     supportingDocumentType = SupportingDocumentType.ADDITIONAL_DOCUMENT;
@@ -61,11 +61,11 @@ class SupportingDocumentsControllerTest extends AbstractControllerTest {
 
   @Test
   void upload_assertStatusOk() throws Exception {
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(scapDetailId)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
 
     MockMultipartFile mockMultipartFile = new MockMultipartFile("file", (byte[]) null);
     mockMvc.perform(multipart(ReverseRouter.route(
-            on(SupportingDocumentsController.class).upload(scapDetailId, supportingDocumentType, null)))
+            on(SupportingDocumentsController.class).upload(SCAP_ID, supportingDocumentType, null)))
             .file(mockMultipartFile)
             .with(user(USER))
             .with(csrf()))
@@ -76,14 +76,14 @@ class SupportingDocumentsControllerTest extends AbstractControllerTest {
 
   @Test
   void download_assertStatusOk() throws Exception {
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(scapDetailId)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
     when(supportingDocumentService.findUploadedFileOrThrow(scapDetail, uploadedFile.getId())).thenReturn(uploadedFile);
     var fileResource = new ClassPathResource("banner.txt");
     when(fileUploadService.downloadFile(uploadedFile)).thenReturn(fileResource.getInputStream());
 
     var response = mockMvc.perform(
             get(ReverseRouter.route(
-                on(SupportingDocumentsController.class).download(scapDetailId, uploadedFile.getId())))
+                on(SupportingDocumentsController.class).download(SCAP_ID, uploadedFile.getId())))
                 .with(user(USER)))
         .andExpect(status().isOk())
         .andReturn().getResponse();
@@ -103,10 +103,10 @@ class SupportingDocumentsControllerTest extends AbstractControllerTest {
 
   @Test
   void delete_assertStatusOk() throws Exception {
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(scapDetailId)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
 
     mockMvc.perform(post(
-            ReverseRouter.route(on(SupportingDocumentsController.class).delete(scapDetailId, uploadedFile.getId())))
+            ReverseRouter.route(on(SupportingDocumentsController.class).delete(SCAP_ID, uploadedFile.getId())))
             .with(user(USER))
             .with(csrf()))
         .andExpect(status().isOk());

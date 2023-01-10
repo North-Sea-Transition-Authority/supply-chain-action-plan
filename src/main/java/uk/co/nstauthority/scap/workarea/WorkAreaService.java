@@ -17,6 +17,7 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSubmissionStage;
 
 @Service
@@ -84,7 +85,7 @@ class WorkAreaService {
             .comparing((WorkAreaItemDto dto) -> dto.status().getDisplayOrder())
             .thenComparing(sortByItemDate(), Comparator.reverseOrder()))
         .map(workAreaItemDto -> new WorkAreaItem(
-            workAreaItemDto.scapId(),
+            new ScapId(workAreaItemDto.scapId()),
             workAreaItemDto.scapVersionNumber(),
             workAreaItemDto.reference(),
             organisationGroupsMap.getOrDefault(workAreaItemDto.organisationGroupId(), "MISSING OPERATOR"),

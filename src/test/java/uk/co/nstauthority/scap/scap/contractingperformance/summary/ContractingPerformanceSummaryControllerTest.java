@@ -96,7 +96,7 @@ class ContractingPerformanceSummaryControllerTest extends AbstractScapSubmitterC
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/contractingperformance/contractingPerformanceSummary"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID.scapId()))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID))))
         .andExpect(model().attribute("summaryViews", summaryViews));
   }
 
@@ -157,7 +157,7 @@ class ContractingPerformanceSummaryControllerTest extends AbstractScapSubmitterC
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/contractingperformance/contractingPerformanceSummary"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID.scapId()))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID))))
         .andExpect(model().attribute("summaryViews", summaryViews))
         .andExpect(model().attributeExists("errorList"));
 
@@ -194,7 +194,7 @@ class ContractingPerformanceSummaryControllerTest extends AbstractScapSubmitterC
 
   @Test
   void saveContractingPerformanceSummary_NoErrors_VerifyUpdateAndRedirect() throws Exception {
-    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID.scapId()));
+    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID));
     var hasMoreContractingPerformance = HasMoreContractingPerformance.NO;
     var form = new HasMoreContractingPerformanceForm();
     form.setHasMoreContractingPerformance(hasMoreContractingPerformance);

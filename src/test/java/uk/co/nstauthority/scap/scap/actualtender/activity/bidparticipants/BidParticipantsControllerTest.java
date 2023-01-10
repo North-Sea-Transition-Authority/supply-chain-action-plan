@@ -26,6 +26,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderControllerRedirectionServiceTestConfig;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
@@ -43,7 +44,7 @@ import uk.co.nstauthority.scap.scap.scap.ScapService;
 @ContextConfiguration(classes = BidParticipantsController.class)
 @WithMockUser
 @Import(ActualTenderControllerRedirectionServiceTestConfig.class)
-class BidParticipantsControllerTest extends AbstractControllerTest {
+class BidParticipantsControllerTest extends AbstractScapSubmitterControllerTest {
 
   @MockBean
   ActualTenderActivityService actualTenderActivityService;
@@ -54,13 +55,11 @@ class BidParticipantsControllerTest extends AbstractControllerTest {
   @MockBean
   InvitationToTenderParticipantService invitationToTenderParticipantService;
 
-  private Scap scap;
   private ActualTenderActivity actualTenderActivity;
   private List<InvitationToTenderParticipant> invitationToTenderParticipants;
 
   @BeforeEach
   void setup() {
-    scap = new Scap(140);
     actualTenderActivity =  new ActualTenderActivity(9140);
     var participant1 = new InvitationToTenderParticipant(1271);
     participant1.setCompanyName("company 1");
@@ -80,12 +79,12 @@ class BidParticipantsControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
         get(ReverseRouter.route(on(BidParticipantsController.class)
-            .renderBidParticipantsForm(scap.getId(), actualTenderActivity.getId(), null))))
+            .renderBidParticipantsForm(scap.getScapId(), actualTenderActivity.getId(), null))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/actualtender/bidParticipants"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(ActualTenderActivityController.class)
-                .renderExistingActualTenderActivityForm(scap.getId(), actualTenderActivity.getId()))))
+                .renderExistingActualTenderActivityForm(scap.getScapId(), actualTenderActivity.getId()))))
         .andExpect(model().attribute("bidParticipantCheckboxes",
             BidParticipantsFormService.getBidParticipantsCheckboxes(invitationToTenderParticipants)));
   }
@@ -96,7 +95,7 @@ class BidParticipantsControllerTest extends AbstractControllerTest {
     form.setSelectedBidParticipantIds(List.of(1272));
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderSummaryController.class)
-        .renderActualTenderSummary(scap.getId()));
+        .renderActualTenderSummary(scap.getScapId()));
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
@@ -107,7 +106,7 @@ class BidParticipantsControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(post(
         ReverseRouter.route(on(BidParticipantsController.class)
-            .renderBidParticipantsForm(scap.getId(), actualTenderActivity.getId(), null)))
+            .renderBidParticipantsForm(scap.getScapId(), actualTenderActivity.getId(), null)))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().is3xxRedirection())
@@ -123,7 +122,7 @@ class BidParticipantsControllerTest extends AbstractControllerTest {
     form.setSelectedBidParticipantIds(List.of(1272));
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     var expectedRedirectUrl = ReverseRouter.route(on(AwardedContractController.class)
-        .renderAwardedContractForm(scap.getId(), actualTenderActivity.getId()));
+        .renderAwardedContractForm(scap.getScapId(), actualTenderActivity.getId()));
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
@@ -134,7 +133,7 @@ class BidParticipantsControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(post(
         ReverseRouter.route(on(BidParticipantsController.class)
-            .renderBidParticipantsForm(scap.getId(), actualTenderActivity.getId(), null)))
+            .renderBidParticipantsForm(scap.getScapId(), actualTenderActivity.getId(), null)))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().is3xxRedirection())
@@ -159,14 +158,14 @@ class BidParticipantsControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(post(
         ReverseRouter.route(on(BidParticipantsController.class)
-            .renderBidParticipantsForm(scap.getId(), actualTenderActivity.getId(), null)))
+            .renderBidParticipantsForm(scap.getScapId(), actualTenderActivity.getId(), null)))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/actualtender/bidParticipants"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(ActualTenderActivityController.class)
-                .renderExistingActualTenderActivityForm(scap.getId(), actualTenderActivity.getId()))))
+                .renderExistingActualTenderActivityForm(scap.getScapId(), actualTenderActivity.getId()))))
         .andExpect(model().attribute("bidParticipantCheckboxes",
             BidParticipantsFormService.getBidParticipantsCheckboxes(invitationToTenderParticipants)))
         .andExpect(model().attributeExists("errorList"));

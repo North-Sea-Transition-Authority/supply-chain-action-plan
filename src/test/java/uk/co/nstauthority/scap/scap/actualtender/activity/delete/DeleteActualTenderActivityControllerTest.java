@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
@@ -44,7 +45,7 @@ import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
 @WithMockUser
 @ContextConfiguration(classes = DeleteActualTenderActivityController.class)
 @Import(ActualTenderControllerRedirectionServiceTestConfig.class)
-class DeleteActualTenderActivityControllerTest extends AbstractControllerTest {
+class DeleteActualTenderActivityControllerTest extends AbstractScapSubmitterControllerTest {
 
   @MockBean
   ScapDetailService scapDetailService;
@@ -64,19 +65,17 @@ class DeleteActualTenderActivityControllerTest extends AbstractControllerTest {
   @MockBean
   ContractingPerformanceService contractingPerformanceService;
 
-  private Scap scap;
   private ActualTenderActivity actualTenderActivity;
 
   @BeforeEach
   void setup() {
-    scap = new Scap(44);
     actualTenderActivity = new ActualTenderActivity(440);
   }
 
   @Test
   void renderDeleteActualTenderActivityConfirmation() throws Exception {
     var actualTenderSummaryView = new ActualTenderActivitySummaryView(
-        scap.getId(),
+        scap.getScapId(),
         actualTenderActivity.getId(),
         "test scope title",
         "test scope description",
@@ -90,23 +89,23 @@ class DeleteActualTenderActivityControllerTest extends AbstractControllerTest {
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
-    when(actualTenderSummaryViewService.getSingleViewByActualTenderActivity(actualTenderActivity, scap.getId()))
+    when(actualTenderSummaryViewService.getSingleViewByActualTenderActivity(actualTenderActivity, scap.getScapId()))
         .thenReturn(actualTenderSummaryView);
 
     mockMvc.perform(get(
         ReverseRouter.route(on(DeleteActualTenderActivityController.class)
-            .renderDeleteActualTenderActivityConfirmation(scap.getId(), actualTenderActivity.getId()))))
+            .renderDeleteActualTenderActivityConfirmation(scap.getScapId(), actualTenderActivity.getId()))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/actualtender/deleteActualTender"))
         .andExpect(model().attribute("backLinkUrl", ReverseRouter.route(on(ActualTenderSummaryController.class)
-            .renderActualTenderSummary(scap.getId()))))
+            .renderActualTenderSummary(scap.getScapId()))))
         .andExpect(model().attribute("actualTenderActivityView", actualTenderSummaryView));
   }
 
   @Test
   void renderDeleteActualTenderActivityConfirmation_HasContractingPerformance() throws Exception {
     var actualTenderSummaryView = new ActualTenderActivitySummaryView(
-        scap.getId(),
+        scap.getScapId(),
         actualTenderActivity.getId(),
         "test scope title",
         "test scope description",
@@ -120,17 +119,17 @@ class DeleteActualTenderActivityControllerTest extends AbstractControllerTest {
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
-    when(actualTenderSummaryViewService.getSingleViewByActualTenderActivity(actualTenderActivity, scap.getId()))
+    when(actualTenderSummaryViewService.getSingleViewByActualTenderActivity(actualTenderActivity, scap.getScapId()))
         .thenReturn(actualTenderSummaryView);
     when(contractingPerformanceService.hasContractingPerformance(actualTenderActivity)).thenReturn(true);
 
     mockMvc.perform(get(
         ReverseRouter.route(on(DeleteActualTenderActivityController.class)
-            .renderDeleteActualTenderActivityConfirmation(scap.getId(), actualTenderActivity.getId()))))
+            .renderDeleteActualTenderActivityConfirmation(scap.getScapId(), actualTenderActivity.getId()))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/actualtender/deleteActualTender"))
         .andExpect(model().attribute("backLinkUrl", ReverseRouter.route(on(ActualTenderSummaryController.class)
-            .renderActualTenderSummary(scap.getId()))))
+            .renderActualTenderSummary(scap.getScapId()))))
         .andExpect(model().attribute("actualTenderActivityView", actualTenderSummaryView))
         .andExpect(model().attribute("contractingPerformanceWarning",
             DeleteActualTenderActivityController.DELETES_CONTRACTING_PERFORMANCE_WARNING));
@@ -139,7 +138,7 @@ class DeleteActualTenderActivityControllerTest extends AbstractControllerTest {
   @Test
   void submitDeleteActualTenderActivity_SomeRemainingActivities_VerifyDeleteAndRedirect() throws Exception {
     var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderSummaryController.class)
-        .renderActualTenderSummary(scap.getId()));
+        .renderActualTenderSummary(scap.getScapId()));
     var scapDetail = new ScapDetail();
     var actualTender = new ActualTender();
 
@@ -151,7 +150,7 @@ class DeleteActualTenderActivityControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(post(
         ReverseRouter.route(on(DeleteActualTenderActivityController.class)
-            .renderDeleteActualTenderActivityConfirmation(scap.getId(), actualTenderActivity.getId())))
+            .renderDeleteActualTenderActivityConfirmation(scap.getScapId(), actualTenderActivity.getId())))
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(ControllerTestingUtil.redirectUrl(expectedRedirectUrl));
@@ -162,7 +161,7 @@ class DeleteActualTenderActivityControllerTest extends AbstractControllerTest {
   @Test
   void submitDeleteActualTenderActivity_NoRemainingActivities_VerifyDeleteAndRedirect() throws Exception {
     var expectedRedirectUrl = ReverseRouter.route(on(HasActualTenderController.class)
-        .renderHasActualTenderForm(scap.getId()));
+        .renderHasActualTenderForm(scap.getScapId()));
     var scapDetail = new ScapDetail();
     var actualTender = new ActualTender();
 
@@ -174,7 +173,7 @@ class DeleteActualTenderActivityControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(post(
             ReverseRouter.route(on(DeleteActualTenderActivityController.class)
-                .renderDeleteActualTenderActivityConfirmation(scap.getId(), actualTenderActivity.getId())))
+                .renderDeleteActualTenderActivityConfirmation(scap.getScapId(), actualTenderActivity.getId())))
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(ControllerTestingUtil.redirectUrl(expectedRedirectUrl));

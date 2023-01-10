@@ -88,7 +88,7 @@ public class PlannedTenderController {
           plannedTenderService
               .updatePlannedTenderHasMorePlannedTenders(plannedTender, form.getHasMorePlannedTenderActivities());
 
-          return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId.scapId()));
+          return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
         });
   }
 
@@ -98,7 +98,7 @@ public class PlannedTenderController {
     return new ModelAndView("scap/scap/plannedtender/plannedTenderActivityList")
         .addObject("form", form)
         .addObject("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId.scapId())))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
         .addObject("plannedTenderDetailsList",
             plannedTenderActivityListService.plannedTenderDetailsToListItems(scapId, existingTenderDetails))
         .addObject("radioItems", HasMorePlannedTenderActivities.getRadioItems());

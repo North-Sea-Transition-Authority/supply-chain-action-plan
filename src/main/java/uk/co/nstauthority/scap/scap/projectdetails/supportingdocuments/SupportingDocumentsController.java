@@ -16,10 +16,14 @@ import uk.co.nstauthority.scap.file.FileDeleteResult;
 import uk.co.nstauthority.scap.file.FileUploadResult;
 import uk.co.nstauthority.scap.file.FileUploadService;
 import uk.co.nstauthority.scap.file.FileUploadUtils;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @RestController
 @RequestMapping("/{scapId}/supporting-documents")
+@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
 public class SupportingDocumentsController {
 
   private final SupportingDocumentService supportingDocumentService;
@@ -37,7 +41,7 @@ public class SupportingDocumentsController {
 
   @PostMapping("upload/{supportingDocumentType}")
   @ResponseBody
-  public FileUploadResult upload(@PathVariable("scapId") Integer scapId,
+  public FileUploadResult upload(@PathVariable("scapId") ScapId scapId,
                                  @PathVariable("supportingDocumentType") SupportingDocumentType supportingDocumentType,
                                  @RequestParam("file") MultipartFile multipartFile) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
@@ -46,7 +50,7 @@ public class SupportingDocumentsController {
 
   @GetMapping("download/{uploadedFileId}")
   @ResponseBody
-  public ResponseEntity<InputStreamResource> download(@PathVariable("scapId") Integer scapId,
+  public ResponseEntity<InputStreamResource> download(@PathVariable("scapId") ScapId scapId,
                                                       @PathVariable("uploadedFileId") UUID uploadedFileId) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
     var uploadedFile = supportingDocumentService.findUploadedFileOrThrow(scapDetail, uploadedFileId);
@@ -56,7 +60,7 @@ public class SupportingDocumentsController {
 
   @PostMapping("delete/{uploadedFileId}")
   @ResponseBody
-  public FileDeleteResult delete(@PathVariable("scapId") Integer scapId,
+  public FileDeleteResult delete(@PathVariable("scapId") ScapId scapId,
                                  @PathVariable("uploadedFileId") UUID uploadedFileId) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
     return supportingDocumentService.deleteFile(scapDetail, uploadedFileId);

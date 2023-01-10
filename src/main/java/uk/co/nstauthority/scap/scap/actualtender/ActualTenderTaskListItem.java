@@ -9,6 +9,7 @@ import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTender
 import uk.co.nstauthority.scap.scap.actualtender.summary.HasMoreActualTenderActivities;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapFormTaskListSection;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.tasklist.ScapTaskListItem;
 import uk.co.nstauthority.scap.tasklist.TaskListSection;
@@ -37,7 +38,7 @@ public class ActualTenderTaskListItem implements ScapTaskListItem {
 
   @Override
   public String getActionUrl(Integer scapId) {
-    return ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scapId));
+    return ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(new ScapId(scapId)));
   }
 
   @Override

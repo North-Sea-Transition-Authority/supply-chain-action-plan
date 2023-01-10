@@ -24,6 +24,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapFormTaskListSection;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 
 @ExtendWith(MockitoExtension.class)
@@ -62,7 +63,7 @@ class ActualTenderTaskListItemTest {
 
   @Test
   void getActionUrl() {
-    var expectedUrl = ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scapId));
+    var expectedUrl = ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(new ScapId(scapId)));
 
     var returnedUrl = actualTenderTaskListItem.getActionUrl(scapId);
 

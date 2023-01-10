@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.scap.ScapFormTaskListSection;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.tasklist.ScapTaskListItem;
 import uk.co.nstauthority.scap.tasklist.TaskListSection;
@@ -33,7 +34,7 @@ public class OperatorTaskListItem implements ScapTaskListItem {
 
   @Override
   public String getActionUrl(Integer target) {
-    return ReverseRouter.route(on(OrganisationGroupController.class).renderExistingScapOrganisationGroupForm(target));
+    return ReverseRouter.route(on(OrganisationGroupController.class).renderExistingScapOrganisationGroupForm(new ScapId(target)));
   }
 
   @Override

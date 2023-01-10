@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderControllerRedirectionService;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
@@ -20,10 +22,12 @@ import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTender
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 
 @Controller
 @RequestMapping("{scapId}/actual-tender/activity")
+@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
 public class ActualTenderActivityController {
 
   static final String DELETES_CONTRACTING_PERFORMANCE_WARNING =
@@ -63,7 +67,7 @@ public class ActualTenderActivityController {
   }
 
   @GetMapping
-  public ModelAndView renderActualTenderActivityForm(@PathVariable("scapId") Integer scapId,
+  public ModelAndView renderActualTenderActivityForm(@PathVariable("scapId") ScapId scapId,
                                                      @ModelAttribute("form") ActualTenderActivityForm form) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
@@ -74,7 +78,7 @@ public class ActualTenderActivityController {
   }
 
   @PostMapping
-  public ModelAndView saveActualTenderActivityForm(@PathVariable("scapId") Integer scapId,
+  public ModelAndView saveActualTenderActivityForm(@PathVariable("scapId") ScapId scapId,
                                                    @ModelAttribute("form") ActualTenderActivityForm form,
                                                    BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
@@ -100,7 +104,7 @@ public class ActualTenderActivityController {
   }
 
   @GetMapping("/{activityId}")
-  public ModelAndView renderExistingActualTenderActivityForm(@PathVariable("scapId") Integer scapId,
+  public ModelAndView renderExistingActualTenderActivityForm(@PathVariable("scapId") ScapId scapId,
                                                              @PathVariable("activityId") Integer activityId) {
     scapService.getScapById(scapId);
     var actualTenderActivity = actualTenderActivityService.getById(activityId);
@@ -118,7 +122,7 @@ public class ActualTenderActivityController {
   }
 
   @PostMapping("/{activityId}")
-  public ModelAndView saveExistingActualTenderActivityForm(@PathVariable("scapId") Integer scapId,
+  public ModelAndView saveExistingActualTenderActivityForm(@PathVariable("scapId") ScapId scapId,
                                                            @PathVariable("activityId") Integer activityId,
                                                            @ModelAttribute("form") ActualTenderActivityForm form,
                                                            BindingResult bindingResult) {

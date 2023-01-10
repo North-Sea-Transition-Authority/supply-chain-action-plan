@@ -24,6 +24,7 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSubmissionStage;
 
 @ExtendWith(MockitoExtension.class)
@@ -81,8 +82,8 @@ class WorkAreaServiceTest {
 
     var views = workAreaService.getWorkAreaItems();
 
-    assertThat(views).extracting(
-        WorkAreaItem::scapId,
+    assertThat(views).extracting(workAreaItem ->
+        workAreaItem.scapId().scapId(),
         WorkAreaItem::scapVersion,
         WorkAreaItem::reference,
         WorkAreaItem::operator,
@@ -109,7 +110,7 @@ class WorkAreaServiceTest {
     team.setTeamType(TeamType.INDUSTRY);
     team.setEnergyPortalOrgGroupId(organisationGroup.getOrganisationGroupId());
     var workAreaItemDto = new WorkAreaItemDto(
-        1,
+       1,
         21,
         "TEST-REF",
         "Project name",
@@ -133,8 +134,8 @@ class WorkAreaServiceTest {
 
     var views = workAreaService.getWorkAreaItems();
 
-    assertThat(views).extracting(
-        WorkAreaItem::scapId,
+    assertThat(views).extracting(workAreaItem ->
+        workAreaItem.scapId().scapId(),
         WorkAreaItem::scapVersion,
         WorkAreaItem::reference,
         WorkAreaItem::operator,
@@ -201,7 +202,7 @@ class WorkAreaServiceTest {
     var views = workAreaService.getWorkAreaItems();
 
     assertThat(views).extracting(
-        WorkAreaItem::scapId
+        item -> item.scapId().scapId()
     ).containsExactly(
         newSubmittedScapDto.scapId(),
         oldSubmittedScapDto.scapId(),

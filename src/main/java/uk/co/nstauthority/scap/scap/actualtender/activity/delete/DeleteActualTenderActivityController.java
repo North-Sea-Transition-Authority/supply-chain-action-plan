@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderControllerRedirectionService;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
@@ -18,11 +20,13 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivitySe
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryViewService;
 
 @Controller
 @RequestMapping("{scapId}/actual-tender/activity/{activityId}/delete")
+@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
 public class DeleteActualTenderActivityController {
 
   static final String DELETES_CONTRACTING_PERFORMANCE_WARNING =
@@ -56,7 +60,7 @@ public class DeleteActualTenderActivityController {
   }
 
   @GetMapping
-  public ModelAndView renderDeleteActualTenderActivityConfirmation(@PathVariable("scapId") Integer scapId,
+  public ModelAndView renderDeleteActualTenderActivityConfirmation(@PathVariable("scapId") ScapId scapId,
                                                                    @PathVariable("activityId") Integer activityId) {
     scapService.getScapById(scapId);
     var actualTenderActivity = actualTenderActivityService.getById(activityId);
@@ -73,7 +77,7 @@ public class DeleteActualTenderActivityController {
   }
 
   @PostMapping
-  public ModelAndView submitDeleteActualTenderActivity(@PathVariable("scapId") Integer scapId,
+  public ModelAndView submitDeleteActualTenderActivity(@PathVariable("scapId") ScapId scapId,
                                                        @PathVariable("activityId") Integer activityId,
                                                        RedirectAttributes redirectAttributes) {
     var scap = scapService.getScapById(scapId);

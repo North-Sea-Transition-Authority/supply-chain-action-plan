@@ -20,6 +20,7 @@ import uk.co.nstauthority.scap.file.UploadedFileView;
 import uk.co.nstauthority.scap.file.VirtualFolder;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @Service
 public class SupportingDocumentService {
@@ -78,7 +79,7 @@ public class SupportingDocumentService {
     return fileUploadService.getUploadedFileViewList(fileUploadIdList);
   }
 
-  public FileUploadTemplate buildFileUploadTemplate(Integer scapDetailId, SupportingDocumentType supportingDocumentType) {
+  public FileUploadTemplate buildFileUploadTemplate(ScapId scapDetailId, SupportingDocumentType supportingDocumentType) {
     return fileUploadService.buildFileUploadTemplate(
         ReverseRouter.route(on(SupportingDocumentsController.class).download(scapDetailId, null)),
         ReverseRouter.route(

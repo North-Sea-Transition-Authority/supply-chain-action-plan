@@ -10,11 +10,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.util.TaskListSectionUtil;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @Controller
-@RequestMapping("/{scapOverviewId}/tasks")
+@RequestMapping("/{scapId}/tasks")
+@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
 public class TaskListController {
 
   static final String WORK_AREA_URL = ReverseRouter.route(on(WorkAreaController.class).getWorkArea());
@@ -29,11 +33,13 @@ public class TaskListController {
   }
 
   @GetMapping
-  public ModelAndView renderTaskList(@PathVariable("scapOverviewId") Integer scapId) {
+  public ModelAndView renderTaskList(@PathVariable("scapId") ScapId scapId) {
 
     return new ModelAndView("scap/scap/taskList")
         .addObject("backLinkUrl", WORK_AREA_URL)
-        .addObject("taskListSections", TaskListSectionUtil.createSectionViews(scapTaskListSections, scapTaskListItems, scapId));
+        .addObject("taskListSections",
+            TaskListSectionUtil.createSectionViews(scapTaskListSections,
+                scapTaskListItems,
+                scapId.scapId()));
   }
-
 }

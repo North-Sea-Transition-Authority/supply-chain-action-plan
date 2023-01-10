@@ -15,17 +15,21 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityController;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @Controller
 @RequestMapping("{scapId}/actual-tender")
+@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
 public class HasActualTenderController {
 
   private final ScapService scapService;
@@ -49,7 +53,7 @@ public class HasActualTenderController {
   }
 
   @GetMapping
-  public ModelAndView renderHasActualTenderForm(@PathVariable("scapId") Integer scapId) {
+  public ModelAndView renderHasActualTenderForm(@PathVariable("scapId") ScapId scapId) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
     var actualTender = actualTenderService.getByScapDetail(scapDetail);
@@ -64,7 +68,7 @@ public class HasActualTenderController {
   }
 
   @PostMapping
-  ModelAndView saveHasActualTenderForm(@PathVariable("scapId") Integer scapId,
+  ModelAndView saveHasActualTenderForm(@PathVariable("scapId") ScapId scapId,
                                        @ModelAttribute("form") HasActualTenderForm form,
                                        BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
@@ -94,7 +98,7 @@ public class HasActualTenderController {
         });
   }
 
-  private ModelAndView hasActualTenderFormModelAndView(Integer scapId, HasActualTenderForm form) {
+  private ModelAndView hasActualTenderFormModelAndView(ScapId scapId, HasActualTenderForm form) {
     return new ModelAndView("scap/scap/actualtender/hasActualTender")
         .addObject("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))

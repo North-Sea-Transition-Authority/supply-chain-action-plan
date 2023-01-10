@@ -19,6 +19,7 @@ import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequired;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.start.ScapStartController;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
@@ -69,11 +70,11 @@ public class OrganisationGroupController {
     }
 
     var scap = createScap(Integer.valueOf(form.getOrganisationGroupId().getInputValue()));
-    return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scap.getId()));
+    return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scap.getScapId()));
   }
 
   @GetMapping("/{scapOverviewId}/organisation-group")
-  public ModelAndView renderExistingScapOrganisationGroupForm(@PathVariable("scapOverviewId") Integer scapId) {
+  public ModelAndView renderExistingScapOrganisationGroupForm(@PathVariable("scapOverviewId") ScapId scapId) {
     var scapOverview = scapService.getScapById(scapId);
     var form = organisationGroupFormService.getForm(scapOverview);
     var postUrl = ReverseRouter.route(on(OrganisationGroupController.class)
@@ -90,7 +91,7 @@ public class OrganisationGroupController {
 
   @PostMapping("/{scapOverviewId}/organisation-group")
   public ModelAndView saveExistingScapOrganisationGroup(@ModelAttribute("form") OrganisationGroupForm form,
-                                                        @PathVariable("scapOverviewId") Integer scapId,
+                                                        @PathVariable("scapOverviewId") ScapId scapId,
                                                         BindingResult bindingResult) {
     var scapOverview = scapService.getScapById(scapId);
     bindingResult = organisationGroupFormService.validate(form, bindingResult);

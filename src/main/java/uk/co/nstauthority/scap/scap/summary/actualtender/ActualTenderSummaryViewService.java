@@ -14,6 +14,7 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderPart
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipantService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContract;
 import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContractService;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @Repository
 public class ActualTenderSummaryViewService {
@@ -32,12 +33,12 @@ public class ActualTenderSummaryViewService {
   }
 
   public ActualTenderActivitySummaryView getSingleViewByActualTenderActivity(ActualTenderActivity actualTenderActivity,
-                                                                     Integer scapId) {
+                                                                     ScapId scapId) {
     return getByActualTenderActivities(List.of(actualTenderActivity), scapId).get(0);
   }
 
   public List<ActualTenderActivitySummaryView> getByActualTenderActivities(List<ActualTenderActivity> activities,
-                                                                           Integer scapId) {
+                                                                           ScapId scapId) {
     var invitationToTenderParticipants = invitationToTenderParticipantService
         .getInvitationToTenderParticipantsForActivities(activities);
     var invitationToTenderParticipantsMap = getActivityParticipantsMap(invitationToTenderParticipants);

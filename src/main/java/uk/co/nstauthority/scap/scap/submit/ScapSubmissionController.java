@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.error.exception.ScapBadRequestException;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
+import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
@@ -23,6 +26,7 @@ import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @Controller
 @RequestMapping("{scapId}/submit")
+@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
 class ScapSubmissionController {
 
   private final ScapService scapService;
@@ -43,7 +47,7 @@ class ScapSubmissionController {
   }
 
   @GetMapping
-  ModelAndView renderScapSubmissionConfirmation(@PathVariable("scapId") Integer scapId) {
+  ModelAndView renderScapSubmissionConfirmation(@PathVariable("scapId") ScapId scapId) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
 
     if (!ScapDetailStatus.DRAFT.equals(scapDetail.getStatus())) {
@@ -55,7 +59,7 @@ class ScapSubmissionController {
   }
 
   @GetMapping("/success")
-  ModelAndView renderScapSubmissionSuccess(@PathVariable("scapId") Integer scapId) {
+  ModelAndView renderScapSubmissionSuccess(@PathVariable("scapId") ScapId scapId) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
 
@@ -69,7 +73,7 @@ class ScapSubmissionController {
   }
 
   @PostMapping
-  ModelAndView submitScap(@PathVariable("scapId") Integer scapId) {
+  ModelAndView submitScap(@PathVariable("scapId") ScapId scapId) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
 
     if (!ScapDetailStatus.DRAFT.equals(scapDetail.getStatus())) {
@@ -77,12 +81,12 @@ class ScapSubmissionController {
     }
 
     scapDetailService.submitScap(scapDetail);
-    timelineEventService.recordNewEvent(SCAP_SUBMITTED, new ScapId(scapId), scapDetail.getVersionNumber());
+    timelineEventService.recordNewEvent(SCAP_SUBMITTED, scapId, scapDetail.getVersionNumber());
 
     return ReverseRouter.redirect(on(ScapSubmissionController.class).renderScapSubmissionSuccess(scapId));
   }
 
-  private ModelAndView scapSubmissionConfirmationModelAndView(Integer scapId) {
+  private ModelAndView scapSubmissionConfirmationModelAndView(ScapId scapId) {
     return new ModelAndView("scap/scap/submit/reviewAndSubmit")
         .addObject("backLinkUrl", ReverseRouter.route(on(TaskListController.class)
             .renderTaskList(scapId)));

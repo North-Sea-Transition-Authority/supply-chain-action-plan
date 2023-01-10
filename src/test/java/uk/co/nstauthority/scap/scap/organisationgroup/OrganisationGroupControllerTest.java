@@ -26,10 +26,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.fds.ErrorItem;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.start.ScapStartController;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
@@ -38,7 +40,7 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = OrganisationGroupController.class)
 @WithMockUser
-class OrganisationGroupControllerTest extends AbstractControllerTest {
+class OrganisationGroupControllerTest extends AbstractScapSubmitterControllerTest {
 
   @MockBean
   ScapDetailService scapDetailService;
@@ -72,12 +74,10 @@ class OrganisationGroupControllerTest extends AbstractControllerTest {
 
   @Test
   void saveNewScapOrganisationGroup_valid_verifyCreatesEntities() throws Exception {
-    var scapId = 234;
     var postUrl = ReverseRouter.route(on(OrganisationGroupController.class)
         .saveNewScapOrganisationGroup(null, emptyBindingResult()));
-    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId));
+    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID));
     var form = new OrganisationGroupForm();
-    var scap = new Scap(scapId);
     scap.setOrganisationGroupId(ORGANISATION_GROUP_ID);
 
     when(scapService.createScap(ORGANISATION_GROUP_ID))
@@ -122,7 +122,7 @@ class OrganisationGroupControllerTest extends AbstractControllerTest {
   @Test
   void renderExistingScapOrganisationGroupForm() throws Exception {
     var organisationGroupId = 322;
-    var scapId = 1;
+    var scapId = new ScapId(1);
     var organisationGroup = new OrganisationGroup(organisationGroupId, "CENTRICA", null, null, null, null);
     var scapOverview = new Scap(scapId);
     scapOverview.setOrganisationGroupId(organisationGroupId);
@@ -138,10 +138,10 @@ class OrganisationGroupControllerTest extends AbstractControllerTest {
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/organisationGroup"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(1))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId))))
         .andExpect(model().attribute("submitPostUrl",
             ReverseRouter.route(on(OrganisationGroupController.class)
-                .saveExistingScapOrganisationGroup(null, 1, emptyBindingResult()))))
+                .saveExistingScapOrganisationGroup(null, scapId, emptyBindingResult()))))
         .andExpect(model().attribute("organisationGroupSearchRestUrl",
             ReverseRouter.route(on(OrganisationGroupRestController.class)
                 .getOrganisationGroupSearchResults(null))))
@@ -150,14 +150,14 @@ class OrganisationGroupControllerTest extends AbstractControllerTest {
 
   @Test
   void saveExistingScapOrganisationGroup_valid() throws Exception {
-    var scapId = 1;
-    var postUrl = ReverseRouter.route(on(OrganisationGroupController.class)
-        .saveExistingScapOrganisationGroup(null, scapId, emptyBindingResult()));
-    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId));
-    var form = new OrganisationGroupForm();
-    var scapOverview = new Scap(scapId);
 
-    when(scapService.getScapById(scapId)).thenReturn(scapOverview);
+    var postUrl = ReverseRouter.route(on(OrganisationGroupController.class)
+        .saveExistingScapOrganisationGroup(null, SCAP_ID, emptyBindingResult()));
+    var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID));
+    var form = new OrganisationGroupForm();
+    var scapOverview = new Scap(SCAP_ID);
+
+    when(scapService.getScapById(SCAP_ID)).thenReturn(scapOverview);
     when(organisationGroupFormService.validate(any(OrganisationGroupForm.class), any(BindingResult.class)))
         .thenReturn(new BeanPropertyBindingResult(form, "form"));
 
@@ -176,7 +176,7 @@ class OrganisationGroupControllerTest extends AbstractControllerTest {
   void saveExistingScapOrganisationGroup_invalid() throws Exception {
     var scapId = 1;
     var postUrl = ReverseRouter.route(on(OrganisationGroupController.class)
-        .saveExistingScapOrganisationGroup(null, scapId, emptyBindingResult()));
+        .saveExistingScapOrganisationGroup(null, SCAP_ID, emptyBindingResult()));
     var form = new OrganisationGroupForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));

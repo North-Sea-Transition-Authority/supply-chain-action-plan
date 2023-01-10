@@ -40,7 +40,7 @@ public class ScapSummaryController {
 
   @GetMapping
   public ModelAndView getScapSummary(@PathVariable("scapId") ScapId scapId) {
-    var scapDetailOptional = scapDetailService.getLatestScapDetailByScapId(scapId.scapId());
+    var scapDetailOptional = scapDetailService.getLatestScapDetailByScapId(scapId);
     if (scapDetailOptional.isPresent()) {
       var scapDetail = scapDetailOptional.get();
       var scapSummary = scapSummaryViewService.getScapSummaryView(scapDetail);
