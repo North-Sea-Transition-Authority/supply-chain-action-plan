@@ -39,6 +39,11 @@ public class Scap {
     this.id = id;
   }
 
+  @VisibleForTesting
+  public Scap(ScapId id) {
+    this.id = id.scapId();
+  }
+
   public Integer getId() {
     return id;
   }

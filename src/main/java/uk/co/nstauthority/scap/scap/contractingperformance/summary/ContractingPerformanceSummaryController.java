@@ -14,10 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverviewService;
 import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperformance.HasContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryView;
 import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryViewService;
@@ -25,6 +28,7 @@ import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @Controller
 @RequestMapping("{scapId}/contracting-performance/summary")
+@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
 public class ContractingPerformanceSummaryController {
 
   private final ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService;
@@ -50,7 +54,7 @@ public class ContractingPerformanceSummaryController {
   }
 
   @GetMapping
-  public ModelAndView renderContractingPerformanceSummary(@PathVariable("scapId") Integer scapId) {
+  public ModelAndView renderContractingPerformanceSummary(@PathVariable("scapId") ScapId scapId) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
     var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail);
@@ -66,7 +70,7 @@ public class ContractingPerformanceSummaryController {
   }
 
   @PostMapping
-  public ModelAndView saveContractingPerformanceSummary(@PathVariable("scapId") Integer scapId,
+  public ModelAndView saveContractingPerformanceSummary(@PathVariable("scapId") ScapId scapId,
                                                         @ModelAttribute("form") HasMoreContractingPerformanceForm form,
                                                         BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
@@ -92,15 +96,15 @@ public class ContractingPerformanceSummaryController {
           }
           contractingPerformanceOverviewService.updateHasMoreContractingPerformance(
               contractingPerformanceOverview, form.getHasMoreContractingPerformance());
-          return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
+          return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId.scapId()));
         }
     );
   }
 
-  private ModelAndView contractingPerformanceSummaryModelAndView(Integer scapId,
+  private ModelAndView contractingPerformanceSummaryModelAndView(ScapId scapId,
                                                                  List<ContractingPerformanceSummaryView> summaryViews) {
     return new ModelAndView("scap/scap/contractingperformance/contractingPerformanceSummary")
-        .addObject("backLinkUrl", ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
+        .addObject("backLinkUrl", ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId.scapId())))
         .addObject("summaryViews", summaryViews)
         .addObject("radioItems", HasMoreContractingPerformance.getRadioItems());
   }

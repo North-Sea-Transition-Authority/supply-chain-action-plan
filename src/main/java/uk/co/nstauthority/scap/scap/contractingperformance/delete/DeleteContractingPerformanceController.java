@@ -12,17 +12,21 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverviewService;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
 import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperformance.HasContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryViewService;
 import uk.co.nstauthority.scap.util.DeletionSuccessBannerUtil;
 
 @Controller
 @RequestMapping("{scapId}/contracting-performance/{contractingPerformanceId}/delete")
+@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
 public class DeleteContractingPerformanceController {
 
   private final ScapService scapService;
@@ -45,14 +49,14 @@ public class DeleteContractingPerformanceController {
   }
 
   @GetMapping
-  public ModelAndView renderDeleteContractingPerformanceConfirmation(@PathVariable("scapId") Integer scapId,
+  public ModelAndView renderDeleteContractingPerformanceConfirmation(@PathVariable("scapId") ScapId scapId,
                                                                      @PathVariable("contractingPerformanceId")
                                                                      Integer contractingPerformanceId) {
     var summaryView = contractingPerformanceSummaryViewService
         .getContractingPerformanceSummaryView(scapId, contractingPerformanceId)
         .orElseThrow(() -> new ScapEntityNotFoundException(
             "Could not get ContractingPerformanceSummaryDto for scapId: [%d] and contractingPerformanceId: [%d]"
-                .formatted(scapId, contractingPerformanceId)));
+                .formatted(scapId.scapId(), contractingPerformanceId)));
 
     return new ModelAndView("scap/scap/contractingperformance/deleteContractingPerformance")
         .addObject("backLinkUrl", ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
@@ -61,7 +65,7 @@ public class DeleteContractingPerformanceController {
   }
 
   @PostMapping
-  public ModelAndView saveDeleteContractingPerformance(@PathVariable("scapId") Integer scapId,
+  public ModelAndView saveDeleteContractingPerformance(@PathVariable("scapId") ScapId scapId,
                                                        @PathVariable("contractingPerformanceId")
                                                        Integer contractingPerformanceId,
                                                        RedirectAttributes redirectAttributes) {

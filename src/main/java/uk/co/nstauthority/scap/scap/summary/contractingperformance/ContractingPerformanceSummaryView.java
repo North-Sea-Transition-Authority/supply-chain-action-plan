@@ -7,8 +7,9 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.contractingperformance.delete.DeleteContractingPerformanceController;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 
-public record ContractingPerformanceSummaryView(Integer scapId,
+public record ContractingPerformanceSummaryView(ScapId scapId,
                                                 Integer contractingPerformanceId,
                                                 String scopeTitle,
                                                 String scopeDescription,

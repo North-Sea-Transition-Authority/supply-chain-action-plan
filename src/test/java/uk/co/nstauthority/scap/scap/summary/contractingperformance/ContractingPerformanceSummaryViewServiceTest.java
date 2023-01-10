@@ -18,6 +18,7 @@ import uk.co.fivium.energyportalapi.generated.types.PortalCountrySet;
 import uk.co.fivium.energyportalapi.generated.types.PortalCountryStatus;
 import uk.co.nstauthority.scap.energyportal.CountryService;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @ExtendWith(MockitoExtension.class)
 class ContractingPerformanceSummaryViewServiceTest {
@@ -31,14 +32,14 @@ class ContractingPerformanceSummaryViewServiceTest {
   @InjectMocks
   ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService;
 
-  private Integer scapId;
+  private ScapId scapId;
   private Integer contractingPerformanceId;
   private Country country;
   private ContractingPerformanceSummaryDto contractingPerformanceSummaryDto;
 
   @BeforeEach
   void setup() {
-    scapId = 11;
+    scapId = new ScapId(11);
     contractingPerformanceId = 123;
     country = new Country(0, "United Kingdom", PortalCountryStatus.ACTIVE, PortalCountrySet.EXPORT_CONTROL);
     contractingPerformanceSummaryDto = new ContractingPerformanceSummaryDto(
@@ -51,7 +52,7 @@ class ContractingPerformanceSummaryViewServiceTest {
   void getContractingPerformanceSummaryView() {
     when(countryService.findCountryById(country.getCountryId(), ContractingPerformanceSummaryViewService.REQUEST_PURPOSE))
         .thenReturn(Optional.of(country));
-    when(contractingPerformanceSummaryDtoRepository.findByScapIdAndContractingPerformanceId(scapId, contractingPerformanceId))
+    when(contractingPerformanceSummaryDtoRepository.findByScapIdAndContractingPerformanceId(scapId.scapId(), contractingPerformanceId))
         .thenReturn(Optional.of(contractingPerformanceSummaryDto));
 
     var view =
@@ -87,7 +88,7 @@ class ContractingPerformanceSummaryViewServiceTest {
 
   @Test
   void getContractingPerformanceSummaryView_WhenNotFound_AssertEmpty() {
-    when(contractingPerformanceSummaryDtoRepository.findByScapIdAndContractingPerformanceId(scapId, contractingPerformanceId))
+    when(contractingPerformanceSummaryDtoRepository.findByScapIdAndContractingPerformanceId(scapId.scapId(), contractingPerformanceId))
         .thenReturn(Optional.empty());
 
     var view =
@@ -100,7 +101,7 @@ class ContractingPerformanceSummaryViewServiceTest {
   void getContractingPerformanceSummaryViews() {
     when(countryService.getCountriesByIds(List.of(country.getCountryId()), ContractingPerformanceSummaryViewService.REQUEST_PURPOSE))
         .thenReturn(List.of(country));
-    when(contractingPerformanceSummaryDtoRepository.getAllByScapId(scapId))
+    when(contractingPerformanceSummaryDtoRepository.getAllByScapId(scapId.scapId()))
         .thenReturn(List.of(contractingPerformanceSummaryDto));
 
     var views = contractingPerformanceSummaryViewService

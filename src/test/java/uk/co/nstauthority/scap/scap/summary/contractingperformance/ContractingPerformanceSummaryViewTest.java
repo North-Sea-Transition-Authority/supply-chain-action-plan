@@ -12,6 +12,7 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.contractingperformance.delete.DeleteContractingPerformanceController;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @ExtendWith(MockitoExtension.class)
 class ContractingPerformanceSummaryViewTest {
@@ -19,11 +20,12 @@ class ContractingPerformanceSummaryViewTest {
   private Integer scapId;
   private ContractingPerformanceSummaryView contractingPerformanceSummaryView;
 
+  private static final ScapId SCAP_ID = new ScapId(51);
+
   @BeforeEach
   void setup() {
-    scapId = 51;
     contractingPerformanceSummaryView = new ContractingPerformanceSummaryView(
-        scapId,
+        SCAP_ID,
         1813,
         "some scope title",
         "some scope description",
@@ -41,7 +43,7 @@ class ContractingPerformanceSummaryViewTest {
   void getChangeLinkUrl() {
     var expectedChangeLinkUrl = ReverseRouter.route(on(ContractingPerformanceController.class)
         .renderExistingContractingPerformanceForm(
-            scapId, contractingPerformanceSummaryView.contractingPerformanceId()));
+            SCAP_ID, contractingPerformanceSummaryView.contractingPerformanceId()));
 
     assertThat(contractingPerformanceSummaryView.getChangeLinkUrl()).isEqualTo(expectedChangeLinkUrl);
   }

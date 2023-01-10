@@ -19,7 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
-import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
@@ -31,8 +31,6 @@ import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperform
 import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
-import uk.co.nstauthority.scap.scap.scap.Scap;
-import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryView;
 import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryViewService;
 import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
@@ -40,7 +38,7 @@ import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = DeleteContractingPerformanceController.class)
 @WithMockUser
-class DeleteContractingPerformanceControllerTest extends AbstractControllerTest {
+class DeleteContractingPerformanceControllerTest extends AbstractScapSubmitterControllerTest {
 
   @MockBean
   ScapDetailService scapDetailService;
@@ -53,51 +51,47 @@ class DeleteContractingPerformanceControllerTest extends AbstractControllerTest 
 
   @MockBean
   ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService;
-
-  private Integer scapId = 51;
   private Integer contractingPerformanceId = 4357;
 
   @BeforeEach
   void setup() {
-    scapId = 51;
     contractingPerformanceId = 4357;
   }
 
   @Test
   void renderDeleteContractingPerformanceConfirmation_NoSummaryView_AssertNotFound() throws Exception{
-    when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryView(scapId, contractingPerformanceId))
+    when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryView(SCAP_ID, contractingPerformanceId))
         .thenReturn(Optional.empty());
 
     mockMvc.perform(get(
         ReverseRouter.route(on(DeleteContractingPerformanceController.class)
-            .renderDeleteContractingPerformanceConfirmation(scapId, contractingPerformanceId))))
+            .renderDeleteContractingPerformanceConfirmation(SCAP_ID, contractingPerformanceId))))
         .andExpect(status().isNotFound());
   }
 
   @Test
   void renderDeleteContractingPerformanceConfirmation() throws Exception {
     var view = new ContractingPerformanceSummaryView(
-        scapId, contractingPerformanceId, "Test scope title", "Test scope description",
+        SCAP_ID, contractingPerformanceId, "Test scope title", "Test scope description",
         BigDecimal.valueOf(47.59), RemunerationModel.LUMP_SUM, null, "contractor name",
         "United Kingdom", BigDecimal.valueOf(48.29), "some outturn rationale"
     );
 
-    when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryView(scapId, contractingPerformanceId))
+    when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryView(SCAP_ID, contractingPerformanceId))
         .thenReturn(Optional.of(view));
 
     mockMvc.perform(get(
         ReverseRouter.route(on(DeleteContractingPerformanceController.class)
-            .renderDeleteContractingPerformanceConfirmation(scapId, contractingPerformanceId))))
+            .renderDeleteContractingPerformanceConfirmation(SCAP_ID, contractingPerformanceId))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/contractingperformance/deleteContractingPerformance"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(ContractingPerformanceSummaryController.class).renderContractingPerformanceSummary(scapId))))
+            ReverseRouter.route(on(ContractingPerformanceSummaryController.class).renderContractingPerformanceSummary(SCAP_ID))))
         .andExpect(model().attribute("summaryView", view));
   }
 
   @Test
   void saveDeleteContractingPerformance_VerifyDeletes() throws Exception {
-    var scap = new Scap(scapId);
     var scapDetail = new ScapDetail();
     var contractingPerformanceOverview = new ContractingPerformanceOverview();
     var actualTenderActivity = new ActualTenderActivity();
@@ -105,9 +99,8 @@ class DeleteContractingPerformanceControllerTest extends AbstractControllerTest 
     var contractingPerformance = new ContractingPerformance(contractingPerformanceId);
     contractingPerformance.setActualTenderActivity(actualTenderActivity);
     var expectedRedirectUrl = ReverseRouter.route(on(HasContractingPerformanceController.class)
-        .renderHasContractingPerformanceForm(scapId));
+        .renderHasContractingPerformanceForm(SCAP_ID));
 
-    when(scapService.getScapById(scapId)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
@@ -116,7 +109,7 @@ class DeleteContractingPerformanceControllerTest extends AbstractControllerTest 
 
     mockMvc.perform(post(
         ReverseRouter.route(on(DeleteContractingPerformanceController.class)
-            .saveDeleteContractingPerformance(scapId, contractingPerformanceId, null)))
+            .saveDeleteContractingPerformance(SCAP_ID, contractingPerformanceId, null)))
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(ControllerTestingUtil.redirectUrl(expectedRedirectUrl));
@@ -126,7 +119,6 @@ class DeleteContractingPerformanceControllerTest extends AbstractControllerTest 
 
   @Test
   void saveDeleteContractingPerformance_StillHasContractingPerformance_VerifyDeleteAndRedirect() throws Exception {
-    var scap = new Scap(scapId);
     var scapDetail = new ScapDetail();
     var contractingPerformanceOverview = new ContractingPerformanceOverview();
     var actualTenderActivity = new ActualTenderActivity();
@@ -134,9 +126,8 @@ class DeleteContractingPerformanceControllerTest extends AbstractControllerTest 
     var contractingPerformance = new ContractingPerformance(contractingPerformanceId);
     contractingPerformance.setActualTenderActivity(actualTenderActivity);
     var expectedRedirectUrl = ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
-        .renderContractingPerformanceSummary(scapId));
+        .renderContractingPerformanceSummary(SCAP_ID));
 
-    when(scapService.getScapById(scapId)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
@@ -145,7 +136,7 @@ class DeleteContractingPerformanceControllerTest extends AbstractControllerTest 
 
     mockMvc.perform(post(
         ReverseRouter.route(on(DeleteContractingPerformanceController.class)
-            .saveDeleteContractingPerformance(scapId, contractingPerformanceId, null)))
+            .saveDeleteContractingPerformance(SCAP_ID, contractingPerformanceId, null)))
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(ControllerTestingUtil.redirectUrl(expectedRedirectUrl));

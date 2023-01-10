@@ -9,6 +9,7 @@ import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperform
 import uk.co.nstauthority.scap.scap.contractingperformance.summary.HasMoreContractingPerformance;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapFormTaskListSection;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.tasklist.ScapTaskListItem;
 import uk.co.nstauthority.scap.tasklist.TaskListSection;
@@ -37,7 +38,8 @@ public class ContractingPerformanceTaskListItem implements ScapTaskListItem {
 
   @Override
   public String getActionUrl(Integer scapId) {
-    return ReverseRouter.route(on(HasContractingPerformanceController.class).renderHasContractingPerformanceForm(scapId));
+    return ReverseRouter.route(on(HasContractingPerformanceController.class)
+        .renderHasContractingPerformanceForm(new ScapId(scapId)));
   }
 
   @Override

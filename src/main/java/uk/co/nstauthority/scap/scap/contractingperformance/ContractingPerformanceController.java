@@ -16,16 +16,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperformance.HasContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 
 @Controller
 @RequestMapping("{scapId}/contracting-performance")
+@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
 public class ContractingPerformanceController {
 
   private final ScapService scapService;
@@ -56,7 +60,7 @@ public class ContractingPerformanceController {
   }
 
   @GetMapping("/new")
-  public ModelAndView renderNewContractingPerformanceForm(@PathVariable("scapId") Integer scapId,
+  public ModelAndView renderNewContractingPerformanceForm(@PathVariable("scapId") ScapId scapId,
                                                           @ModelAttribute("form") ContractingPerformanceForm form) {
 
     var scap = scapService.getScapById(scapId);
@@ -74,7 +78,7 @@ public class ContractingPerformanceController {
   }
 
   @PostMapping("/new")
-  public ModelAndView saveNewContractingPerformanceForm(@PathVariable("scapId") Integer scapId,
+  public ModelAndView saveNewContractingPerformanceForm(@PathVariable("scapId") ScapId scapId,
                                                         @ModelAttribute("form") ContractingPerformanceForm form,
                                                         BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
@@ -103,7 +107,7 @@ public class ContractingPerformanceController {
   }
 
   @GetMapping("/{contractingPerformanceId}")
-  public ModelAndView renderExistingContractingPerformanceForm(@PathVariable("scapId") Integer scapId,
+  public ModelAndView renderExistingContractingPerformanceForm(@PathVariable("scapId") ScapId scapId,
                                                                @PathVariable("contractingPerformanceId")
                                                                Integer contractingPerformanceId) {
     var scap = scapService.getScapById(scapId);
@@ -125,7 +129,7 @@ public class ContractingPerformanceController {
   }
 
   @PostMapping("/{contractingPerformanceId}")
-  public ModelAndView saveExistingContractingPerformanceForm(@PathVariable("scapId") Integer scapId,
+  public ModelAndView saveExistingContractingPerformanceForm(@PathVariable("scapId") ScapId scapId,
                                                              @PathVariable("contractingPerformanceId")
                                                              Integer contractingPerformanceId,
                                                              @ModelAttribute("form") ContractingPerformanceForm form,
@@ -156,7 +160,7 @@ public class ContractingPerformanceController {
     );
   }
 
-  private String getBackLinkUrl(Integer scapId, ContractingPerformanceOverview contractingPerformanceOverview) {
+  private String getBackLinkUrl(ScapId scapId, ContractingPerformanceOverview contractingPerformanceOverview) {
     if (contractingPerformanceService.hasContractingPerformance(contractingPerformanceOverview)) {
       return ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
           .renderContractingPerformanceSummary(scapId));

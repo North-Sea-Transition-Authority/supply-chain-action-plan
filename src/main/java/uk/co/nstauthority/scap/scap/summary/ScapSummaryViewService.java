@@ -143,7 +143,7 @@ public class ScapSummaryViewService {
         return new ContractingPerformanceOverviewSummaryView(false, Collections.emptyList());
       }
       var contractingPerformanceSummaryViews = contractingPerformanceSummaryViewService
-          .getContractingPerformanceSummaryViews(scapDetail.getScap().getId());
+          .getContractingPerformanceSummaryViews(scapDetail.getScap().getScapId());
       return new ContractingPerformanceOverviewSummaryView(true, contractingPerformanceSummaryViews);
     }
     ).orElse(new ContractingPerformanceOverviewSummaryView(null, null));

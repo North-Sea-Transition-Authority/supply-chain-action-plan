@@ -368,7 +368,7 @@ class ScapSummaryViewServiceTest {
     ));
 
     when(contractingPerformanceOverviewService.getByScapDetail(scapDetail)).thenReturn(Optional.of(contractingPerformanceOverview));
-    when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(scapDetail.getScap().getId()))
+    when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(scapDetail.getScap().getScapId()))
         .thenReturn(contractingPerformanceViews);
 
     var contractingPerformanceOverviewSummaryView = scapSummaryViewService.getContractingPerformanceOverviewSummaryView(scapDetail);

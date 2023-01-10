@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.fivium.energyportalapi.generated.types.Country;
 import uk.co.nstauthority.scap.energyportal.CountryService;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @Service
 public class ContractingPerformanceSummaryViewService {
@@ -24,10 +25,10 @@ public class ContractingPerformanceSummaryViewService {
     this.countryService = countryService;
   }
 
-  public Optional<ContractingPerformanceSummaryView> getContractingPerformanceSummaryView(Integer scapId,
+  public Optional<ContractingPerformanceSummaryView> getContractingPerformanceSummaryView(ScapId scapId,
                                                                                           Integer contractingPerformanceId) {
     var contractingPerformanceSummaryDtoOpt = contractingPerformanceSummaryDtoRepository
-        .findByScapIdAndContractingPerformanceId(scapId, contractingPerformanceId);
+        .findByScapIdAndContractingPerformanceId(scapId.scapId(), contractingPerformanceId);
     return contractingPerformanceSummaryDtoOpt.map(contractingPerformanceSummaryDto -> {
       var country = countryService.findCountryById(contractingPerformanceSummaryDto.countryId(), REQUEST_PURPOSE);
       return new ContractingPerformanceSummaryView(
@@ -45,8 +46,8 @@ public class ContractingPerformanceSummaryViewService {
     });
   }
 
-  public List<ContractingPerformanceSummaryView> getContractingPerformanceSummaryViews(Integer scapId) {
-    var contractingPerformanceSummaryDtoList = contractingPerformanceSummaryDtoRepository.getAllByScapId(scapId);
+  public List<ContractingPerformanceSummaryView> getContractingPerformanceSummaryViews(ScapId scapId) {
+    var contractingPerformanceSummaryDtoList = contractingPerformanceSummaryDtoRepository.getAllByScapId(scapId.scapId());
     var countryMap = getCountryMap(contractingPerformanceSummaryDtoList);
     return contractingPerformanceSummaryDtoList.stream()
         .map(contractingPerformanceSummaryDto -> new ContractingPerformanceSummaryView(

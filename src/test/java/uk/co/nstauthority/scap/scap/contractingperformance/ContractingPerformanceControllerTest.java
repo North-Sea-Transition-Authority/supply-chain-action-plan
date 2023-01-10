@@ -30,6 +30,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
@@ -40,12 +41,13 @@ import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPe
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = ContractingPerformanceController.class)
 @WithMockUser
-class ContractingPerformanceControllerTest extends AbstractControllerTest {
+class ContractingPerformanceControllerTest extends AbstractScapSubmitterControllerTest {
 
   @MockBean
   ScapDetailService scapDetailService;
@@ -64,15 +66,12 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
 
   @MockBean
   ActualTenderActivityService actualTenderActivityService;
-
-  private Scap scap;
   private ScapDetail scapDetail;
   private ActualTender actualTender;
   private ContractingPerformanceOverview contractingPerformanceOverview;
 
   @BeforeEach
   void setup() {
-    scap = new Scap(49);
     scapDetail = new ScapDetail();
     actualTender = new ActualTender();
     contractingPerformanceOverview = new ContractingPerformanceOverview();
@@ -84,7 +83,7 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
     var activities = List.of(activity);
     var scopeTitlesMap = Map.of(String.valueOf(activity.getId()), "Activity scope title");
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
@@ -93,30 +92,30 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(get(
         ReverseRouter.route(on(ContractingPerformanceController.class)
-            .renderNewContractingPerformanceForm(scap.getId(), null))))
+            .renderNewContractingPerformanceForm(scap.getScapId(), null))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/contractingperformance/contractingPerformanceDetail"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(HasContractingPerformanceController.class)
-                .renderHasContractingPerformanceForm(scap.getId()))))
+                .renderHasContractingPerformanceForm(scap.getScapId()))))
         .andExpect(model().attribute("scopeTitlesMap", scopeTitlesMap))
         .andExpect(model().attributeExists("form"));
   }
 
   @Test
   void renderNewContractingPerformanceForm_NoActualTender() throws Exception {
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
     mockMvc.perform(get(
         ReverseRouter.route(on(ContractingPerformanceController.class)
-            .renderNewContractingPerformanceForm(scap.getId(), null))))
+            .renderNewContractingPerformanceForm(scap.getScapId(), null))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/contractingperformance/contractingPerformanceDetail"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(HasContractingPerformanceController.class)
-                .renderHasContractingPerformanceForm(scap.getId()))))
+                .renderHasContractingPerformanceForm(scap.getScapId()))))
         .andExpect(model().attribute("scopeTitlesMap", Collections.emptyMap()))
         .andExpect(model().attributeExists("form"));
   }
@@ -127,7 +126,7 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
     var activities = List.of(activity);
     var scopeTitlesMap = Map.of(String.valueOf(activity.getId()), "Activity scope title");
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
@@ -140,12 +139,12 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(get(
             ReverseRouter.route(on(ContractingPerformanceController.class)
-                .renderNewContractingPerformanceForm(scap.getId(), null))))
+                .renderNewContractingPerformanceForm(scap.getScapId(), null))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/contractingperformance/contractingPerformanceDetail"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
-                .renderContractingPerformanceSummary(scap.getId()))))
+                .renderContractingPerformanceSummary(scap.getScapId()))))
         .andExpect(model().attribute("scopeTitlesMap", scopeTitlesMap))
         .andExpect(model().attributeExists("form"));
   }
@@ -158,9 +157,9 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
     var form = new ContractingPerformanceForm();
     var bindingResultWithoutErrors = new BeanPropertyBindingResult(form, "form");
     var expectedRedirectUrl = ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
-        .renderContractingPerformanceSummary(scap.getId()));
+        .renderContractingPerformanceSummary(scap.getScapId()));
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
@@ -172,7 +171,7 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(post(
         ReverseRouter.route(on(ContractingPerformanceController.class)
-            .saveNewContractingPerformanceForm(scap.getId(), null, emptyBindingResult())))
+            .saveNewContractingPerformanceForm(scap.getScapId(), null, emptyBindingResult())))
         .with(csrf())
         .flashAttr("form", form))
         .andExpect(status().is3xxRedirection())
@@ -192,7 +191,7 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
         new FieldError("form", "testField", "test error message")
     );
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
@@ -205,14 +204,14 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(post(
             ReverseRouter.route(on(ContractingPerformanceController.class)
-                .saveNewContractingPerformanceForm(scap.getId(), null, emptyBindingResult())))
+                .saveNewContractingPerformanceForm(scap.getScapId(), null, emptyBindingResult())))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/contractingperformance/contractingPerformanceDetail"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(HasContractingPerformanceController.class)
-                .renderHasContractingPerformanceForm(scap.getId()))))
+                .renderHasContractingPerformanceForm(scap.getScapId()))))
         .andExpect(model().attribute("scopeTitlesMap", scopeTitlesMap))
         .andExpect(model().attribute("form", form))
         .andExpect(model().attributeExists("errorList"));
@@ -228,7 +227,7 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
         new FieldError("form", "testField", "test error message")
     );
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.empty());
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
@@ -238,14 +237,14 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(post(
         ReverseRouter.route(on(ContractingPerformanceController.class)
-            .saveNewContractingPerformanceForm(scap.getId(), null, emptyBindingResult())))
+            .saveNewContractingPerformanceForm(scap.getScapId(), null, emptyBindingResult())))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/contractingperformance/contractingPerformanceDetail"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(HasContractingPerformanceController.class)
-                .renderHasContractingPerformanceForm(scap.getId()))))
+                .renderHasContractingPerformanceForm(scap.getScapId()))))
         .andExpect(model().attribute("scopeTitlesMap", Collections.emptyMap()))
         .andExpect(model().attribute("form", form))
         .andExpect(model().attributeExists("errorList"));
@@ -262,7 +261,7 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
     var activities = List.of(activity);
     var scopeTitlesMap = Map.of(String.valueOf(activity.getId()), "Activity scope title");
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
@@ -274,11 +273,11 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(get(
         ReverseRouter.route(on(ContractingPerformanceController.class)
-            .renderExistingContractingPerformanceForm(scap.getId(), contractingPerformanceId))))
+            .renderExistingContractingPerformanceForm(scap.getScapId(), contractingPerformanceId))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/contractingperformance/contractingPerformanceDetail"))
         .andExpect(model().attribute("backLinkUrl", ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
-            .renderContractingPerformanceSummary(scap.getId()))))
+            .renderContractingPerformanceSummary(scap.getScapId()))))
         .andExpect(model().attribute("scopeTitlesMap", scopeTitlesMap))
         .andExpect(model().attribute("form", form));
   }
@@ -293,9 +292,9 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
     var form = new ContractingPerformanceForm();
     var bindingResultWithoutErrors = new BeanPropertyBindingResult(form, "form");
     var expectedRedirectUrl = ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
-        .renderContractingPerformanceSummary(scap.getId()));
+        .renderContractingPerformanceSummary(scap.getScapId()));
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
+    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
@@ -308,7 +307,7 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(post(
             ReverseRouter.route(on(ContractingPerformanceController.class)
-                .saveExistingContractingPerformanceForm(scap.getId(), contractingPerformanceId, null, emptyBindingResult())))
+                .saveExistingContractingPerformanceForm(scap.getScapId(), contractingPerformanceId, null, emptyBindingResult())))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().is3xxRedirection())
@@ -330,7 +329,6 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
         new FieldError("form", "testField", "test error message")
     );
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
@@ -345,13 +343,13 @@ class ContractingPerformanceControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(post(
         ReverseRouter.route(on(ContractingPerformanceController.class)
-            .saveExistingContractingPerformanceForm(scap.getId(), contractingPerformanceId, null, emptyBindingResult())))
+            .saveExistingContractingPerformanceForm(SCAP_ID, contractingPerformanceId, null, emptyBindingResult())))
             .with(csrf())
             .flashAttr("form", form))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/contractingperformance/contractingPerformanceDetail"))
         .andExpect(model().attribute("backLinkUrl", ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
-            .renderContractingPerformanceSummary(scap.getId()))))
+            .renderContractingPerformanceSummary(scap.getScapId()))))
         .andExpect(model().attribute("scopeTitlesMap", scopeTitlesMap))
         .andExpect(model().attribute("form", form))
         .andExpect(model().attributeExists("errorList"));
