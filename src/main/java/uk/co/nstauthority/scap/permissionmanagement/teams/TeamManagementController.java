@@ -2,7 +2,9 @@ package uk.co.nstauthority.scap.permissionmanagement.teams;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -15,6 +17,9 @@ import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerBodyLine;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
+import uk.co.nstauthority.scap.permissionmanagement.TeamType;
+import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupRestController;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.util.NotificationBannerUtils;
@@ -24,6 +29,8 @@ import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 public class TeamManagementController {
 
   private final TeamService teamService;
+
+  private final TeamMemberService teamMemberService;
 
   private final UserDetailService userDetailService;
 
@@ -36,11 +43,14 @@ public class TeamManagementController {
       ReverseRouter.route(on(OrganisationGroupRestController.class).getOrganisationGroupSearchResults(null));
 
   @Autowired
-  public TeamManagementController(TeamService teamService, UserDetailService userDetailService,
+  public TeamManagementController(TeamService teamService,
+                                  TeamMemberService teamMemberService,
+                                  UserDetailService userDetailService,
                                   ControllerHelperService controllerHelperService,
                                   OrganisationGroupService organisationGroupService,
                                   NewTeamFormvalidator newTeamFormvalidator) {
     this.teamService = teamService;
+    this.teamMemberService = teamMemberService;
     this.userDetailService = userDetailService;
     this.controllerHelperService = controllerHelperService;
     this.organisationGroupService = organisationGroupService;
@@ -49,14 +59,9 @@ public class TeamManagementController {
 
   @GetMapping
   public ModelAndView renderTeamList() {
-    var teams = teamService.getTeamsThatUserBelongsTo(userDetailService.getUserDetail())
-        .stream()
-        .map(TeamView::fromTeam)
-        .collect(Collectors.toList());
-
     return new ModelAndView("scap/permissionmanagement/teamList")
         .addObject("pageTitle", "Choose team to manage")
-        .addObject("allTeams", teams)
+        .addObject("allTeams", getTeamList())
         .addObject("newTeamFormUrl",
             ReverseRouter.route(on(TeamManagementController.class).renderNewIndustryTeamForm(null)));
   }
@@ -102,5 +107,28 @@ public class TeamManagementController {
       return view;
     }
     return renderNewIndustryTeamForm(form);
+  }
+
+  private List<TeamView> getTeamList() {
+    List<Team> teams;
+    var user = userDetailService.getUserDetail();
+    var regulatorTeams = teamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR);
+
+    if (!(regulatorTeams.isEmpty())) {
+      var regTeamMember = teamMemberService.getTeamMember(regulatorTeams.get(0), user.getWebUserAccountId());
+      if (regTeamMember.roles().contains(RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER)) {
+        teams = StreamSupport.stream(teamService.getAllTeams().spliterator(), false)
+            .collect(Collectors.toList());
+      } else {
+        teams = teamService.getTeamsThatUserBelongsTo(user);
+      }
+    } else {
+      teams = teamService.getTeamsThatUserBelongsTo(user);
+    }
+
+    return teams
+        .stream()
+        .map(TeamView::fromTeam)
+        .collect(Collectors.toList());
   }
 }

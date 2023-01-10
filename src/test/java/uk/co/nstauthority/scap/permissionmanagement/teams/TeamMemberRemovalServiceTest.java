@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 
 @ExtendWith(MockitoExtension.class)
@@ -56,6 +57,25 @@ class TeamMemberRemovalServiceTest {
     var user2 = TeamMemberTestUtil
         .Builder()
         .withRole(RegulatorTeamRole.ACCESS_MANAGER)
+        .withWebUserAccountId(2000)
+        .build();
+
+    when(teamMemberService.getTeamMembers(team)).thenReturn(List.of(user1, user2));
+    teamMemberRemovalService.removeTeamMember(team, user1);
+    verify(teamMemberRoleRepository).findAllByTeamAndWuaId(team, user1.wuaId().id());
+  }
+
+  @Test
+  void removeTeamMember_notLastOrganisationAccessManager_returns() {
+    var team = TeamTestUtil.Builder().build();
+    var user1 = TeamMemberTestUtil
+        .Builder()
+        .withRole(IndustryTeamRole.ACCESS_MANAGER)
+        .withWebUserAccountId(1000)
+        .build();
+    var user2 = TeamMemberTestUtil
+        .Builder()
+        .withRole(RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER)
         .withWebUserAccountId(2000)
         .build();
 

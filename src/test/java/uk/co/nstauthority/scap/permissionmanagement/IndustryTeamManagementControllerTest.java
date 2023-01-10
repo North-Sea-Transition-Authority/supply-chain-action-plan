@@ -1,6 +1,7 @@
 package uk.co.nstauthority.scap.permissionmanagement;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -21,6 +22,7 @@ import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.industry.AbstractIndustryTeamControllerTest;
+import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.teams.NewTeamForm;
 import uk.co.nstauthority.scap.permissionmanagement.teams.NewTeamFormvalidator;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamManagementController;
@@ -68,6 +70,55 @@ class IndustryTeamManagementControllerTest extends AbstractIndustryTeamControlle
             .with(user(user)))
         .andExpect(status().isOk())
         .andExpect(model().attribute("allTeams", List.of(TeamView.fromTeam(team))));
+  }
+
+  @Test
+  void renderTeamList_userAccessManager_thenAllTeamPresent() throws Exception {
+    var user = ServiceUserDetailTestUtil.Builder().build();
+    var team = TeamTestUtil
+        .Builder()
+        .withTeamType(TeamType.INDUSTRY)
+        .build();
+
+    var regulatorTeam = TeamTestUtil
+        .Builder()
+        .withTeamType(TeamType.REGULATOR)
+        .build();
+
+    when(userDetailService.getUserDetail()).thenReturn(user);
+    when(teamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR)).thenReturn(List.of(regulatorTeam));
+    when(teamMemberService.getTeamMember(any(Team.class), eq(user.getWebUserAccountId()))).thenReturn(
+        TeamMemberTestUtil.Builder()
+            .withRole(RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER)
+            .build());
+    when(teamService.getAllTeams()).thenReturn(List.of(team, regulatorTeam));
+    mockMvc.perform(
+            get(ReverseRouter.route(on(TeamManagementController.class).renderTeamList()))
+                .with(user(user)))
+        .andExpect(status().isOk())
+        .andExpect(model().attribute("allTeams", List.of(TeamView.fromTeam(team), TeamView.fromTeam(regulatorTeam))));
+  }
+
+  @Test
+  void renderTeamList_notUserAccessManager_thenRegulatorTeamPresent() throws Exception {
+    var user = ServiceUserDetailTestUtil.Builder().build();
+    var regulatorTeam = TeamTestUtil
+        .Builder()
+        .withTeamType(TeamType.REGULATOR)
+        .build();
+
+    when(userDetailService.getUserDetail()).thenReturn(user);
+    when(teamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR)).thenReturn(List.of(regulatorTeam));
+    when(teamMemberService.getTeamMember(any(Team.class), eq(user.getWebUserAccountId()))).thenReturn(
+        TeamMemberTestUtil.Builder()
+            .withRole(RegulatorTeamRole.SCAP_VIEWER)
+            .build());
+    when(teamService.getTeamsThatUserBelongsTo(user)).thenReturn(List.of(regulatorTeam));
+    mockMvc.perform(
+            get(ReverseRouter.route(on(TeamManagementController.class).renderTeamList()))
+                .with(user(user)))
+        .andExpect(status().isOk())
+        .andExpect(model().attribute("allTeams", List.of(TeamView.fromTeam(regulatorTeam))));
   }
 
   @Test

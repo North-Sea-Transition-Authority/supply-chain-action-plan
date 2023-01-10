@@ -34,6 +34,10 @@ public class TeamService {
     this.newTeamFormvalidator = newTeamFormvalidator;
   }
 
+  public Iterable<Team> getAllTeams() {
+    return teamRepository.findAll();
+  }
+
   public Optional<Team> findTeam(TeamId teamId) {
     return teamRepository.findByUuid(teamId.uuid());
   }

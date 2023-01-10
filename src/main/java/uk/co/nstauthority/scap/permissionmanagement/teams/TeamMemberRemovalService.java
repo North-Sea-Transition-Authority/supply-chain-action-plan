@@ -62,7 +62,8 @@ public class TeamMemberRemovalService extends TeamMemberPersistenceService {
                 .roles()
                 .stream()
                 .map(TeamRole::getRolePermissions)
-                .anyMatch(rolePermissions -> rolePermissions.contains(RolePermission.GRANT_ROLES)))
+                .anyMatch(rolePermissions -> rolePermissions.contains(RolePermission.GRANT_ROLES)
+                    || rolePermissions.contains(RolePermission.MANAGE_ORGANISATIONS)))
         .toList();
   }
 }
