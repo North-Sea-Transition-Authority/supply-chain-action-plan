@@ -10,15 +10,18 @@
   pageHeading=pageTitle
   pageSize=PageSize.TWO_THIRDS_COLUMN
   backLinkUrl=springUrl(backLinkUrl)
+  singleErrorMessage=incompleteErrorMessage
 >
   <@scapSummary.summary scapSummaryView=scapSummaryView />
 
   <@fdsForm.htmlForm>
-    <@fdsAction.submitButtons
-      primaryButtonText="Submit"
-      linkSecondaryAction=true
-      linkSecondaryActionUrl=springUrl(backLinkUrl)
-      secondaryLinkText="Cancel"
-    />
+    <#if isValid>
+      <@fdsAction.submitButtons
+        primaryButtonText="Submit"
+        linkSecondaryAction=true
+        linkSecondaryActionUrl=springUrl(backLinkUrl)
+        secondaryLinkText="Cancel"
+      />
+    </#if>
   </@fdsForm.htmlForm>
 </@defaultPage>

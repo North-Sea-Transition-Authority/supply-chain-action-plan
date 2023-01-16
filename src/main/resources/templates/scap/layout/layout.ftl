@@ -26,6 +26,7 @@
   pageSize=PageSize.TWO_THIRDS_COLUMN
   backLinkUrl=""
   caption=""
+  singleErrorMessage=""
 >
   <#local serviceName = serviceBranding.name() />
   <#local customerMnemonic = customerBranding.mnemonic() />
@@ -97,6 +98,7 @@
     errorItems=errorItems
     notificationBannerContent=notificationBannerContent
     headerContent=headerContent
+    singleErrorMessage=singleErrorMessage
   >
     <#nested />
   </@fdsDefaultPageTemplate>
