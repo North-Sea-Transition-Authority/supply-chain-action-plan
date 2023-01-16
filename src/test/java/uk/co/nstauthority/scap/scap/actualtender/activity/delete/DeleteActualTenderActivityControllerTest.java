@@ -20,7 +20,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
-import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
@@ -34,9 +33,6 @@ import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTender
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
-import uk.co.nstauthority.scap.scap.scap.Scap;
-import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderActivitySummaryView;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryViewService;
 import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
@@ -46,9 +42,6 @@ import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
 @ContextConfiguration(classes = DeleteActualTenderActivityController.class)
 @Import(ActualTenderControllerRedirectionServiceTestConfig.class)
 class DeleteActualTenderActivityControllerTest extends AbstractScapSubmitterControllerTest {
-
-  @MockBean
-  ScapDetailService scapDetailService;
 
   @MockBean
   ActualTenderService actualTenderService;

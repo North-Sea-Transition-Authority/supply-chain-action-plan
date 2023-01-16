@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.mvc;
+package uk.co.nstauthority.scap.configuration;
 
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +10,8 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.ResourceUrlEncodingFilter;
 import org.springframework.web.servlet.resource.VersionResourceResolver;
+import uk.co.nstauthority.scap.endpointvalidation.ScapHandlerInterceptor;
+import uk.co.nstauthority.scap.mvc.ResponseBufferSizeHandlerInterceptor;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionManagementHandlerInterceptor;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.ScapPermissionManagementHandlerInterceptor;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.TeamManagementHandlerInterceptor;
@@ -26,16 +28,19 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
   private final PermissionManagementHandlerInterceptor permissionManagementHandlerInterceptor;
 
   private final ScapPermissionManagementHandlerInterceptor scapPermissionManagementHandlerInterceptor;
+  private final ScapHandlerInterceptor scapHandlerInterceptor;
 
   @Autowired
   WebMvcConfiguration(TeamPermissionManagementHandlerInterceptor teamPermissionManagementHandlerInterceptor,
                       TeamManagementHandlerInterceptor teamManagementHandlerInterceptor,
                       PermissionManagementHandlerInterceptor permissionManagementHandlerInterceptor,
-                      ScapPermissionManagementHandlerInterceptor scapPermissionManagementHandlerInterceptor) {
+                      ScapPermissionManagementHandlerInterceptor scapPermissionManagementHandlerInterceptor,
+                      ScapHandlerInterceptor scapHandlerInterceptor) {
     this.teamPermissionManagementHandlerInterceptor = teamPermissionManagementHandlerInterceptor;
     this.teamManagementHandlerInterceptor = teamManagementHandlerInterceptor;
     this.permissionManagementHandlerInterceptor = permissionManagementHandlerInterceptor;
     this.scapPermissionManagementHandlerInterceptor = scapPermissionManagementHandlerInterceptor;
+    this.scapHandlerInterceptor = scapHandlerInterceptor;
   }
 
   @Override
@@ -57,8 +62,11 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         .excludePathPatterns(ASSET_EXCLUSION_PATH);
     registry.addInterceptor(teamPermissionManagementHandlerInterceptor)
         .addPathPatterns("/permission-management/**");
+    registry.addInterceptor(scapHandlerInterceptor)
+        .excludePathPatterns(ASSET_EXCLUSION_PATH);
     registry.addInterceptor(teamManagementHandlerInterceptor)
         .addPathPatterns("/permission-management/**");
+    // TODO SCAP2022-203: Condense interceptors to just teamHandlerInterceptor and scapHandlerInterceptor
 
   }
 

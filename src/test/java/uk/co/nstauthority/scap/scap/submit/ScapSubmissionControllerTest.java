@@ -24,13 +24,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
-import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
-import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
@@ -43,9 +40,6 @@ import uk.co.nstauthority.scap.workarea.WorkAreaController;
 @ContextConfiguration(classes = ScapSubmissionController.class)
 class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
   private ScapDetail scapDetail;
-
-  @MockBean
-  ScapDetailService scapDetailService;
 
   @MockBean
   ScapSummaryViewService scapSummaryViewService;

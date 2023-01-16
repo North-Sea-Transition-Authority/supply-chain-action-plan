@@ -104,6 +104,11 @@ public class ScapDetail {
     return createdByUserId;
   }
 
+  @VisibleForTesting
+  public void setCreatedByUserId(Integer createdByUserId) {
+    this.createdByUserId = createdByUserId;
+  }
+
   public Instant getSubmittedTimestamp() {
     return submittedTimestamp;
   }

@@ -25,14 +25,11 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
-import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.fds.ErrorItem;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
-import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.start.ScapStartController;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
@@ -41,9 +38,6 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 @ContextConfiguration(classes = OrganisationGroupController.class)
 @WithMockUser
 class OrganisationGroupControllerTest extends AbstractScapSubmitterControllerTest {
-
-  @MockBean
-  ScapDetailService scapDetailService;
 
   @MockBean
   OrganisationGroupFormService organisationGroupFormService;

@@ -21,7 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
-import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
@@ -30,7 +29,6 @@ import uk.co.nstauthority.scap.file.FileUploadService;
 import uk.co.nstauthority.scap.file.UploadedFile;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 
 @ContextConfiguration(classes = SupportingDocumentsController.class)
 class SupportingDocumentsControllerTest extends AbstractScapSubmitterControllerTest {
@@ -41,12 +39,8 @@ class SupportingDocumentsControllerTest extends AbstractScapSubmitterControllerT
   SupportingDocumentService supportingDocumentService;
 
   @MockBean
-  ScapDetailService scapDetailService;
-
-  @MockBean
   FileUploadService fileUploadService;
 
-  private Integer scapDetailId;
   private ScapDetail scapDetail;
   private SupportingDocumentType supportingDocumentType;
   private UploadedFile uploadedFile;

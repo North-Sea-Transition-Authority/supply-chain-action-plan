@@ -33,7 +33,6 @@ import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivity;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityController;
@@ -49,9 +48,6 @@ import uk.co.nstauthority.scap.utils.EntityTestingUtil;
 @ContextConfiguration(classes = PlannedTenderController.class)
 @WithMockUser
 class PlannedTenderControllerTest extends AbstractControllerTest {
-
-  @MockBean
-  ScapDetailService scapDetailService;
 
   @MockBean
   PlannedTenderService plannedTenderService;

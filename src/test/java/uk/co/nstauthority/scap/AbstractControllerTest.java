@@ -23,17 +23,20 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.branding.IncludeServiceBrandingConfigurationProperties;
+import uk.co.nstauthority.scap.configuration.WebMvcConfiguration;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
+import uk.co.nstauthority.scap.endpointvalidation.ScapHandlerInterceptor;
+import uk.co.nstauthority.scap.endpointvalidation.rules.ScapHasStatusRule;
 import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
-import uk.co.nstauthority.scap.mvc.WebMvcConfiguration;
 import uk.co.nstauthority.scap.mvc.WithDefaultPageControllerAdvice;
-import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionManagementHandlerInterceptor;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionManagementHandlerInterceptor;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.ScapPermissionManagementHandlerInterceptor;
-import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.TeamPermissionManagementHandlerInterceptor;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.TeamManagementHandlerInterceptor;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.TeamPermissionManagementHandlerInterceptor;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.technicalsupport.IncludeTechnicalSupportConfigurationProperties;
 import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
@@ -47,7 +50,11 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
     PermissionManagementHandlerInterceptor.class,
     TeamPermissionManagementHandlerInterceptor.class,
     TeamManagementHandlerInterceptor.class,
-    ScapPermissionManagementHandlerInterceptor.class})
+    ScapPermissionManagementHandlerInterceptor.class,
+    ScapHandlerInterceptor.class,
+    // Interceptor rules
+    ScapHasStatusRule.class
+})
 @WithDefaultPageControllerAdvice
 @WebMvcTest
 public abstract class AbstractControllerTest {
@@ -71,6 +78,9 @@ public abstract class AbstractControllerTest {
 
   @MockBean
   protected ScapService scapService;
+
+  @MockBean
+  protected ScapDetailService scapDetailService;
 
   @BeforeEach
   void setup() {

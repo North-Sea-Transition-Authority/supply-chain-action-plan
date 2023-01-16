@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,12 +15,12 @@ import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
-import uk.co.nstauthority.scap.permissionmanagement.TeamMemberView;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
-import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
+import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 
@@ -32,6 +33,8 @@ public abstract class AbstractScapSubmitterControllerTest extends AbstractContro
   protected final static ScapId SCAP_ID = new ScapId(1111);
 
   protected final Scap scap = getScap();
+
+  protected final ScapDetail scapDetail = getScapDetail(scap, webUserAccountId);
 
   protected final Team team = getTeam();
 
@@ -73,5 +76,15 @@ public abstract class AbstractScapSubmitterControllerTest extends AbstractContro
     scap.setReference("Test Scap");
     scap.setOrganisationGroupId(1000);
     return scap;
+  }
+
+  private ScapDetail getScapDetail(Scap scap, WebUserAccountId webUserAccountId) {
+    var scapDetail = new ScapDetail(2222);
+    scapDetail.setScap(scap);
+    scapDetail.setCreatedTimestamp(Instant.now());
+    scapDetail.setStatus(ScapDetailStatus.DRAFT);
+    scapDetail.setTipFlag(true);
+    scapDetail.setCreatedByUserId(webUserAccountId.toInt());
+    return scapDetail;
   }
 }

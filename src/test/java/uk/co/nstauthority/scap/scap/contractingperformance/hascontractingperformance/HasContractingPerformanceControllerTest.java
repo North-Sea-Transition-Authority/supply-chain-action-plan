@@ -34,7 +34,6 @@ import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanc
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
 import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
 
@@ -42,9 +41,6 @@ import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
 @ContextConfiguration(classes = HasContractingPerformanceController.class)
 @WithMockUser
 class HasContractingPerformanceControllerTest extends AbstractScapSubmitterControllerTest {
-
-  @MockBean
-  ScapDetailService scapDetailService;
 
   @MockBean
   ContractingPerformanceOverviewService contractingPerformanceOverviewService;

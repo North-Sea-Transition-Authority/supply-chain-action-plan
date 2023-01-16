@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.mvc;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -13,10 +14,10 @@ import org.springframework.web.servlet.HandlerInterceptor;
  * back to the client.
  */
 @Service
-class ResponseBufferSizeHandlerInterceptor implements HandlerInterceptor {
+public class ResponseBufferSizeHandlerInterceptor implements HandlerInterceptor {
 
   @Override
-  public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+  public boolean preHandle(@NotNull HttpServletRequest request, HttpServletResponse response, @NotNull Object handler) {
     response.setBufferSize(1024 * 200);
     return true;
   }

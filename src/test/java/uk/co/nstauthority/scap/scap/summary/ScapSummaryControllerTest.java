@@ -23,7 +23,6 @@ import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetails;
@@ -36,9 +35,6 @@ import uk.co.nstauthority.scap.scap.timeline.TimelineEventService;
 
 @ContextConfiguration(classes = ScapSummaryController.class)
 class ScapSummaryControllerTest extends AbstractControllerTest {
-
-  @MockBean
-  ScapDetailService scapDetailService;
 
   @MockBean
   ProjectDetailsService projectDetailsService;

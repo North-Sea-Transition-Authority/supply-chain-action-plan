@@ -25,21 +25,16 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = ProjectPerformanceController.class)
 @WithMockUser
 class ProjectPerformanceControllerTest extends AbstractScapSubmitterControllerTest {
-
-  @MockBean
-  ScapDetailService scapDetailService;
 
   @MockBean
   ProjectPerformanceFormService projectPerformanceFormService;

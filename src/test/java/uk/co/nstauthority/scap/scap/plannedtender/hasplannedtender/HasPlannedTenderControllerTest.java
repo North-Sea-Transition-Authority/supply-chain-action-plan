@@ -29,7 +29,6 @@ import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTender;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderController;
@@ -47,10 +46,7 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 @WithMockUser
 class HasPlannedTenderControllerTest extends AbstractControllerTest {
 
-  @MockBean
-  ScapDetailService scapDetailService;
-
-  @MockBean
+@MockBean
   PlannedTenderService plannedTenderService;
 
   @MockBean
