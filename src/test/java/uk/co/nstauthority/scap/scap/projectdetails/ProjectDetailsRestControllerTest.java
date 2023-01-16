@@ -14,8 +14,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
-import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.fivium.energyportalapi.generated.types.Facility;
+import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
@@ -38,8 +38,14 @@ class ProjectDetailsRestControllerTest extends AbstractControllerTest {
   void getFieldSearchResults_assertCorrectResponse() throws Exception {
     var searchTerm = "test";
     var fields = List.of(
-        new Field(1, "test field 1", null, null, null, null),
-        new Field(2, "test field 2", null, null, null, null)
+        Field.newBuilder()
+            .fieldId(1)
+            .fieldName("test field 1")
+            .build(),
+        Field.newBuilder()
+            .fieldId(2)
+            .fieldName("test field 2")
+            .build()
     );
     var fieldsSearchResult = new RestSearchResult(List.of(
         new RestSearchItem(fields.get(0).getFieldId().toString(), fields.get(0).getFieldName()),

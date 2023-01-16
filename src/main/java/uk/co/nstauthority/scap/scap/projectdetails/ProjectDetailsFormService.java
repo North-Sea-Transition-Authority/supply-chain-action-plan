@@ -1,8 +1,7 @@
 package uk.co.nstauthority.scap.scap.projectdetails;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
@@ -42,7 +41,9 @@ public class ProjectDetailsFormService {
     return bindingResult;
   }
 
-  ProjectDetailsForm getForm(ProjectDetails projectDetails, List<Integer> projectFacilityIds) {
+  ProjectDetailsForm getForm(ProjectDetails projectDetails,
+                             List<Integer> projectFacilityIds,
+                             List<Integer> projectFieldIds) {
     var form = new ProjectDetailsForm();
 
     form.setProjectName(projectDetails.getProjectName());
@@ -51,7 +52,7 @@ public class ProjectDetailsFormService {
     form.setProjectTypes(projectTypes);
     form.setProjectCostEstimate(projectDetails.getProjectCostEstimate().toString());
     form.setEstimatedValueLocalContent(projectDetails.getEstimatedValueLocalContent().toString());
-    form.setFieldId(projectDetails.getFieldId().toString());
+    form.setFieldIds(projectFieldIds);
 
     if (Boolean.TRUE.equals(projectDetails.getHasFacilities())) {
       form.setHasPlatforms(YesNo.YES);
@@ -78,15 +79,25 @@ public class ProjectDetailsFormService {
     return form;
   }
 
-  Optional<Map<String, String>> getPreselectedField(Integer fieldId) {
-    var fieldOptional = fieldService.getFieldById(fieldId, PRESELECTED_FIELD_REQUEST_PURPOSE);
-    return fieldOptional.map(field -> Map.of(String.valueOf(fieldId), field.getFieldName()));
-  }
-
   List<AddToListItem> getPreselectedFacilities(List<Integer> projectFacilityIds) {
+    if (projectFacilityIds.isEmpty()) {
+      return Collections.emptyList();
+    }
+
     var facilities = facilityService.findFacilitiesByIds(projectFacilityIds, PRESELECTED_FACILITIES_REQUEST_PURPOSE);
     return facilities.stream()
         .map(facility -> new AddToListItem(facility.getId().toString(), facility.getName(), true))
+        .toList();
+  }
+
+  List<AddToListItem> getPreselectedFields(List<Integer> projectFieldIds) {
+    if (projectFieldIds.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    var fields = fieldService.getFieldsByIds(projectFieldIds, PRESELECTED_FIELD_REQUEST_PURPOSE);
+    return fields.stream()
+        .map(field -> new AddToListItem(field.getFieldId().toString(), field.getFieldName(), true))
         .toList();
   }
 

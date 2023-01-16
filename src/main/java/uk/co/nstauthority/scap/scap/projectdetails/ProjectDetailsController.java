@@ -4,9 +4,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,20 +58,27 @@ class ProjectDetailsController {
     var projectFacilities = projectDetails
         .map(projectDetailsService::getProjectFacilities)
         .orElse(Collections.emptyList());
+    var projectFields = projectDetails
+        .map(projectDetailsService::getProjectFields)
+        .orElse(Collections.emptyList());
+
     var projectFacilityIds = projectFacilities
         .stream()
         .map(ProjectFacility::getFacilityId)
         .toList();
+    var projectFieldIds = projectFields
+        .stream()
+        .map(ProjectField::getFieldId)
+        .toList();
     var form = projectDetails
-        .map(existingProjectDetails -> projectDetailsFormService.getForm(existingProjectDetails, projectFacilityIds))
+        .map(existingProjectDetails -> projectDetailsFormService
+            .getForm(existingProjectDetails, projectFacilityIds, projectFieldIds))
         .orElse(new ProjectDetailsForm());
-    var preselectedField = form.getFieldId().getAsInteger()
-        .flatMap(projectDetailsFormService::getPreselectedField)
-        .orElse(null);
+    var preselectedFields = projectDetailsFormService.getPreselectedFields(projectFieldIds);
     var preselectedFacilities = projectDetailsFormService.getPreselectedFacilities(projectFacilityIds);
     var supportingDocuments = projectDetailsFormService.getSupportingDocuments(form);
 
-    return projectDetailsFormModelAndView(scapId, preselectedField, preselectedFacilities, supportingDocuments)
+    return projectDetailsFormModelAndView(scapId, preselectedFields, preselectedFacilities, supportingDocuments)
         .addObject("form", form);
   }
 
@@ -84,16 +89,14 @@ class ProjectDetailsController {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
     projectDetailsService.getProjectDetails(scapDetail);
     var projectFacilityIds = form.getInstallationIds();
-    var preselectedField = form.getFieldId().getAsInteger()
-        .flatMap(projectDetailsFormService::getPreselectedField)
-        .orElse(null);
+    var preselectedFields = projectDetailsFormService.getPreselectedFields(projectFacilityIds);
     var preselectedFacilities = projectDetailsFormService.getPreselectedFacilities(projectFacilityIds);
     var supportingDocuments = projectDetailsFormService.getSupportingDocuments(form);
 
     bindingResult = projectDetailsFormService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        projectDetailsFormModelAndView(scapId, preselectedField, preselectedFacilities, supportingDocuments),
+        projectDetailsFormModelAndView(scapId, preselectedFields, preselectedFacilities, supportingDocuments),
         form,
         () -> {
           projectDetailsService.saveProjectDetails(scapDetail, form);
@@ -102,14 +105,14 @@ class ProjectDetailsController {
   }
 
   private ModelAndView projectDetailsFormModelAndView(ScapId scapId,
-                                                      @Nullable Map<String, String> preselectedField,
+                                                      List<AddToListItem> preselectedFields,
                                                       List<AddToListItem> preselectedFacilities,
                                                       List<UploadedFileView> supportingDocuments) {
     return new ModelAndView("scap/scap/projectDetails")
         .addObject("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId)))
         .addObject("projectTypesMap", ProjectType.getCheckboxItems())
-        .addObject("preselectedField", preselectedField)
+        .addObject("preselectedFields", preselectedFields)
         .addObject("preselectedFacilities", preselectedFacilities)
         .addObject("hasInstallationsMap", YesNo.getRadioOptions())
         .addObject("fieldSearchRestUrl",

@@ -16,7 +16,8 @@ class ProjectDetailsForm {
   private Set<ProjectType> projectTypes;
   private final DecimalInput projectCostEstimate;
   private final DecimalInput estimatedValueLocalContent;
-  private final IntegerInput fieldId;
+  private Integer fieldSelector;
+  private List<Integer> fieldIds;
   private YesNo hasPlatforms;
   private List<Integer> installationIds;
   private Integer installationSelector;
@@ -35,7 +36,6 @@ class ProjectDetailsForm {
     this.projectCostEstimate = new DecimalInput("projectCostEstimate", "Project cost estimate");
     this.estimatedValueLocalContent = new DecimalInput("estimatedValueLocalContent",
         "Estimated value local content");
-    this.fieldId = new IntegerInput("fieldId", "Field");
     this.startDay = new IntegerInput("startDay", "Start day");
     this.startMonth = new IntegerInput("startMonth", "Start month");
     this.startYear = new IntegerInput("startYear", "Start year");
@@ -90,12 +90,20 @@ class ProjectDetailsForm {
     this.estimatedValueLocalContent.setInputValue(estimatedValueLocalContent);
   }
 
-  public IntegerInput getFieldId() {
-    return fieldId;
+  public List<Integer> getFieldIds() {
+    return fieldIds;
   }
 
-  public void setFieldId(String fieldId) {
-    this.fieldId.setInputValue(fieldId);
+  public void setFieldIds(List<Integer> fieldIds) {
+    this.fieldIds = fieldIds;
+  }
+
+  public Integer getFieldSelector() {
+    return fieldSelector;
+  }
+
+  public void setFieldSelector(Integer fieldSelector) {
+    this.fieldSelector = fieldSelector;
   }
 
   public YesNo getHasPlatforms() {

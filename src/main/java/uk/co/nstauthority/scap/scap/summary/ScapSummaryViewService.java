@@ -82,6 +82,7 @@ public class ScapSummaryViewService {
     return projectDetailsOpt.map(projectDetails -> {
       var projectTypes = projectDetailsService.getProjectTypesByProjectDetails(projectDetails)
           .stream().toList();
+      var projectFields = projectDetailsService.getProjectFieldNames(projectDetails);
       var projectFacilities = projectDetailsService.getProjectFacilityNames(projectDetails);
       var hasFacilities = YesNo.fromBoolean(projectDetails.getHasFacilities());
 
@@ -90,7 +91,7 @@ public class ScapSummaryViewService {
           projectTypes,
           projectDetails.getProjectCostEstimate(),
           projectDetails.getEstimatedValueLocalContent(),
-          projectDetails.getFieldName(),
+          projectFields,
           hasFacilities,
           projectFacilities,
           DateUtils.format(projectDetails.getPlannedExecutionStartDate()),

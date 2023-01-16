@@ -55,7 +55,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
   @MockBean
   EnergyPortalUserService energyPortalUserService;
 
-  private static ScapId SCAP_ID = new ScapId(1000);
+  private static final ScapId SCAP_ID = new ScapId(1000);
 
   @Test
   void renderSummary_fullSCAPDetails() throws Exception {
@@ -67,7 +67,6 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     detail.setScap(scap);
 
     var projectDetails = new ProjectDetails();
-    projectDetails.setFieldName("TESTING FIELD");
 
     when(scapDetailService.getLatestScapDetailByScapId(SCAP_ID)).thenReturn(Optional.of(detail));
     when(projectDetailsService.getProjectDetails(detail)).thenReturn(Optional.of(projectDetails));
@@ -97,7 +96,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
         List.of(FIELD_DEVELOPMENT_PLAN),
         new BigDecimal("5000.50"),
         new BigDecimal("5000.50"),
-        "44/L01",
+        Collections.singletonList("BRENT"),
         YesNo.YES,
         Collections.emptyList(),
         "11-07-2024",

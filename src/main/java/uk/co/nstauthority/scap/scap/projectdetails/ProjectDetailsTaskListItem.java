@@ -55,13 +55,21 @@ class ProjectDetailsTaskListItem implements ScapTaskListItem {
     var projectFacilities = projectDetailsOptional
         .map(projectDetailsService::getProjectFacilities)
         .orElse(Collections.emptyList());
+    var projectFields = projectDetailsOptional
+        .map(projectDetailsService::getProjectFields)
+        .orElse(Collections.emptyList());
     var projectFacilityIds = projectFacilities
         .stream()
         .map(ProjectFacility::getFacilityId)
         .toList();
+    var projectFieldIds = projectFields
+        .stream()
+        .map(ProjectField::getFieldId)
+        .toList();
     return projectDetailsOptional
         .map(projectDetails -> {
-          var form = projectDetailsFormService.getForm(projectDetails, projectFacilityIds);
+          var form = projectDetailsFormService
+              .getForm(projectDetails, projectFacilityIds, projectFieldIds);
           var bindingResult = new BeanPropertyBindingResult(form, "form");
           return !projectDetailsFormService.validate(form, bindingResult).hasErrors();
         }).orElse(false);

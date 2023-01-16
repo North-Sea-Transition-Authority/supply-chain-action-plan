@@ -26,9 +26,13 @@
         £${projectDetailsView.estimatedValueLocalContent()} million
       </#if>
     </@fdsSummaryList.summaryListRowNoAction>
-    <@fdsSummaryList.summaryListRowNoAction keyText="Field name">
-      ${projectDetailsView.fieldName()!""}
-    </@fdsSummaryList.summaryListRowNoAction>
+    <#if projectDetailsView.fieldNames()?has_content>
+      <#list projectDetailsView.fieldNames() as field>
+        <@fdsSummaryList.summaryListRowNoAction keyText="Field name ${field_index + 1}">
+          ${field}
+        </@fdsSummaryList.summaryListRowNoAction>
+      </#list>
+    </#if>
     <@fdsSummaryList.summaryListRowNoAction keyText="Are any installations or subsea infrastructure related to this project?">
       <#if projectDetailsView.hasFacilities()?has_content>
         ${projectDetailsView.hasFacilities().displayName}

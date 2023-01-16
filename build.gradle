@@ -50,7 +50,8 @@ dependencies {
 
   implementation 'uk.co.fivium.digital.energyportalteamaccesslibrary:energy-portal-team-access-libray:develop-SNAPSHOT'
   implementation 'uk.co.fivium.digitalformlibrary:digital-form-library:v1.0.1'
-  implementation 'uk.co.fivium.energyportalapi:client:v3.0.0'
+  implementation 'uk.co.fivium.energyportalapi:client:develop-SNAPSHOT'
+  // Above should be switched to a release version when one is available with EPA-24 (fieldsByIds)
 
   implementation 'com.amazonaws:aws-java-sdk-s3:1.12.351'
   implementation 'fi.solita.clamav:clamav-client:1.0.1'

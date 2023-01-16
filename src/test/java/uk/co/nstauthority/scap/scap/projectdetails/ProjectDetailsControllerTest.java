@@ -15,9 +15,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.time.Clock;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,18 +30,17 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.energyportal.FieldService;
 import uk.co.nstauthority.scap.fds.ErrorItem;
+import uk.co.nstauthority.scap.fds.addtolist.AddToListItem;
 import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
-import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 
@@ -105,18 +104,23 @@ class ProjectDetailsControllerTest extends AbstractScapSubmitterControllerTest {
 
   @Test
   void renderProjectDetailsForm_existingProjectDetails_assertCorrectResponse() throws Exception {
-    var field = new Field(22, "Test field", null, null, null, null);
     var projectDetails = new ProjectDetails(scapDetail, clock.instant());
-    projectDetails.setFieldId(field.getFieldId());
-    projectDetails.setFieldName(field.getFieldName());
+    var fieldId = 22;
+    var fieldIds = Collections.singletonList(fieldId);
+    var projectField = new ProjectField(projectDetails, fieldId, Instant.now());
+    var projectFields = Collections.singletonList(projectField);
     var form = new ProjectDetailsForm();
-    form.setFieldId(String.valueOf(field.getFieldId()));
-    var preselectedItem = Map.of(String.valueOf(field.getFieldId()), field.getFieldName());
+    form.setFieldIds(Collections.singletonList(fieldId));
+    var preselectedFields = List.of(
+        new AddToListItem(String.valueOf(fieldId), "Test field", true)
+    );
 
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
     when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
-    when(projectDetailsFormService.getForm(projectDetails, Collections.emptyList())).thenReturn(form);
-    when(projectDetailsFormService.getPreselectedField(field.getFieldId())).thenReturn(Optional.of(preselectedItem));
+    when(projectDetailsService.getProjectFields(projectDetails)).thenReturn(projectFields);
+    when(projectDetailsFormService.getForm(projectDetails, Collections.emptyList(), fieldIds))
+        .thenReturn(form);
+    when(projectDetailsFormService.getPreselectedFields(fieldIds)).thenReturn(preselectedFields);
     when(supportingDocumentService.buildFileUploadTemplate(SCAP_ID, SupportingDocumentType.ADDITIONAL_DOCUMENT))
         .thenReturn(fileUploadTemplate);
 
@@ -132,7 +136,7 @@ class ProjectDetailsControllerTest extends AbstractScapSubmitterControllerTest {
                 .getFieldSearchResults(null))))
         .andExpect(model().attribute("projectTypesMap", ProjectType.getCheckboxItems()))
         .andExpect(model().attribute("form", form))
-        .andExpect(model().attribute("preselectedField", preselectedItem));
+        .andExpect(model().attribute("preselectedFields", preselectedFields));
 
 
   }

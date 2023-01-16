@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.fivium.energyportalapi.generated.types.Facility;
+import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
@@ -23,10 +24,12 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 public class ProjectDetailsService {
 
   static final String PROJECT_FACILITIES_REQUEST_PURPOSE = "Get facility names for summary";
+  static final String PROJECT_FIELDS_REQUEST_PURPOSE = "Get field names for summary";
 
   private final ProjectDetailsRepository projectDetailsRepository;
   private final ProjectDetailTypeRepository projectDetailTypeRepository;
   private final ProjectFacilityRepository projectFacilityRepository;
+  private final ProjectFieldRepository projectFieldRepository;
   private final Clock clock;
   private final FieldService fieldService;
   private final FacilityService facilityService;
@@ -35,11 +38,16 @@ public class ProjectDetailsService {
   @Autowired
   ProjectDetailsService(ProjectDetailsRepository projectDetailsRepository,
                         ProjectDetailTypeRepository projectDetailTypeRepository,
-                        ProjectFacilityRepository projectFacilityRepository, Clock clock, FieldService fieldService,
-                        FacilityService facilityService, FileUploadService fileUploadService) {
+                        ProjectFacilityRepository projectFacilityRepository,
+                        ProjectFieldRepository projectFieldRepository,
+                        Clock clock,
+                        FieldService fieldService,
+                        FacilityService facilityService,
+                        FileUploadService fileUploadService) {
     this.projectDetailsRepository = projectDetailsRepository;
     this.projectDetailTypeRepository = projectDetailTypeRepository;
     this.projectFacilityRepository = projectFacilityRepository;
+    this.projectFieldRepository = projectFieldRepository;
     this.clock = clock;
     this.fieldService = fieldService;
     this.facilityService = facilityService;
@@ -72,6 +80,7 @@ public class ProjectDetailsService {
     updateProjectDetailTypes(projectDetails, form.getProjectTypes(), createdTimestamp);
     fileUploadService.updateFileUploadDescriptions(form.getSupportingDocuments());
 
+    saveProjectFields(projectDetails, form.getFieldIds(), createdTimestamp);
     if (YesNo.YES.equals(form.getHasPlatforms())) {
       saveProjectFacilities(projectDetails, form.getInstallationIds(), createdTimestamp);
     } else {
@@ -81,6 +90,10 @@ public class ProjectDetailsService {
 
   public List<ProjectFacility> getProjectFacilities(ProjectDetails projectDetails) {
     return projectFacilityRepository.findAllByProjectDetails(projectDetails);
+  }
+
+  public List<ProjectField> getProjectFields(ProjectDetails projectDetails) {
+    return projectFieldRepository.findAllByProjectDetails(projectDetails);
   }
 
   public List<String> getProjectFacilityNames(ProjectDetails projectDetails) {
@@ -96,6 +109,22 @@ public class ProjectDetailsService {
         projectFacilityIds, PROJECT_FACILITIES_REQUEST_PURPOSE);
     return facilities.stream()
         .map(Facility::getName)
+        .toList();
+  }
+
+  public List<String> getProjectFieldNames(ProjectDetails projectDetails) {
+    var projectFields = getProjectFields(projectDetails);
+    if (projectFields.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    var projectFieldIds = projectFields.stream()
+        .map(ProjectField::getFieldId)
+        .toList();
+    var fields = fieldService.getFieldsByIds(
+        projectFieldIds, PROJECT_FIELDS_REQUEST_PURPOSE);
+    return fields.stream()
+        .map(Field::getFieldName)
         .toList();
   }
 
@@ -127,6 +156,33 @@ public class ProjectDetailsService {
 
   }
 
+  private void saveProjectFields(ProjectDetails projectDetails, List<Integer> fieldIds, Instant createdTimestamp) {
+    var existingProjectFields = getProjectFields(projectDetails);
+    var existingProjectFieldIds = existingProjectFields
+        .stream()
+        .map(ProjectField::getFieldId)
+        .collect(Collectors.toSet());
+
+    var addedFieldIds = fieldIds.stream()
+        .filter(fieldId -> !existingProjectFieldIds.contains(fieldId))
+        .collect(Collectors.toSet());
+
+    var removedFieldIds = existingProjectFieldIds.stream()
+        .filter(existingFieldId -> !fieldIds.contains(existingFieldId))
+        .collect(Collectors.toSet());
+
+    var newProjectFields = addedFieldIds.stream()
+        .map(fieldId -> new ProjectField(projectDetails, fieldId, createdTimestamp))
+        .collect(Collectors.toSet());
+
+    var removedProjectFields = existingProjectFields.stream()
+        .filter(existingField -> removedFieldIds.contains(existingField.getFieldId()))
+        .collect(Collectors.toSet());
+
+    projectFieldRepository.deleteAll(removedProjectFields);
+    projectFieldRepository.saveAll(newProjectFields);
+  }
+
   private void saveProjectDetailType(ProjectDetails projectDetails, ProjectType projectType, Instant createdTimestamp) {
     var projectDetailType = new ProjectDetailType(projectDetails, createdTimestamp);
     projectDetailType.setProjectType(projectType);
@@ -152,13 +208,6 @@ public class ProjectDetailsService {
     projectDetails.setProjectName(form.getProjectName().getInputValue());
     projectDetails.setProjectCostEstimate(form.getProjectCostEstimate().getAsBigDecimal().orElse(null));
     projectDetails.setEstimatedValueLocalContent(form.getEstimatedValueLocalContent().getAsBigDecimal().orElse(null));
-    form.getFieldId().getAsInteger().ifPresent(fieldId -> {
-      var field = fieldService.getFieldById(fieldId, "Get field name to save SCAP project details");
-      field.ifPresent(actualField -> {
-        projectDetails.setFieldId(fieldId);
-        projectDetails.setFieldName(actualField.getFieldName());
-      });
-    });
     var startDate = form.getExpectedStartDate()
         .getAsLocalDate().orElse(null);
     var endDate = form.getExpectedEndDate()

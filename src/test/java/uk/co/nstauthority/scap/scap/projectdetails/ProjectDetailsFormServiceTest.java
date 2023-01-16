@@ -3,14 +3,14 @@ package uk.co.nstauthority.scap.scap.projectdetails;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -23,10 +23,10 @@ import uk.co.fivium.energyportalapi.generated.types.Facility;
 import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
-import uk.co.nstauthority.scap.file.FileUploadForm;
-import uk.co.nstauthority.scap.file.UploadedFileView;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.fds.addtolist.AddToListItem;
+import uk.co.nstauthority.scap.file.FileUploadForm;
+import uk.co.nstauthority.scap.file.UploadedFileView;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,7 +66,7 @@ class ProjectDetailsFormServiceTest {
     var projectTypes = Set.of(ProjectType.DECOMMISSIONING_PROGRAMME, ProjectType.FIELD_DEVELOPMENT_PLAN);
     var projectCostEstimate = BigDecimal.valueOf(12.3);
     var estimatedValueLocalContent = BigDecimal.valueOf(11.3);
-    var fieldId = 7235;
+    var fieldIds = Collections.singletonList(7235);
     var startDate = LocalDate.of(2000, 12, 30);
     var endDate = LocalDate.of(2003, 8, 11);
 
@@ -74,20 +74,19 @@ class ProjectDetailsFormServiceTest {
     projectDetails.setProjectName(projectName);
     projectDetails.setProjectCostEstimate(projectCostEstimate);
     projectDetails.setEstimatedValueLocalContent(estimatedValueLocalContent);
-    projectDetails.setFieldId(fieldId);
     projectDetails.setPlannedExecutionStartDate(startDate);
     projectDetails.setPlannedCompletionDate(endDate);
 
     when(projectDetailsService.getProjectTypesByProjectDetails(projectDetails)).thenReturn(projectTypes);
 
-    var form = projectDetailsFormService.getForm(projectDetails, null);
+    var form = projectDetailsFormService.getForm(projectDetails, null, fieldIds);
 
     assertThat(form).extracting(
         extractedForm -> extractedForm.getProjectName().getInputValue(),
         ProjectDetailsForm::getProjectTypes,
         extractedForm -> extractedForm.getProjectCostEstimate().getInputValue(),
         extractedForm -> extractedForm.getEstimatedValueLocalContent().getInputValue(),
-        extractedForm -> extractedForm.getFieldId().getInputValue(),
+        ProjectDetailsForm::getFieldIds,
         ProjectDetailsForm::getHasPlatforms,
         extractedForm -> extractedForm.getStartDay().getInputValue(),
         extractedForm -> extractedForm.getStartMonth().getInputValue(),
@@ -100,7 +99,7 @@ class ProjectDetailsFormServiceTest {
         projectTypes,
         projectCostEstimate.toString(),
         estimatedValueLocalContent.toString(),
-        String.valueOf(fieldId),
+        fieldIds,
         null,
         String.valueOf(startDate.getDayOfMonth()),
         String.valueOf(startDate.getMonthValue()),
@@ -118,11 +117,10 @@ class ProjectDetailsFormServiceTest {
     projectDetails.setHasFacilities(false);
     projectDetails.setProjectCostEstimate(BigDecimal.valueOf(1));
     projectDetails.setEstimatedValueLocalContent(BigDecimal.valueOf(1));
-    projectDetails.setFieldId(1);
     projectDetails.setPlannedExecutionStartDate(LocalDate.of(1, 1, 1));
     projectDetails.setPlannedCompletionDate(LocalDate.of(1, 1, 1));
 
-    var form = projectDetailsFormService.getForm(projectDetails, null);
+    var form = projectDetailsFormService.getForm(projectDetails, null, null);
 
     assertThat(form.getHasPlatforms()).isEqualTo(YesNo.NO);
   }
@@ -133,37 +131,45 @@ class ProjectDetailsFormServiceTest {
     projectDetails.setHasFacilities(true);
     projectDetails.setProjectCostEstimate(BigDecimal.valueOf(1));
     projectDetails.setEstimatedValueLocalContent(BigDecimal.valueOf(1));
-    projectDetails.setFieldId(1);
     projectDetails.setPlannedExecutionStartDate(LocalDate.of(1, 1, 1));
     projectDetails.setPlannedCompletionDate(LocalDate.of(1, 1, 1));
     var projectFacilityIds = List.of(1, 2, 3);
 
-    var form = projectDetailsFormService.getForm(projectDetails, projectFacilityIds);
+    var form = projectDetailsFormService.getForm(projectDetails, projectFacilityIds, null);
 
     assertThat(form.getHasPlatforms()).isEqualTo(YesNo.YES);
     assertThat(form.getInstallationIds()).isEqualTo(projectFacilityIds);
   }
 
   @Test
-  void getPreselectedField_existingField() {
-    var field = new Field(22, "Test field", null, null, null, null);
+  void getPreselectedFields_existingField() {
+    var fieldId = 22;
+    var field = Field.newBuilder()
+        .fieldId(fieldId)
+        .fieldName("Test field")
+        .build();
+    var fields = Collections.singletonList(field);
     var requestPurpose = ProjectDetailsFormService.PRESELECTED_FIELD_REQUEST_PURPOSE;
-    when(fieldService.getFieldById(field.getFieldId(), requestPurpose)).thenReturn(Optional.of(field));
+    var projectFieldIds = Collections.singletonList(fieldId);
 
-    var preselectedField = projectDetailsFormService.getPreselectedField(field.getFieldId());
+    when(fieldService.getFieldsByIds(projectFieldIds, requestPurpose)).thenReturn(fields);
 
-    assertThat(preselectedField).contains(Map.of(String.valueOf(field.getFieldId()), field.getFieldName()));
+    var preselectedFields = projectDetailsFormService.getPreselectedFields(projectFieldIds);
+
+    assertThat(preselectedFields).extracting(
+        AddToListItem::getId, AddToListItem::getName, AddToListItem::isValid
+    ).containsExactly(
+        tuple(String.valueOf(fieldId), field.getFieldName(), true)
+    );
   }
 
   @Test
-  void getPreselectedField_nonExistentField_assertEmpty() {
-    var fieldId = 22;
-    var requestPurpose = ProjectDetailsFormService.PRESELECTED_FIELD_REQUEST_PURPOSE;
-    when(fieldService.getFieldById(fieldId, requestPurpose)).thenReturn(Optional.empty());
+  void getPreselectedFields_NoProjectFields() {
+    var preselectedFields = projectDetailsFormService.getPreselectedFields(Collections.emptyList());
 
-    var preselectedField = projectDetailsFormService.getPreselectedField(fieldId);
+    assertThat(preselectedFields).isEmpty();
 
-    assertThat(preselectedField).isEmpty();
+    verifyNoInteractions(fieldService);
   }
 
   @Test
@@ -182,6 +188,15 @@ class ProjectDetailsFormServiceTest {
     ).containsExactly(
         tuple(String.valueOf(facility.getId()), facility.getName(), true)
     );
+  }
+
+  @Test
+  void getPreselectedFields_NoProjectFacilities() {
+    var preselectedFacilities = projectDetailsFormService.getPreselectedFacilities(Collections.emptyList());
+
+    assertThat(preselectedFacilities).isEmpty();
+
+    verifyNoInteractions(facilityService);
   }
 
   @Test

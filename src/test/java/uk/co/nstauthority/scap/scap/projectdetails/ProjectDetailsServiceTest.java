@@ -43,6 +43,8 @@ class ProjectDetailsServiceTest {
   @Mock
   ProjectDetailTypeRepository projectDetailTypeRepository;
 
+  @Mock
+  ProjectFieldRepository projectFieldRepository;
 
   @Mock
   ProjectFacilityRepository projectFacilityRepository;
@@ -67,6 +69,12 @@ class ProjectDetailsServiceTest {
 
   @Captor
   private ArgumentCaptor<Set<ProjectFacility>> deletedProjectFacilitiesArgumentCaptor;
+
+  @Captor
+  private ArgumentCaptor<Set<ProjectField>> savedProjectFieldsArgumentCaptor;
+
+  @Captor
+  private ArgumentCaptor<Set<ProjectField>> deletedProjectFieldsArgumentCaptor;
 
   private ScapDetail scapDetail;
 
@@ -156,6 +164,37 @@ class ProjectDetailsServiceTest {
   }
 
   @Test
+  void getProjectFieldNames() {
+    var projectDetails = new ProjectDetails();
+    var projectFieldId = 7;
+    var projectFields = List.of(new ProjectField(projectDetails, projectFieldId, Instant.now()));
+    var field = Field.newBuilder()
+        .fieldId(1)
+        .fieldName("test field 1")
+        .build();
+
+    when(projectFieldRepository.findAllByProjectDetails(projectDetails)).thenReturn(projectFields);
+    when(fieldService.getFieldsByIds(List.of(projectFieldId), ProjectDetailsService.PROJECT_FIELDS_REQUEST_PURPOSE))
+        .thenReturn(List.of(field));
+
+    var projectFieldNames = projectDetailsService.getProjectFieldNames(projectDetails);
+
+    assertThat(projectFieldNames).containsExactly(field.getFieldName());
+  }
+
+  @Test
+  void getProjectFieldNames_NoProjectFields_AssertEmpty() {
+    var projectDetails = new ProjectDetails();
+
+    when(projectFieldRepository.findAllByProjectDetails(projectDetails)).thenReturn(Collections.emptyList());
+
+    var projectFieldNames = projectDetailsService.getProjectFieldNames(projectDetails);
+
+    assertThat(projectFieldNames).isEmpty();
+  }
+
+  @SuppressWarnings("OptionalGetWithoutIsPresent")
+  @Test
   void saveProjectDetails_newProjectDetails() {
     var createdTimestamp = Instant.ofEpochSecond(1666778603);
     var form = getFilledProjectDetailsForm();
@@ -171,12 +210,9 @@ class ProjectDetailsServiceTest {
     );
     var projectDetailsArgumentCaptor = ArgumentCaptor.forClass(ProjectDetails.class);
     var projectDetailTypesArgumentCaptor = ArgumentCaptor.forClass(ProjectDetailType.class);
-    var field = new Field(7235, "Test field", null, null, null, null);
 
     when(clock.instant()).thenReturn(createdTimestamp);
     when(projectDetailsRepository.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
-    when(fieldService.getFieldById(form.getFieldId().getAsInteger().get(), "Get field name to save SCAP project details"))
-        .thenReturn(Optional.of(field));
 
     projectDetailsService.saveProjectDetails(scapDetail, form);
 
@@ -190,8 +226,6 @@ class ProjectDetailsServiceTest {
         ProjectDetails::getProjectName,
         ProjectDetails::getProjectCostEstimate,
         ProjectDetails::getEstimatedValueLocalContent,
-        ProjectDetails::getFieldId,
-        ProjectDetails::getFieldName,
         ProjectDetails::getHasFacilities,
         ProjectDetails::getPlannedExecutionStartDate,
         ProjectDetails::getPlannedCompletionDate,
@@ -200,8 +234,6 @@ class ProjectDetailsServiceTest {
         form.getProjectName().getInputValue(),
         form.getProjectCostEstimate().getAsBigDecimal().get(),
         form.getEstimatedValueLocalContent().getAsBigDecimal().get(),
-        form.getFieldId().getAsInteger().get(),
-        field.getFieldName(),
         false,
         startDate,
         endDate,
@@ -218,6 +250,7 @@ class ProjectDetailsServiceTest {
     );
   }
 
+  @SuppressWarnings("OptionalGetWithoutIsPresent")
   @Test
   void saveProjectDetails_updateProjectDetails_assertOnlyCreatesAddedAndOnlyDeletesRemoved() {
     var createdTimestamp = Instant.ofEpochSecond(1666778603);
@@ -242,7 +275,6 @@ class ProjectDetailsServiceTest {
         existingProjectDetailType1,
         existingProjectDetailType2
     );
-    var field = new Field(7235, "Test field", null, null, null, null);
 
     var projectDetailsArgumentCaptor = ArgumentCaptor.forClass(ProjectDetails.class);
     var projectDetailTypesArgumentCaptor = ArgumentCaptor.forClass(ProjectDetailType.class);
@@ -250,8 +282,6 @@ class ProjectDetailsServiceTest {
     when(clock.instant()).thenReturn(createdTimestamp);
     when(projectDetailsRepository.findByScapDetail(scapDetail)).thenReturn(Optional.of(existingProjectDetails));
     when(projectDetailTypeRepository.findAllByProjectDetails(existingProjectDetails)).thenReturn(existingProjectDetailTypes);
-    when(fieldService.getFieldById(form.getFieldId().getAsInteger().get(), "Get field name to save SCAP project details"))
-        .thenReturn(Optional.of(field));
 
     projectDetailsService.saveProjectDetails(scapDetail, form);
 
@@ -267,8 +297,6 @@ class ProjectDetailsServiceTest {
         ProjectDetails::getProjectName,
         ProjectDetails::getProjectCostEstimate,
         ProjectDetails::getEstimatedValueLocalContent,
-        ProjectDetails::getFieldId,
-        ProjectDetails::getFieldName,
         ProjectDetails::getHasFacilities,
         ProjectDetails::getPlannedExecutionStartDate,
         ProjectDetails::getPlannedCompletionDate,
@@ -277,8 +305,6 @@ class ProjectDetailsServiceTest {
         form.getProjectName().getInputValue(),
         form.getProjectCostEstimate().getAsBigDecimal().get(),
         form.getEstimatedValueLocalContent().getAsBigDecimal().get(),
-        form.getFieldId().getAsInteger().get(),
-        field.getFieldName(),
         false,
         startDate,
         endDate,
@@ -326,6 +352,39 @@ class ProjectDetailsServiceTest {
     assertThat(deletedProjectFacilitiesArgumentCaptor.getValue()).containsExactly(removedExistingFacility);
   }
 
+  @Test
+  void saveProjectDetails_VerifySavesAndDeletesProjectFields() {
+    var projectDetails = new ProjectDetails();
+
+    var keptExistingField = new ProjectField(projectDetails, 11, Instant.now());
+    var removedExistingField = new ProjectField(projectDetails, 22, Instant.now());
+    var existingProjectFields = List.of(keptExistingField, removedExistingField);
+
+    var addedFieldId = 33;
+    var form = getFilledProjectDetailsForm();
+    var createdInstant = Instant.now();
+    form.setFieldIds(List.of(addedFieldId, keptExistingField.getFieldId()));
+
+    when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
+    when(projectFieldRepository.findAllByProjectDetails(projectDetails)).thenReturn(existingProjectFields);
+    when(clock.instant()).thenReturn(createdInstant);
+
+    projectDetailsService.saveProjectDetails(scapDetail, form);
+
+    verify(projectFieldRepository).saveAll(savedProjectFieldsArgumentCaptor.capture());
+    verify(projectFieldRepository).deleteAll(deletedProjectFieldsArgumentCaptor.capture());
+
+    assertThat(savedProjectFieldsArgumentCaptor.getValue()).extracting(
+        ProjectField::getProjectDetails,
+        ProjectField::getFieldId,
+        ProjectField::getCreatedTimestamp
+    ).containsExactly(
+        Tuple.tuple(projectDetails, addedFieldId, createdInstant)
+    );
+
+    assertThat(deletedProjectFieldsArgumentCaptor.getValue()).containsExactly(removedExistingField);
+  }
+
   private ProjectDetailsForm getFilledProjectDetailsForm() {
     var form = new ProjectDetailsForm();
     form.setProjectName("Test project name");
@@ -334,7 +393,7 @@ class ProjectDetailsServiceTest {
     ));
     form.setProjectCostEstimate("2.2");
     form.setEstimatedValueLocalContent("1.1");
-    form.setFieldId(String.valueOf(7235));
+    form.setFieldIds(Collections.singletonList(7235));
     form.setHasPlatforms(YesNo.NO);
     form.setStartDay("22");
     form.setStartMonth("1");

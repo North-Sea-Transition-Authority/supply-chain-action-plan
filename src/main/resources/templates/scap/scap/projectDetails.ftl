@@ -47,12 +47,16 @@
       detailsText=localContentText
     />
 
-    <@fdsSearchSelector.searchSelectorRest
-      path="form.fieldId.inputValue"
+    <@fdsAddToList.addToList
+      pathForList="form.fieldIds"
+      pathForSelector="form.fieldSelector"
       restUrl=springUrl(fieldSearchRestUrl)
-      labelText="Field"
-      inputClass="govuk-!-width-one-half"
-      preselectedItems=preselectedField!{}
+      itemName="Fields"
+      selectorInputClass="govuk-!-width-one-half"
+      alreadyAdded=preselectedFields
+      selectorMinInputLength=2
+      noItemText="There are no selected fields"
+      selectorLabelText="Select the fields related to this project"
     />
 
     <@fdsRadio.radioGroup

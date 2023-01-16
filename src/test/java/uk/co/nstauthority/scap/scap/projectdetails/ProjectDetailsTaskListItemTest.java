@@ -82,7 +82,7 @@ class ProjectDetailsTaskListItemTest {
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
-    when(projectDetailsFormService.getForm(projectDetails, Collections.emptyList())).thenReturn(form);
+    when(projectDetailsFormService.getForm(projectDetails, Collections.emptyList(), Collections.emptyList())).thenReturn(form);
     when(projectDetailsFormService.validate(eq(form), any(BindingResult.class))).thenReturn(bindingResult);
 
     assertFalse(projectDetailsTaskListItem.isValid(scap.getId()));
@@ -97,7 +97,7 @@ class ProjectDetailsTaskListItemTest {
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
-    when(projectDetailsFormService.getForm(projectDetails, Collections.emptyList())).thenReturn(form);
+    when(projectDetailsFormService.getForm(projectDetails, Collections.emptyList(), Collections.emptyList())).thenReturn(form);
     when(projectDetailsFormService.validate(eq(form), any(BindingResult.class))).thenReturn(bindingResult);
 
     assertTrue(projectDetailsTaskListItem.isValid(scap.getId()));

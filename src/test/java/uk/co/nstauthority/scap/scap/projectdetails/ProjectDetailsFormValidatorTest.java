@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
@@ -18,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.fivium.energyportalapi.generated.types.Facility;
+import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
@@ -37,7 +39,8 @@ class ProjectDetailsFormValidatorTest {
 
   private ProjectDetailsForm form;
   private BindingResult bindingResult;
-  private static final Integer VALID_FIELD_ID = 33;
+  private static final List<Integer> VALID_FIELD_IDS = Collections.singletonList(33);
+  private static final List<Field> FIELDS = Collections.singletonList(mock(Field.class));
 
   @BeforeEach
   void setup() {
@@ -56,8 +59,9 @@ class ProjectDetailsFormValidatorTest {
   }
 
   @Test
-  void validate_allFieldsMissing_assertHasExpectedErrors() {
+  void validate_allFormFieldsMissing_assertHasExpectedErrors() {
     var emptyForm = new ProjectDetailsForm();
+    emptyForm.setFieldIds(Collections.emptyList());
     var emptyFormBindingResult = new BeanPropertyBindingResult(emptyForm, "form");
 
     validator.validate(emptyForm, emptyFormBindingResult);
@@ -69,7 +73,7 @@ class ProjectDetailsFormValidatorTest {
         entry("projectTypes", Set.of("projectTypes.required")),
         entry("projectCostEstimate.inputValue", Set.of("projectCostEstimate.required")),
         entry("estimatedValueLocalContent.inputValue", Set.of("estimatedValueLocalContent.required")),
-        entry("fieldId.inputValue", Set.of("fieldId.required")),
+        entry("fieldSelector", Set.of("fieldSelector.required")),
         entry("hasPlatforms", Set.of("hasPlatforms.required")),
         entry("startDay.inputValue", Set.of("startDay.required")),
         entry("startMonth.inputValue", Set.of("startMonth.required")),
@@ -85,7 +89,8 @@ class ProjectDetailsFormValidatorTest {
     form.setProjectCostEstimate("0.1234");
     form.setEstimatedValueLocalContent("0.1234");
 
-    when(fieldService.doesFieldExist(VALID_FIELD_ID)).thenReturn(true);
+    when(fieldService.getFieldsByIds(VALID_FIELD_IDS, ProjectDetailsFormValidator.FIELDS_REQUEST_PURPOSE))
+        .thenReturn(FIELDS);
 
     validator.validate(form, bindingResult);
 
@@ -102,7 +107,8 @@ class ProjectDetailsFormValidatorTest {
     form.setProjectCostEstimate("0");
     form.setEstimatedValueLocalContent("0");
 
-    when(fieldService.doesFieldExist(VALID_FIELD_ID)).thenReturn(true);
+    when(fieldService.getFieldsByIds(VALID_FIELD_IDS, ProjectDetailsFormValidator.FIELDS_REQUEST_PURPOSE))
+        .thenReturn(FIELDS);
 
     validator.validate(form, bindingResult);
 
@@ -119,7 +125,8 @@ class ProjectDetailsFormValidatorTest {
     form.setProjectCostEstimate("12.2");
     form.setEstimatedValueLocalContent("100");
 
-    when(fieldService.doesFieldExist(VALID_FIELD_ID)).thenReturn(true);
+    when(fieldService.getFieldsByIds(VALID_FIELD_IDS, ProjectDetailsFormValidator.FIELDS_REQUEST_PURPOSE))
+        .thenReturn(FIELDS);
 
     validator.validate(form, bindingResult);
 
@@ -131,18 +138,19 @@ class ProjectDetailsFormValidatorTest {
   }
 
   @Test
-  void validate_fieldDoesNotExist_assertHasExpectedError() {
-    var invalidFieldId = 9999;
-    form.setFieldId(String.valueOf(invalidFieldId));
+  void validate_fieldsInvalid_assertHasExpectedError() {
+    var invalidFieldIds = Collections.singletonList(9999);
+    form.setFieldIds(invalidFieldIds);
 
-    when(fieldService.doesFieldExist(invalidFieldId)).thenReturn(false);
+    when(fieldService.getFieldsByIds(invalidFieldIds, ProjectDetailsFormValidator.FIELDS_REQUEST_PURPOSE))
+        .thenReturn(Collections.emptyList());
 
     validator.validate(form, bindingResult);
 
     var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
 
     assertThat(extractedErrors).containsExactly(
-        entry("fieldId", Set.of("fieldId.doesNotExist"))
+        entry("fieldSelector", Set.of("fieldSelector.invalid"))
     );
   }
 
@@ -151,7 +159,8 @@ class ProjectDetailsFormValidatorTest {
     form.setStartYear("2023");
     form.setEndYear("2022");
 
-    when(fieldService.doesFieldExist(VALID_FIELD_ID)).thenReturn(true);
+    when(fieldService.getFieldsByIds(VALID_FIELD_IDS, ProjectDetailsFormValidator.FIELDS_REQUEST_PURPOSE))
+        .thenReturn(FIELDS);
 
     validator.validate(form, bindingResult);
 
@@ -169,7 +178,8 @@ class ProjectDetailsFormValidatorTest {
     form.setHasPlatforms(YesNo.YES);
     form.setInstallationIds(Collections.emptyList());
 
-    when(fieldService.doesFieldExist(VALID_FIELD_ID)).thenReturn(true);
+    when(fieldService.getFieldsByIds(VALID_FIELD_IDS, ProjectDetailsFormValidator.FIELDS_REQUEST_PURPOSE))
+        .thenReturn(FIELDS);
 
     validator.validate(form, bindingResult);
 
@@ -188,7 +198,8 @@ class ProjectDetailsFormValidatorTest {
     form.setHasPlatforms(YesNo.YES);
     form.setInstallationIds(facilityIds);
 
-    when(fieldService.doesFieldExist(VALID_FIELD_ID)).thenReturn(true);
+    when(fieldService.getFieldsByIds(VALID_FIELD_IDS, ProjectDetailsFormValidator.FIELDS_REQUEST_PURPOSE))
+        .thenReturn(FIELDS);
     when(facilityService.findFacilitiesByIds(facilityIds, ProjectDetailsFormValidator.INSTALLATIONS_REQUEST_PURPOSE))
         .thenReturn(Collections.emptyList());
 
@@ -210,7 +221,8 @@ class ProjectDetailsFormValidatorTest {
     form.setHasPlatforms(YesNo.YES);
     form.setInstallationIds(facilityIds);
 
-    when(fieldService.doesFieldExist(VALID_FIELD_ID)).thenReturn(true);
+    when(fieldService.getFieldsByIds(VALID_FIELD_IDS, ProjectDetailsFormValidator.FIELDS_REQUEST_PURPOSE))
+        .thenReturn(FIELDS);
     when(facilityService.findFacilitiesByIds(facilityIds, ProjectDetailsFormValidator.INSTALLATIONS_REQUEST_PURPOSE))
         .thenReturn(facilities);
 
@@ -225,7 +237,7 @@ class ProjectDetailsFormValidatorTest {
     form.setProjectTypes(Set.of(ProjectType.CARBON_STORAGE_PERMIT));
     form.setProjectCostEstimate("2.2");
     form.setEstimatedValueLocalContent("1.1");
-    form.setFieldId(String.valueOf(VALID_FIELD_ID));
+    form.setFieldIds(VALID_FIELD_IDS);
     form.setHasPlatforms(YesNo.NO);
     form.setStartDay("22");
     form.setStartMonth("1");

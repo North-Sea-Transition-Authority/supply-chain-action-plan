@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.scap.projectdetails;
+package uk.co.nstauthority.scap.energyportal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
@@ -17,15 +17,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.fivium.energyportalapi.client.RequestPurpose;
 import uk.co.fivium.energyportalapi.client.field.FieldApi;
 import uk.co.fivium.energyportalapi.generated.client.FieldProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.client.FieldsProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.fivium.energyportalapi.generated.types.FieldStatus;
-import uk.co.nstauthority.scap.energyportal.FieldService;
 import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,13 +38,22 @@ class FieldServiceTest {
   @InjectMocks
   FieldService fieldService;
 
+  @Captor
+  ArgumentCaptor<RequestPurpose> requestPurposeArgumentCaptor;
+
   List<Field> fields;
 
   @BeforeEach
   void setup() {
     fields = List.of(
-        new Field(1, "test field 1", null, null, null, null),
-        new Field(2, "test field 2", null, null, null, null)
+        Field.newBuilder()
+            .fieldId(1)
+            .fieldName("test field 1")
+            .build(),
+        Field.newBuilder()
+            .fieldId(2)
+            .fieldName("test field 2")
+            .build()
     );
   }
 
@@ -55,14 +65,15 @@ class FieldServiceTest {
         .filter(fieldStatus -> fieldStatus != FieldStatus.STATUS9999)
         .toList();
     var argumentCaptor = ArgumentCaptor.forClass(FieldsProjectionRoot.class);
+    var requestPurposeArgCaptor = ArgumentCaptor.forClass(RequestPurpose.class);
 
-    when(fieldApi.searchFields(eq(searchTerm), eq(statuses), any(), eq(purpose)))
+    when(fieldApi.searchFields(eq(searchTerm), eq(statuses), any(), any(RequestPurpose.class)))
         .thenReturn(fields);
 
     var queryResults = fieldService.getFieldsByName(searchTerm, purpose);
 
     verify(fieldApi)
-        .searchFields(eq(searchTerm), eq(statuses), argumentCaptor.capture(), eq(purpose));
+        .searchFields(eq(searchTerm), eq(statuses), argumentCaptor.capture(), requestPurposeArgCaptor.capture());
 
     var requestedParams = argumentCaptor.getValue().getFields();
 
@@ -71,13 +82,19 @@ class FieldServiceTest {
         entry("fieldId", null),
         entry("fieldName", null)
     );
+    assertThat(requestPurposeArgCaptor.getValue())
+        .extracting(RequestPurpose::purpose)
+        .isEqualTo(purpose);
   }
 
   @Test
   void getFieldById() {
     var requestedFieldId = 34;
     var requestPurpose = "Test request purpose";
-    var field = new Field(requestedFieldId, "Test field name", null, null, null, null);
+    var field = Field.newBuilder()
+        .fieldId(requestedFieldId)
+        .fieldName("Test field name")
+        .build();
     var argumentCaptor = ArgumentCaptor.forClass(FieldProjectionRoot.class);
 
     when(fieldApi.findFieldById(eq(requestedFieldId), any(FieldProjectionRoot.class), eq(requestPurpose)))
@@ -117,11 +134,6 @@ class FieldServiceTest {
 
   @Test
   void getFieldSearchResults() {
-    var fields = List.of(
-        new Field(1, "field name 1", null, null, null, null),
-        new Field(2, "field name 2", null, null, null, null)
-    );
-
     var fieldsSearchResult = fieldService.getFieldsSearchResult(fields);
 
     assertThat(fieldsSearchResult.getResults()).extracting(
@@ -131,5 +143,29 @@ class FieldServiceTest {
         tuple(fields.get(0).getFieldId().toString(), fields.get(0).getFieldName()),
         tuple(fields.get(1).getFieldId().toString(), fields.get(1).getFieldName())
     );
+  }
+
+  @Test
+  void getFieldsByIds() {
+    var fieldIds = fields.stream().map(Field::getFieldId).toList();
+    var purpose = "Test request purpose";
+    when(fieldApi.getFieldsByIds(
+        eq(fieldIds),
+        eq(FieldService.FIELDS_PROJECTION_ROOT),
+        any(RequestPurpose.class))
+    ).thenReturn(fields);
+
+    var fieldsByIds = fieldService.getFieldsByIds(fieldIds, purpose);
+
+    verify(fieldApi).getFieldsByIds(
+        eq(fieldIds),
+        eq(FieldService.FIELDS_PROJECTION_ROOT),
+        requestPurposeArgumentCaptor.capture()
+    );
+
+    assertThat(fieldsByIds).isEqualTo(fields);
+    assertThat(requestPurposeArgumentCaptor.getValue())
+        .extracting(RequestPurpose::purpose)
+        .isEqualTo(purpose);
   }
 }

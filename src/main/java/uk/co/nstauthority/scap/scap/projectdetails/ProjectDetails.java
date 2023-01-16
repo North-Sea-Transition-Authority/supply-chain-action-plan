@@ -31,10 +31,6 @@ public class ProjectDetails {
 
   private BigDecimal estimatedValueLocalContent;
 
-  private Integer fieldId;
-
-  private String fieldName;
-
   private LocalDate plannedExecutionStartDate;
 
   private LocalDate plannedCompletionDate;
@@ -78,22 +74,6 @@ public class ProjectDetails {
 
   public void setEstimatedValueLocalContent(BigDecimal estimatedValueLocalContent) {
     this.estimatedValueLocalContent = estimatedValueLocalContent;
-  }
-
-  Integer getFieldId() {
-    return fieldId;
-  }
-
-  void setFieldId(Integer fieldId) {
-    this.fieldId = fieldId;
-  }
-
-  public String getFieldName() {
-    return fieldName;
-  }
-
-  public void setFieldName(String fieldName) {
-    this.fieldName = fieldName;
   }
 
   public LocalDate getPlannedExecutionStartDate() {

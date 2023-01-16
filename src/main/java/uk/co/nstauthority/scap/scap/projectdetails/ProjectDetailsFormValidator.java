@@ -10,7 +10,6 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 import uk.co.fivium.formlibrary.validator.date.ThreeFieldDateInputValidator;
 import uk.co.fivium.formlibrary.validator.decimal.DecimalInputValidator;
-import uk.co.fivium.formlibrary.validator.integer.IntegerInputValidator;
 import uk.co.fivium.formlibrary.validator.string.StringInputValidator;
 import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
@@ -21,6 +20,8 @@ class ProjectDetailsFormValidator implements Validator {
 
   static final String INSTALLATION_SELECTOR_FIELD_NAME = "installationSelector";
   static final String INSTALLATIONS_REQUEST_PURPOSE = "Verify facilities exist for SCAP project details validation";
+  static final String FIELDS_SELECTOR_FIELD_NAME = "fieldSelector";
+  static final String FIELDS_REQUEST_PURPOSE = "Verify fields exist for SCAP project details";
   private final FieldService fieldService;
   private final FacilityService facilityService;
 
@@ -61,13 +62,22 @@ class ProjectDetailsFormValidator implements Validator {
     }
     localContentValueValidatorBuilder.validate(form.getEstimatedValueLocalContent(), errors);
 
-    IntegerInputValidator.builder()
-        .mustBeMoreThanOrEqual(0)
-        .validate(form.getFieldId(), errors);
+    if (form.getFieldIds().isEmpty()) {
+      errors.rejectValue(
+          FIELDS_SELECTOR_FIELD_NAME,
+          "%s.required".formatted(FIELDS_SELECTOR_FIELD_NAME),
+          "Select at least one field"
+      );
+    }
 
-    if (!errors.hasFieldErrors("fieldId.inputValue")
-        && !fieldService.doesFieldExist(Integer.valueOf(form.getFieldId().getInputValue()))) {
-      errors.rejectValue("fieldId", "fieldId.doesNotExist", "Select a valid field");
+    if (!errors.hasFieldErrors(FIELDS_SELECTOR_FIELD_NAME)) {
+      var fieldIds = form.getFieldIds();
+      if (fieldIds.size() != fieldService.getFieldsByIds(fieldIds, FIELDS_REQUEST_PURPOSE).size()) {
+        errors.rejectValue(
+            FIELDS_SELECTOR_FIELD_NAME,
+            "%s.invalid".formatted(FIELDS_SELECTOR_FIELD_NAME),
+            "Selected fields must all be valid");
+      }
     }
 
     ValidationUtils.rejectIfEmpty(

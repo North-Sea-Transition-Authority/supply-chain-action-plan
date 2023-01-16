@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.fivium.energyportalapi.client.RequestPurpose;
 import uk.co.fivium.energyportalapi.client.field.FieldApi;
 import uk.co.fivium.energyportalapi.generated.client.FieldProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.client.FieldsProjectionRoot;
@@ -16,6 +17,12 @@ import uk.co.nstauthority.scap.fds.searchselector.RestSearchResult;
 @Service
 public class FieldService {
 
+  private static final List<FieldStatus> FIELD_STATUSES = Arrays.stream(FieldStatus.values())
+      .filter(fieldStatus -> fieldStatus != FieldStatus.STATUS9999)
+      .toList();
+  static final FieldsProjectionRoot FIELDS_PROJECTION_ROOT = new FieldsProjectionRoot()
+      .fieldId()
+      .fieldName();
   private final FieldApi fieldApi;
 
   @Autowired
@@ -24,13 +31,13 @@ public class FieldService {
   }
 
   public List<Field> getFieldsByName(String term, String purpose) {
-    var statuses = Arrays.stream(FieldStatus.values())
-        .filter(fieldStatus -> fieldStatus != FieldStatus.STATUS9999)
-        .toList();
-    var requestedFields = new FieldsProjectionRoot()
-        .fieldId()
-        .fieldName();
-    return fieldApi.searchFields(term, statuses, requestedFields, purpose);
+    var requestPurpose = new RequestPurpose(purpose);
+    return fieldApi.searchFields(term, FIELD_STATUSES, FIELDS_PROJECTION_ROOT, requestPurpose);
+  }
+
+  public List<Field> getFieldsByIds(List<Integer> fieldIds, String purpose) {
+    var requestPurpose = new RequestPurpose(purpose);
+    return fieldApi.getFieldsByIds(fieldIds, FIELDS_PROJECTION_ROOT, requestPurpose);
   }
 
   public RestSearchResult getFieldsSearchResult(List<Field> fields) {

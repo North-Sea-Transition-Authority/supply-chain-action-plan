@@ -135,10 +135,12 @@ class ScapSummaryViewServiceTest {
     projectDetails.setHasFacilities(hasFacilities);
     var projectTypes = getValidProjectTypes();
     var facilities = List.of("Test facility");
+    var fields = Collections.singletonList("Test field");
 
     when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
     when(projectDetailsService.getProjectTypesByProjectDetails(projectDetails)).thenReturn(projectTypes);
     when(projectDetailsService.getProjectFacilityNames(projectDetails)).thenReturn(facilities);
+    when(projectDetailsService.getProjectFieldNames(projectDetails)).thenReturn(fields);
 
     var projectDetailsView = scapSummaryViewService.getProjectDetailsSummaryView(scapDetail);
 
@@ -147,7 +149,7 @@ class ScapSummaryViewServiceTest {
         ProjectDetailsSummaryView::projectTypes,
         ProjectDetailsSummaryView::projectCostEstimate,
         ProjectDetailsSummaryView::estimatedValueLocalContent,
-        ProjectDetailsSummaryView::fieldName,
+        ProjectDetailsSummaryView::fieldNames,
         ProjectDetailsSummaryView::hasFacilities,
         ProjectDetailsSummaryView::projectFacilities,
         ProjectDetailsSummaryView::plannedExecutionStartDate,
@@ -157,7 +159,7 @@ class ScapSummaryViewServiceTest {
         projectTypes.stream().toList(),
         projectDetails.getProjectCostEstimate(),
         projectDetails.getEstimatedValueLocalContent(),
-        projectDetails.getFieldName(),
+        fields,
         hasFacilitiesEnum,
         facilities,
         "1 Jan 2023",
@@ -176,7 +178,7 @@ class ScapSummaryViewServiceTest {
         ProjectDetailsSummaryView::projectTypes,
         ProjectDetailsSummaryView::projectCostEstimate,
         ProjectDetailsSummaryView::estimatedValueLocalContent,
-        ProjectDetailsSummaryView::fieldName,
+        ProjectDetailsSummaryView::fieldNames,
         ProjectDetailsSummaryView::hasFacilities,
         ProjectDetailsSummaryView::projectFacilities,
         ProjectDetailsSummaryView::plannedExecutionStartDate,
@@ -553,7 +555,6 @@ class ScapSummaryViewServiceTest {
     var projectName = "test project";
     var projectCostEstimate = BigDecimal.valueOf(12.345);
     var estimatedValueLocalContent = BigDecimal.valueOf(54.321);
-    var fieldName = "test field";
     var plannedExecutionStartDate = LocalDate.of(2023, 1, 1);
     var plannedCompletionDate = LocalDate.of(2024, 1, 1);
 
@@ -561,7 +562,6 @@ class ScapSummaryViewServiceTest {
     projectDetails.setProjectName(projectName);
     projectDetails.setProjectCostEstimate(projectCostEstimate);
     projectDetails.setEstimatedValueLocalContent(estimatedValueLocalContent);
-    projectDetails.setFieldName(fieldName);
     projectDetails.setHasFacilities(false);
     projectDetails.setPlannedExecutionStartDate(plannedExecutionStartDate);
     projectDetails.setPlannedCompletionDate(plannedCompletionDate);
@@ -578,7 +578,7 @@ class ScapSummaryViewServiceTest {
         List.of(ProjectType.DECOMMISSIONING_PROGRAMME),
         new BigDecimal("50000"),
         new BigDecimal("50000"),
-        "44/02",
+        Collections.singletonList("BRENT"),
         YesNo.NO,
         Collections.emptyList(),
         "11-05-2023",
