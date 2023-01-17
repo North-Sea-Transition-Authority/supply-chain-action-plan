@@ -29,7 +29,6 @@ import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.fds.ErrorItem;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.scap.Scap;
-import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.start.ScapStartController;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
@@ -116,26 +115,24 @@ class OrganisationGroupControllerTest extends AbstractScapSubmitterControllerTes
   @Test
   void renderExistingScapOrganisationGroupForm() throws Exception {
     var organisationGroupId = 322;
-    var scapId = new ScapId(1);
     var organisationGroup = new OrganisationGroup(organisationGroupId, "CENTRICA", null, null, null, null);
-    var scapOverview = new Scap(scapId);
-    scapOverview.setOrganisationGroupId(organisationGroupId);
-    when(scapService.getScapById(scapId)).thenReturn(scapOverview);
+    scap.setOrganisationGroupId(organisationGroupId);
+    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(organisationGroupService.getOrganisationGroupById(organisationGroupId, "Get name of current SCAP operator"))
         .thenReturn(Optional.of(organisationGroup));
-    when(organisationGroupFormService.getForm(scapOverview)).thenReturn(new OrganisationGroupForm());
+    when(organisationGroupFormService.getForm(scap)).thenReturn(new OrganisationGroupForm());
 
     mockMvc.perform(
         get(
             ReverseRouter.route(on(OrganisationGroupController.class)
-                .renderExistingScapOrganisationGroupForm(scapId))))
+                .renderExistingScapOrganisationGroupForm(SCAP_ID))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/organisationGroup"))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId))))
+            ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID))))
         .andExpect(model().attribute("submitPostUrl",
             ReverseRouter.route(on(OrganisationGroupController.class)
-                .saveExistingScapOrganisationGroup(null, scapId, emptyBindingResult()))))
+                .saveExistingScapOrganisationGroup(null, SCAP_ID, emptyBindingResult()))))
         .andExpect(model().attribute("organisationGroupSearchRestUrl",
             ReverseRouter.route(on(OrganisationGroupRestController.class)
                 .getOrganisationGroupSearchResults(null))))

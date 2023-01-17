@@ -16,7 +16,6 @@ import static uk.co.nstauthority.scap.mvc.ReverseRouter.emptyBindingResult;
 
 import java.time.Clock;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -35,8 +34,6 @@ import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityController;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
-import uk.co.nstauthority.scap.scap.detail.ScapDetail;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,14 +52,6 @@ class HasActualTenderControllerTest extends AbstractScapSubmitterControllerTest 
 
   @MockBean
   ActualTenderActivityService actualTenderActivityService;
-
-  private ScapDetail scapDetail;
-
-  @BeforeEach
-  void setup() {
-    scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, clock.instant(), 1);
-  }
-
   @Test
   void renderHasActualTenderForm_expectIsOk() throws Exception {
 
@@ -86,7 +75,6 @@ class HasActualTenderControllerTest extends AbstractScapSubmitterControllerTest 
     form.setHasActualTender(YesNo.NO);
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(hasActualTenderFormService.getForm(actualTender)).thenReturn(form);
 
@@ -128,7 +116,6 @@ class HasActualTenderControllerTest extends AbstractScapSubmitterControllerTest 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.empty());
     when(hasActualTenderFormService.validate(eq(form), any(BindingResult.class))).thenReturn(bindingResult);
 
@@ -152,7 +139,6 @@ class HasActualTenderControllerTest extends AbstractScapSubmitterControllerTest 
     var existingActualTender = new ActualTender();
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(existingActualTender));
     when(hasActualTenderFormService.validate(eq(form), any(BindingResult.class))).thenReturn(bindingResult);
 
@@ -203,7 +189,6 @@ class HasActualTenderControllerTest extends AbstractScapSubmitterControllerTest 
         .renderActualTenderSummary(scap.getScapId()));
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(hasActualTenderFormService.getForm(actualTender)).thenReturn(form);
     when(actualTenderActivityService.hasActualTenderActivity(actualTender)).thenReturn(true);

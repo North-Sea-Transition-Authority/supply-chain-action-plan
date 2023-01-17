@@ -47,7 +47,6 @@ import uk.co.nstauthority.scap.workarea.WorkAreaController;
 @WithMockUser
 @ContextConfiguration(classes = ScapSubmissionController.class)
 class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
-  private ScapDetail scapDetail;
 
   @MockBean
   ScapSummaryViewService scapSummaryViewService;
@@ -98,7 +97,7 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
     doReturn(ScapFormTaskListSection.class).when(taskListItem).getTaskListSection();
     doReturn(false).when(taskListItem).isValid(SCAP_ID.scapId());
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
-    mockScapSummaryViewServiceMethods(scapSummaryViewService, scapDetail);
+    when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
 
     mockMvc.perform(get(
             ReverseRouter.route(on(ScapSubmissionController.class).renderScapSubmissionConfirmation(SCAP_ID))))
@@ -109,16 +108,6 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
         .andExpect(model().attribute("scapSummaryView", getScapSummaryView()))
         .andExpect(model().attribute("isValid", false))
         .andExpect(model().attribute("incompleteErrorMessage", ScapSubmissionController.INVALID_SCAP_ERROR_MESSAGE));
-  }
-
-  @Test
-  void renderScapSubmissionConfirmation_AlreadySubmitted_AssertThrows() throws Exception {
-    scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
-
-    mockMvc.perform(get(
-        ReverseRouter.route(on(ScapSubmissionController.class).renderScapSubmissionConfirmation(SCAP_ID))))
-        .andExpect(status().isBadRequest());
   }
 
   @Test
@@ -160,23 +149,7 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
   }
 
   @Test
-  void submitScap_AlreadySubmitted_AssertThrows() throws Exception {
-    scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID
-    )).thenReturn(scapDetail);
-
-    mockMvc.perform(post(
-        ReverseRouter.route(on(ScapSubmissionController.class).submitScap(SCAP_ID)))
-            .with(csrf()))
-        .andExpect(status().isBadRequest());
-
-    verify(scapDetailService, never()).submitScap(scapDetail);
-  }
-
-  @Test
   void renderScapSubmissionSuccess_NotSubmitted_AssertThrows() throws Exception {
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
-
     mockMvc.perform(get(
         ReverseRouter.route(on(ScapSubmissionController.class).renderScapSubmissionSuccess(SCAP_ID))))
         .andExpect(status().isBadRequest());

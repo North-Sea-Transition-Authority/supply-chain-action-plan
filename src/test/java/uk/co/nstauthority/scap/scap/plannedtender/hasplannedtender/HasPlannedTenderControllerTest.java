@@ -15,7 +15,6 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import static uk.co.nstauthority.scap.mvc.ReverseRouter.emptyBindingResult;
 
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -25,18 +24,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
-import uk.co.nstauthority.scap.scap.detail.ScapDetail;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTender;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderController;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderService;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityController;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityService;
-import uk.co.nstauthority.scap.scap.scap.Scap;
-import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.utils.EntityTestingUtil;
 import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
@@ -44,7 +39,7 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = HasPlannedTenderController.class)
 @WithMockUser
-class HasPlannedTenderControllerTest extends AbstractControllerTest {
+class HasPlannedTenderControllerTest extends AbstractScapSubmitterControllerTest {
 
 @MockBean
   PlannedTenderService plannedTenderService;
@@ -58,23 +53,10 @@ class HasPlannedTenderControllerTest extends AbstractControllerTest {
   @MockBean
   ValidationErrorOrderingService validationErrorOrderingService;
 
-  private Scap scap;
-  private ScapDetail scapDetail;
-
-  private static final ScapId SCAP_ID = new ScapId(22);
-
-  @BeforeEach
-  void setup() {
-    scap = new Scap(1664);
-    scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, EntityTestingUtil.dateToInstant(2000, 4, 23), 1);
-  }
-
   @Test
   void renderHasPlannedTenderActivityForm_noExistingEntity() throws Exception {
     var form = new HasPlannedTenderForm();
 
-    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(hasPlannedTenderFormService.getForm(scapDetail)).thenReturn(form);
     when(plannedTenderService.getScapPlannedTenderByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
@@ -99,8 +81,6 @@ class HasPlannedTenderControllerTest extends AbstractControllerTest {
     form.setHasPlannedTender(YesNo.YES);
     var createdPlannedTender = new PlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 4, 23));
 
-    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetail(scapDetail)).thenReturn(Optional.empty());
     when(hasPlannedTenderFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(emptyBindingResult());
@@ -127,8 +107,6 @@ class HasPlannedTenderControllerTest extends AbstractControllerTest {
     form.setHasPlannedTender(YesNo.NO);
     var createdPlannedTender = new PlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 4, 23));
 
-    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetail(scapDetail)).thenReturn(Optional.empty());
     when(hasPlannedTenderFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(emptyBindingResult());
@@ -155,8 +133,6 @@ class HasPlannedTenderControllerTest extends AbstractControllerTest {
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("form", "hasPlannedTender", "This field is required"));
 
-    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetail(scapDetail)).thenReturn(Optional.empty());
     when(hasPlannedTenderFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResult);
@@ -188,8 +164,6 @@ class HasPlannedTenderControllerTest extends AbstractControllerTest {
     var expectedRedirectUrl = ReverseRouter.route(on(PlannedTenderController.class)
         .renderPlannedTenderActivities(SCAP_ID));
 
-    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetail(scapDetail))
         .thenReturn(Optional.of(existingPlannedTender));
     when(plannedTenderActivityService.hasExistingTenderDetails(existingPlannedTender)).thenReturn(true);

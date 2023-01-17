@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderController;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderService;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivity;
@@ -26,6 +28,7 @@ import uk.co.nstauthority.scap.util.DeletionSuccessBannerUtil;
 @Controller
 @RequestMapping("{scapId}/planned-tender/{plannedTenderDetailId}/delete")
 @PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
+@ScapHasStatus(permittedStatuses = ScapDetailStatus.DRAFT)
 public class DeletePlannedTenderActivityController {
 
   private final ScapService scapService;

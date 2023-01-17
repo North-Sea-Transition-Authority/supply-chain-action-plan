@@ -37,7 +37,6 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperformance.HasContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryController;
-import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = ContractingPerformanceController.class)
@@ -58,13 +57,11 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
 
   @MockBean
   ActualTenderActivityService actualTenderActivityService;
-  private ScapDetail scapDetail;
   private ActualTender actualTender;
   private ContractingPerformanceOverview contractingPerformanceOverview;
 
   @BeforeEach
   void setup() {
-    scapDetail = new ScapDetail();
     actualTender = new ActualTender();
     contractingPerformanceOverview = new ContractingPerformanceOverview();
   }
@@ -76,7 +73,6 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
     var scopeTitlesMap = Map.of(String.valueOf(activity.getId()), "Activity scope title");
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
     when(contractingPerformanceService.getActivitiesWithoutContractingPerformance(activities)).thenReturn(activities);
@@ -97,7 +93,6 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
   @Test
   void renderNewContractingPerformanceForm_NoActualTender() throws Exception {
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
     mockMvc.perform(get(
@@ -119,7 +114,6 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
     var scopeTitlesMap = Map.of(String.valueOf(activity.getId()), "Activity scope title");
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
     when(contractingPerformanceService.getActivitiesWithoutContractingPerformance(activities)).thenReturn(activities);
@@ -152,7 +146,6 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
         .renderContractingPerformanceSummary(scap.getScapId()));
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
@@ -184,7 +177,6 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
     );
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
@@ -220,7 +212,6 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
     );
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.empty());
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
@@ -254,7 +245,6 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
     var scopeTitlesMap = Map.of(String.valueOf(activity.getId()), "Activity scope title");
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
     when(contractingPerformanceService.getById(contractingPerformanceId)).thenReturn(contractingPerformance);
@@ -287,7 +277,6 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
         .renderContractingPerformanceSummary(scap.getScapId()));
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
@@ -321,7 +310,6 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
         new FieldError("form", "testField", "test error message")
     );
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))

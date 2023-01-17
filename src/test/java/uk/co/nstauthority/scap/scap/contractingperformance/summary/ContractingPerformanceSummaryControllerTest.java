@@ -34,7 +34,6 @@ import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanc
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverview;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverviewService;
 import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperformance.HasContractingPerformanceController;
-import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryView;
 import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryViewService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
@@ -53,13 +52,11 @@ class ContractingPerformanceSummaryControllerTest extends AbstractScapSubmitterC
   @MockBean
   ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService;
 
-  private ScapDetail scapDetail;
   private ContractingPerformanceOverview contractingPerformanceOverview;
   private List<ContractingPerformanceSummaryView> summaryViews;
 
   @BeforeEach
   void setup() {
-    scapDetail = new ScapDetail();
     contractingPerformanceOverview = new ContractingPerformanceOverview();
     summaryViews = List.of(new ContractingPerformanceSummaryView(
         SCAP_ID,
@@ -78,7 +75,6 @@ class ContractingPerformanceSummaryControllerTest extends AbstractScapSubmitterC
 
   @Test
   void renderContractingPerformanceSummary() throws Exception {
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(SCAP_ID))
@@ -137,7 +133,6 @@ class ContractingPerformanceSummaryControllerTest extends AbstractScapSubmitterC
         "form", "testField", "test error message"
     ));
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(SCAP_ID))
@@ -169,7 +164,6 @@ class ContractingPerformanceSummaryControllerTest extends AbstractScapSubmitterC
     form.setHasMoreContractingPerformance(hasMoreContractingPerformance);
     var bindingResultWithoutErrors = new BeanPropertyBindingResult(form, "form");
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(SCAP_ID))
@@ -196,7 +190,6 @@ class ContractingPerformanceSummaryControllerTest extends AbstractScapSubmitterC
     form.setHasMoreContractingPerformance(hasMoreContractingPerformance);
     var bindingResultWithoutErrors = new BeanPropertyBindingResult(form, "form");
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(SCAP_ID))

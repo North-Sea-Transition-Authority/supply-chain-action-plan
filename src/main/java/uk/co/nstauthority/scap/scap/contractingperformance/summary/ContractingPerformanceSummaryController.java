@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
@@ -20,6 +21,7 @@ import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanc
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverviewService;
 import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperformance.HasContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryView;
@@ -29,6 +31,7 @@ import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 @Controller
 @RequestMapping("{scapId}/contracting-performance/summary")
 @PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
+@ScapHasStatus(permittedStatuses = ScapDetailStatus.DRAFT)
 public class ContractingPerformanceSummaryController {
 
   private final ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService;

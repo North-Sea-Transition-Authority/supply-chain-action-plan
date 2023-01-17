@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
@@ -19,6 +20,7 @@ import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanc
 import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperformance.HasContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryViewService;
@@ -27,6 +29,7 @@ import uk.co.nstauthority.scap.util.DeletionSuccessBannerUtil;
 @Controller
 @RequestMapping("{scapId}/contracting-performance/{contractingPerformanceId}/delete")
 @PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
+@ScapHasStatus(permittedStatuses = ScapDetailStatus.DRAFT)
 public class DeleteContractingPerformanceController {
 
   private final ScapService scapService;

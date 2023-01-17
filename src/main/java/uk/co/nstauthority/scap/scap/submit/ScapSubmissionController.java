@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.error.exception.ScapBadRequestException;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
@@ -28,6 +29,7 @@ import uk.co.nstauthority.scap.workarea.WorkAreaController;
 @Controller
 @RequestMapping("{scapId}/submit")
 @PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
+@ScapHasStatus(permittedStatuses = ScapDetailStatus.DRAFT)
 class ScapSubmissionController {
 
   static final String INVALID_SCAP_ERROR_MESSAGE = """
@@ -57,22 +59,14 @@ class ScapSubmissionController {
   ModelAndView renderScapSubmissionConfirmation(@PathVariable("scapId") ScapId scapId) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
 
-    if (!ScapDetailStatus.DRAFT.equals(scapDetail.getStatus())) {
-      throw new ScapBadRequestException("SCAP with ID [%d] is not in DRAFT status");
-    }
-
     return scapSubmissionConfirmationModelAndView(scapId)
         .addObject("scapSummaryView", scapSummaryViewService.getScapSummaryView(scapDetail));
   }
 
   @GetMapping("/success")
+  @ScapHasStatus(permittedStatuses = ScapDetailStatus.SUBMITTED)
   ModelAndView renderScapSubmissionSuccess(@PathVariable("scapId") ScapId scapId) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
-
-    if (!ScapDetailStatus.SUBMITTED.equals(scapDetail.getStatus())) {
-      throw new ScapBadRequestException("SCAP with ID [%d] is not in SUBMITTED status");
-    }
 
     return new ModelAndView("scap/scap/submit/submissionSuccess")
         .addObject("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea()))
@@ -82,10 +76,6 @@ class ScapSubmissionController {
   @PostMapping
   ModelAndView submitScap(@PathVariable("scapId") ScapId scapId) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
-
-    if (!ScapDetailStatus.DRAFT.equals(scapDetail.getStatus())) {
-      throw new ScapBadRequestException("SCAP with ID [%d] is not in DRAFT status");
-    }
 
     if (!isScapValid(scapId)) {
       throw new ScapBadRequestException(

@@ -15,7 +15,6 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import static uk.co.nstauthority.scap.mvc.ReverseRouter.emptyBindingResult;
 
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -33,7 +32,6 @@ import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanc
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverviewService;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
 import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryController;
-import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
 
@@ -51,16 +49,8 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
   @MockBean
   HasContractingPerformanceFormService contractingPerformanceFormService;
 
-  private ScapDetail scapDetail;
-
-  @BeforeEach
-  void setup() {
-    scapDetail = new ScapDetail();
-  }
-
   @Test
   void renderHasContractingPerformanceForm_NoExistingContractPerformanceOverview() throws Exception {
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceOverviewService.getByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
     mockMvc.perform(get(
@@ -79,7 +69,6 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
     var existingContractPerformanceOverview = new ContractingPerformanceOverview();
     var filledForm = new HasContractingPerformanceForm();
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
         .thenReturn(Optional.of(existingContractPerformanceOverview));
     when(contractingPerformanceFormService.getForm(existingContractPerformanceOverview)).thenReturn(filledForm);
@@ -102,7 +91,6 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
     var expectedRedirectUrl = ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
         .renderContractingPerformanceSummary(SCAP_ID));
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
         .thenReturn(Optional.of(existingContractPerformanceOverview));
     when(contractingPerformanceService.hasContractingPerformance(existingContractPerformanceOverview))
@@ -122,7 +110,6 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
     var expectedRedirectUrl = ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
         .renderContractingPerformanceSummary(SCAP_ID));
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
         .thenReturn(Optional.of(existingContractPerformanceOverview));
     when(contractingPerformanceService.hasContractingPerformance(existingContractPerformanceOverview))
@@ -144,7 +131,6 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
         new FieldError("form", "testField", "Test error message")
     );
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResultWithErrors);
 
@@ -171,7 +157,6 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
     var expectedRedirectUrl = ReverseRouter.route(on(ContractingPerformanceController.class)
         .renderNewContractingPerformanceForm(SCAP_ID, null));
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResultWithoutErrors);
 
@@ -194,7 +179,6 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
     var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class)
         .renderTaskList(scap.getScapId()));
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResultWithoutErrors);
 

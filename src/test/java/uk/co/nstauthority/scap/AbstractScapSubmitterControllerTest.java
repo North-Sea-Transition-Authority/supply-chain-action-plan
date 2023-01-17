@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.co.nstauthority.scap.authentication.TestUserProvider;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
@@ -32,9 +33,9 @@ public abstract class AbstractScapSubmitterControllerTest extends AbstractContro
 
   protected final static ScapId SCAP_ID = new ScapId(1111);
 
-  protected final Scap scap = getScap();
+  protected Scap scap;
 
-  protected final ScapDetail scapDetail = getScapDetail(scap, webUserAccountId);
+  protected ScapDetail scapDetail;
 
   protected final Team team = getTeam();
 
@@ -45,8 +46,12 @@ public abstract class AbstractScapSubmitterControllerTest extends AbstractContro
 
   @BeforeEach
   void setupSubmitterMocks() {
+    scap = getScap();
+    scapDetail = getScapDetail();
+
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(scapService.getScapById(SCAP_ID.scapId())).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(teamService.getByEnergyPortalOrgGroupId(anyInt())).thenReturn(team);
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.findTeamMember(any(Team.class), eq(webUserAccountId))).thenReturn(Optional.of(getTeamMember()));
@@ -78,13 +83,13 @@ public abstract class AbstractScapSubmitterControllerTest extends AbstractContro
     return scap;
   }
 
-  private ScapDetail getScapDetail(Scap scap, WebUserAccountId webUserAccountId) {
+  private ScapDetail getScapDetail() {
     var scapDetail = new ScapDetail(2222);
     scapDetail.setScap(scap);
     scapDetail.setCreatedTimestamp(Instant.now());
     scapDetail.setStatus(ScapDetailStatus.DRAFT);
     scapDetail.setTipFlag(true);
-    scapDetail.setCreatedByUserId(webUserAccountId.toInt());
+    scapDetail.setCreatedByUserId(TestUserProvider.getUser().getWebUserAccountId().toInt());
     return scapDetail;
   }
 }

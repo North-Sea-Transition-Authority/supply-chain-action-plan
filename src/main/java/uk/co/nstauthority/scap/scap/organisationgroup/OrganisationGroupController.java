@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequired;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
@@ -73,8 +75,9 @@ public class OrganisationGroupController {
     return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scap.getScapId()));
   }
 
-  @GetMapping("/{scapOverviewId}/organisation-group")
-  public ModelAndView renderExistingScapOrganisationGroupForm(@PathVariable("scapOverviewId") ScapId scapId) {
+  @GetMapping("/{scapId}/organisation-group")
+  @ScapHasStatus(permittedStatuses = ScapDetailStatus.DRAFT)
+  public ModelAndView renderExistingScapOrganisationGroupForm(@PathVariable("scapId") ScapId scapId) {
     var scapOverview = scapService.getScapById(scapId);
     var form = organisationGroupFormService.getForm(scapOverview);
     var postUrl = ReverseRouter.route(on(OrganisationGroupController.class)
@@ -89,9 +92,10 @@ public class OrganisationGroupController {
         .addObject("form", form);
   }
 
-  @PostMapping("/{scapOverviewId}/organisation-group")
+  @PostMapping("/{scapId}/organisation-group")
+  @ScapHasStatus(permittedStatuses = ScapDetailStatus.DRAFT)
   public ModelAndView saveExistingScapOrganisationGroup(@ModelAttribute("form") OrganisationGroupForm form,
-                                                        @PathVariable("scapOverviewId") ScapId scapId,
+                                                        @PathVariable("scapId") ScapId scapId,
                                                         BindingResult bindingResult) {
     var scapOverview = scapService.getScapById(scapId);
     bindingResult = organisationGroupFormService.validate(form, bindingResult);

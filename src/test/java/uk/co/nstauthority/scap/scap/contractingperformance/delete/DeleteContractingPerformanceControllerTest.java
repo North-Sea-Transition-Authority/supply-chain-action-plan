@@ -29,7 +29,6 @@ import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanc
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
 import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperformance.HasContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryController;
-import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryView;
 import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryViewService;
 import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
@@ -89,7 +88,6 @@ class DeleteContractingPerformanceControllerTest extends AbstractScapSubmitterCo
 
   @Test
   void saveDeleteContractingPerformance_VerifyDeletes() throws Exception {
-    var scapDetail = new ScapDetail();
     var contractingPerformanceOverview = new ContractingPerformanceOverview();
     var actualTenderActivity = new ActualTenderActivity();
     actualTenderActivity.setScopeTitle("test scope title");
@@ -98,7 +96,6 @@ class DeleteContractingPerformanceControllerTest extends AbstractScapSubmitterCo
     var expectedRedirectUrl = ReverseRouter.route(on(HasContractingPerformanceController.class)
         .renderHasContractingPerformanceForm(SCAP_ID));
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceService.getById(contractingPerformanceId)).thenReturn(contractingPerformance);
@@ -116,7 +113,6 @@ class DeleteContractingPerformanceControllerTest extends AbstractScapSubmitterCo
 
   @Test
   void saveDeleteContractingPerformance_StillHasContractingPerformance_VerifyDeleteAndRedirect() throws Exception {
-    var scapDetail = new ScapDetail();
     var contractingPerformanceOverview = new ContractingPerformanceOverview();
     var actualTenderActivity = new ActualTenderActivity();
     actualTenderActivity.setScopeTitle("test scope title");
@@ -125,7 +121,6 @@ class DeleteContractingPerformanceControllerTest extends AbstractScapSubmitterCo
     var expectedRedirectUrl = ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
         .renderContractingPerformanceSummary(SCAP_ID));
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceService.getById(contractingPerformanceId)).thenReturn(contractingPerformance);

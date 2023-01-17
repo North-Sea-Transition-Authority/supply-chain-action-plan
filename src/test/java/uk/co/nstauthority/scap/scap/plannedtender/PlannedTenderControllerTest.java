@@ -28,26 +28,23 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
-import uk.co.nstauthority.scap.scap.detail.ScapDetail;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivity;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityController;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityService;
 import uk.co.nstauthority.scap.scap.plannedtender.hasplannedtender.HasPlannedTenderController;
 import uk.co.nstauthority.scap.scap.plannedtender.list.PlannedTenderActivityListItem;
 import uk.co.nstauthority.scap.scap.plannedtender.list.PlannedTenderActivityListService;
-import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.utils.EntityTestingUtil;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = PlannedTenderController.class)
 @WithMockUser
-class PlannedTenderControllerTest extends AbstractControllerTest {
+class PlannedTenderControllerTest extends AbstractScapSubmitterControllerTest {
 
   @MockBean
   PlannedTenderService plannedTenderService;
@@ -64,20 +61,10 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
   @Autowired
   ControllerHelperService controllerHelperService;
 
-  private Scap scap;
-  private ScapDetail scapDetail;
   private PlannedTender plannedTender;
 
   @BeforeEach
   void setup() {
-    scap = new Scap(22);
-    scapDetail = new ScapDetail(
-        scap,
-        1,
-        true,
-        ScapDetailStatus.DRAFT,
-        EntityTestingUtil.dateToInstant(2000, 4, 23),
-        1);
     plannedTender = new PlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 4, 23));
   }
 
@@ -99,8 +86,6 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
     );
     var form = new PlannedTenderForm();
 
-    when(scapService.getScapById(scap.getScapId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
         .thenReturn(plannedTender);
     when(plannedTenderActivityService.getTenderDetailsByPlannedTender(plannedTender))
@@ -125,8 +110,6 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
     var expectedRedirectUrl = ReverseRouter.route(on(HasPlannedTenderController.class)
         .renderHasPlannedTenderActivityForm(scap.getScapId()));
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
         .thenReturn(plannedTender);
     when(plannedTenderActivityService.getTenderDetailsByPlannedTender(plannedTender))
@@ -146,8 +129,6 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
     var expectedRedirectUrl = ReverseRouter.route(on(PlannedTenderActivityController.class)
             .renderPlannedTenderDetailForm(scap.getScapId(), null));
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
         .thenReturn(plannedTender);
     when(plannedTenderActivityService.getTenderDetailsByPlannedTender(plannedTender))
@@ -175,8 +156,6 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getScapId()));
 
-    when(scapService.getScapById(scap.getScapId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
         .thenReturn(plannedTender);
     when(plannedTenderActivityService.getTenderDetailsByPlannedTender(plannedTender))
@@ -204,8 +183,6 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getScapId()));
 
-    when(scapService.getScapById(scap.getScapId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
         .thenReturn(plannedTender);
     when(plannedTenderActivityService.getTenderDetailsByPlannedTender(plannedTender))
@@ -234,8 +211,6 @@ class PlannedTenderControllerTest extends AbstractControllerTest {
     bindingResult.addError(
         new FieldError("form", "hasMorePlannedTenderActivities", "This field is required"));
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
         .thenReturn(plannedTender);
     when(plannedTenderActivityService.getTenderDetailsByPlannedTender(plannedTender))

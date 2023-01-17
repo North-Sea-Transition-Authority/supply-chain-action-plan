@@ -25,7 +25,6 @@ import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
-import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTender;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderController;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderService;
@@ -144,11 +143,9 @@ class DeletePlannedTenderActivityControllerTest extends AbstractScapSubmitterCon
   void deletePlannedTenderDetail_SomeRemainingPlannedTenderActivities_ExpectRedirection() throws Exception {
     var expectedRedirectUrl = ReverseRouter.route(on(PlannedTenderController.class)
         .renderPlannedTenderActivities(SCAP_ID));
-    var scapDetail = new ScapDetail();
     var plannedTender = new PlannedTender();
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail)).thenReturn(plannedTender);
     when(plannedTenderActivityService.getPlannedTenderDetailById(100)).thenReturn(plannedTenderActivity);
     when(plannedTenderActivityService.hasExistingTenderDetails(plannedTender)).thenReturn(true);

@@ -40,8 +40,6 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityCo
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ContractStage;
 import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTenderController;
-import uk.co.nstauthority.scap.scap.detail.ScapDetail;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderActivitySummaryView;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryViewService;
 import uk.co.nstauthority.scap.scap.summary.actualtender.AwardedContractSummaryView;
@@ -66,12 +64,10 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
   @MockBean
   ActualTenderSummaryFormService actualTenderSummaryFormService;
 
-  private ScapDetail scapDetail;
   private ActualTender actualTender;
 
   @BeforeEach
   void setup() {
-    scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, Instant.now(), 1);
     actualTender = new ActualTender(scapDetail, Instant.now());
   }
 
@@ -81,7 +77,6 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
         .renderHasActualTenderForm(scap.getScapId()));
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(Collections.emptyList());
 
@@ -106,8 +101,6 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
         List.of("bid participant 1", "bid participant 2"), awardedContractSummaryView);
     var actualTenderActivitySummaryViews = List.of(actualTenderSummaryView);
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(actualTenderActivities);
     when(actualTenderSummaryViewService.getByActualTenderActivities(actualTenderActivities, scap.getScapId()))
@@ -129,7 +122,6 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
         .renderHasActualTenderForm(scap.getScapId()));
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(Collections.emptyList());
 
@@ -161,8 +153,6 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
         new FieldError("form", "testField", "Test error message")
     );
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(actualTenderActivities);
     when(actualTenderSummaryViewService.getByActualTenderActivities(actualTenderActivities, scap.getScapId()))
@@ -204,8 +194,6 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
     var bindingResultNoErrors = new BeanPropertyBindingResult(form, "form");
     var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getScapId()));
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(actualTenderActivities);
     when(actualTenderSummaryViewService.getByActualTenderActivities(actualTenderActivities, scap.getScapId()))
@@ -244,8 +232,6 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
     var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderActivityController.class)
         .renderActualTenderActivityForm(scap.getScapId(), null));
 
-    when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(actualTenderActivities);
     when(actualTenderSummaryViewService.getByActualTenderActivities(actualTenderActivities, scap.getScapId()))

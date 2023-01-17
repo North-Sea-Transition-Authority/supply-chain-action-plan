@@ -32,7 +32,6 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.ContractStage;
 import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTenderController;
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
-import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderActivitySummaryView;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryViewService;
 import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
@@ -132,11 +131,9 @@ class DeleteActualTenderActivityControllerTest extends AbstractScapSubmitterCont
   void submitDeleteActualTenderActivity_SomeRemainingActivities_VerifyDeleteAndRedirect() throws Exception {
     var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderSummaryController.class)
         .renderActualTenderSummary(scap.getScapId()));
-    var scapDetail = new ScapDetail();
     var actualTender = new ActualTender();
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
     when(actualTenderActivityService.hasActualTenderActivity(actualTender)).thenReturn(true);
@@ -155,11 +152,9 @@ class DeleteActualTenderActivityControllerTest extends AbstractScapSubmitterCont
   void submitDeleteActualTenderActivity_NoRemainingActivities_VerifyDeleteAndRedirect() throws Exception {
     var expectedRedirectUrl = ReverseRouter.route(on(HasActualTenderController.class)
         .renderHasActualTenderForm(scap.getScapId()));
-    var scapDetail = new ScapDetail();
     var actualTender = new ActualTender();
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
     when(actualTenderActivityService.hasActualTenderActivity(actualTender)).thenReturn(false);

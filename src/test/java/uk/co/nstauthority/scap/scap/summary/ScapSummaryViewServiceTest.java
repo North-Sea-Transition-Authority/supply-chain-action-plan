@@ -12,6 +12,7 @@ import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getContractingPerformanceOverviewSummaryView;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getPlannedTenderSummaryView;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getProjectDetailsSummaryView;
+import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.mockScapSummaryViewServiceMethods;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -106,7 +107,7 @@ class ScapSummaryViewServiceTest {
   void getScapSummaryView_VerifyCalls() {
     var scapDetail = mock(ScapDetail.class);
 
-    ScapSummaryControllerTestUtil.mockScapSummaryViewServiceMethods(scapSummaryViewService, scapDetail);
+    mockScapSummaryViewServiceMethods(scapSummaryViewService, scapDetail);
 
     var summaryView = scapSummaryViewService.getScapSummaryView(scapDetail);
 

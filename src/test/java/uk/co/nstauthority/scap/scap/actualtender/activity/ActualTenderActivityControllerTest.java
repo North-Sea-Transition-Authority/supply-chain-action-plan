@@ -38,8 +38,6 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.bidparticipants.BidPar
 import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTenderController;
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
-import uk.co.nstauthority.scap.scap.detail.ScapDetail;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -69,12 +67,10 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
   @MockBean
   UpdateActualTenderActivityService updateActualTenderActivityService;
 
-  private ScapDetail scapDetail;
   private ActualTender actualTender;
 
   @BeforeEach
   void setup() {
-    scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, clock.instant(), 1);
     actualTender = new ActualTender(scapDetail, clock.instant());
   }
 
@@ -278,7 +274,6 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
 
     when(actualTenderActivityService.getById(actualTenderActivity.getId()))
         .thenReturn(actualTenderActivity);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender), eq(actualTenderActivity)))
         .thenReturn(bindingResultWithErrors);
