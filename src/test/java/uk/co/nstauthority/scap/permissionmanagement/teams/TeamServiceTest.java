@@ -6,7 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -21,7 +23,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
-import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRepository;
@@ -154,21 +155,16 @@ class TeamServiceTest {
         .withTeamType(TeamType.INDUSTRY)
         .build();
     var teamCaptor = ArgumentCaptor.forClass(Team.class);
-    var userCaptor = ArgumentCaptor.forClass(EnergyPortalUserDto.class);
 
     when(teamRepository.save(any())).thenReturn(team);
-    var result = teamService.createTeam(team.getDisplayName(), team.getEnergyPortalOrgGroupId(), 1000L);
+    var result = teamService.createTeam(team.getDisplayName(), team.getEnergyPortalOrgGroupId());
 
 
     verify(teamRepository).save(teamCaptor.capture());
-    verify(teamMemberRoleService).updateUserTeamRoles(teamCaptor.capture(), eq(1000L), eq(Set.of("ACCESS_MANAGER")));
+    verifyNoInteractions(teamMemberRoleService);
 
     var capturedTeam = teamCaptor.getAllValues().get(0);
     assertThat(result.getDisplayName()).isEqualTo(team.getDisplayName());
-    assertThat(capturedTeam.getDisplayName()).isEqualTo(team.getDisplayName());
-    assertThat(capturedTeam.getEnergyPortalOrgGroupId()).isEqualTo(team.getEnergyPortalOrgGroupId());
-
-    capturedTeam = teamCaptor.getAllValues().get(1);
     assertThat(capturedTeam.getDisplayName()).isEqualTo(team.getDisplayName());
     assertThat(capturedTeam.getEnergyPortalOrgGroupId()).isEqualTo(team.getEnergyPortalOrgGroupId());
   }

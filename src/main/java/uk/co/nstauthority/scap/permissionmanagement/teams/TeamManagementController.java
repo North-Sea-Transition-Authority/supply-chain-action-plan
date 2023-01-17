@@ -93,8 +93,7 @@ public class TeamManagementController {
 
     if (orgGroup.isPresent()) {
       teamService.createTeam(orgGroup.get().getName(),
-          Integer.valueOf(groupId),
-          userDetailService.getUserDetail().wuaId());
+          Integer.valueOf(groupId));
 
       var view = renderTeamList();
       NotificationBannerUtils.successBanner(

@@ -59,14 +59,12 @@ public class TeamService {
             "Could not find Team associated with energy portal organisation group ID: %s".formatted(epGroupId)));
   }
 
-  public Team createTeam(String groupName, int energyPortalGroupId, long wuaId) {
+  public Team createTeam(String groupName, int energyPortalGroupId) {
     var team = new Team();
     team.setTeamType(TeamType.INDUSTRY);
     team.setDisplayName(groupName);
     team.setEnergyPortalOrgGroupId(energyPortalGroupId);
     team = teamRepository.save(team);
-
-    teamMemberRoleService.updateUserTeamRoles(team, wuaId, Set.of("ACCESS_MANAGER"));
     return team;
   }
 
