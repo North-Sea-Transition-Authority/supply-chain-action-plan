@@ -52,11 +52,11 @@
       pathForSelector="form.fieldSelector"
       restUrl=springUrl(fieldSearchRestUrl)
       itemName="Fields"
-      selectorInputClass="govuk-!-width-one-half"
+      selectorInputClass="govuk-!-width-two-thirds"
       alreadyAdded=preselectedFields
       selectorMinInputLength=2
       noItemText="There are no selected fields"
-      selectorLabelText="Select the fields related to this project"
+      selectorLabelText="What fields are related to this project?"
     />
 
     <@fdsRadio.radioGroup
@@ -79,7 +79,8 @@
               itemName="Installations"
               selectorNestingPath="form.hasPlatforms"
               restUrl=springUrl(facilitiesSearchRestUrl)
-              selectorMinInputLength=3
+              selectorMinInputLength=2
+              selectorInputClass="govuk-!-width-two-thirds"
               noItemText="There are no selected installations"
             />
           </#if>
