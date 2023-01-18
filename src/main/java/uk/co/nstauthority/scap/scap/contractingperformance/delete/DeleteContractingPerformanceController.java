@@ -88,6 +88,7 @@ public class DeleteContractingPerformanceController {
           .renderContractingPerformanceSummary(scapId));
     }
 
+    contractingPerformanceOverviewService.updateHasMoreContractingPerformance(contractingPerformanceOverview, null);
     return ReverseRouter.redirect(on(HasContractingPerformanceController.class)
         .renderHasContractingPerformanceForm(scapId));
   }

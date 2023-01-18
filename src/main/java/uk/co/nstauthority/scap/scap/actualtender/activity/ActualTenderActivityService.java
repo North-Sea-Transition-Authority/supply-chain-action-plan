@@ -7,6 +7,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 
 @Service
@@ -59,7 +60,11 @@ public class ActualTenderActivityService {
     actualTenderActivity.setScopeTitle(form.getScopeTitle().getInputValue());
     actualTenderActivity.setScopeDescription(form.getScopeDescription().getInputValue());
     actualTenderActivity.setRemunerationModel(form.getRemunerationModel());
-    actualTenderActivity.setRemunerationModelName(form.getRemunerationModelName().getInputValue());
+    if (RemunerationModel.OTHER.equals(form.getRemunerationModel())) {
+      actualTenderActivity.setRemunerationModelName(form.getRemunerationModelName().getInputValue());
+    } else {
+      actualTenderActivity.setRemunerationModelName(null);
+    }
     actualTenderActivity.setContractStage(form.getContractStage());
 
     actualTenderActivityRepository.save(actualTenderActivity);

@@ -16,10 +16,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -41,9 +41,6 @@ class ActualTenderActivityServiceTest {
 
   @InjectMocks
   ActualTenderActivityService actualTenderActivityService;
-
-  @Captor
-  private ArgumentCaptor<List<InvitationToTenderParticipant>> invitationToTenderParticipantCaptor;
 
   private ActualTender actualTender;
   private ActualTenderActivityForm form;
@@ -132,6 +129,38 @@ class ActualTenderActivityServiceTest {
         form.getRemunerationModelName().getInputValue(),
         form.getContractStage(),
         clock.instant()
+    );
+  }
+
+  @Test
+  @DisplayName("Assert that remuneration model name is null when changing type from OTHER to something else")
+  void saveActualTenderActivity_WhenChangingRemunerationModel() {
+    var actualTenderDetailArgumentCaptor = ArgumentCaptor.forClass(ActualTenderActivity.class);
+    var activityId = 345;
+    var actualTenderActivity = new ActualTenderActivity(activityId);
+    actualTenderActivity.setRemunerationModelName("some remuneration model name");
+    actualTenderActivity.setRemunerationModel(RemunerationModel.OTHER);
+    form.setRemunerationModel(RemunerationModel.LUMP_SUM);
+
+    actualTenderActivityService.saveActualTenderActivity(actualTenderActivity, form);
+
+    verify(actualTenderActivityRepository).save(actualTenderDetailArgumentCaptor.capture());
+    verify(invitationToTenderParticipantRepository, never()).deleteAll(any());
+
+    assertThat(actualTenderDetailArgumentCaptor.getValue()).extracting(
+        ActualTenderActivity::getScopeTitle,
+        ActualTenderActivity::getScopeDescription,
+        ActualTenderActivity::getRemunerationModel,
+        ActualTenderActivity::getRemunerationModelName,
+        ActualTenderActivity::getContractStage,
+        ActualTenderActivity::getId
+    ).containsExactly(
+        form.getScopeTitle().getInputValue(),
+        form.getScopeDescription().getInputValue(),
+        form.getRemunerationModel(),
+        null,
+        form.getContractStage(),
+        activityId
     );
   }
 

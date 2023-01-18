@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -163,6 +164,40 @@ class PlannedTenderActivityServiceTest {
         form.getEstimatedValue().getAsBigDecimal().get(),
         form.getRemunerationModel(),
         form.getRemunerationModelName().getInputValue(),
+        form.getScopeDescription().getInputValue()
+    );
+  }
+
+  @Test
+  @DisplayName("Assert that remuneration model name is null when changing type from OTHER to something else")
+  void updatePlannedTenderDetail_WhenChangingRemunerationModel_VerifySaves() {
+    var activity = new PlannedTenderActivity(19);
+    activity.setRemunerationModelName("some remuneration model");
+    activity.setRemunerationModel(RemunerationModel.OTHER);
+    var form = new PlannedTenderActivityForm();
+    form.setAwardRationale("Some award rationale");
+    form.setEstimatedValue("2.32");
+    form.setRemunerationModel(RemunerationModel.LUMP_SUM);
+    form.setScopeDescription("Some scope description");
+    var argumentCaptor = ArgumentCaptor.forClass(PlannedTenderActivity.class);
+
+    plannedTenderActivityService.updatePlannedTenderDetail(activity, form);
+
+    verify(plannedTenderActivityRepository).save(argumentCaptor.capture());
+
+    assertThat(argumentCaptor.getValue()).extracting(
+        PlannedTenderActivity::getId,
+        PlannedTenderActivity::getAwardRationale,
+        PlannedTenderActivity::getEstimatedValue,
+        PlannedTenderActivity::getRemunerationModel,
+        PlannedTenderActivity::getRemunerationModelName,
+        PlannedTenderActivity::getScopeDescription
+    ).containsExactly(
+        activity.getId(),
+        form.getAwardRationale().getInputValue(),
+        form.getEstimatedValue().getAsBigDecimal().get(),
+        form.getRemunerationModel(),
+        null,
         form.getScopeDescription().getInputValue()
     );
   }

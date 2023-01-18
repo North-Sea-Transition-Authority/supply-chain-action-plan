@@ -46,9 +46,11 @@ class DeletePlannedTenderActivityControllerTest extends AbstractScapSubmitterCon
 
   private PlannedTenderActivity plannedTenderActivity;
 
+  private static final Integer PLANNED_ACTIVITY_ID = 100;
+
   @BeforeEach
   void setup() {
-    plannedTenderActivity = new PlannedTenderActivity(100);
+    plannedTenderActivity = new PlannedTenderActivity(PLANNED_ACTIVITY_ID);
   }
 
   @Test
@@ -58,18 +60,18 @@ class DeletePlannedTenderActivityControllerTest extends AbstractScapSubmitterCon
 
     mockMvc.perform(get(
         ReverseRouter.route(on(DeletePlannedTenderActivityController.class)
-            .renderPlannedTenderRemoval(SCAP_ID, 100))))
+            .renderPlannedTenderRemoval(SCAP_ID, PLANNED_ACTIVITY_ID))))
         .andExpect(status().isNotFound());
   }
 
   @Test
   void renderPlannedTenderRemoval_plannedTenderActivityDoesNotExist_expectNotFound() throws Exception {
-    when(plannedTenderActivityService.getPlannedTenderDetailById(100))
+    when(plannedTenderActivityService.getPlannedTenderDetailById(PLANNED_ACTIVITY_ID))
         .thenThrow(new ScapEntityNotFoundException("Could not find planned tender activity with ID 100"));
 
     mockMvc.perform(get(
         ReverseRouter.route(on(DeletePlannedTenderActivityController.class)
-            .renderPlannedTenderRemoval(SCAP_ID, 100))))
+            .renderPlannedTenderRemoval(SCAP_ID, PLANNED_ACTIVITY_ID))))
         .andExpect(status().isNotFound());
   }
 
@@ -83,7 +85,7 @@ class DeletePlannedTenderActivityControllerTest extends AbstractScapSubmitterCon
 
     mockMvc.perform(get(
         ReverseRouter.route(on(DeletePlannedTenderActivityController.class)
-            .renderPlannedTenderRemoval(SCAP_ID, 100))))
+            .renderPlannedTenderRemoval(SCAP_ID, PLANNED_ACTIVITY_ID))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/plannedtender/plannedTenderActivityDelete"))
         .andExpect(model().attribute("backLinkUrl",
@@ -91,7 +93,7 @@ class DeletePlannedTenderActivityControllerTest extends AbstractScapSubmitterCon
         .andExpect(model().attribute("plannedTenderDetail", plannedTenderActivity))
         .andExpect(model().attribute("submitPostUrl",
             ReverseRouter.route(on(DeletePlannedTenderActivityController.class)
-                .deletePlannedTenderDetail(SCAP_ID, 100, null))));
+                .deletePlannedTenderDetail(SCAP_ID, PLANNED_ACTIVITY_ID, null))));
   }
 
   @Test
@@ -101,7 +103,7 @@ class DeletePlannedTenderActivityControllerTest extends AbstractScapSubmitterCon
 
     mockMvc.perform(post(
         ReverseRouter.route(on(DeletePlannedTenderActivityController.class)
-            .deletePlannedTenderDetail(SCAP_ID, 100, null)))
+            .deletePlannedTenderDetail(SCAP_ID, PLANNED_ACTIVITY_ID, null)))
             .with(csrf()))
         .andExpect(status().isNotFound());
 
@@ -110,12 +112,12 @@ class DeletePlannedTenderActivityControllerTest extends AbstractScapSubmitterCon
 
   @Test
   void deletePlannedTenderDetail_plannedTenderActivityDoesNotExist_expectNotFound() throws Exception {
-    when(plannedTenderActivityService.getPlannedTenderDetailById(100))
+    when(plannedTenderActivityService.getPlannedTenderDetailById(PLANNED_ACTIVITY_ID))
         .thenThrow(new ScapEntityNotFoundException("Could not find planned tender activity with ID 100"));
 
     mockMvc.perform(post(
         ReverseRouter.route(on(DeletePlannedTenderActivityController.class)
-            .deletePlannedTenderDetail(SCAP_ID, 100, null)))
+            .deletePlannedTenderDetail(SCAP_ID, PLANNED_ACTIVITY_ID, null)))
             .with(csrf()))
         .andExpect(status().isNotFound());
 
@@ -126,17 +128,20 @@ class DeletePlannedTenderActivityControllerTest extends AbstractScapSubmitterCon
   void deletePlannedTenderDetail_NoRemainingPlannedTenderActivities_ExpectRedirection() throws Exception {
     var expectedRedirectUrl = ReverseRouter.route(on(HasPlannedTenderController.class)
         .renderHasPlannedTenderActivityForm(SCAP_ID));
+    var plannedTender = new PlannedTender();
 
-    when(plannedTenderActivityService.getPlannedTenderDetailById(100)).thenReturn(plannedTenderActivity);
+    when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail)).thenReturn(plannedTender);
+    when(plannedTenderActivityService.getPlannedTenderDetailById(PLANNED_ACTIVITY_ID)).thenReturn(plannedTenderActivity);
 
     mockMvc.perform(post(
         ReverseRouter.route(on(DeletePlannedTenderActivityController.class)
-            .deletePlannedTenderDetail(SCAP_ID, 100, null)))
+            .deletePlannedTenderDetail(SCAP_ID, PLANNED_ACTIVITY_ID, null)))
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectUrl(expectedRedirectUrl));
 
     verify(plannedTenderActivityService).deletePlannedTenderDetail(plannedTenderActivity);
+    verify(plannedTenderService).updatePlannedTenderHasMorePlannedTenders(plannedTender, null);
   }
 
   @Test
@@ -147,12 +152,12 @@ class DeletePlannedTenderActivityControllerTest extends AbstractScapSubmitterCon
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail)).thenReturn(plannedTender);
-    when(plannedTenderActivityService.getPlannedTenderDetailById(100)).thenReturn(plannedTenderActivity);
+    when(plannedTenderActivityService.getPlannedTenderDetailById(PLANNED_ACTIVITY_ID)).thenReturn(plannedTenderActivity);
     when(plannedTenderActivityService.hasExistingTenderDetails(plannedTender)).thenReturn(true);
 
     mockMvc.perform(post(
         ReverseRouter.route(on(DeletePlannedTenderActivityController.class)
-            .deletePlannedTenderDetail(SCAP_ID, 100, null)))
+            .deletePlannedTenderDetail(SCAP_ID, PLANNED_ACTIVITY_ID, null)))
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectUrl(expectedRedirectUrl));

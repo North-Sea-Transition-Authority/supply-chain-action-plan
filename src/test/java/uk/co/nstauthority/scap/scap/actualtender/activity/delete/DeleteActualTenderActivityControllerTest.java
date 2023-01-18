@@ -167,5 +167,6 @@ class DeleteActualTenderActivityControllerTest extends AbstractScapSubmitterCont
         .andExpect(ControllerTestingUtil.redirectUrl(expectedRedirectUrl));
 
     verify(deleteActualTenderActivityService).deleteActualTenderActivity(actualTenderActivity);
+    verify(actualTenderService).updateHasMoreActualTenders(actualTender, null);
   }
 }

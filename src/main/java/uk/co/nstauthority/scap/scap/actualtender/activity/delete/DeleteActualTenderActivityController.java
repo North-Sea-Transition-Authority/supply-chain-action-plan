@@ -93,6 +93,10 @@ public class DeleteActualTenderActivityController {
         redirectAttributes, actualTenderActivity.getScopeTitle());
 
     var hasRemainingActualTenderActivities = actualTenderActivityService.hasActualTenderActivity(actualTender);
+
+    if (!hasRemainingActualTenderActivities) {
+      actualTenderService.updateHasMoreActualTenders(actualTender, null);
+    }
     return actualTenderControllerRedirectionService.redirectFromActualTenderDeletion(scapId, hasRemainingActualTenderActivities);
   }
 

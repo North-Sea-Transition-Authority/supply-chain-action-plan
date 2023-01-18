@@ -13,6 +13,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.math.BigDecimal;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -87,6 +88,7 @@ class DeleteContractingPerformanceControllerTest extends AbstractScapSubmitterCo
   }
 
   @Test
+  @DisplayName("Verify redirect to \"Has contracting performance?\" when deleting last contracting performance")
   void saveDeleteContractingPerformance_VerifyDeletes() throws Exception {
     var contractingPerformanceOverview = new ContractingPerformanceOverview();
     var actualTenderActivity = new ActualTenderActivity();
@@ -108,6 +110,7 @@ class DeleteContractingPerformanceControllerTest extends AbstractScapSubmitterCo
         .andExpect(status().is3xxRedirection())
         .andExpect(ControllerTestingUtil.redirectUrl(expectedRedirectUrl));
 
+    verify(contractingPerformanceOverviewService).updateHasMoreContractingPerformance(contractingPerformanceOverview, null);
     verify(contractingPerformanceService).deleteContractingPerformance(contractingPerformance);
   }
 

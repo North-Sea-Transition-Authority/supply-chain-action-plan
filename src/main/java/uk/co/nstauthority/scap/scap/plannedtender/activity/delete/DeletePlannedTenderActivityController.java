@@ -70,6 +70,7 @@ public class DeletePlannedTenderActivityController {
       return ReverseRouter.redirect(on(PlannedTenderController.class).renderPlannedTenderActivities(scapId));
     }
 
+    plannedTenderService.updatePlannedTenderHasMorePlannedTenders(plannedTender, null);
     return ReverseRouter.redirect(on(HasPlannedTenderController.class).renderHasPlannedTenderActivityForm(scapId));
   }
 
