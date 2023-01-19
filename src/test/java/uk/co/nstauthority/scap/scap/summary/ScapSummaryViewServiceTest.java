@@ -49,6 +49,7 @@ import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivity
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetails;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsService;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectType;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.projectperformance.ProjectPerformance;
 import uk.co.nstauthority.scap.scap.projectperformance.ProjectPerformanceService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
@@ -58,6 +59,7 @@ import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryView
 import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceOverviewSummaryView;
 import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryView;
 import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryViewService;
+import uk.co.nstauthority.scap.scap.summary.files.FileUploadSummaryViewService;
 import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderActivitySummaryView;
 import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderSummaryView;
 
@@ -90,6 +92,9 @@ class ScapSummaryViewServiceTest {
 
   @Mock
   ProjectPerformanceService projectPerformanceService;
+
+  @Mock
+  FileUploadSummaryViewService fileUploadSummaryViewService;
 
   @InjectMocks
   ScapSummaryViewService scapSummaryViewService;
@@ -151,6 +156,8 @@ class ScapSummaryViewServiceTest {
     when(projectDetailsService.getProjectTypesByProjectDetails(projectDetails)).thenReturn(projectTypes);
     when(projectDetailsService.getProjectFacilityNames(projectDetails)).thenReturn(facilities);
     when(projectDetailsService.getProjectFieldNames(projectDetails)).thenReturn(fields);
+    doReturn(Collections.emptyList()).when(fileUploadSummaryViewService)
+        .getAllByScapDetailAndDocumentType(scapDetail, SupportingDocumentType.ADDITIONAL_DOCUMENT);
 
     var projectDetailsView = scapSummaryViewService.getProjectDetailsSummaryView(scapDetail);
 
@@ -163,7 +170,8 @@ class ScapSummaryViewServiceTest {
         ProjectDetailsSummaryView::hasFacilities,
         ProjectDetailsSummaryView::projectFacilities,
         ProjectDetailsSummaryView::plannedExecutionStartDate,
-        ProjectDetailsSummaryView::plannedCompletionDate
+        ProjectDetailsSummaryView::plannedCompletionDate,
+        ProjectDetailsSummaryView::supportingDocuments
     ).containsExactly(
         projectDetails.getProjectName(),
         projectTypes.stream().toList(),
@@ -173,7 +181,8 @@ class ScapSummaryViewServiceTest {
         hasFacilitiesEnum,
         facilities,
         "1 Jan 2023",
-        "1 Jan 2024"
+        "1 Jan 2024",
+        Collections.emptyList()
     );
   }
 
@@ -192,7 +201,8 @@ class ScapSummaryViewServiceTest {
         ProjectDetailsSummaryView::hasFacilities,
         ProjectDetailsSummaryView::projectFacilities,
         ProjectDetailsSummaryView::plannedExecutionStartDate,
-        ProjectDetailsSummaryView::plannedCompletionDate
+        ProjectDetailsSummaryView::plannedCompletionDate,
+        ProjectDetailsSummaryView::supportingDocuments
     ).containsExactly(
         null,
         Collections.emptyList(),
@@ -202,7 +212,8 @@ class ScapSummaryViewServiceTest {
         null,
         Collections.emptyList(),
         null,
-        null
+        null,
+        Collections.emptyList()
     );
   }
 
@@ -592,6 +603,7 @@ class ScapSummaryViewServiceTest {
         YesNo.NO,
         Collections.emptyList(),
         "11-05-2023",
-        "11-06-2023");
+        "11-06-2023",
+        Collections.emptyList());
   }
 }

@@ -53,5 +53,24 @@
     <@fdsSummaryList.summaryListRowNoAction keyText="Planned completion date">
       ${projectDetailsView.plannedCompletionDate()!""}
     </@fdsSummaryList.summaryListRowNoAction>
+    <@fileUploadSummaryContent projectDetailsView.supportingDocuments() />
+
   </@fdsSummaryList.summaryListCard>
+</#macro>
+
+<#macro fileUploadSummaryContent fileUploadSummaryViews>
+<#-- @ftlvariable name="fileUploadSummaryViews" type="java.util.List<uk.co.nstauthority.scap.scap.summary.files.FileUploadSummaryView>" -->
+  <#if fileUploadSummaryViews?has_content>
+    <#list fileUploadSummaryViews as fileUploadSummaryView>
+      <@fdsSummaryList.summaryListRowNoAction keyText="File name">
+        <@fdsAction.link linkText=fileUploadSummaryView.fileName()!"" linkUrl=springUrl(fileUploadSummaryView.fileUrl())/>
+      </@fdsSummaryList.summaryListRowNoAction>
+      <@fdsSummaryList.summaryListRowNoAction keyText="File description">
+        ${fileUploadSummaryView.fileDescription()!""}
+      </@fdsSummaryList.summaryListRowNoAction>
+    </#list>
+  <#else>
+    <@fdsSummaryList.summaryListRowNoAction keyText="File name" />
+    <@fdsSummaryList.summaryListRowNoAction keyText="File description" />
+  </#if>
 </#macro>

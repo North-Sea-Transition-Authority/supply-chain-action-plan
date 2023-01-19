@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.fivium.formlibrary.validator.date.DateUtils;
 import uk.co.nstauthority.scap.enumutil.YesNo;
+import uk.co.nstauthority.scap.file.FileUploadService;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverviewService;
@@ -15,21 +16,19 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderService;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityService;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsService;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.projectperformance.ProjectPerformanceService;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryView;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryViewService;
 import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceOverviewSummaryView;
 import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryViewService;
+import uk.co.nstauthority.scap.scap.summary.files.FileUploadSummaryViewService;
 import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderActivitySummaryView;
 import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderSummaryView;
 
 @Service
 public class ScapSummaryViewService {
-
-  public static final String  PROJECT_DETAILS_OBJECT_NAME = "projectDetailsSummaryView";
-  public static final String PLANNED_TENDER_OBJECT_NAME = "plannedTenderSummaryView";
-
-  public static final String ACTUAL_TENDER_OBJECT_NAME = "actualTenderSummaryView";
 
   private final ProjectDetailsService projectDetailsService;
   private final PlannedTenderService plannedTenderService;
@@ -40,6 +39,7 @@ public class ScapSummaryViewService {
   private final ContractingPerformanceOverviewService contractingPerformanceOverviewService;
   private final ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService;
   private final ProjectPerformanceService projectPerformanceService;
+  private final FileUploadSummaryViewService fileUploadSummaryViewService;
 
   @Autowired
   ScapSummaryViewService(ProjectDetailsService projectDetailsService,
@@ -50,7 +50,9 @@ public class ScapSummaryViewService {
                          ActualTenderActivityService actualTenderActivityService,
                          ContractingPerformanceOverviewService contractingPerformanceOverviewService,
                          ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService,
-                         ProjectPerformanceService projectPerformanceService) {
+                         ProjectPerformanceService projectPerformanceService, FileUploadService fileUploadService,
+                         SupportingDocumentService supportingDocumentService,
+                         FileUploadSummaryViewService fileUploadSummaryViewService) {
     this.projectDetailsService = projectDetailsService;
     this.plannedTenderService = plannedTenderService;
     this.plannedTenderActivityService = plannedTenderActivityService;
@@ -60,6 +62,7 @@ public class ScapSummaryViewService {
     this.contractingPerformanceOverviewService = contractingPerformanceOverviewService;
     this.contractingPerformanceSummaryViewService = contractingPerformanceSummaryViewService;
     this.projectPerformanceService = projectPerformanceService;
+    this.fileUploadSummaryViewService = fileUploadSummaryViewService;
   }
 
   @Transactional
@@ -85,6 +88,8 @@ public class ScapSummaryViewService {
       var projectFields = projectDetailsService.getProjectFieldNames(projectDetails);
       var projectFacilities = projectDetailsService.getProjectFacilityNames(projectDetails);
       var hasFacilities = YesNo.fromBoolean(projectDetails.getHasFacilities());
+      var supportingDocuments = fileUploadSummaryViewService
+          .getAllByScapDetailAndDocumentType(scapDetail, SupportingDocumentType.ADDITIONAL_DOCUMENT);
 
       return new ProjectDetailsSummaryView(
           projectDetails.getProjectName(),
@@ -95,11 +100,12 @@ public class ScapSummaryViewService {
           hasFacilities,
           projectFacilities,
           DateUtils.format(projectDetails.getPlannedExecutionStartDate()),
-          DateUtils.format(projectDetails.getPlannedCompletionDate())
+          DateUtils.format(projectDetails.getPlannedCompletionDate()),
+          supportingDocuments
       );
     }).orElse(new ProjectDetailsSummaryView(
         null, Collections.emptyList(), null, null, null,
-        null, Collections.emptyList(), null, null
+        null, Collections.emptyList(), null, null, Collections.emptyList()
     ));
   }
 

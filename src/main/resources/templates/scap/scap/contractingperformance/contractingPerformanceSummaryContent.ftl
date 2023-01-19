@@ -18,12 +18,10 @@
   <#assign outturnCost = (summaryView.outturnCost()?has_content)?then("£${summaryView.outturnCost()} million", "") >
   <@simpleSummaryRow keyText="Outturn cost" valueText=outturnCost />
 
-  <#if summaryView.outturnCostRationale()?has_content>
-    <@simpleSummaryRow
-      keyText="Rationale for outturn cost being greater than the award value"
-      valueText=summaryView.outturnCostRationale()
-    />
-  </#if>
+  <@simpleSummaryRow
+    keyText="Rationale for outturn cost being greater than the award value"
+    valueText=summaryView.outturnCostRationale()!""
+  />
 </#macro>
 
 

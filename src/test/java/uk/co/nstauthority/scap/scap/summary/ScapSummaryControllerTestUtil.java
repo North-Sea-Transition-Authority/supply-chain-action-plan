@@ -9,7 +9,7 @@ public class ScapSummaryControllerTestUtil {
 
   private static final ProjectDetailsSummaryView PROJECT_DETAILS_SUMMARY_VIEW = new ProjectDetailsSummaryView(
       null, Collections.emptyList(), null, null, null,
-      null, Collections.emptyList(), null, null
+      null, Collections.emptyList(), null, null, Collections.emptyList()
   );
   private static final PlannedTenderSummaryView PLANNED_TENDER_SUMMARY_VIEW = new PlannedTenderSummaryView(
       null,

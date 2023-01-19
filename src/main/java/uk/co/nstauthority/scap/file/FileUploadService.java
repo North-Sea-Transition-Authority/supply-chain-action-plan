@@ -82,7 +82,7 @@ public class FileUploadService {
     return fileUploadForm;
   }
 
-  private UploadedFileView createUploadedFileView(UploadedFile uploadedFile) {
+  public UploadedFileView createUploadedFileView(UploadedFile uploadedFile) {
     return new UploadedFileView(
         uploadedFile.getId().toString(),
         uploadedFile.getFilename(),
