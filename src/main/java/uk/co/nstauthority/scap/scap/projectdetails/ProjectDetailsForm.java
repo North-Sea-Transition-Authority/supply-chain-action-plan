@@ -17,9 +17,9 @@ class ProjectDetailsForm {
   private final DecimalInput projectCostEstimate;
   private final DecimalInput estimatedValueLocalContent;
   private Integer fieldSelector;
-  private List<Integer> fieldIds;
+  private Set<Integer> fieldIds;
   private YesNo hasPlatforms;
-  private List<Integer> installationIds;
+  private Set<Integer> installationIds;
   private Integer installationSelector;
   private final IntegerInput startDay;
   private final IntegerInput startMonth;
@@ -90,11 +90,11 @@ class ProjectDetailsForm {
     this.estimatedValueLocalContent.setInputValue(estimatedValueLocalContent);
   }
 
-  public List<Integer> getFieldIds() {
+  public Set<Integer> getFieldIds() {
     return fieldIds;
   }
 
-  public void setFieldIds(List<Integer> fieldIds) {
+  public void setFieldIds(Set<Integer> fieldIds) {
     this.fieldIds = fieldIds;
   }
 
@@ -114,11 +114,11 @@ class ProjectDetailsForm {
     this.hasPlatforms = hasPlatforms;
   }
 
-  public List<Integer> getInstallationIds() {
+  public Set<Integer> getInstallationIds() {
     return installationIds;
   }
 
-  public void setInstallationIds(List<Integer> installationIds) {
+  public void setInstallationIds(Set<Integer> installationIds) {
     this.installationIds = installationIds;
   }
 

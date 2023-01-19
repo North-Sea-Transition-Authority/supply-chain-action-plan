@@ -101,11 +101,11 @@ class ProjectDetailsControllerTest extends AbstractScapSubmitterControllerTest {
   void renderProjectDetailsForm_existingProjectDetails_assertCorrectResponse() throws Exception {
     var projectDetails = new ProjectDetails(scapDetail, clock.instant());
     var fieldId = 22;
-    var fieldIds = Collections.singletonList(fieldId);
+    var fieldIds = Collections.singleton(fieldId);
     var projectField = new ProjectField(projectDetails, fieldId, Instant.now());
     var projectFields = Collections.singletonList(projectField);
     var form = new ProjectDetailsForm();
-    form.setFieldIds(Collections.singletonList(fieldId));
+    form.setFieldIds(Collections.singleton(fieldId));
     var preselectedFields = List.of(
         new AddToListItem(String.valueOf(fieldId), "Test field", true)
     );
@@ -113,7 +113,7 @@ class ProjectDetailsControllerTest extends AbstractScapSubmitterControllerTest {
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
     when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
     when(projectDetailsService.getProjectFields(projectDetails)).thenReturn(projectFields);
-    when(projectDetailsFormService.getForm(projectDetails, Collections.emptyList(), fieldIds))
+    when(projectDetailsFormService.getForm(projectDetails, Collections.emptySet(), fieldIds))
         .thenReturn(form);
     when(projectDetailsFormService.getPreselectedFields(fieldIds)).thenReturn(preselectedFields);
     when(supportingDocumentService.buildFileUploadTemplate(SCAP_ID, SupportingDocumentType.ADDITIONAL_DOCUMENT))

@@ -66,7 +66,7 @@ class ProjectDetailsFormServiceTest {
     var projectTypes = Set.of(ProjectType.DECOMMISSIONING_PROGRAMME, ProjectType.FIELD_DEVELOPMENT_PLAN);
     var projectCostEstimate = BigDecimal.valueOf(12.3);
     var estimatedValueLocalContent = BigDecimal.valueOf(11.3);
-    var fieldIds = Collections.singletonList(7235);
+    var fieldIds = Collections.singleton(7235);
     var startDate = LocalDate.of(2000, 12, 30);
     var endDate = LocalDate.of(2003, 8, 11);
 
@@ -133,7 +133,7 @@ class ProjectDetailsFormServiceTest {
     projectDetails.setEstimatedValueLocalContent(BigDecimal.valueOf(1));
     projectDetails.setPlannedExecutionStartDate(LocalDate.of(1, 1, 1));
     projectDetails.setPlannedCompletionDate(LocalDate.of(1, 1, 1));
-    var projectFacilityIds = List.of(1, 2, 3);
+    var projectFacilityIds = Set.of(1, 2, 3);
 
     var form = projectDetailsFormService.getForm(projectDetails, projectFacilityIds, null);
 
@@ -150,9 +150,9 @@ class ProjectDetailsFormServiceTest {
         .build();
     var fields = Collections.singletonList(field);
     var requestPurpose = ProjectDetailsFormService.PRESELECTED_FIELD_REQUEST_PURPOSE;
-    var projectFieldIds = Collections.singletonList(fieldId);
+    var projectFieldIds = Collections.singleton(fieldId);
 
-    when(fieldService.getFieldsByIds(projectFieldIds, requestPurpose)).thenReturn(fields);
+    when(fieldService.getFieldsByIds(Collections.singletonList(fieldId), requestPurpose)).thenReturn(fields);
 
     var preselectedFields = projectDetailsFormService.getPreselectedFields(projectFieldIds);
 
@@ -165,7 +165,7 @@ class ProjectDetailsFormServiceTest {
 
   @Test
   void getPreselectedFields_NoProjectFields() {
-    var preselectedFields = projectDetailsFormService.getPreselectedFields(Collections.emptyList());
+    var preselectedFields = projectDetailsFormService.getPreselectedFields(Collections.emptySet());
 
     assertThat(preselectedFields).isEmpty();
 
@@ -174,11 +174,13 @@ class ProjectDetailsFormServiceTest {
 
   @Test
   void getPreselectedFacilities() {
-    var projectFacilityIds = List.of(14);
-    var facility = new Facility(14, "Test facility name", null, null, null);
+    var facilityId = 14;
+    var projectFacilityIds = Collections.singleton(facilityId);
+    var facility = new Facility(facilityId, "Test facility name", null, null, null);
     var facilities = List.of(facility);
 
-    when(facilityService.findFacilitiesByIds(projectFacilityIds, ProjectDetailsFormService.PRESELECTED_FACILITIES_REQUEST_PURPOSE))
+    when(facilityService
+        .findFacilitiesByIds(Collections.singletonList(facilityId), ProjectDetailsFormService.PRESELECTED_FACILITIES_REQUEST_PURPOSE))
         .thenReturn(facilities);
 
     var preselectedFacilities = projectDetailsFormService.getPreselectedFacilities(projectFacilityIds);
@@ -192,7 +194,7 @@ class ProjectDetailsFormServiceTest {
 
   @Test
   void getPreselectedFields_NoProjectFacilities() {
-    var preselectedFacilities = projectDetailsFormService.getPreselectedFacilities(Collections.emptyList());
+    var preselectedFacilities = projectDetailsFormService.getPreselectedFacilities(Collections.emptySet());
 
     assertThat(preselectedFacilities).isEmpty();
 

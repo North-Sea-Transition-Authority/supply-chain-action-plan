@@ -4,6 +4,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -67,11 +68,11 @@ class ProjectDetailsController {
     var projectFacilityIds = projectFacilities
         .stream()
         .map(ProjectFacility::getFacilityId)
-        .toList();
+        .collect(Collectors.toSet());
     var projectFieldIds = projectFields
         .stream()
         .map(ProjectField::getFieldId)
-        .toList();
+        .collect(Collectors.toSet());
     var form = projectDetails
         .map(existingProjectDetails -> projectDetailsFormService
             .getForm(existingProjectDetails, projectFacilityIds, projectFieldIds))

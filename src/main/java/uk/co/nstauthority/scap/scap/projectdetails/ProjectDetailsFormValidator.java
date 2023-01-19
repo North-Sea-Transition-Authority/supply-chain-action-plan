@@ -1,6 +1,7 @@
 package uk.co.nstauthority.scap.scap.projectdetails;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +73,7 @@ class ProjectDetailsFormValidator implements Validator {
 
     if (!errors.hasFieldErrors(FIELDS_SELECTOR_FIELD_NAME)) {
       var fieldIds = form.getFieldIds();
-      if (fieldIds.size() != fieldService.getFieldsByIds(fieldIds, FIELDS_REQUEST_PURPOSE).size()) {
+      if (fieldIds.size() != fieldService.getFieldsByIds(List.copyOf(fieldIds), FIELDS_REQUEST_PURPOSE).size()) {
         errors.rejectValue(
             FIELDS_SELECTOR_FIELD_NAME,
             "%s.invalid".formatted(FIELDS_SELECTOR_FIELD_NAME),
@@ -98,7 +99,8 @@ class ProjectDetailsFormValidator implements Validator {
       }
 
       if (!errors.hasFieldErrors(INSTALLATION_SELECTOR_FIELD_NAME)) {
-        var facilities = facilityService.findFacilitiesByIds(form.getInstallationIds(), INSTALLATIONS_REQUEST_PURPOSE);
+        var facilities = facilityService
+            .findFacilitiesByIds(List.copyOf(form.getInstallationIds()), INSTALLATIONS_REQUEST_PURPOSE);
         if (!Objects.equals(facilities.size(), form.getInstallationIds().size())) {
           errors.rejectValue(INSTALLATION_SELECTOR_FIELD_NAME,
               "%s.invalid".formatted(INSTALLATION_SELECTOR_FIELD_NAME),

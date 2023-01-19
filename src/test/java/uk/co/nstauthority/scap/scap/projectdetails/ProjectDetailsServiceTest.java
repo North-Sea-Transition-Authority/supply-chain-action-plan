@@ -331,7 +331,7 @@ class ProjectDetailsServiceTest {
     var addedFacilityId = 33;
     var form = getFilledProjectDetailsForm();
     form.setHasPlatforms(YesNo.YES);
-    form.setInstallationIds(List.of(addedFacilityId, keptExistingFacility.getFacilityId()));
+    form.setInstallationIds(Set.of(addedFacilityId, keptExistingFacility.getFacilityId()));
     var projectDetails = new ProjectDetails();
 
     when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
@@ -363,7 +363,7 @@ class ProjectDetailsServiceTest {
     var addedFieldId = 33;
     var form = getFilledProjectDetailsForm();
     var createdInstant = Instant.now();
-    form.setFieldIds(List.of(addedFieldId, keptExistingField.getFieldId()));
+    form.setFieldIds(Set.of(addedFieldId, keptExistingField.getFieldId()));
 
     when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
     when(projectFieldRepository.findAllByProjectDetails(projectDetails)).thenReturn(existingProjectFields);
@@ -393,7 +393,7 @@ class ProjectDetailsServiceTest {
     ));
     form.setProjectCostEstimate("2.2");
     form.setEstimatedValueLocalContent("1.1");
-    form.setFieldIds(Collections.singletonList(7235));
+    form.setFieldIds(Collections.singleton(7235));
     form.setHasPlatforms(YesNo.NO);
     form.setStartDay("22");
     form.setStartMonth("1");

@@ -84,7 +84,7 @@ public class ProjectDetailsService {
     if (YesNo.YES.equals(form.getHasPlatforms())) {
       saveProjectFacilities(projectDetails, form.getInstallationIds(), createdTimestamp);
     } else {
-      saveProjectFacilities(projectDetails, Collections.emptyList(), createdTimestamp);
+      saveProjectFacilities(projectDetails, Collections.emptySet(), createdTimestamp);
     }
   }
 
@@ -128,7 +128,7 @@ public class ProjectDetailsService {
         .toList();
   }
 
-  private void saveProjectFacilities(ProjectDetails projectDetails, List<Integer> facilityIds, Instant createdTimestamp) {
+  private void saveProjectFacilities(ProjectDetails projectDetails, Set<Integer> facilityIds, Instant createdTimestamp) {
     var existingProjectFacilities = getProjectFacilities(projectDetails);
     var existingProjectFacilityIds = existingProjectFacilities
         .stream()
@@ -156,7 +156,7 @@ public class ProjectDetailsService {
 
   }
 
-  private void saveProjectFields(ProjectDetails projectDetails, List<Integer> fieldIds, Instant createdTimestamp) {
+  private void saveProjectFields(ProjectDetails projectDetails, Set<Integer> fieldIds, Instant createdTimestamp) {
     var existingProjectFields = getProjectFields(projectDetails);
     var existingProjectFieldIds = existingProjectFields
         .stream()

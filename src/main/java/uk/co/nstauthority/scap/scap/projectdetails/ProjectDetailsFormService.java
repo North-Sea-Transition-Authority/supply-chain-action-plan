@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.projectdetails;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
@@ -42,8 +43,8 @@ public class ProjectDetailsFormService {
   }
 
   ProjectDetailsForm getForm(ProjectDetails projectDetails,
-                             List<Integer> projectFacilityIds,
-                             List<Integer> projectFieldIds) {
+                             Set<Integer> projectFacilityIds,
+                             Set<Integer> projectFieldIds) {
     var form = new ProjectDetailsForm();
 
     form.setProjectName(projectDetails.getProjectName());
@@ -79,23 +80,24 @@ public class ProjectDetailsFormService {
     return form;
   }
 
-  List<AddToListItem> getPreselectedFacilities(List<Integer> projectFacilityIds) {
+  List<AddToListItem> getPreselectedFacilities(Set<Integer> projectFacilityIds) {
     if (projectFacilityIds.isEmpty()) {
       return Collections.emptyList();
     }
 
-    var facilities = facilityService.findFacilitiesByIds(projectFacilityIds, PRESELECTED_FACILITIES_REQUEST_PURPOSE);
+    var facilities = facilityService
+        .findFacilitiesByIds(List.copyOf(projectFacilityIds), PRESELECTED_FACILITIES_REQUEST_PURPOSE);
     return facilities.stream()
         .map(facility -> new AddToListItem(facility.getId().toString(), facility.getName(), true))
         .toList();
   }
 
-  List<AddToListItem> getPreselectedFields(List<Integer> projectFieldIds) {
+  List<AddToListItem> getPreselectedFields(Set<Integer> projectFieldIds) {
     if (projectFieldIds.isEmpty()) {
       return Collections.emptyList();
     }
 
-    var fields = fieldService.getFieldsByIds(projectFieldIds, PRESELECTED_FIELD_REQUEST_PURPOSE);
+    var fields = fieldService.getFieldsByIds(List.copyOf(projectFieldIds), PRESELECTED_FIELD_REQUEST_PURPOSE);
     return fields.stream()
         .map(field -> new AddToListItem(field.getFieldId().toString(), field.getFieldName(), true))
         .toList();

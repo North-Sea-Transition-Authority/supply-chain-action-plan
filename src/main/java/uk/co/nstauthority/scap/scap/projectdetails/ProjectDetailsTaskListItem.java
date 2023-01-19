@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.scap.projectdetails;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.Collections;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
@@ -61,11 +62,11 @@ class ProjectDetailsTaskListItem implements ScapTaskListItem {
     var projectFacilityIds = projectFacilities
         .stream()
         .map(ProjectFacility::getFacilityId)
-        .toList();
+        .collect(Collectors.toSet());
     var projectFieldIds = projectFields
         .stream()
         .map(ProjectField::getFieldId)
-        .toList();
+        .collect(Collectors.toSet());
     return projectDetailsOptional
         .map(projectDetails -> {
           var form = projectDetailsFormService
