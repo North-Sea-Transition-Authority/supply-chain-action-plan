@@ -23,6 +23,7 @@ import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.scap.scap.Scap;
+import uk.co.nstauthority.scap.scap.submit.ReviewAndSubmitForm;
 import uk.co.nstauthority.scap.utils.EntityTestingUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -121,17 +122,44 @@ class ScapDetailServiceTest {
     var scapDetail = new ScapDetail();
     scapDetail.setStatus(ScapDetailStatus.DRAFT);
     var argumentCaptor = ArgumentCaptor.forClass(ScapDetail.class);
+    var form = new ReviewAndSubmitForm();
+    form.setApprovedByStakeholders(true);
 
-    scapDetailService.submitScap(scapDetail);
+    scapDetailService.submitScap(scapDetail, form);
 
     verify(scapDetailRepository).save(argumentCaptor.capture());
 
     assertThat(argumentCaptor.getValue()).extracting(
         ScapDetail::getStatus,
-        ScapDetail::getSubmittedTimestamp
+        ScapDetail::getSubmittedTimestamp,
+        ScapDetail::getApprovedByStakeholders
     ).containsExactly(
         ScapDetailStatus.SUBMITTED,
-        clock.instant()
+        clock.instant(),
+        true
+    );
+  }
+
+  @Test
+  void submitScap_VerifySaves_NotApprovedByStakeholders() {
+    var scapDetail = new ScapDetail();
+    scapDetail.setStatus(ScapDetailStatus.DRAFT);
+    var argumentCaptor = ArgumentCaptor.forClass(ScapDetail.class);
+    var form = new ReviewAndSubmitForm();
+    form.setApprovedByStakeholders(false);
+
+    scapDetailService.submitScap(scapDetail, form);
+
+    verify(scapDetailRepository).save(argumentCaptor.capture());
+
+    assertThat(argumentCaptor.getValue()).extracting(
+        ScapDetail::getStatus,
+        ScapDetail::getSubmittedTimestamp,
+        ScapDetail::getApprovedByStakeholders
+    ).containsExactly(
+        ScapDetailStatus.SUBMITTED,
+        clock.instant(),
+        false
     );
   }
 

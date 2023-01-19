@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.scap.summary;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -12,7 +13,7 @@ import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getContractingPerformanceOverviewSummaryView;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getPlannedTenderSummaryView;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getProjectDetailsSummaryView;
-import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.mockScapSummaryViewServiceMethods;
+import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getProjectPerformanceSummaryView;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -107,7 +108,12 @@ class ScapSummaryViewServiceTest {
   void getScapSummaryView_VerifyCalls() {
     var scapDetail = mock(ScapDetail.class);
 
-    mockScapSummaryViewServiceMethods(scapSummaryViewService, scapDetail);
+    doReturn(getProjectDetailsSummaryView()).when(scapSummaryViewService).getProjectDetailsSummaryView(scapDetail);
+    doReturn(getPlannedTenderSummaryView()).when(scapSummaryViewService).getPlannedTenderSummaryView(scapDetail);
+    doReturn(getActualTenderSummaryView()).when(scapSummaryViewService).getActualTenderSummaryView(scapDetail);
+    doReturn(getContractingPerformanceOverviewSummaryView()).when(scapSummaryViewService)
+        .getContractingPerformanceOverviewSummaryView(scapDetail);
+    doReturn(getProjectPerformanceSummaryView()).when(scapSummaryViewService).getProjectPerformanceSummaryView(scapDetail);
 
     var summaryView = scapSummaryViewService.getScapSummaryView(scapDetail);
 
@@ -115,17 +121,20 @@ class ScapSummaryViewServiceTest {
     verify(scapSummaryViewService).getPlannedTenderSummaryView(scapDetail);
     verify(scapSummaryViewService).getActualTenderSummaryView(scapDetail);
     verify(scapSummaryViewService).getContractingPerformanceOverviewSummaryView(scapDetail);
+    verify(scapSummaryViewService).getProjectPerformanceSummaryView(scapDetail);
 
     assertThat(summaryView).extracting(
         ScapSummaryView::projectDetailsSummaryView,
         ScapSummaryView::plannedTenderSummaryView,
         ScapSummaryView::actualTenderSummaryView,
-        ScapSummaryView::contractingPerformanceOverviewSummaryView
+        ScapSummaryView::contractingPerformanceOverviewSummaryView,
+        ScapSummaryView::projectPerformanceSummaryView
     ).containsExactly(
         getProjectDetailsSummaryView(),
         getPlannedTenderSummaryView(),
         getActualTenderSummaryView(),
-        getContractingPerformanceOverviewSummaryView()
+        getContractingPerformanceOverviewSummaryView(),
+        getProjectPerformanceSummaryView()
     );
   }
 

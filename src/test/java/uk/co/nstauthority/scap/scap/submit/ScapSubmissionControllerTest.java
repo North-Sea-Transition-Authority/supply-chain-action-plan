@@ -16,8 +16,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import static uk.co.nstauthority.scap.mvc.ReverseRouter.emptyBindingResult;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getScapSummaryView;
-import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.mockScapSummaryViewServiceMethods;
+import static uk.co.nstauthority.scap.utils.ControllerTestingUtil.bindingResultWithErrors;
 
 import java.time.Instant;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.validation.BindingResult;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
@@ -57,6 +59,9 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
   @MockBean
   List<ScapTaskListItem> scapTaskListItems;
 
+  @MockBean
+  ReviewAndSubmitFormService reviewAndSubmitFormService;
+
   @BeforeEach
   void setup() {
     scap.setReference("SCAP/2022/1");
@@ -74,7 +79,8 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
     doReturn(ReviewAndSubmitTaskListSection.class).when(submitTaskListItem).getTaskListSection();
     doReturn(true).when(taskListItem).isValid(SCAP_ID.scapId());
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
-    mockScapSummaryViewServiceMethods(scapSummaryViewService, scapDetail);
+    when(reviewAndSubmitFormService.getForm(scapDetail)).thenReturn(new ReviewAndSubmitForm());
+    when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
 
     mockMvc.perform(get(
         ReverseRouter.route(on(ScapSubmissionController.class).renderScapSubmissionConfirmation(SCAP_ID))))
@@ -83,7 +89,8 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID))))
         .andExpect(model().attribute("scapSummaryView", getScapSummaryView()))
-        .andExpect(model().attribute("isValid", true));
+        .andExpect(model().attribute("isValid", true))
+        .andExpect(model().attributeExists("form"));
 
     verify(submitTaskListItem, never()).isValid(any());
   }
@@ -116,17 +123,38 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
         .renderScapSubmissionSuccess(SCAP_ID));
 
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(reviewAndSubmitFormService.validate(any(), any())).thenReturn(emptyBindingResult());
 
     mockMvc.perform(post(
-        ReverseRouter.route(on(ScapSubmissionController.class).submitScap(SCAP_ID)))
+        ReverseRouter.route(on(ScapSubmissionController.class).submitScap(SCAP_ID, null, emptyBindingResult())))
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl(expectedRedirectUrl));
 
-    verify(scapDetailService).submitScap(scapDetail);
+    verify(scapDetailService).submitScap(eq(scapDetail), any());
     verify(timelineEventService).recordNewEvent(eq(TimelineEventSubject.SCAP_SUBMITTED),
         any(ScapId.class),
         eq(scapDetail.getVersionNumber()));
+  }
+
+  @Test
+  @DisplayName("Assert that submitting a SCAP without confirming that it has been reviewed is not submitted")
+  void submitScap_NotReviewedInternally_AssertThrows() throws Exception {
+    var form = new ReviewAndSubmitForm();
+
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(reviewAndSubmitFormService.validate(eq(form), any(BindingResult.class)))
+        .thenReturn(bindingResultWithErrors(form));
+    when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
+
+    mockMvc.perform(post(
+        ReverseRouter.route(on(ScapSubmissionController.class).submitScap(SCAP_ID, null, emptyBindingResult())))
+            .with(csrf())
+            .flashAttr("form", form))
+        .andExpect(status().isOk());
+
+    verify(scapDetailService, never()).submitScap(any(), any());
+    verifyNoInteractions(timelineEventService);
   }
 
   @Test
@@ -140,11 +168,11 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
 
     mockMvc.perform(post(
-        ReverseRouter.route(on(ScapSubmissionController.class).submitScap(SCAP_ID)))
+        ReverseRouter.route(on(ScapSubmissionController.class).submitScap(SCAP_ID, null, emptyBindingResult())))
             .with(csrf()))
         .andExpect(status().isBadRequest());
 
-    verify(scapDetailService, never()).submitScap(scapDetail);
+    verify(scapDetailService, never()).submitScap(any(), any());
     verifyNoInteractions(timelineEventService);
   }
 

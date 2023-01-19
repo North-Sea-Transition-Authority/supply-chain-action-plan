@@ -9,6 +9,7 @@ import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
+import uk.co.nstauthority.scap.scap.submit.ReviewAndSubmitForm;
 
 @Service
 public class ScapDetailService {
@@ -63,9 +64,10 @@ public class ScapDetailService {
   }
 
   @Transactional
-  public void submitScap(ScapDetail scapDetail) {
+  public void submitScap(ScapDetail scapDetail, ReviewAndSubmitForm form) {
     scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
     scapDetail.setSubmittedTimestamp(clock.instant());
+    scapDetail.setApprovedByStakeholders(form.getApprovedByStakeholders());
     scapDetailRepository.save(scapDetail);
   }
 }

@@ -6,16 +6,21 @@ import static uk.co.nstauthority.scap.scap.timeline.TimelineEventSubject.SCAP_SU
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
+import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.error.exception.ScapBadRequestException;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
+import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
@@ -41,26 +46,33 @@ class ScapSubmissionController {
   private final ScapSummaryViewService scapSummaryViewService;
   private final TimelineEventService timelineEventService;
   private final List<ScapTaskListItem> scapTaskListItems;
+  private final ReviewAndSubmitFormService reviewAndSubmitFormService;
+  private final ControllerHelperService controllerHelperService;
 
 
   @Autowired
   ScapSubmissionController(ScapService scapService,
                            ScapDetailService scapDetailService,
                            ScapSummaryViewService scapSummaryViewService,
-                           TimelineEventService timelineEventService, List<ScapTaskListItem> scapTaskListItems) {
+                           TimelineEventService timelineEventService, List<ScapTaskListItem> scapTaskListItems,
+                           ReviewAndSubmitFormService reviewAndSubmitFormService,
+                           ControllerHelperService controllerHelperService) {
     this.scapService = scapService;
     this.scapDetailService = scapDetailService;
     this.scapSummaryViewService = scapSummaryViewService;
     this.timelineEventService = timelineEventService;
     this.scapTaskListItems = scapTaskListItems;
+    this.reviewAndSubmitFormService = reviewAndSubmitFormService;
+    this.controllerHelperService = controllerHelperService;
   }
 
   @GetMapping
   ModelAndView renderScapSubmissionConfirmation(@PathVariable("scapId") ScapId scapId) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
+    var form = reviewAndSubmitFormService.getForm(scapDetail);
 
-    return scapSubmissionConfirmationModelAndView(scapId)
-        .addObject("scapSummaryView", scapSummaryViewService.getScapSummaryView(scapDetail));
+    return scapSubmissionConfirmationModelAndView(scapId, scapDetail)
+        .addObject("form", form);
   }
 
   @GetMapping("/success")
@@ -74,7 +86,9 @@ class ScapSubmissionController {
   }
 
   @PostMapping
-  ModelAndView submitScap(@PathVariable("scapId") ScapId scapId) {
+  ModelAndView submitScap(@PathVariable("scapId") ScapId scapId,
+                          @ModelAttribute("form") ReviewAndSubmitForm form,
+                          BindingResult bindingResult) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
 
     if (!isScapValid(scapId)) {
@@ -82,19 +96,29 @@ class ScapSubmissionController {
           "Could not submit SCAP with ID [%d] as it is not complete".formatted(scapId.scapId()));
     }
 
-    scapDetailService.submitScap(scapDetail);
-    timelineEventService.recordNewEvent(SCAP_SUBMITTED, scapId, scapDetail.getVersionNumber());
+    bindingResult = reviewAndSubmitFormService.validate(form, bindingResult);
+    return controllerHelperService.checkErrorsAndRedirect(
+        bindingResult,
+        scapSubmissionConfirmationModelAndView(scapId, scapDetail),
+        form,
+        () -> {
+          scapDetailService.submitScap(scapDetail, form);
+          timelineEventService.recordNewEvent(SCAP_SUBMITTED, scapId, scapDetail.getVersionNumber());
 
-    return ReverseRouter.redirect(on(ScapSubmissionController.class).renderScapSubmissionSuccess(scapId));
+          return ReverseRouter.redirect(on(ScapSubmissionController.class).renderScapSubmissionSuccess(scapId));
+        }
+    );
   }
 
-  private ModelAndView scapSubmissionConfirmationModelAndView(ScapId scapId) {
+  private ModelAndView scapSubmissionConfirmationModelAndView(ScapId scapId, ScapDetail scapDetail) {
     var isValid = isScapValid(scapId);
     return new ModelAndView("scap/scap/submit/reviewAndSubmit")
         .addObject("backLinkUrl", ReverseRouter.route(on(TaskListController.class)
             .renderTaskList(scapId)))
         .addObject("isValid", isValid)
-        .addObject("incompleteErrorMessage", getIncompleteErrorMessage(isValid));
+        .addObject("incompleteErrorMessage", getIncompleteErrorMessage(isValid))
+        .addObject("radioItems", YesNo.getRadioOptions())
+        .addObject("scapSummaryView", scapSummaryViewService.getScapSummaryView(scapDetail));
   }
 
   private String getIncompleteErrorMessage(boolean isValid) {
