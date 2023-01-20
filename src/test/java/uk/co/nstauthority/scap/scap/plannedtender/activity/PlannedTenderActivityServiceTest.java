@@ -178,6 +178,7 @@ class PlannedTenderActivityServiceTest {
     form.setAwardRationale("Some award rationale");
     form.setEstimatedValue("2.32");
     form.setRemunerationModel(RemunerationModel.LUMP_SUM);
+    form.setRemunerationModelName("some other remuneration model");
     form.setScopeDescription("Some scope description");
     var argumentCaptor = ArgumentCaptor.forClass(PlannedTenderActivity.class);
 

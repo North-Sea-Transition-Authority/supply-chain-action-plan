@@ -72,7 +72,6 @@ public class PlannedTenderActivityService {
     } else {
       plannedTenderDetail.setRemunerationModelName(null);
     }
-    plannedTenderDetail.setRemunerationModelName(form.getRemunerationModelName().getInputValue());
     plannedTenderDetail.setScopeDescription(form.getScopeDescription().getInputValue());
     plannedTenderActivityRepository.save(plannedTenderDetail);
   }
