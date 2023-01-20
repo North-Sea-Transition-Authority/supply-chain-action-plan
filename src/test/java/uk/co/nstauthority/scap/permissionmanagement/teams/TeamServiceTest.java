@@ -5,15 +5,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -182,5 +179,21 @@ class TeamServiceTest {
     var team = TeamTestUtil.Builder().withTeamType(TeamType.INDUSTRY).withOrgGroupId(5000).build();
     when(teamRepository.findAllTeamsThatUserIsMemberOf(user.wuaId())).thenReturn(List.of(team));
     assertTrue(teamService.userIsMemberOfOrganisationGroupTeam(team.getEnergyPortalOrgGroupId(), user));
+  }
+
+  @Test
+  void userIsMemberOfRegulatorTeam_IsMember() {
+    var user = ServiceUserDetailTestUtil.Builder().build();
+    var team = TeamTestUtil.Builder().withTeamType(TeamType.REGULATOR).build();
+    when(teamRepository.findAllTeamsThatUserIsMemberOf(user.wuaId())).thenReturn(List.of(team));
+    assertTrue(teamService.userIsMemberOfRegulatorTeam(user));
+  }
+
+  @Test
+  void userIsMemberOfRegulatorTeam_NotMember() {
+    var user = ServiceUserDetailTestUtil.Builder().build();
+    var team = TeamTestUtil.Builder().withTeamType(TeamType.INDUSTRY).build();
+    when(teamRepository.findAllTeamsThatUserIsMemberOf(user.wuaId())).thenReturn(List.of(team));
+    assertFalse(teamService.userIsMemberOfRegulatorTeam(user));
   }
 }

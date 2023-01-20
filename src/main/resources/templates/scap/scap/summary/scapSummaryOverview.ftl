@@ -23,13 +23,17 @@ backLinkUrl=springUrl(backLinkUrl)
   <@fdsTabs.tabs tabsHeading="SCAP overview tabs">
     <@fdsTabs.tabList>
       <@fdsTabs.tab tabLabel="Application form" tabAnchor="summary-tab"/>
-      <@fdsTabs.tab tabLabel="Case Events" tabAnchor="events-tab"/>
+      <#if timelineEvents?has_content>
+        <@fdsTabs.tab tabLabel="Case Events" tabAnchor="events-tab"/>
+      </#if>
     </@fdsTabs.tabList>
     <@fdsTabs.tabContent tabAnchor="summary-tab">
       <@scapSummary.summary scapSummaryView/>
     </@fdsTabs.tabContent>
-    <@fdsTabs.tabContent tabAnchor="events-tab">
-      <@timeline.timeline timelineEvents=timelineEvents/>
-    </@fdsTabs.tabContent>
+      <#if timelineEvents?has_content>
+        <@fdsTabs.tabContent tabAnchor="events-tab">
+          <@timeline.timeline timelineEvents=timelineEvents/>
+        </@fdsTabs.tabContent>
+      </#if>
   </@fdsTabs.tabs>
 </@defaultPage>

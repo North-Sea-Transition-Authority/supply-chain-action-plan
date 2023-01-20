@@ -1,5 +1,7 @@
 package uk.co.nstauthority.scap.permissionmanagement.teams;
 
+import static uk.co.nstauthority.scap.permissionmanagement.TeamType.REGULATOR;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -80,6 +82,12 @@ public class TeamService {
     return getTeamsThatUserBelongsTo(user)
         .stream()
         .anyMatch(team -> team.getEnergyPortalOrgGroupId().equals(organisationGroupId));
+  }
+
+  public boolean userIsMemberOfRegulatorTeam(ServiceUserDetail user) {
+    return getTeamsThatUserBelongsTo(user)
+        .stream()
+        .anyMatch(team -> REGULATOR.equals(team.getTeamType()));
   }
 
   public BindingResult validate(NewTeamForm form, BindingResult bindingResult) {

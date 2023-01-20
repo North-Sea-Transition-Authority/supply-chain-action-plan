@@ -2,20 +2,28 @@ package uk.co.nstauthority.scap.scap.summary;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
+import static uk.co.nstauthority.scap.scap.projectdetails.ProjectType.FIELD_DEVELOPMENT_PLAN;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getScapSummaryView;
 
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
+import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
@@ -24,7 +32,11 @@ import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetails;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
+import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryView;
+import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderSummaryView;
 import uk.co.nstauthority.scap.scap.timeline.TimelineEventService;
+import uk.co.nstauthority.scap.scap.timeline.TimelineEventSubject;
+import uk.co.nstauthority.scap.scap.timeline.TimelineEventView;
 
 @ContextConfiguration(classes = ScapSummaryController.class)
 class ScapSummaryControllerTest extends AbstractControllerTest {
@@ -78,5 +90,90 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
             .with(user(testUser)))
         .andExpect(status().isNotFound())
         .andExpect(result -> assertThat(result.getResolvedException().getMessage()).isEqualTo(expectedErrorMessage));
+  }
+
+  @Test
+  void renderSummary_RegulatorUser_CaseEventEmpty() throws Exception {
+    var scap = new Scap();
+    scap.setReference("TEST PROJECT NAME");
+
+    var detail = new ScapDetail();
+    detail.setStatus(ScapDetailStatus.DRAFT);
+    detail.setScap(scap);
+
+    var projectDetails = new ProjectDetails();
+
+    when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(true);
+    when(scapDetailService.getLatestScapDetailByScapId(SCAP_ID)).thenReturn(Optional.of(detail));
+    when(projectDetailsService.getProjectDetails(detail)).thenReturn(Optional.of(projectDetails));
+    when(scapSummaryViewService.getScapSummaryView(detail)).thenReturn(getSummaryView());
+    when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
+    when(timelineEventService.getEventViewByScapId(SCAP_ID)).thenReturn(getTimelineView());
+
+    mockMvc.perform(get(
+            ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
+            .with(user(testUser)))
+        .andExpect(status().isOk())
+        .andExpect(view().name("scap/scap/summary/scapSummaryOverview"))
+        .andExpect(model().attribute("timelineEvents", getTimelineView()));
+    verify(timelineEventService).getEventViewByScapId(SCAP_ID);
+  }
+
+  @Test
+  void renderSummary_IndustryUser_CaseEventEmpty() throws Exception {
+    var scap = new Scap();
+    scap.setReference("TEST PROJECT NAME");
+
+    var detail = new ScapDetail();
+    detail.setStatus(ScapDetailStatus.DRAFT);
+    detail.setScap(scap);
+
+    var projectDetails = new ProjectDetails();
+
+    when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(false);
+    when(scapDetailService.getLatestScapDetailByScapId(SCAP_ID)).thenReturn(Optional.of(detail));
+    when(projectDetailsService.getProjectDetails(detail)).thenReturn(Optional.of(projectDetails));
+    when(scapSummaryViewService.getScapSummaryView(detail)).thenReturn(getSummaryView());
+    when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
+    when(timelineEventService.getEventViewByScapId(SCAP_ID)).thenReturn(getTimelineView());
+
+    mockMvc.perform(get(
+            ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
+            .with(user(testUser)))
+        .andExpect(status().isOk())
+        .andExpect(view().name("scap/scap/summary/scapSummaryOverview"))
+        .andExpect(model().attribute("timelineEvents", Collections.emptyList()));
+    verify(timelineEventService, never()).getEventViewByScapId(SCAP_ID);
+  }
+
+  private ScapSummaryView getSummaryView() {
+    var projectDetailsSummaryView = new ProjectDetailsSummaryView("Project Name",
+        List.of(FIELD_DEVELOPMENT_PLAN),
+        new BigDecimal("5000.50"),
+        new BigDecimal("5000.50"),
+        Collections.singletonList("BRENT"),
+        YesNo.YES,
+        Collections.emptyList(),
+        "11-07-2024",
+        "11-09-2024",
+        null);
+
+    var plannedTenderSummaryView = new PlannedTenderSummaryView(false,
+        Collections.emptyList());
+
+    var actualTenderSummaryView = new ActualTenderSummaryView(false,
+        Collections.emptyList());
+
+    return getScapSummaryView();
+  }
+
+  private List<TimelineEventView> getTimelineView() {
+    var timelineEvent = new TimelineEventView(TimelineEventSubject.SCAP_SUBMITTED.getDisplayName(),
+        SCAP_ID.scapId(),
+        1,
+        "",
+        "TEST TESTER");
+
+    return List.of(timelineEvent);
   }
 }
