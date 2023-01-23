@@ -13,4 +13,6 @@ public class CaseEventAction {
   public static final String SUBMIT = "SUBMIT";
 
   public static final String INFO_REQUESTED = "INFO_REQUESTED";
+
+  public static final String CONSULTATION_REQUESTED = "CONSULTATION_REQUESTED";
 }

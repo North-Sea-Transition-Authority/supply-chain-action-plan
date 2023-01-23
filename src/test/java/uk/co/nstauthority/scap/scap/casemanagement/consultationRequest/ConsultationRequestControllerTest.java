@@ -1,8 +1,7 @@
-package uk.co.nstauthority.scap.scap.casemanagement.qacomments;
+package uk.co.nstauthority.scap.scap.casemanagement.consultationRequest;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -31,19 +30,22 @@ import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
+import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestController;
+import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestForm;
+import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestFormValidator;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
-import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 
 @ExtendWith(MockitoExtension.class)
 @WithMockUser
-@ContextConfiguration(classes = QaCommentController.class)
-class QaCommentControllerTest extends AbstractControllerTest {
+@ContextConfiguration(classes = ConsultationRequestController.class)
+class ConsultationRequestControllerTest extends AbstractControllerTest {
 
   @MockBean
   private CaseEventService caseEventService;
@@ -58,7 +60,7 @@ class QaCommentControllerTest extends AbstractControllerTest {
   private OrganisationGroupService organisationGroupService;
 
   @MockBean
-  private QaCommentFormValidator qaCommentFormValidator;
+  private ConsultationRequestFormValidator consultationRequestFormValidator;
 
   private static final ScapId SCAP_ID = new ScapId(1111);
 
@@ -66,79 +68,64 @@ class QaCommentControllerTest extends AbstractControllerTest {
 
   private static final String TEST_STRING = "This is a test comment";
 
+  private static final String PURPOSE = "Get Org Group for Summary of SCAP ID: %s".formatted(SCAP_ID.scapId());
+
   @BeforeEach
   void setup() {
+    var scapDetail = getScapDetail();
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
     when(scapService.getScapById(anyInt())).thenReturn(new Scap());
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(getScapDetail());
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(any(Scap.class))).thenReturn(getScapDetail());
-    when(organisationGroupService.getOrganisationGroupById(eq(ORG_GROUP_ID), any())).thenReturn(Optional.of(getOrgGroup()));
-    when(scapSummaryViewService.getScapSummaryView(any())).thenReturn(getScapSummaryView());
-  }
-
-  @Test
-  void saveQaComments_ValidationSuccesful_saved() throws Exception {
-    mockMvc.perform(post(ReverseRouter.route(on(QaCommentController.class)
-        .saveQaCommentForm(
-            SCAP_ID,
-            CaseEventAction.QA,
-            false,
-            null,
-            null)))
-        .with(user(testUser))
-        .with(csrf()))
-        .andExpect(status().is3xxRedirection());
-
-    verify(caseEventService).recordNewEvent(CaseEventSubject.QA_COMMENT, SCAP_ID, 1, null);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(any(Scap.class))).thenReturn(scapDetail);
+    when(organisationGroupService.getOrganisationGroupById(ORG_GROUP_ID, PURPOSE)).thenReturn(Optional.of(getOrgGroup()));
+    when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
   }
 
   @Test
   void saveQaComments_ValidationSuccesful_savedWithComments() throws Exception {
-    mockMvc.perform(post(ReverseRouter.route(on(QaCommentController.class)
-            .saveQaCommentForm(
+    mockMvc.perform(post(ReverseRouter.route(on(ConsultationRequestController.class)
+            .saveConsultationRequestForm(
                 SCAP_ID,
-                CaseEventAction.QA,
+                CaseEventAction.CONSULTATION_REQUESTED,
                 false,
-                getQaCommentForm(),
+                getConsultationRequestedForm(),
                 null)))
             .with(user(testUser))
             .with(csrf())
-            .flashAttr("qaForm", getQaCommentForm()))
+            .flashAttr("consultationRequestForm", getConsultationRequestedForm()))
         .andExpect(status().is3xxRedirection());
-
-    verify(caseEventService).recordNewEvent(CaseEventSubject.QA_COMMENT, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.CONSULTATION_REQUESTED, SCAP_ID, 1, TEST_STRING);
   }
 
   @Test
   void saveQaComments_ValidationFailed_Reroute() throws Exception {
     doAnswer(invocation -> {
       var bindingResult = (BindingResult) invocation.getArgument(1);
-      bindingResult.rejectValue("qaComments.inputValue", "testError", "This is an error message");
+      bindingResult.rejectValue("requestComments.inputValue", "testError", "This is an error message");
       return bindingResult;
-    }).when(qaCommentFormValidator).validate(any(), any());
+    }).when(consultationRequestFormValidator).validate(any(), any());
 
-    mockMvc.perform(post(ReverseRouter.route(on(QaCommentController.class)
-            .saveQaCommentForm(
+    mockMvc.perform(post(ReverseRouter.route(on(ConsultationRequestController.class)
+            .saveConsultationRequestForm(
                 SCAP_ID,
-                CaseEventAction.INFO_REQUESTED,
+                CaseEventAction.CONSULTATION_REQUESTED,
                 false,
-                getQaCommentForm(),
+                getConsultationRequestedForm(),
                 null)))
             .with(user(testUser))
             .with(csrf())
-            .flashAttr("qaForm", getQaCommentForm()))
+            .flashAttr("consultationRequestForm", getConsultationRequestedForm()))
         .andExpect(status().isOk());
-
-    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.FURTHER_INFO_REQUESTED, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.CONSULTATION_REQUESTED, SCAP_ID, 1, TEST_STRING);
   }
 
-  private QaCommentForm getQaCommentForm() {
-    var form = new QaCommentForm();
-    var input = form.getQaComments();
+  private ConsultationRequestForm getConsultationRequestedForm() {
+    var form = new ConsultationRequestForm();
+    var input = form.getRequestComments();
     input.setInputValue(TEST_STRING);
 
-    form.setQaComments(input);
+    form.setRequestComments(input);
     return form;
   }
 

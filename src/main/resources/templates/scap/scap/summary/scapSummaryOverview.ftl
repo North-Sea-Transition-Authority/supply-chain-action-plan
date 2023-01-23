@@ -20,8 +20,9 @@ pageSize=PageSize.FULL_WIDTH
 backLinkUrl=springUrl(backLinkUrl)
 >
   <@scapSummaryCard.summaryCard/>
-  <@fdsSlideOutPanel.slideOutPanelButton buttonText="Complete QA checks" buttonPanelId="Qa-Panel"/>
-  <@fdsSlideOutPanel.slideOutPanelButton buttonText="Request further information" buttonPanelId="Info-Request-Panel"/>
+  <@fdsSlideOutPanel.slideOutPanelButton buttonText="Complete QA checks" buttonPanelId="Qa-Panel" buttonClass="govuk-button--secondary"/>
+  <@fdsSlideOutPanel.slideOutPanelButton buttonText="Request further information" buttonPanelId="Info-Request-Panel" buttonClass="govuk-button--secondary"/>
+  <@fdsSlideOutPanel.slideOutPanelButton buttonText="Request Consultation" buttonPanelId="Consultation-Request-Panel" buttonClass="govuk-button--secondary"/>
 
   <@fdsTabs.tabs tabsHeading="SCAP overview tabs">
     <@fdsTabs.tabList>
@@ -41,4 +42,5 @@ backLinkUrl=springUrl(backLinkUrl)
   </@fdsTabs.tabs>
   <#include 'caseActions/qaCommentAction.ftl'/>
   <#include 'caseActions/infoRequestAction.ftl'/>
+  <#include 'caseActions/consultationRequestAction.ftl'/>
 </@defaultPage>

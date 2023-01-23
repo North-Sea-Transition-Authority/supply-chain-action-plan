@@ -10,6 +10,8 @@ import uk.co.nstauthority.scap.error.exception.IllegalUtilClassInstantiationExce
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventView;
+import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestController;
+import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestForm;
 import uk.co.nstauthority.scap.scap.casemanagement.furtherinfo.FurtherInfoController;
 import uk.co.nstauthority.scap.scap.casemanagement.furtherinfo.FurtherInfoRequestForm;
 import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentController;
@@ -42,6 +44,8 @@ public class ScapSummaryModelAndViewGenerator {
     private FurtherInfoRequestForm furtherInfoRequestForm = new FurtherInfoRequestForm();
     private QaCommentForm qaCommentForm = new QaCommentForm();
 
+    private ConsultationRequestForm consultationRequestForm = new ConsultationRequestForm();
+
     public Generator(ScapDetail scapDetail,
                      ScapSummaryView scapSummary) {
       this.scapDetail = scapDetail;
@@ -73,6 +77,11 @@ public class ScapSummaryModelAndViewGenerator {
       return this;
     }
 
+    public Generator withConsultationRequestForm(ConsultationRequestForm consultationRequestForm) {
+      this.consultationRequestForm = consultationRequestForm;
+      return this;
+    }
+
     public ModelAndView generate() {
       var modelAndView =  new ModelAndView("scap/scap/summary/scapSummaryOverview")
           .addObject("scapSummaryView", scapSummary)
@@ -87,6 +96,7 @@ public class ScapSummaryModelAndViewGenerator {
       addCaseEventTimeline(modelAndView);
       addQaCommentForm(modelAndView);
       addInfoRequestForm(modelAndView);
+      addConsultationRequestForm(modelAndView);
 
       return modelAndView;
     }
@@ -112,6 +122,17 @@ public class ScapSummaryModelAndViewGenerator {
           ReverseRouter.route(on(FurtherInfoController.class)
               .saveInfoRequestedForm(scapDetail.getScap().getScapId(),
                   CaseEventAction.INFO_REQUESTED,
+                  true,
+                  null,
+                  null)));
+    }
+
+    private void addConsultationRequestForm(ModelAndView modelAndView) {
+      modelAndView.addObject("consultationRequestForm", consultationRequestForm);
+      modelAndView.addObject("consultationRequestSubmitUrl",
+          ReverseRouter.route(on(ConsultationRequestController.class)
+              .saveConsultationRequestForm(scapDetail.getScap().getScapId(),
+                  CaseEventAction.CONSULTATION_REQUESTED,
                   true,
                   null,
                   null)));

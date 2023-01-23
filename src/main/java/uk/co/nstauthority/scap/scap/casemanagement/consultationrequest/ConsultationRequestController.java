@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.scap.casemanagement.qacomments;
+package uk.co.nstauthority.scap.scap.casemanagement.consultationrequest;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -31,7 +31,7 @@ import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 @RequestMapping("{scapId}/")
 @PermissionsRequired(permissions = RolePermission.REVIEW_SCAP)
 @ScapHasStatus(permittedStatuses = ScapDetailStatus.SUBMITTED)
-public class QaCommentController {
+public class ConsultationRequestController {
 
   private final CaseEventService caseEventService;
 
@@ -43,31 +43,31 @@ public class QaCommentController {
 
   private final OrganisationGroupService organisationGroupService;
 
-  private final QaCommentFormValidator qaCommentFormValidator;
+  private final ConsultationRequestFormValidator consultationRequestFormValidator;
 
   @Autowired
-  public QaCommentController(CaseEventService caseEventService,
-                             ControllerHelperService controllerHelperService,
-                             ScapDetailService scapDetailService,
-                             ScapSummaryViewService scapSummaryViewService,
-                             OrganisationGroupService organisationGroupService,
-                             QaCommentFormValidator qaCommentFormValidator) {
+  public ConsultationRequestController(CaseEventService caseEventService,
+                                       ControllerHelperService controllerHelperService,
+                                       ScapDetailService scapDetailService,
+                                       ScapSummaryViewService scapSummaryViewService,
+                                       OrganisationGroupService organisationGroupService,
+                                       ConsultationRequestFormValidator consultationRequestFormValidator) {
     this.caseEventService = caseEventService;
     this.controllerHelperService = controllerHelperService;
     this.scapDetailService = scapDetailService;
     this.scapSummaryViewService = scapSummaryViewService;
     this.organisationGroupService = organisationGroupService;
-    this.qaCommentFormValidator = qaCommentFormValidator;
+    this.consultationRequestFormValidator = consultationRequestFormValidator;
   }
 
-  @PostMapping(params = CaseEventAction.QA)
-  public ModelAndView saveQaCommentForm(@PathVariable("scapId") ScapId scapId,
-                                        @RequestParam(CaseEventAction.QA) String caseEventAction,
-                                        @RequestParam("Qa-Panel") Boolean slideOutPanelOpen,
-                                        @ModelAttribute("qaForm") QaCommentForm qaCommentForm,
-                                        BindingResult bindingResult) {
-
-    qaCommentFormValidator.validate(qaCommentForm, bindingResult);
+  @PostMapping(params = CaseEventAction.CONSULTATION_REQUESTED)
+  public ModelAndView saveConsultationRequestForm(@PathVariable("scapId") ScapId scapId,
+                                                  @RequestParam(CaseEventAction.CONSULTATION_REQUESTED) String caseEventAction,
+                                                  @RequestParam("Consultation-Request-Panel") Boolean slideOutPanelOpen,
+                                                  @ModelAttribute("consultationRequestForm")
+                                                    ConsultationRequestForm consultationRequestForm,
+                                                  BindingResult bindingResult) {
+    consultationRequestFormValidator.validate(consultationRequestForm, bindingResult);
 
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
     var scapSummary = scapSummaryViewService.getScapSummaryView(scapDetail);
@@ -78,18 +78,18 @@ public class QaCommentController {
     var generator =
         ScapSummaryModelAndViewGenerator.generator(scapDetail, scapSummary)
             .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
-            .withQaCommentForm(qaCommentForm);
+            .withConsultationRequestForm(consultationRequestForm);
     orgGroup.ifPresent(generator::withOrgGroup);
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
         generator.generate(),
-        qaCommentForm,
+        consultationRequestForm,
         () -> {
-          caseEventService.recordNewEvent(CaseEventSubject.QA_COMMENT,
+          caseEventService.recordNewEvent(CaseEventSubject.CONSULTATION_REQUESTED,
               scapId,
               scapDetail.getVersionNumber(),
-              qaCommentForm.getQaComments().getInputValue());
+              consultationRequestForm.getRequestComments().getInputValue());
           return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
         });
   }
