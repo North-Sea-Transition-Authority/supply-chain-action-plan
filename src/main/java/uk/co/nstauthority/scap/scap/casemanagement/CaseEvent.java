@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.scap.timeline;
+package uk.co.nstauthority.scap.scap.casemanagement;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
@@ -12,17 +12,17 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "timeline_events")
-public class TimelineEvent {
+@Table(name = "case_events")
+public class CaseEvent {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "timeline_id")
+  @Column(name = "case_event_id")
   private Integer id;
 
   @Column(name = "subject")
   @Enumerated(EnumType.STRING)
-  private TimelineEventSubject timelineEventSubject;
+  private CaseEventSubject caseEventSubject;
 
   private Integer scapId;
 
@@ -30,22 +30,24 @@ public class TimelineEvent {
 
   private Instant eventTime;
 
-  private Long eventBy;
+  @Column(name = "event_by")
+  private Long eventByWuaId;
+  private String comments;
 
-  public TimelineEvent() {
+  public CaseEvent() {
   }
 
   @VisibleForTesting
-  public TimelineEvent(Integer id) {
+  public CaseEvent(Integer id) {
     this.id = id;
   }
 
-  public TimelineEventSubject getTimelineEventSubject() {
-    return timelineEventSubject;
+  public CaseEventSubject getTimelineEventSubject() {
+    return caseEventSubject;
   }
 
-  public void setTimelineEventSubject(TimelineEventSubject timelineEventSubject) {
-    this.timelineEventSubject = timelineEventSubject;
+  public void setCaseEventSubject(CaseEventSubject caseEventSubject) {
+    this.caseEventSubject = caseEventSubject;
   }
 
   public Integer getScapId() {
@@ -72,11 +74,19 @@ public class TimelineEvent {
     this.eventTime = eventTime;
   }
 
-  public Long getEventBy() {
-    return eventBy;
+  public Long getEventByWuaId() {
+    return eventByWuaId;
   }
 
-  public void setEventBy(Long eventBy) {
-    this.eventBy = eventBy;
+  public void setEventByWuaId(Long eventByWuaId) {
+    this.eventByWuaId = eventByWuaId;
+  }
+
+  public String getComments() {
+    return comments;
+  }
+
+  public void setComments(String comments) {
+    this.comments = comments;
   }
 }

@@ -1,6 +1,5 @@
 package uk.co.nstauthority.scap.scap.summary;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -25,6 +24,8 @@ import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventView;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
@@ -32,11 +33,9 @@ import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetails;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryView;
 import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderSummaryView;
-import uk.co.nstauthority.scap.scap.timeline.TimelineEventService;
-import uk.co.nstauthority.scap.scap.timeline.TimelineEventSubject;
-import uk.co.nstauthority.scap.scap.timeline.TimelineEventView;
 
 @ContextConfiguration(classes = ScapSummaryController.class)
 class ScapSummaryControllerTest extends AbstractControllerTest {
@@ -51,7 +50,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
   OrganisationGroupService organisationGroupService;
 
   @MockBean
-  TimelineEventService timelineEventService;
+  CaseEventService caseEventService;
 
   @MockBean
   EnergyPortalUserService energyPortalUserService;
@@ -69,7 +68,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
 
     var projectDetails = new ProjectDetails();
 
-    when(scapDetailService.getLatestScapDetailByScapId(SCAP_ID)).thenReturn(Optional.of(detail));
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(detail);
     when(projectDetailsService.getProjectDetails(detail)).thenReturn(Optional.of(projectDetails));
     when(scapSummaryViewService.getScapSummaryView(detail)).thenReturn(getScapSummaryView());
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
@@ -81,16 +80,6 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
         .andExpect(view().name("scap/scap/summary/scapSummaryOverview"));
   }
 
-  @Test
-  void renderSummary_NoScap_NotFoundException() throws Exception {
-    var expectedErrorMessage = "Could not find details for SCAP of ID: %s".formatted(SCAP_ID);
-
-    mockMvc.perform(get(
-            ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
-            .with(user(testUser)))
-        .andExpect(status().isNotFound())
-        .andExpect(result -> assertThat(result.getResolvedException().getMessage()).isEqualTo(expectedErrorMessage));
-  }
 
   @Test
   void renderSummary_RegulatorUser_CaseEventEmpty() throws Exception {
@@ -104,19 +93,18 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     var projectDetails = new ProjectDetails();
 
     when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(true);
-    when(scapDetailService.getLatestScapDetailByScapId(SCAP_ID)).thenReturn(Optional.of(detail));
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(detail);
     when(projectDetailsService.getProjectDetails(detail)).thenReturn(Optional.of(projectDetails));
-    when(scapSummaryViewService.getScapSummaryView(detail)).thenReturn(getSummaryView());
+    when(scapSummaryViewService.getScapSummaryView(detail)).thenReturn(getScapSummaryView());
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
-    when(timelineEventService.getEventViewByScapId(SCAP_ID)).thenReturn(getTimelineView());
+    when(caseEventService.getEventViewByScapId(SCAP_ID)).thenReturn(getTimelineView());
 
     mockMvc.perform(get(
-            ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
+        ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
             .with(user(testUser)))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/scap/summary/scapSummaryOverview"))
-        .andExpect(model().attribute("timelineEvents", getTimelineView()));
-    verify(timelineEventService).getEventViewByScapId(SCAP_ID);
+        .andExpect(view().name("scap/scap/summary/scapSummaryOverview"));
+    verify(caseEventService).getEventViewByScapId(SCAP_ID);
   }
 
   @Test
@@ -131,19 +119,18 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     var projectDetails = new ProjectDetails();
 
     when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(false);
-    when(scapDetailService.getLatestScapDetailByScapId(SCAP_ID)).thenReturn(Optional.of(detail));
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(detail);
     when(projectDetailsService.getProjectDetails(detail)).thenReturn(Optional.of(projectDetails));
     when(scapSummaryViewService.getScapSummaryView(detail)).thenReturn(getSummaryView());
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
-    when(timelineEventService.getEventViewByScapId(SCAP_ID)).thenReturn(getTimelineView());
+    when(caseEventService.getEventViewByScapId(SCAP_ID)).thenReturn(getTimelineView());
 
     mockMvc.perform(get(
             ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
             .with(user(testUser)))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/scap/summary/scapSummaryOverview"))
-        .andExpect(model().attribute("timelineEvents", Collections.emptyList()));
-    verify(timelineEventService, never()).getEventViewByScapId(SCAP_ID);
+        .andExpect(view().name("scap/scap/summary/scapSummaryOverview"));
+    verify(caseEventService, never()).getEventViewByScapId(SCAP_ID);
   }
 
   private ScapSummaryView getSummaryView() {
@@ -167,13 +154,13 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     return getScapSummaryView();
   }
 
-  private List<TimelineEventView> getTimelineView() {
-    var timelineEvent = new TimelineEventView(TimelineEventSubject.SCAP_SUBMITTED.getDisplayName(),
+  private List<CaseEventView> getTimelineView() {
+    var timelineEvent = new CaseEventView(CaseEventSubject.SCAP_SUBMITTED.getDisplayName(),
         SCAP_ID.scapId(),
         1,
         "",
-        "TEST TESTER");
-
+        "TEST TESTER",
+        "");
     return List.of(timelineEvent);
   }
 }

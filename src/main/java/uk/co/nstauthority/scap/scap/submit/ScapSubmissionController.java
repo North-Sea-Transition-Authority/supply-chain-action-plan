@@ -1,7 +1,7 @@
 package uk.co.nstauthority.scap.scap.submit;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-import static uk.co.nstauthority.scap.scap.timeline.TimelineEventSubject.SCAP_SUBMITTED;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_SUBMITTED;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +20,7 @@ import uk.co.nstauthority.scap.error.exception.ScapBadRequestException;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
@@ -28,7 +29,6 @@ import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 import uk.co.nstauthority.scap.scap.tasklist.ScapTaskListItem;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
-import uk.co.nstauthority.scap.scap.timeline.TimelineEventService;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @Controller
@@ -44,23 +44,23 @@ class ScapSubmissionController {
   private final ScapService scapService;
   private final ScapDetailService scapDetailService;
   private final ScapSummaryViewService scapSummaryViewService;
-  private final TimelineEventService timelineEventService;
+  private final CaseEventService caseEventService;
   private final List<ScapTaskListItem> scapTaskListItems;
   private final ReviewAndSubmitFormService reviewAndSubmitFormService;
   private final ControllerHelperService controllerHelperService;
-
 
   @Autowired
   ScapSubmissionController(ScapService scapService,
                            ScapDetailService scapDetailService,
                            ScapSummaryViewService scapSummaryViewService,
-                           TimelineEventService timelineEventService, List<ScapTaskListItem> scapTaskListItems,
+                           CaseEventService caseEventService,
+                           List<ScapTaskListItem> scapTaskListItems,
                            ReviewAndSubmitFormService reviewAndSubmitFormService,
                            ControllerHelperService controllerHelperService) {
     this.scapService = scapService;
     this.scapDetailService = scapDetailService;
     this.scapSummaryViewService = scapSummaryViewService;
-    this.timelineEventService = timelineEventService;
+    this.caseEventService = caseEventService;
     this.scapTaskListItems = scapTaskListItems;
     this.reviewAndSubmitFormService = reviewAndSubmitFormService;
     this.controllerHelperService = controllerHelperService;
@@ -103,7 +103,7 @@ class ScapSubmissionController {
         form,
         () -> {
           scapDetailService.submitScap(scapDetail, form);
-          timelineEventService.recordNewEvent(SCAP_SUBMITTED, scapId, scapDetail.getVersionNumber());
+          caseEventService.recordNewEvent(SCAP_SUBMITTED, scapId, scapDetail.getVersionNumber(), null);
 
           return ReverseRouter.redirect(on(ScapSubmissionController.class).renderScapSubmissionSuccess(scapId));
         }

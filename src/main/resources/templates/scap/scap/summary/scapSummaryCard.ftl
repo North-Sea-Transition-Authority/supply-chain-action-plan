@@ -7,7 +7,7 @@
     <@fdsDataItems.dataValues key="SCAP submission status"  value=scapSubmissionStatus></@fdsDataItems.dataValues>
   </@fdsDataItems.dataItem>
   <@fdsDataItems.dataItem>
-    <@fdsDataItems.dataValues key="Operator"  value=operator></@fdsDataItems.dataValues>
+    <@fdsDataItems.dataValues key="Operator" value=operator!''></@fdsDataItems.dataValues>
     <@fdsDataItems.dataValues key=""  value=""></@fdsDataItems.dataValues>
   </@fdsDataItems.dataItem>
 </#macro>

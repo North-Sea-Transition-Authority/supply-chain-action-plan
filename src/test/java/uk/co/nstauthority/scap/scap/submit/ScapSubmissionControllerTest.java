@@ -41,8 +41,8 @@ import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 import uk.co.nstauthority.scap.scap.tasklist.ScapTaskListItem;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
-import uk.co.nstauthority.scap.scap.timeline.TimelineEventService;
-import uk.co.nstauthority.scap.scap.timeline.TimelineEventSubject;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,7 +54,7 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
   ScapSummaryViewService scapSummaryViewService;
 
   @MockBean
-  TimelineEventService timelineEventService;
+  CaseEventService caseEventService;
 
   @MockBean
   List<ScapTaskListItem> scapTaskListItems;
@@ -132,9 +132,10 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
         .andExpect(redirectedUrl(expectedRedirectUrl));
 
     verify(scapDetailService).submitScap(eq(scapDetail), any());
-    verify(timelineEventService).recordNewEvent(eq(TimelineEventSubject.SCAP_SUBMITTED),
-        any(ScapId.class),
-        eq(scapDetail.getVersionNumber()));
+    verify(caseEventService).recordNewEvent(eq(CaseEventSubject.SCAP_SUBMITTED),
+        eq(SCAP_ID),
+        eq(scapDetail.getVersionNumber()),
+        eq(null));
   }
 
   @Test
@@ -154,7 +155,7 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
         .andExpect(status().isOk());
 
     verify(scapDetailService, never()).submitScap(any(), any());
-    verifyNoInteractions(timelineEventService);
+    verifyNoInteractions(caseEventService);
   }
 
   @Test
@@ -171,9 +172,8 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
         ReverseRouter.route(on(ScapSubmissionController.class).submitScap(SCAP_ID, null, emptyBindingResult())))
             .with(csrf()))
         .andExpect(status().isBadRequest());
-
-    verify(scapDetailService, never()).submitScap(any(), any());
-    verifyNoInteractions(timelineEventService);
+    verify(scapDetailService, never()).submitScap(eq(scapDetail), any());
+    verifyNoInteractions(caseEventService);
   }
 
   @Test
