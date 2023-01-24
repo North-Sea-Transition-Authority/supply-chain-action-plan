@@ -1,7 +1,7 @@
 package uk.co.nstauthority.scap.scap.casemanagement;
 
 public enum CaseEventSubject {
-  QA_COMMENT(CaseEventAction.QA, "QA comment added"),
+  QA_COMMENT(CaseEventAction.QA, "QA checks completed"),
   FURTHER_INFO_REQUESTED(CaseEventAction.INFO_REQUESTED, "Addional Information Requested"),
   SCAP_SUBMITTED(CaseEventAction.SUBMIT, "Submitted SCAP"),
   CONSULTATION_REQUESTED(CaseEventAction.CONSULTATION_REQUESTED, "Consultation Requested");
