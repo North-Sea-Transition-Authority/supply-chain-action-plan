@@ -5,7 +5,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -17,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
@@ -24,6 +24,7 @@ import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventView;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
@@ -33,7 +34,6 @@ import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetails;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
-import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryView;
 import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderSummaryView;
 
@@ -55,22 +55,29 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
   @MockBean
   EnergyPortalUserService energyPortalUserService;
 
+  private ScapDetail scapDetail;
+
   private static final ScapId SCAP_ID = new ScapId(1000);
+
+  @BeforeEach
+  void setup() {
+    var scap = new Scap(SCAP_ID);
+    scap.setReference("TEST PROJECT NAME");
+    scapDetail = new ScapDetail();
+    scapDetail.setScap(scap);
+    scapDetail.setStatus(ScapDetailStatus.DRAFT);
+
+    when(scapService.getScapById(SCAP_ID.scapId())).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+  }
 
   @Test
   void renderSummary_fullSCAPDetails() throws Exception {
-    var scap = new Scap();
-    scap.setReference("TEST PROJECT NAME");
-
-    var detail = new ScapDetail();
-    detail.setStatus(ScapDetailStatus.DRAFT);
-    detail.setScap(scap);
-
     var projectDetails = new ProjectDetails();
 
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(detail);
-    when(projectDetailsService.getProjectDetails(detail)).thenReturn(Optional.of(projectDetails));
-    when(scapSummaryViewService.getScapSummaryView(detail)).thenReturn(getScapSummaryView());
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
+    when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
 
     mockMvc.perform(get(
@@ -83,19 +90,13 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
 
   @Test
   void renderSummary_RegulatorUser_CaseEventEmpty() throws Exception {
-    var scap = new Scap();
-    scap.setReference("TEST PROJECT NAME");
-
-    var detail = new ScapDetail();
-    detail.setStatus(ScapDetailStatus.DRAFT);
-    detail.setScap(scap);
-
     var projectDetails = new ProjectDetails();
 
+    when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(true);
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(detail);
-    when(projectDetailsService.getProjectDetails(detail)).thenReturn(Optional.of(projectDetails));
-    when(scapSummaryViewService.getScapSummaryView(detail)).thenReturn(getScapSummaryView());
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
+    when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
     when(caseEventService.getEventViewByScapId(SCAP_ID)).thenReturn(getTimelineView());
 
@@ -109,19 +110,12 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
 
   @Test
   void renderSummary_IndustryUser_CaseEventEmpty() throws Exception {
-    var scap = new Scap();
-    scap.setReference("TEST PROJECT NAME");
-
-    var detail = new ScapDetail();
-    detail.setStatus(ScapDetailStatus.DRAFT);
-    detail.setScap(scap);
-
     var projectDetails = new ProjectDetails();
 
     when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(false);
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(detail);
-    when(projectDetailsService.getProjectDetails(detail)).thenReturn(Optional.of(projectDetails));
-    when(scapSummaryViewService.getScapSummaryView(detail)).thenReturn(getSummaryView());
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
+    when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getSummaryView());
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
     when(caseEventService.getEventViewByScapId(SCAP_ID)).thenReturn(getTimelineView());
 

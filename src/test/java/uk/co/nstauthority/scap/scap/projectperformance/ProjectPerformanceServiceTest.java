@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 @ExtendWith(MockitoExtension.class)
 class ProjectPerformanceServiceTest {
 

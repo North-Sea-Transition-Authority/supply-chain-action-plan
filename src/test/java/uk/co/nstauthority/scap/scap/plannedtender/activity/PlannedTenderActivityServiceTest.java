@@ -29,6 +29,7 @@ import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTender;
 import uk.co.nstauthority.scap.utils.EntityTestingUtil;
 
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 @ExtendWith(MockitoExtension.class)
 class PlannedTenderActivityServiceTest {
 

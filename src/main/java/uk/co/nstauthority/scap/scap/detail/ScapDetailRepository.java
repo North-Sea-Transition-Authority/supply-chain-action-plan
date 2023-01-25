@@ -10,4 +10,6 @@ public interface ScapDetailRepository extends CrudRepository<ScapDetail, Integer
   List<ScapDetail> findAllByScap(Scap scap);
 
   Optional<ScapDetail> findFirstByScapIdAndTipFlag(Integer scapId, boolean tipFlag);
+
+  Optional<ScapDetail> findByScapIdAndVersionNumber(Integer scapId, Integer versionNumber);
 }

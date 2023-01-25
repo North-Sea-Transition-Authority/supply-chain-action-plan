@@ -24,6 +24,7 @@ import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 @ExtendWith(MockitoExtension.class)
 class ContractingPerformanceServiceTest {
 

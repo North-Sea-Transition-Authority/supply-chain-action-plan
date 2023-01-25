@@ -14,10 +14,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerBodyLine;
 import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerType;
 import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerView;
+import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipantService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContractService;
+import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverviewService;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,6 +36,12 @@ class DeleteActualTenderActivityServiceTest {
 
   @Mock
   ContractingPerformanceService contractingPerformanceService;
+
+  @Mock
+  ActualTenderService actualTenderService;
+
+  @Mock
+  ContractingPerformanceOverviewService contractingPerformanceOverviewService;
 
   @InjectMocks
   DeleteActualTenderActivityService deleteActualTenderActivityService;

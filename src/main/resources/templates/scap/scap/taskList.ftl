@@ -7,6 +7,13 @@ pageHeading=pageTitle
 pageSize=PageSize.TWO_THIRDS_COLUMN
 backLinkUrl=springUrl(backLinkUrl)
 >
+  <@fdsAction.link
+    linkText="Delete SCAP"
+    linkUrl=springUrl(deleteScapUrl)
+    linkClass="govuk-button govuk-button--secondary"
+    role=true
+  />
+
   <@standardTaskList taskListSections=taskListSections />
 </@defaultPage>
 

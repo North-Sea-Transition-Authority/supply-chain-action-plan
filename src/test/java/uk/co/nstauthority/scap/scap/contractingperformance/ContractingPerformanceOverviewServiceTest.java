@@ -139,5 +139,4 @@ class ContractingPerformanceOverviewServiceTest {
         contractingPerformanceOverviewId
     );
   }
-
 }

@@ -9,10 +9,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventView;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 
@@ -47,6 +49,7 @@ public class ScapSummaryController {
   }
 
   @GetMapping
+  @ScapHasStatus(permittedStatuses = {ScapDetailStatus.DRAFT, ScapDetailStatus.SUBMITTED})
   public ModelAndView getScapSummary(@PathVariable("scapId") ScapId scapId) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
     var scapSummary = scapSummaryViewService.getScapSummaryView(scapDetail);

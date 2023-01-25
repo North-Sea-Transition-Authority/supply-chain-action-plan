@@ -63,11 +63,34 @@ public class ScapDetailService {
         ));
   }
 
+  public Optional<ScapDetail> getByScapIdAndVersionNumber(ScapId scapId, Integer versionNumber) {
+    return scapDetailRepository.findByScapIdAndVersionNumber(scapId.scapId(), versionNumber);
+  }
+
   @Transactional
   public void submitScap(ScapDetail scapDetail, ReviewAndSubmitForm form) {
     scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
     scapDetail.setSubmittedTimestamp(clock.instant());
     scapDetail.setApprovedByStakeholders(form.getApprovedByStakeholders());
+    scapDetailRepository.save(scapDetail);
+  }
+
+  @Transactional
+  public void deleteScapById(ScapId scapId) {
+    var scapDetail = getLatestScapDetailByScapIdOrThrow(scapId);
+    if (scapDetail.getVersionNumber() != 1) {
+      var previousVersion = scapDetail.getVersionNumber() - 1;
+      getByScapIdAndVersionNumber(scapId, previousVersion)
+          .ifPresent(previousScapDetail -> {
+            previousScapDetail.setTipFlag(true);
+            scapDetailRepository.save(previousScapDetail);
+          });
+    }
+
+    scapDetail.setVersionNumber(-1);
+    scapDetail.setTipFlag(false);
+    scapDetail.setStatus(ScapDetailStatus.DELETED);
+
     scapDetailRepository.save(scapDetail);
   }
 }

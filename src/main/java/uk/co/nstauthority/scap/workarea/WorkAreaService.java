@@ -112,10 +112,11 @@ class WorkAreaService {
     return ScapSubmissionStage.DRAFT;
   }
 
+  @SuppressWarnings("SwitchStatementWithTooFewBranches")
   private Function<WorkAreaItemDto, Instant> sortByItemDate() {
     return dto -> switch (dto.status()) {
-      case DRAFT -> dto.createdTimestamp();
       case SUBMITTED -> dto.submittedTimestamp();
+      default -> dto.createdTimestamp();
     };
   }
 }

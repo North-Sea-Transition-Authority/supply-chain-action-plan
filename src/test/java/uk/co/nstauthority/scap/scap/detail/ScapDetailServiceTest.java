@@ -3,6 +3,10 @@ package uk.co.nstauthority.scap.scap.detail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -161,6 +165,44 @@ class ScapDetailServiceTest {
         clock.instant(),
         false
     );
+  }
+
+  @Test
+  void deleteScapDetail_WhenNotFirstDraft() {
+    var versionNumber = 2;
+    var latestScapDetail = mock(ScapDetail.class);
+    var previousScapDetail = mock(ScapDetail.class);
+
+    doReturn(Optional.of(latestScapDetail)).when(scapDetailRepository).findFirstByScapIdAndTipFlag(scap.getId(), true);
+    doReturn(versionNumber).when(latestScapDetail).getVersionNumber();
+    doReturn(Optional.of(previousScapDetail)).when(scapDetailRepository).findByScapIdAndVersionNumber(scap.getId(), versionNumber - 1);
+
+    scapDetailService.deleteScapById(scap.getScapId());
+
+    verify(previousScapDetail).setTipFlag(true);
+    verify(scapDetailRepository).save(previousScapDetail);
+
+    verify(latestScapDetail).setVersionNumber(-1);
+    verify(latestScapDetail).setTipFlag(false);
+    verify(latestScapDetail).setStatus(ScapDetailStatus.DELETED);
+    verify(scapDetailRepository).save(latestScapDetail);
+  }
+
+  @Test
+  void deleteScapDetail_WhenFirstDraft() {
+    var versionNumber = 1;
+    var latestScapDetail = mock(ScapDetail.class);
+
+    doReturn(Optional.of(latestScapDetail)).when(scapDetailRepository).findFirstByScapIdAndTipFlag(scap.getId(), true);
+    doReturn(versionNumber).when(latestScapDetail).getVersionNumber();
+
+    scapDetailService.deleteScapById(scap.getScapId());
+
+    verify(latestScapDetail).setVersionNumber(-1);
+    verify(latestScapDetail).setTipFlag(false);
+    verify(latestScapDetail).setStatus(ScapDetailStatus.DELETED);
+    verify(scapDetailRepository, never()).findByScapIdAndVersionNumber(any(), any());
+    verify(scapDetailRepository).save(latestScapDetail);
   }
 
   private ServiceUserDetail getUserDetail() {

@@ -24,6 +24,7 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ContractStage;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
 
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 @ExtendWith(MockitoExtension.class)
 class AwardedContractServiceTest {
 

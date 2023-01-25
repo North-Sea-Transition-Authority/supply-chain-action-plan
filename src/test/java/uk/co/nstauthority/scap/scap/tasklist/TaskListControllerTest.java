@@ -17,6 +17,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.scap.delete.ScapDeletionController;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = TaskListController.class)
@@ -31,14 +32,15 @@ class TaskListControllerTest extends AbstractScapSubmitterControllerTest {
 
   @Test
   void renderTaskList() throws Exception {
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
 
     mockMvc.perform(
         get(ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/taskList"))
         .andExpect(model().attribute("backLinkUrl", TaskListController.WORK_AREA_URL))
-        .andExpect(model().attribute("taskListSections", Collections.emptyList()));
+        .andExpect(model().attribute("taskListSections", Collections.emptyList()))
+        .andExpect(model().attribute("deleteScapUrl",
+            ReverseRouter.route(on(ScapDeletionController.class).renderScapDeletionConfirmation(SCAP_ID))));
   }
-
 }

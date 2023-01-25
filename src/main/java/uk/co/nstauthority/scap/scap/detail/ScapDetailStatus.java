@@ -4,7 +4,8 @@ import uk.co.nstauthority.scap.enumutil.Displayable;
 
 public enum ScapDetailStatus implements Displayable {
   SUBMITTED("Submitted", 10),
-  DRAFT("Draft", 20);
+  DRAFT("Draft", 20),
+  DELETED("Deleted", 100);
 
   private final String displayName;
   private final Integer displayOrder;

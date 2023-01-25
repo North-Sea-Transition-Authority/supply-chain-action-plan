@@ -57,6 +57,7 @@ class FileUploadServiceTest {
     verify(uploadedFilePersistenceService).deleteFile(uploadedFile);
   }
 
+  @SuppressWarnings("resource")
   @Test
   void downloadFile_VerifyInteractions() {
     fileUploadService.downloadFile(uploadedFile);
