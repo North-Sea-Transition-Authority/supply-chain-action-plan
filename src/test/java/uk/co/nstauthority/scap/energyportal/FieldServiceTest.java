@@ -97,39 +97,46 @@ class FieldServiceTest {
         .build();
     var argumentCaptor = ArgumentCaptor.forClass(FieldProjectionRoot.class);
 
-    when(fieldApi.findFieldById(eq(requestedFieldId), any(FieldProjectionRoot.class), eq(requestPurpose)))
+    when(fieldApi.findFieldById(eq(requestedFieldId), any(FieldProjectionRoot.class), any(RequestPurpose.class)))
         .thenReturn(Optional.of(field));
 
     var returnedField = fieldService.getFieldById(requestedFieldId, requestPurpose);
 
     verify(fieldApi)
-        .findFieldById(eq(requestedFieldId), argumentCaptor.capture(), eq(requestPurpose));
+        .findFieldById(eq(requestedFieldId), argumentCaptor.capture(), requestPurposeArgumentCaptor.capture());
     var requestedParams = argumentCaptor.getValue().getFields();
     assertThat(requestedParams).containsExactly(
         entry("fieldId", null),
         entry("fieldName", null)
     );
     assertThat(returnedField).contains(field);
+    assertThat(requestPurposeArgumentCaptor.getValue().purpose()).isEqualTo(requestPurpose);
   }
 
   @Test
   void doesFieldExist_doesExist_assertTrue() {
     var existingFieldId = 1;
     var purpose = "Validate that Field exists for SCAP project details";
-    when(fieldApi.findFieldById(eq(existingFieldId), any(FieldProjectionRoot.class), eq(purpose)))
+    when(fieldApi.findFieldById(eq(existingFieldId), any(FieldProjectionRoot.class), any(RequestPurpose.class)))
         .thenReturn(Optional.of(fields.get(0)));
 
     assertTrue(fieldService.doesFieldExist(1));
+
+    verify(fieldApi).findFieldById(eq(existingFieldId), any(FieldProjectionRoot.class), requestPurposeArgumentCaptor.capture());
+    assertThat(requestPurposeArgumentCaptor.getValue().purpose()).isEqualTo(purpose);
   }
 
   @Test
   void doesFieldExist_doesNotExist_assertFalse() {
     var existingFieldId = 3;
     var purpose = "Validate that Field exists for SCAP project details";
-    when(fieldApi.findFieldById(eq(existingFieldId), any(FieldProjectionRoot.class), eq(purpose)))
+    when(fieldApi.findFieldById(eq(existingFieldId), any(FieldProjectionRoot.class), any(RequestPurpose.class)))
         .thenReturn(Optional.empty());
 
     assertFalse(fieldService.doesFieldExist(3));
+
+    verify(fieldApi).findFieldById(eq(existingFieldId), any(FieldProjectionRoot.class), requestPurposeArgumentCaptor.capture());
+    assertThat(requestPurposeArgumentCaptor.getValue().purpose()).isEqualTo(purpose);
   }
 
   @Test

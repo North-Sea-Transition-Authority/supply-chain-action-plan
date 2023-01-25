@@ -49,14 +49,14 @@ public class FieldService {
 
   public Optional<Field> getFieldById(Integer id, String requestPurpose) {
     var requestedFields = new FieldProjectionRoot().fieldId().fieldName();
-    return fieldApi.findFieldById(id, requestedFields, requestPurpose);
+    return fieldApi.findFieldById(id, requestedFields, new RequestPurpose(requestPurpose));
   }
 
   public boolean doesFieldExist(Integer id) {
     return fieldApi.findFieldById(
         id,
         new FieldProjectionRoot().fieldId(),
-        "Validate that Field exists for SCAP project details")
+        new RequestPurpose("Validate that Field exists for SCAP project details"))
         .isPresent();
   }
 }
