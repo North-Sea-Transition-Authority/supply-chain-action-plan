@@ -36,14 +36,29 @@ steps:
       - npm install
       - npx gulp buildAll
 
-  - name: build-backend
-    image: eclipse-temurin:17-jdk
+  - name: build-java
+    image: quay.io/testcontainers/dind-drone-plugin
+    privileged: true
+    # See https://confluence.fivium.co.uk/display/JAVA/Testcontainers
     environment:
-      SONAR_TOKEN:
-        from_secret: sonarcloud_token
-    commands:
-      - chmod +x gradlew
-      - ./gradlew checkstyleMain test bootJar
+      CI_WORKSPACE: /drone/src
+      GRADLE_USER_HOME: /drone/src/gradle_cache
+      DOCKER_CONFIG_JSON:
+        from_secret: docker_config
+      DOCKER_CONFIG: /drone/dockerconfig # testcontainers override location for Docker config JSON
+    volumes:
+      - name: docker-cache-overlay2
+        path: /drone/docker/overlay2
+      - name: docker-cache-image
+        path: /drone/docker/image
+    settings:
+      storage_driver: overlay2 --dns=192.168.10.1
+      cmd:
+        - mkdir /drone/dockerconfig
+        - echo $DOCKER_CONFIG_JSON > /drone/dockerconfig/config.json
+        - chmod +x gradlew
+        - ./gradlew checkstyleMain test bootJar --continue --parallel --max-workers=3
+      build_image: repo1.dev.fivium.local:5000/docker-compose-java17
 
   - name: sync-reports
     image: alpine:3.16.0
@@ -188,6 +203,14 @@ volumes:
     host:
       path: /root/.cache/
 
+  - name: docker-cache-overlay2
+    host:
+      path: /home/fivium/docker-drone-cache-v2/overlay2
+
+  - name: docker-cache-image
+    host:
+      path: /home/fivium/docker-drone-cache-v2/image
+
 ---
 kind: pipeline
 type: docker
@@ -240,15 +263,28 @@ steps:
 
   # This is in the PR pipeline so the code-analysis below can access the test data (to see coverage)
   - name: test
-    image: eclipse-temurin:17-jdk
+    image: quay.io/testcontainers/dind-drone-plugin
+    privileged: true
+    # See https://confluence.fivium.co.uk/display/JAVA/Testcontainers
     environment:
+      CI_WORKSPACE: /drone/src
       GRADLE_USER_HOME: /drone/src/gradle_cache
+      DOCKER_CONFIG_JSON:
+        from_secret: docker_config
+      DOCKER_CONFIG: /drone/dockerconfig # testcontainers override location for Docker config JSON
     volumes:
-      - name: localtime
-        path: /etc/localtime
-    commands:
-      - chmod +x gradlew
-      - ./gradlew test
+      - name: docker-cache-overlay2
+        path: /drone/docker/overlay2
+      - name: docker-cache-image
+        path: /drone/docker/image
+    settings:
+      storage_driver: overlay2 --dns=192.168.10.1
+      cmd:
+        - mkdir /drone/dockerconfig
+        - echo $DOCKER_CONFIG_JSON > /drone/dockerconfig/config.json
+        - chmod +x gradlew
+        - ./gradlew checkstyleMain test bootJar --continue --parallel --max-workers=3
+      build_image: repo1.dev.fivium.local:5000/docker-compose-java17
 
   # This is in the PR pipeline as only PR events get the necessary information for proper github integration
   - name: code-analysis
@@ -283,6 +319,14 @@ volumes:
   - name: drone-cache
     host:
       path: /home/fivium/drone-cache
+
+  - name: docker-cache-overlay2
+    host:
+      path: /home/fivium/docker-drone-cache-v2/overlay2
+
+  - name: docker-cache-image
+    host:
+      path: /home/fivium/docker-drone-cache-v2/image
 
 ---
 

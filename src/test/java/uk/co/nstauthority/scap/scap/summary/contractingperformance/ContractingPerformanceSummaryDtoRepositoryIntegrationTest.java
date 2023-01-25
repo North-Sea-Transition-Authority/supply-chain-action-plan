@@ -5,13 +5,14 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import uk.co.nstauthority.scap.IntegrationTest;
+import uk.co.nstauthority.scap.integrationtest.AbstractIntegrationTest;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
+import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
 import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContract;
@@ -22,11 +23,10 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 
 @Transactional
-@IntegrationTest
-class ContractingPerformanceSummaryDtoRepositoryIntegrationTest {
+class ContractingPerformanceSummaryDtoRepositoryIntegrationTest extends AbstractIntegrationTest {
 
   @Autowired
-  TestEntityManager entityManager;
+  EntityManager entityManager;
 
   @Autowired
   ContractingPerformanceSummaryDtoRepository contractingPerformanceSummaryDtoRepository;
@@ -44,48 +44,56 @@ class ContractingPerformanceSummaryDtoRepositoryIntegrationTest {
   @BeforeEach
   void setup() {
     scap = new Scap(59803, Instant.now(), null);
+    scap.setReference("SCAP/2023/1");
     var otherScap = new Scap(4598, Instant.now(), null);
+    otherScap.setReference("SCAP/2023/2");
 
-    entityManager.persistAndFlush(scap);
-    entityManager.persistAndFlush(otherScap);
+    entityManager.persist(scap);
+    entityManager.persist(otherScap);
 
     var scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, Instant.now(), 0);
     var otherScapDetail = new ScapDetail(otherScap, 1, true, ScapDetailStatus.DRAFT, Instant.now(), 0);
 
-    entityManager.persistAndFlush(scapDetail);
-    entityManager.persistAndFlush(otherScapDetail);
+    entityManager.persist(scapDetail);
+    entityManager.persist(otherScapDetail);
 
     ContractingPerformanceOverview contractingPerformanceOverview = new ContractingPerformanceOverview(scapDetail,
         Instant.now());
     ContractingPerformanceOverview otherContractingPerformanceOverview = new ContractingPerformanceOverview(
         otherScapDetail, Instant.now());
 
-    entityManager.persistAndFlush(contractingPerformanceOverview);
-    entityManager.persistAndFlush(otherContractingPerformanceOverview);
+    entityManager.persist(contractingPerformanceOverview);
+    entityManager.persist(otherContractingPerformanceOverview);
 
-    actualTenderActivity1 = new ActualTenderActivity();
+    var actualTender = new ActualTender(scapDetail, Instant.now());
+    var otherActualTender = new ActualTender(otherScapDetail, Instant.now());
+
+    entityManager.persist(actualTender);
+    entityManager.persist(otherActualTender);
+
+    actualTenderActivity1 = new ActualTenderActivity(actualTender, Instant.now());
     actualTenderActivity1.setScopeTitle("scope title 1");
     actualTenderActivity1.setScopeDescription("some scope desc 1");
     actualTenderActivity1.setRemunerationModel(RemunerationModel.OTHER);
     actualTenderActivity1.setRemunerationModelName("some remuneration model name");
-    actualTenderActivity2 = new ActualTenderActivity();
+    actualTenderActivity2 = new ActualTenderActivity(actualTender, Instant.now());
     actualTenderActivity2.setScopeTitle("scope title 2");
     actualTenderActivity2.setScopeDescription("some scope desc 2");
     actualTenderActivity2.setRemunerationModel(RemunerationModel.LUMP_SUM);
-    var otherActualTenderActivity = new ActualTenderActivity();
+    var otherActualTenderActivity = new ActualTenderActivity(otherActualTender, Instant.now());
 
-    entityManager.persistAndFlush(actualTenderActivity1);
-    entityManager.persistAndFlush(actualTenderActivity2);
-    entityManager.persistAndFlush(otherActualTenderActivity);
+    entityManager.persist(actualTenderActivity1);
+    entityManager.persist(actualTenderActivity2);
+    entityManager.persist(otherActualTenderActivity);
 
     contractor1 = new InvitationToTenderParticipant(actualTenderActivity1, Instant.now(), "company name 1");
     contractor2 = new InvitationToTenderParticipant(actualTenderActivity2, Instant.now(), "company name 2");
     var otherContractor = new InvitationToTenderParticipant(otherActualTenderActivity,
         Instant.now(), "other company name");
 
-    entityManager.persistAndFlush(contractor1);
-    entityManager.persistAndFlush(contractor2);
-    entityManager.persistAndFlush(otherContractor);
+    entityManager.persist(contractor1);
+    entityManager.persist(contractor2);
+    entityManager.persist(otherContractor);
 
     awardedContract1 = new AwardedContract(actualTenderActivity1, Instant.now());
     awardedContract1.setAwardValue(BigDecimal.valueOf(58.03));
@@ -97,9 +105,9 @@ class ContractingPerformanceSummaryDtoRepositoryIntegrationTest {
     awardedContract2.setPreferredBidder(contractor2);
     var otherAwardedContract = new AwardedContract(otherActualTenderActivity, Instant.now());
 
-    entityManager.persistAndFlush(awardedContract1);
-    entityManager.persistAndFlush(awardedContract2);
-    entityManager.persistAndFlush(otherAwardedContract);
+    entityManager.persist(awardedContract1);
+    entityManager.persist(awardedContract2);
+    entityManager.persist(otherAwardedContract);
 
     contractingPerformance1 = new ContractingPerformance(contractingPerformanceOverview, Instant.now());
     contractingPerformance1.setActualTenderActivity(actualTenderActivity1);
@@ -111,9 +119,11 @@ class ContractingPerformanceSummaryDtoRepositoryIntegrationTest {
     contractingPerformance2.setOutturnRationale("some outturn rationale 2");
     var otherContractingPerformance = new ContractingPerformance(otherContractingPerformanceOverview, Instant.now());
 
-    entityManager.persistAndFlush(contractingPerformance1);
-    entityManager.persistAndFlush(contractingPerformance2);
-    entityManager.persistAndFlush(otherContractingPerformance);
+    entityManager.persist(contractingPerformance1);
+    entityManager.persist(contractingPerformance2);
+    entityManager.persist(otherContractingPerformance);
+
+    entityManager.flush();
   }
 
   @Test

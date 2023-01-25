@@ -54,7 +54,7 @@ dependencies {
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	// Using H2 for the tests as a temporary measure until a final decision is made on which database is being used.
-	testImplementation 'com.h2database:h2:2.1.214'
+  testImplementation 'org.testcontainers:postgresql:1.17.6'
   testImplementation 'org.springframework.security:spring-security-test'
 
 }

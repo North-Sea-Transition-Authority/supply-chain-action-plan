@@ -49,7 +49,7 @@ public class ActualTenderActivity {
     this.id = id;
   }
 
-  ActualTenderActivity(ActualTender actualTender, Instant createdTimestamp) {
+  public ActualTenderActivity(ActualTender actualTender, Instant createdTimestamp) {
     this.actualTender = actualTender;
     this.createdTimestamp = createdTimestamp;
   }

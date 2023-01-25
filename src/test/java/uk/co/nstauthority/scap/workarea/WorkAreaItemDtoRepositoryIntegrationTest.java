@@ -5,13 +5,13 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.time.Clock;
 import java.util.Collections;
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import uk.co.nstauthority.scap.IntegrationTest;
+import uk.co.nstauthority.scap.integrationtest.AbstractIntegrationTest;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverview;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
@@ -22,12 +22,11 @@ import uk.co.nstauthority.scap.scap.projectperformance.ProjectPerformance;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 
 @Transactional
-@IntegrationTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class WorkAreaItemDtoRepositoryIntegrationTest {
+class WorkAreaItemDtoRepositoryIntegrationTest extends AbstractIntegrationTest {
 
   @Autowired
-  TestEntityManager entityManager;
+  EntityManager entityManager;
 
   @Autowired
   WorkAreaItemDtoRepository workAreaItemDtoRepository;
@@ -63,15 +62,17 @@ class WorkAreaItemDtoRepositoryIntegrationTest {
     plannedTender = new PlannedTender(scapDetail, clock.instant());
     plannedTender.setHasPlannedTenders(true);
 
-    entityManager.persistAndFlush(scap);
-    entityManager.persistAndFlush(otherOrganisationScap);
-    entityManager.persistAndFlush(scapDetail);
-    entityManager.persistAndFlush(otherScapDetail);
-    entityManager.persistAndFlush(projectDetails);
-    entityManager.persistAndFlush(projectPerformance);
-    entityManager.persistAndFlush(contractingPerformanceOverview);
-    entityManager.persistAndFlush(actualTender);
-    entityManager.persistAndFlush(plannedTender);
+    entityManager.persist(scap);
+    entityManager.persist(otherOrganisationScap);
+    entityManager.persist(scapDetail);
+    entityManager.persist(otherScapDetail);
+    entityManager.persist(projectDetails);
+    entityManager.persist(projectPerformance);
+    entityManager.persist(contractingPerformanceOverview);
+    entityManager.persist(actualTender);
+    entityManager.persist(plannedTender);
+
+    entityManager.flush();
   }
 
   @Test
