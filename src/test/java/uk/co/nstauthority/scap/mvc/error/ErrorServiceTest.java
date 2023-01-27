@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -17,6 +18,7 @@ import uk.co.nstauthority.scap.branding.ServiceConfigurationProperties;
 import uk.co.nstauthority.scap.error.ErrorConfiguration;
 import uk.co.nstauthority.scap.error.ErrorConfigurationProperties;
 import uk.co.nstauthority.scap.error.ErrorService;
+import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
 import uk.co.nstauthority.scap.technicalsupport.TechnicalSupportConfigurationProperties;
 
 @ExtendWith(SpringExtension.class)
@@ -45,11 +47,14 @@ class ErrorServiceTest {
   @Autowired
   private ServiceBrandingConfigurationProperties serviceBrandingConfigurationProperties;
 
+  @MockBean
+  private TopNavigationService topNavigationService;
+
   private ErrorService errorService;
 
   @BeforeEach
   public void setup() {
-    errorService = new ErrorService(errorConfiguration);
+    errorService = new ErrorService(errorConfiguration, topNavigationService);
   }
 
   @Test

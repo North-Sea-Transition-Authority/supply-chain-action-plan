@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
@@ -19,9 +20,12 @@ public class ErrorService {
   private static final Logger LOGGER = LoggerFactory.getLogger(ErrorService.class);
   private static final String SAFE_CHARACTERS = "BCDFGHJKMPQRTVWXY346789";
 
+  private final TopNavigationService topNavigationService;
+
   @Autowired
-  public ErrorService(ErrorConfiguration errorConfiguration) {
+  public ErrorService(ErrorConfiguration errorConfiguration, TopNavigationService topNavigationService) {
     this.errorConfiguration = errorConfiguration;
+    this.topNavigationService = topNavigationService;
   }
 
   private String generateErrorReference() {
@@ -36,6 +40,7 @@ public class ErrorService {
     addCommonUrls(modelAndView);
     addBrandingConfigs(modelAndView);
     addTechnicalSupportConfigs(modelAndView);
+    addTopNavigation(modelAndView);
     return modelAndView;
   }
 
@@ -73,5 +78,9 @@ public class ErrorService {
       modelAndView.addObject("errorRef", errorReference);
       LOGGER.error("Caught unhandled exception (errorRef {})", errorReference, throwable);
     }
+  }
+
+  private void addTopNavigation(ModelAndView modelAndView) {
+    modelAndView.addObject("navigationItems", topNavigationService.getTopNavigationItems());
   }
 }
