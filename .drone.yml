@@ -57,7 +57,7 @@ steps:
         - mkdir /drone/dockerconfig
         - echo $DOCKER_CONFIG_JSON > /drone/dockerconfig/config.json
         - chmod +x gradlew
-        - ./gradlew checkstyleMain test bootJar --continue --parallel --max-workers=3
+        - ./gradlew generateJooq checkstyleMain test bootJar --continue --parallel --max-workers=3
       build_image: repo1.dev.fivium.local:5000/docker-compose-java17
 
   - name: sync-reports
@@ -262,7 +262,7 @@ steps:
       - npx gulp buildAll
 
   # This is in the PR pipeline so the code-analysis below can access the test data (to see coverage)
-  - name: test
+  - name: build-java
     image: quay.io/testcontainers/dind-drone-plugin
     privileged: true
     # See https://confluence.fivium.co.uk/display/JAVA/Testcontainers
@@ -283,7 +283,7 @@ steps:
         - mkdir /drone/dockerconfig
         - echo $DOCKER_CONFIG_JSON > /drone/dockerconfig/config.json
         - chmod +x gradlew
-        - ./gradlew checkstyleMain test bootJar --continue --parallel --max-workers=3
+        - ./gradlew generateJooq checkstyleMain test bootJar --continue --parallel --max-workers=3
       build_image: repo1.dev.fivium.local:5000/docker-compose-java17
 
   # This is in the PR pipeline as only PR events get the necessary information for proper github integration
