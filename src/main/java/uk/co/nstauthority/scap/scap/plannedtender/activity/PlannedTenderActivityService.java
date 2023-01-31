@@ -24,17 +24,9 @@ public class PlannedTenderActivityService {
 
   @Transactional
   public void createPlannedTenderDetail(PlannedTender plannedTender, PlannedTenderActivityForm form) {
-    var activity = new PlannedTenderActivity(
-        plannedTender,
-        form.getScopeDescription().getInputValue(),
-        form.getEstimatedValue().getAsBigDecimal()
-            .orElseThrow(() -> new ClassCastException("Could not cast this forms estimatedValue to BigDecimal")),
-        form.getRemunerationModel(),
-        form.getRemunerationModelName().getInputValue(),
-        form.getAwardRationale().getInputValue(),
-        clock.instant()
+    var activity = new PlannedTenderActivity(plannedTender, clock.instant()
     );
-    plannedTenderActivityRepository.save(activity);
+    updatePlannedTenderDetail(activity, form);
   }
 
   public List<PlannedTenderActivity> getTenderDetailsByPlannedTender(PlannedTender plannedTender) {
@@ -58,21 +50,36 @@ public class PlannedTenderActivityService {
   }
 
   @Transactional
-  public void updatePlannedTenderDetail(PlannedTenderActivity plannedTenderDetail, PlannedTenderActivityForm form) {
+  public void updatePlannedTenderDetail(PlannedTenderActivity plannedTenderActivity, PlannedTenderActivityForm form) {
     var estimatedValue = form.getEstimatedValue().getAsBigDecimal().orElseThrow(() ->
         new ClassCastException(
             String.format("Could not update planned tender detail with ID %d, as estimatedValue is not a BigDecimal",
-                plannedTenderDetail.getId())));
+                plannedTenderActivity.getId())));
 
-    plannedTenderDetail.setAwardRationale(form.getAwardRationale().getInputValue());
-    plannedTenderDetail.setEstimatedValue(estimatedValue);
-    plannedTenderDetail.setRemunerationModel(form.getRemunerationModel());
+    plannedTenderActivity.setAwardRationale(form.getAwardRationale().getInputValue());
+    plannedTenderActivity.setEstimatedValue(estimatedValue);
+    plannedTenderActivity.setRemunerationModel(form.getRemunerationModel());
     if (RemunerationModel.OTHER.equals(form.getRemunerationModel())) {
-      plannedTenderDetail.setRemunerationModelName(form.getRemunerationModelName().getInputValue());
+      plannedTenderActivity.setRemunerationModelName(form.getRemunerationModelName().getInputValue());
     } else {
-      plannedTenderDetail.setRemunerationModelName(null);
+      plannedTenderActivity.setRemunerationModelName(null);
     }
-    plannedTenderDetail.setScopeDescription(form.getScopeDescription().getInputValue());
-    plannedTenderActivityRepository.save(plannedTenderDetail);
+    plannedTenderActivity.setScopeDescription(form.getScopeDescription().getInputValue());
+    var expectedActualTenderStartDate = form.getIndicativeActualTenderStartDate()
+        .getAsLocalDate()
+        .orElseThrow(() -> new ClassCastException(
+            "Update failed for planned tender activity with ID %d, as indicativeActualTenderStartDate is not a LocalDate"
+                .formatted(plannedTenderActivity.getId())));
+    plannedTenderActivity.setExpectedActualTenderStartDate(expectedActualTenderStartDate);
+
+    var expectedContractAwardDate = form.getIndicativeContractAwardDate()
+        .getAsLocalDate()
+        .orElseThrow(() -> new ClassCastException(
+            "Update failed for planned tender activity with ID %d, as indicativeContractAwardDate is not a LocalDate"
+                .formatted(plannedTenderActivity.getId())));
+
+    plannedTenderActivity.setExpectedContractAwardDate(expectedContractAwardDate);
+
+    plannedTenderActivityRepository.save(plannedTenderActivity);
   }
 }

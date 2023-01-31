@@ -5,5 +5,6 @@ import java.math.BigDecimal;
 public record AwardedContractSummaryView(String preferredBidderName,
                                          BigDecimal awardValue,
                                          String awardRationale,
-                                         String preferredBidderCountry) {
+                                         String preferredBidderCountry,
+                                         String contractAwardDate) {
 }

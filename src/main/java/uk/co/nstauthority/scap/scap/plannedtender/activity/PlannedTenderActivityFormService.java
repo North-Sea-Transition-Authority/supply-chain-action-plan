@@ -19,13 +19,15 @@ public class PlannedTenderActivityFormService {
     return bindingResult;
   }
 
-  public PlannedTenderActivityForm getForm(PlannedTenderActivity plannedTenderDetail) {
+  public PlannedTenderActivityForm getForm(PlannedTenderActivity plannedTenderActivity) {
     var form = new PlannedTenderActivityForm();
-    form.setAwardRationale(plannedTenderDetail.getAwardRationale());
-    form.setRemunerationModelName(plannedTenderDetail.getRemunerationModelName());
-    form.setRemunerationModel(plannedTenderDetail.getRemunerationModel());
-    form.setScopeDescription(plannedTenderDetail.getScopeDescription());
-    form.setEstimatedValue(String.valueOf(plannedTenderDetail.getEstimatedValue()));
+    form.setAwardRationale(plannedTenderActivity.getAwardRationale());
+    form.setRemunerationModelName(plannedTenderActivity.getRemunerationModelName());
+    form.setRemunerationModel(plannedTenderActivity.getRemunerationModel());
+    form.setScopeDescription(plannedTenderActivity.getScopeDescription());
+    form.setEstimatedValue(String.valueOf(plannedTenderActivity.getEstimatedValue()));
+    form.setIndicativeActualTenderStartDate(plannedTenderActivity.getExpectedActualTenderStartDate());
+    form.setIndicativeContractAwardDate(plannedTenderActivity.getExpectedContractAwardDate());
     return form;
   }
 }

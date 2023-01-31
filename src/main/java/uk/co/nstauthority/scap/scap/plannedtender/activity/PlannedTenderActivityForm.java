@@ -1,7 +1,10 @@
 package uk.co.nstauthority.scap.scap.plannedtender.activity;
 
+import java.time.LocalDate;
+import java.util.Objects;
 import uk.co.fivium.formlibrary.input.DecimalInput;
 import uk.co.fivium.formlibrary.input.StringInput;
+import uk.co.fivium.formlibrary.input.ThreeFieldDateInput;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 
 public class PlannedTenderActivityForm {
@@ -16,11 +19,24 @@ public class PlannedTenderActivityForm {
 
   private final StringInput awardRationale;
 
+  private final ThreeFieldDateInput indicativeActualTenderStartDate;
+
+  private final ThreeFieldDateInput indicativeContractAwardDate;
+
+  static final String INDICATIVE_ACTUAL_TENDER_START_DATE_FIELD = "indicativeActualTenderStartDate";
+  static final String INDICATIVE_CONTRACT_AWARD_DATE_FIELD = "indicativeContractAwardDate";
+
   public PlannedTenderActivityForm() {
     this.scopeDescription = new StringInput("scopeDescription", "Scope description");
     this.estimatedValue = new DecimalInput("estimatedValue", "Estimated value");
     this.remunerationModelName = new StringInput("remunerationModelName", "Remuneration model");
     this.awardRationale = new StringInput("awardRationale", "Award rationale");
+    this.indicativeActualTenderStartDate = new ThreeFieldDateInput(
+        INDICATIVE_ACTUAL_TENDER_START_DATE_FIELD, "Indicative actual tender start date"
+    );
+    this.indicativeContractAwardDate = new ThreeFieldDateInput(
+        INDICATIVE_CONTRACT_AWARD_DATE_FIELD, "Indicative contract award date"
+    );
   }
 
   public StringInput getScopeDescription() {
@@ -61,5 +77,25 @@ public class PlannedTenderActivityForm {
 
   public void setAwardRationale(String awardRationale) {
     this.awardRationale.setInputValue(awardRationale);
+  }
+
+  public ThreeFieldDateInput getIndicativeActualTenderStartDate() {
+    return indicativeActualTenderStartDate;
+  }
+
+  public void setIndicativeActualTenderStartDate(LocalDate localDate) {
+    if (Objects.nonNull(localDate)) {
+      indicativeActualTenderStartDate.setDate(localDate);
+    }
+  }
+
+  public ThreeFieldDateInput getIndicativeContractAwardDate() {
+    return indicativeContractAwardDate;
+  }
+
+  public void setIndicativeContractAwardDate(LocalDate localDate) {
+    if (Objects.nonNull(localDate)) {
+      indicativeContractAwardDate.setDate(localDate);
+    }
   }
 }

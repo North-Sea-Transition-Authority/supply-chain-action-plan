@@ -36,6 +36,14 @@ backLinkUrl=springUrl(backLinkUrl)
       preselectedItems=preselectedCountry!{}
     />
 
+    <@fdsDateInput.dateInput
+      formId="actual-contract-award-date"
+      labelText="Contract award date"
+      dayPath="form.contractAwardDate.dayInput.inputValue"
+      monthPath="form.contractAwardDate.monthInput.inputValue"
+      yearPath="form.contractAwardDate.yearInput.inputValue"
+    />
+
     <@fdsAction.button buttonText="Save and continue"/>
   </@fdsForm.htmlForm>
 </@defaultPage>

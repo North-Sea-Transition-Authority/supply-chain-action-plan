@@ -14,7 +14,7 @@ backLinkUrl=springUrl(backLinkUrl)
     headingText="Planned tender activity"
   >
     <@fdsSummaryList.summaryList>
-      <@plannedTenderActivity.plannedTenderActivityRows plannedTenderDetail=plannedTenderDetail/>
+      <@plannedTenderActivity.plannedTenderActivityRows plannedTenderActivity=plannedTenderActivityView/>
     </@fdsSummaryList.summaryList>
   </@fdsSummaryList.summaryListWrapper>
 

@@ -10,6 +10,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,6 +70,7 @@ class AwardedContractFormValidatorTest {
     form.setAwardValue("1.41");
     form.setAwardRationale("test award rationale");
     form.setPreferredBidderCountryId(countryId);
+    form.setContractAwardDate(LocalDate.of(2000, 1, 1));
 
     when(countryService.doesCountryExist(countryId)).thenReturn(true);
 
@@ -85,13 +87,20 @@ class AwardedContractFormValidatorTest {
     validator.validate(form, bindingResult, new AwardedContractFormValidatorHint(bidParticipants));
 
     var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
+    var contractAwardDateField = AwardedContractForm.CONTRACT_AWARD_DATE_FIELD;
 
     verify(countryService, never()).doesCountryExist(any());
     assertThat(extractedErrors).containsExactly(
         entry("preferredBidderId", Set.of("preferredBidderId.required")),
         entry("awardValue.inputValue", Set.of("awardValue.required")),
         entry("awardRationale.inputValue", Set.of("awardRationale.required")),
-        entry("preferredBidderCountryId", Set.of("preferredBidderCountryId.required"))
+        entry("preferredBidderCountryId", Set.of("preferredBidderCountryId.required")),
+        entry("%s.dayInput.inputValue".formatted(contractAwardDateField),
+            Set.of("%s.dayInput.required".formatted(contractAwardDateField))),
+        entry("%s.monthInput.inputValue".formatted(contractAwardDateField),
+            Set.of("%s.monthInput.required".formatted(contractAwardDateField))),
+        entry("%s.yearInput.inputValue".formatted(contractAwardDateField),
+            Set.of("%s.yearInput.required".formatted(contractAwardDateField)))
     );
   }
 
@@ -105,6 +114,7 @@ class AwardedContractFormValidatorTest {
     form.setAwardValue("1.41");
     form.setAwardRationale("test award rationale");
     form.setPreferredBidderCountryId(countryId);
+    form.setContractAwardDate(LocalDate.of(2000, 1, 1));
 
     when(countryService.doesCountryExist(countryId)).thenReturn(false);
 
@@ -128,6 +138,7 @@ class AwardedContractFormValidatorTest {
     form.setAwardValue("0");
     form.setAwardRationale("test award rationale");
     form.setPreferredBidderCountryId(countryId);
+    form.setContractAwardDate(LocalDate.of(2000, 1, 1));
 
     when(countryService.doesCountryExist(countryId)).thenReturn(true);
 
@@ -150,6 +161,7 @@ class AwardedContractFormValidatorTest {
     form.setAwardValue("0.1234");
     form.setAwardRationale("test award rationale");
     form.setPreferredBidderCountryId(countryId);
+    form.setContractAwardDate(LocalDate.of(2000, 1, 1));
 
     when(countryService.doesCountryExist(countryId)).thenReturn(true);
 

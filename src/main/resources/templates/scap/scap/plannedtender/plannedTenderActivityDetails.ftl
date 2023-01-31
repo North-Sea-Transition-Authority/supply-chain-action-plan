@@ -39,6 +39,22 @@
 
       <@fdsTextarea.textarea path="form.awardRationale.inputValue" labelText="Award rationale"/>
 
+      <@fdsDateInput.dateInput
+        formId="indicative-actual-tender-start-date"
+        labelText="Indicative actual tender start date"
+        dayPath="form.indicativeActualTenderStartDate.dayInput.inputValue"
+        monthPath="form.indicativeActualTenderStartDate.monthInput.inputValue"
+        yearPath="form.indicativeActualTenderStartDate.yearInput.inputValue"
+      />
+
+      <@fdsDateInput.dateInput
+        formId="indicative-contract-award-date"
+        labelText="Indicative contract award date"
+        dayPath="form.indicativeContractAwardDate.dayInput.inputValue"
+        monthPath="form.indicativeContractAwardDate.monthInput.inputValue"
+        yearPath="form.indicativeContractAwardDate.yearInput.inputValue"
+      />
+
       <@fdsAction.button buttonText="Save and continue"/>
   </@fdsForm.htmlForm>
 </@defaultPage>

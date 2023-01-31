@@ -32,6 +32,7 @@ import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivity
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityService;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.delete.DeletePlannedTenderActivityController;
 import uk.co.nstauthority.scap.scap.plannedtender.hasplannedtender.HasPlannedTenderController;
+import uk.co.nstauthority.scap.scap.plannedtender.list.PlannedTenderActivityListItem;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = DeletePlannedTenderActivityController.class)
@@ -81,7 +82,7 @@ class DeletePlannedTenderActivityControllerTest extends AbstractScapSubmitterCon
     plannedTenderActivity.setScopeDescription("test scope description");
     plannedTenderActivity.setEstimatedValue(BigDecimal.valueOf(4.35));
     plannedTenderActivity.setRemunerationModel(RemunerationModel.LUMP_SUM);
-    when(plannedTenderActivityService.getPlannedTenderDetailById(100)).thenReturn(plannedTenderActivity);
+    when(plannedTenderActivityService.getPlannedTenderDetailById(PLANNED_ACTIVITY_ID)).thenReturn(plannedTenderActivity);
 
     mockMvc.perform(get(
         ReverseRouter.route(on(DeletePlannedTenderActivityController.class)
@@ -90,7 +91,8 @@ class DeletePlannedTenderActivityControllerTest extends AbstractScapSubmitterCon
         .andExpect(view().name("scap/scap/plannedtender/plannedTenderActivityDelete"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(PlannedTenderController.class).renderPlannedTenderActivities(SCAP_ID))))
-        .andExpect(model().attribute("plannedTenderDetail", plannedTenderActivity))
+        .andExpect(model().attribute("plannedTenderActivityView",
+            PlannedTenderActivityListItem.from(SCAP_ID, plannedTenderActivity)))
         .andExpect(model().attribute("submitPostUrl",
             ReverseRouter.route(on(DeletePlannedTenderActivityController.class)
                 .deletePlannedTenderDetail(SCAP_ID, PLANNED_ACTIVITY_ID, null))));

@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
-import java.time.ZoneId;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +37,7 @@ class PlannedTenderActivityServiceTest {
   PlannedTenderActivityRepository plannedTenderActivityRepository;
 
   @Mock
-  Clock clock = Clock.fixed(Instant.ofEpochSecond(1667576106), ZoneId.systemDefault());
+  Clock clock;
 
   @InjectMocks
   PlannedTenderActivityService plannedTenderActivityService;
@@ -52,12 +52,24 @@ class PlannedTenderActivityServiceTest {
   @Test
   void createPlannedTenderDetail_verifySaves() {
     var form = new PlannedTenderActivityForm();
-    form.setScopeDescription("Test scope description");
-    form.setEstimatedValue("2.3");
-    form.setRemunerationModel(RemunerationModel.OTHER);
-    form.setRemunerationModelName("Test remuneration model");
-    form.setAwardRationale("Test award rationale");
+    var scopeDescription = "Test scope description";
+    var estimatedValue = BigDecimal.valueOf(2.3);
+    var remunerationModel = RemunerationModel.OTHER;
+    var remunerationModelName = "Test remuneration model";
+    var awardRationale = "Test award rationale";
+    var startDate = LocalDate.of(2000, 1, 1);
+    var awardDate = LocalDate.of(2000, 2, 1);
+    var timestamp = Instant.ofEpochSecond(1667576106);
+    form.setScopeDescription(scopeDescription);
+    form.setEstimatedValue(estimatedValue.toPlainString());
+    form.setRemunerationModel(remunerationModel);
+    form.setRemunerationModelName(remunerationModelName);
+    form.setAwardRationale(awardRationale);
+    form.setIndicativeActualTenderStartDate(startDate);
+    form.setIndicativeContractAwardDate(awardDate);
     var argumentCaptor = ArgumentCaptor.forClass(PlannedTenderActivity.class);
+
+    when(clock.instant()).thenReturn(timestamp);
 
     plannedTenderActivityService.createPlannedTenderDetail(plannedTender, form);
 
@@ -66,19 +78,25 @@ class PlannedTenderActivityServiceTest {
     var savedDetail = argumentCaptor.getValue();
 
     assertThat(savedDetail).extracting(
-        "plannedTender",
-        "scopeDescription",
-        "estimatedValue",
-        "remunerationModel",
-        "remunerationModelName",
-        "awardRationale"
+        PlannedTenderActivity::getPlannedTender,
+        PlannedTenderActivity::getScopeDescription,
+        PlannedTenderActivity::getEstimatedValue,
+        PlannedTenderActivity::getRemunerationModel,
+        PlannedTenderActivity::getRemunerationModelName,
+        PlannedTenderActivity::getAwardRationale,
+        PlannedTenderActivity::getCreatedTimestamp,
+        PlannedTenderActivity::getExpectedActualTenderStartDate,
+        PlannedTenderActivity::getExpectedContractAwardDate
     ).containsExactly(
         plannedTender,
-        "Test scope description",
-        BigDecimal.valueOf(2.3),
-        RemunerationModel.OTHER,
-        "Test remuneration model",
-        "Test award rationale"
+        scopeDescription,
+        estimatedValue,
+        remunerationModel,
+        remunerationModelName,
+        awardRationale,
+        timestamp,
+        startDate,
+        awardDate
     );
   }
 
@@ -143,6 +161,10 @@ class PlannedTenderActivityServiceTest {
   void updatePlannedTenderDetail_verifySaves() {
     var activity = new PlannedTenderActivity(19);
     var form = new PlannedTenderActivityForm();
+    var startDate = LocalDate.of(2000, 1, 1);
+    var awardDate = LocalDate.of(2000, 2, 1);
+    form.setIndicativeActualTenderStartDate(startDate);
+    form.setIndicativeContractAwardDate(awardDate);
     form.setAwardRationale("Some award rationale");
     form.setEstimatedValue("2.32");
     form.setRemunerationModel(RemunerationModel.OTHER);
@@ -159,13 +181,17 @@ class PlannedTenderActivityServiceTest {
         PlannedTenderActivity::getEstimatedValue,
         PlannedTenderActivity::getRemunerationModel,
         PlannedTenderActivity::getRemunerationModelName,
-        PlannedTenderActivity::getScopeDescription
+        PlannedTenderActivity::getScopeDescription,
+        PlannedTenderActivity::getExpectedActualTenderStartDate,
+        PlannedTenderActivity::getExpectedContractAwardDate
     ).containsExactly(
         form.getAwardRationale().getInputValue(),
         form.getEstimatedValue().getAsBigDecimal().get(),
         form.getRemunerationModel(),
         form.getRemunerationModelName().getInputValue(),
-        form.getScopeDescription().getInputValue()
+        form.getScopeDescription().getInputValue(),
+        startDate,
+        awardDate
     );
   }
 
@@ -176,6 +202,10 @@ class PlannedTenderActivityServiceTest {
     activity.setRemunerationModelName("some remuneration model");
     activity.setRemunerationModel(RemunerationModel.OTHER);
     var form = new PlannedTenderActivityForm();
+    var startDate = LocalDate.of(2000, 1, 1);
+    var awardDate = LocalDate.of(2000, 2, 1);
+    form.setIndicativeActualTenderStartDate(startDate);
+    form.setIndicativeContractAwardDate(awardDate);
     form.setAwardRationale("Some award rationale");
     form.setEstimatedValue("2.32");
     form.setRemunerationModel(RemunerationModel.LUMP_SUM);
@@ -193,14 +223,18 @@ class PlannedTenderActivityServiceTest {
         PlannedTenderActivity::getEstimatedValue,
         PlannedTenderActivity::getRemunerationModel,
         PlannedTenderActivity::getRemunerationModelName,
-        PlannedTenderActivity::getScopeDescription
+        PlannedTenderActivity::getScopeDescription,
+        PlannedTenderActivity::getExpectedActualTenderStartDate,
+        PlannedTenderActivity::getExpectedContractAwardDate
     ).containsExactly(
         activity.getId(),
         form.getAwardRationale().getInputValue(),
         form.getEstimatedValue().getAsBigDecimal().get(),
         form.getRemunerationModel(),
         null,
-        form.getScopeDescription().getInputValue()
+        form.getScopeDescription().getInputValue(),
+        startDate,
+        awardDate
     );
   }
 
@@ -219,4 +253,51 @@ class PlannedTenderActivityServiceTest {
 
     verify(plannedTenderActivityRepository, never()).save(any());
   }
+
+  @Test
+  void updatePlannedTenderDetail_InvalidActualTenderStartDate_VerifyNeverSaves() {
+    var activity = new PlannedTenderActivity(19);
+    var form = new PlannedTenderActivityForm();
+    form.setAwardRationale("Some award rationale");
+    form.setEstimatedValue("2");
+    form.setRemunerationModel(RemunerationModel.OTHER);
+    form.setRemunerationModelName("Some remuneration model");
+    form.setScopeDescription("Some scope description");
+    form.setIndicativeActualTenderStartDate(null);
+    form.setIndicativeContractAwardDate(LocalDate.of(2000, 1, 1));
+
+    var expectedErrorMessage =
+        "Update failed for planned tender activity with ID %d, as indicativeActualTenderStartDate is not a LocalDate"
+        .formatted(activity.getId());
+
+    assertThatThrownBy(() -> plannedTenderActivityService.updatePlannedTenderDetail(activity, form))
+        .isInstanceOf(ClassCastException.class)
+        .hasMessage(expectedErrorMessage);
+
+    verify(plannedTenderActivityRepository, never()).save(any());
+  }
+
+  @Test
+  void updatePlannedTenderDetail_InvalidContractAwardDate_VerifyNeverSaves() {
+    var activity = new PlannedTenderActivity(19);
+    var form = new PlannedTenderActivityForm();
+    form.setAwardRationale("Some award rationale");
+    form.setEstimatedValue("2");
+    form.setRemunerationModel(RemunerationModel.OTHER);
+    form.setRemunerationModelName("Some remuneration model");
+    form.setScopeDescription("Some scope description");
+    form.setIndicativeActualTenderStartDate(LocalDate.of(2000, 1, 1));
+    form.setIndicativeContractAwardDate(null);
+
+    var expectedErrorMessage =
+        "Update failed for planned tender activity with ID %d, as indicativeContractAwardDate is not a LocalDate"
+            .formatted(activity.getId());
+
+    assertThatThrownBy(() -> plannedTenderActivityService.updatePlannedTenderDetail(activity, form))
+        .isInstanceOf(ClassCastException.class)
+        .hasMessage(expectedErrorMessage);
+
+    verify(plannedTenderActivityRepository, never()).save(any());
+  }
+
 }

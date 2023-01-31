@@ -91,7 +91,8 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
     var actualTenderActivities = List.of(new ActualTenderActivity(430));
     var awardedContractSummaryView = new AwardedContractSummaryView(
         "preferred bidder name", BigDecimal.valueOf(1.32),
-        "award rationale", "preferred bidder location");
+        "award rationale", "preferred bidder location",
+        null);
     var actualTenderSummaryView = new ActualTenderActivitySummaryView(
         scap.getScapId(), actualTenderActivities.get(0).getId(),
         "scope title", "scope description",
@@ -138,7 +139,7 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
     var actualTenderActivities = List.of(new ActualTenderActivity(430));
     var awardedContractSummaryView = new AwardedContractSummaryView(
         "preferred bidder name", BigDecimal.valueOf(1.32),
-        "award rationale", "preferred bidder location");
+        "award rationale", "preferred bidder location", null);
     var actualTenderSummaryView = new ActualTenderActivitySummaryView(
         scap.getScapId(), actualTenderActivities.get(0).getId(),
         "scope title", "scope description",
@@ -180,7 +181,7 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
     var actualTenderActivities = List.of(new ActualTenderActivity(430));
     var awardedContractSummaryView = new AwardedContractSummaryView(
         "preferred bidder name", BigDecimal.valueOf(1.32),
-        "award rationale", "preferred bidder location");
+        "award rationale", "preferred bidder location", null);
     var actualTenderSummaryView = new ActualTenderActivitySummaryView(
         scap.getScapId(), actualTenderActivities.get(0).getId(),
         "scope title", "scope description",
@@ -217,7 +218,7 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
     var actualTenderActivities = List.of(new ActualTenderActivity(430));
     var awardedContractSummaryView = new AwardedContractSummaryView(
         "preferred bidder name", BigDecimal.valueOf(1.32),
-        "award rationale", "preferred bidder location");
+        "award rationale", "preferred bidder location", null);
     var actualTenderSummaryView = new ActualTenderActivitySummaryView(
         scap.getScapId(), actualTenderActivities.get(0).getId(),
         "scope title", "scope description",

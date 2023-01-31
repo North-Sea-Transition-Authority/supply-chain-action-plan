@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,10 +54,12 @@ class AwardedContractFormServiceTest {
     var preferredBidderLocation = 2141;
     var awardValue = BigDecimal.valueOf(3.14);
     var awardRationale = "Test award rationale";
+    var awardDate = LocalDate.of(2000, 1, 1);
     awardedContract.setPreferredBidder(new InvitationToTenderParticipant(preferredBidderId));
     awardedContract.setAwardValue(awardValue);
     awardedContract.setAwardRationale(awardRationale);
     awardedContract.setPreferredBidderCountryId(preferredBidderLocation);
+    awardedContract.setContractAwardDate(awardDate);
 
     var form = awardedContractFormService.getForm(awardedContract);
 
@@ -64,12 +67,14 @@ class AwardedContractFormServiceTest {
         AwardedContractForm::getPreferredBidderId,
         actualForm -> actualForm.getAwardValue().getInputValue(),
         actualForm -> actualForm.getAwardRationale().getInputValue(),
-        AwardedContractForm::getPreferredBidderCountryId
+        AwardedContractForm::getPreferredBidderCountryId,
+        actualForm -> actualForm.getContractAwardDate().getAsLocalDate()
     ).containsExactly(
         preferredBidderId,
         String.valueOf(awardValue),
         awardRationale,
-        preferredBidderLocation
+        preferredBidderLocation,
+        Optional.of(awardDate)
     );
   }
 

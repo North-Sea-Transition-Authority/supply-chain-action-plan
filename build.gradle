@@ -48,9 +48,8 @@ dependencies {
   implementation 'org.jooq:jooq-meta'
 
   implementation 'uk.co.fivium.digital.energyportalteamaccesslibrary:energy-portal-team-access-libray:develop-SNAPSHOT'
-  implementation 'uk.co.fivium.digitalformlibrary:digital-form-library:v1.0.1'
-  implementation 'uk.co.fivium.energyportalapi:client:develop-SNAPSHOT'
-  // Above should be switched to a release version when one is available with EPA-24 (fieldsByIds)
+  implementation 'uk.co.fivium.digitalformlibrary:digital-form-library:v2.1.1'
+  implementation 'uk.co.fivium.energyportalapi:client:v3.1.0'
 
   implementation 'com.amazonaws:aws-java-sdk-s3:1.12.351'
   implementation 'fi.solita.clamav:clamav-client:1.0.1'

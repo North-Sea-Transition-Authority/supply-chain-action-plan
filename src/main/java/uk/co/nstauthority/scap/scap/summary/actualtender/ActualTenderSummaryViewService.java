@@ -8,6 +8,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 import uk.co.fivium.energyportalapi.generated.types.Country;
+import uk.co.fivium.formlibrary.validator.date.DateUtils;
 import uk.co.nstauthority.scap.energyportal.CountryService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
@@ -64,7 +65,8 @@ public class ActualTenderSummaryViewService {
                   awardedContract.getPreferredBidder().getCompanyName(),
                   awardedContract.getAwardValue(),
                   awardedContract.getAwardRationale(),
-                  countriesMap.getOrDefault(awardedContract.getPreferredBidderCountryId(), "MISSING COUNTRY"))
+                  countriesMap.getOrDefault(awardedContract.getPreferredBidderCountryId(), "MISSING COUNTRY"),
+                  DateUtils.format(awardedContract.getContractAwardDate()))
               ).orElse(null);
 
           return new ActualTenderActivitySummaryView(

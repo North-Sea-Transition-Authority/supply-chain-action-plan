@@ -27,26 +27,34 @@
     headingText="Planned tender activity"
     cardActionsContent=cardActionsContent
   >
-    <@plannedTenderActivityRows plannedTenderDetail=listItem.detail()/>
+    <@plannedTenderActivityRows plannedTenderActivity=listItem/>
   </@fdsSummaryList.summaryListCard>
 </#macro>
 
 
-<#macro plannedTenderActivityRows plannedTenderDetail>
+<#macro plannedTenderActivityRows plannedTenderActivity>
+<#-- @ftlvariable name="plannedTenderActivity" type="uk.co.nstauthority.scap.scap.plannedtender.list.PlannedTenderActivityListItem" -->
   <@fdsSummaryList.summaryListRowNoAction keyText="Scope description">
-    ${plannedTenderDetail.scopeDescription!"No scope description"}
+    ${plannedTenderActivity.indicativeContractAwardDate()!""}
+    ${plannedTenderActivity.detail().scopeDescription!""}
   </@fdsSummaryList.summaryListRowNoAction>
   <@fdsSummaryList.summaryListRowNoAction keyText="Estimated value">
-    <#if plannedTenderDetail.estimatedValue?has_content>
-      £${plannedTenderDetail.estimatedValue} million
-    <#else>
-      No estimated value
+    <#if plannedTenderActivity.detail().estimatedValue?has_content>
+      £${plannedTenderActivity.detail().estimatedValue} million
     </#if>
   </@fdsSummaryList.summaryListRowNoAction>
   <@fdsSummaryList.summaryListRowNoAction keyText="Remuneration model">
-    ${plannedTenderDetail.remunerationModel.displayName!"No remuneration model"}
+    <#if plannedTenderActivity.detail().remunerationModel?has_content>
+      ${plannedTenderActivity.detail().remunerationModel.displayName!""}
+    </#if>
   </@fdsSummaryList.summaryListRowNoAction>
   <@fdsSummaryList.summaryListRowNoAction keyText="Award rationale">
-    ${plannedTenderDetail.awardRationale!"No award rationale"}
+    ${plannedTenderActivity.detail().awardRationale!""}
+  </@fdsSummaryList.summaryListRowNoAction>
+  <@fdsSummaryList.summaryListRowNoAction keyText="Indicative actual tender start date">
+    ${plannedTenderActivity.indicativeActualTenderStartDate()!""}
+  </@fdsSummaryList.summaryListRowNoAction>
+  <@fdsSummaryList.summaryListRowNoAction keyText="Indicative contract award date">
+    ${plannedTenderActivity.indicativeContractAwardDate()!""}
   </@fdsSummaryList.summaryListRowNoAction>
 </#macro>

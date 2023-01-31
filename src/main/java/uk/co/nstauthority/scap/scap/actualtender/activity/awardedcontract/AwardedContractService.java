@@ -26,6 +26,7 @@ public class AwardedContractService {
     return awardedContractRepository.findByActualTenderActivity(actualTenderActivity);
   }
 
+  @Transactional
   void saveAwardedContract(ActualTenderActivity actualTenderActivity, AwardedContractForm form,
                            List<InvitationToTenderParticipant> bidParticipants) {
     var awardedContract = getByActualTenderActivity(actualTenderActivity)
@@ -36,13 +37,16 @@ public class AwardedContractService {
         .orElseThrow(() -> new ScapEntityNotFoundException(
             String.format("Could not find bid participant with ID [%d]", form.getPreferredBidderId())));
     var awardValue = form.getAwardValue().getAsBigDecimal()
-            .orElseThrow(() -> new ClassCastException(
-                String.format("Could not cast %s to BigDecimal", form.getAwardValue().getInputValue())));
+        .orElseThrow(() -> new ClassCastException(
+            String.format("Could not cast %s to BigDecimal", form.getAwardValue().getInputValue())));
+    var contractAwardDate = form.getContractAwardDate().getAsLocalDate()
+        .orElseThrow(() -> new ClassCastException("Could not cast contractAwardDate to LocalDate"));
 
     awardedContract.setPreferredBidder(preferredBidder);
     awardedContract.setAwardValue(awardValue);
     awardedContract.setAwardRationale(form.getAwardRationale().getInputValue());
     awardedContract.setPreferredBidderCountryId(form.getPreferredBidderCountryId());
+    awardedContract.setContractAwardDate(contractAwardDate);
 
     awardedContractRepository.save(awardedContract);
   }

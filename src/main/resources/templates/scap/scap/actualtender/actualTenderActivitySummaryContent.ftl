@@ -59,4 +59,7 @@
   <@fdsSummaryList.summaryListRowNoAction keyText="Preferred bidder location">
     ${awardedContract.preferredBidderCountry()!""}
   </@fdsSummaryList.summaryListRowNoAction>
+  <@fdsSummaryList.summaryListRowNoAction keyText="Contract award date">
+    ${awardedContract.contractAwardDate()!""}
+  </@fdsSummaryList.summaryListRowNoAction>
 </#macro>

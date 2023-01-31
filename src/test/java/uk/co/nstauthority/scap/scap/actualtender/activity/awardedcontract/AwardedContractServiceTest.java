@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
@@ -64,11 +65,13 @@ class AwardedContractServiceTest {
   @Test
   void saveAwardedContract_UpdateExisting_VerifySaves() {
     var awardedContract = new AwardedContract(27);
+    var date = LocalDate.of(2000, 1, 1);
     var form = new AwardedContractForm();
     form.setPreferredBidderId(bidParticipants.get(0).getId());
     form.setAwardValue("1.23");
     form.setAwardRationale("Test award rationale");
     form.setPreferredBidderCountryId(0);
+    form.setContractAwardDate(date);
     var argumentCaptor = ArgumentCaptor.forClass(AwardedContract.class);
 
     when(awardedContractRepository.findByActualTenderActivity(actualTenderActivity))
@@ -83,23 +86,27 @@ class AwardedContractServiceTest {
         AwardedContract::getPreferredBidder,
         AwardedContract::getAwardValue,
         AwardedContract::getAwardRationale,
-        AwardedContract::getPreferredBidderCountryId
+        AwardedContract::getPreferredBidderCountryId,
+        AwardedContract::getContractAwardDate
     ).containsExactly(
         awardedContract.getId(),
         bidParticipants.get(0),
         form.getAwardValue().getAsBigDecimal().get(),
         form.getAwardRationale().getInputValue(),
-        form.getPreferredBidderCountryId()
+        form.getPreferredBidderCountryId(),
+        date
     );
   }
 
   @Test
   void saveAwardedContract_CreateNew_VerifySaves() {
     var form = new AwardedContractForm();
+    var date = LocalDate.of(2000, 1, 1);
     form.setPreferredBidderId(bidParticipants.get(0).getId());
     form.setAwardValue("1.23");
     form.setAwardRationale("Test award rationale");
     form.setPreferredBidderCountryId(0);
+    form.setContractAwardDate(date);
     var argumentCaptor = ArgumentCaptor.forClass(AwardedContract.class);
 
     when(awardedContractRepository.findByActualTenderActivity(actualTenderActivity))
@@ -114,13 +121,15 @@ class AwardedContractServiceTest {
         AwardedContract::getAwardValue,
         AwardedContract::getAwardRationale,
         AwardedContract::getPreferredBidderCountryId,
-        AwardedContract::getCreatedTimestamp
+        AwardedContract::getCreatedTimestamp,
+        AwardedContract::getContractAwardDate
     ).containsExactly(
         bidParticipants.get(0),
         form.getAwardValue().getAsBigDecimal().get(),
         form.getAwardRationale().getInputValue(),
         form.getPreferredBidderCountryId(),
-        clock.instant()
+        clock.instant(),
+        date
     );
   }
 

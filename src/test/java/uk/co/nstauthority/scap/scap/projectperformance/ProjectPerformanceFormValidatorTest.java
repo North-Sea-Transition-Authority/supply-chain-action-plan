@@ -104,12 +104,12 @@ class ProjectPerformanceFormValidatorTest {
     var extractedErrors = ValidatorTestingUtil.extractErrors(errors);
 
     assertThat(extractedErrors).containsExactly(
-        entry("startDay.inputValue", Set.of("startDay.maxDateExceeded")),
-        entry("startMonth.inputValue", Set.of("startMonth.maxDateExceeded")),
-        entry("startYear.inputValue", Set.of("startYear.maxDateExceeded")),
-        entry("completionDay.inputValue", Set.of("completionDay.maxDateExceeded")),
-        entry("completionMonth.inputValue", Set.of("completionMonth.maxDateExceeded")),
-        entry("completionYear.inputValue", Set.of("completionYear.maxDateExceeded"))
+        entry("startDay.inputValue", Set.of("startDay.maxDateExclusiveExceeded")),
+        entry("startMonth.inputValue", Set.of("startMonth.maxDateExclusiveExceeded")),
+        entry("startYear.inputValue", Set.of("startYear.maxDateExclusiveExceeded")),
+        entry("completionDay.inputValue", Set.of("completionDay.maxDateExclusiveExceeded")),
+        entry("completionMonth.inputValue", Set.of("completionMonth.maxDateExclusiveExceeded")),
+        entry("completionYear.inputValue", Set.of("completionYear.maxDateExclusiveExceeded"))
     );
   }
 
@@ -131,9 +131,9 @@ class ProjectPerformanceFormValidatorTest {
     var extractedErrors = ValidatorTestingUtil.extractErrors(errors);
 
     assertThat(extractedErrors).containsExactly(
-        entry("completionDay.inputValue", Set.of("completionDay.minDateNotMet")),
-        entry("completionMonth.inputValue", Set.of("completionMonth.minDateNotMet")),
-        entry("completionYear.inputValue", Set.of("completionYear.minDateNotMet"))
+        entry("completionDay.inputValue", Set.of("completionDay.minDateExclusiveNotMet")),
+        entry("completionMonth.inputValue", Set.of("completionMonth.minDateExclusiveNotMet")),
+        entry("completionYear.inputValue", Set.of("completionYear.minDateExclusiveNotMet"))
     );
   }
 

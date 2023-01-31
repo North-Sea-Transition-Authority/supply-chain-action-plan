@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract;
 import com.google.common.annotations.VisibleForTesting;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -37,6 +38,8 @@ public class AwardedContract {
   private Integer preferredBidderCountryId;
 
   private Instant createdTimestamp;
+
+  private LocalDate contractAwardDate;
 
   public AwardedContract() {
   }
@@ -94,5 +97,13 @@ public class AwardedContract {
 
   public Instant getCreatedTimestamp() {
     return createdTimestamp;
+  }
+
+  public LocalDate getContractAwardDate() {
+    return contractAwardDate;
+  }
+
+  public void setContractAwardDate(LocalDate contractAwardDate) {
+    this.contractAwardDate = contractAwardDate;
   }
 }

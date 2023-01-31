@@ -168,9 +168,9 @@ class ProjectDetailsFormValidatorTest {
     var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
 
     assertThat(extractedErrors).containsExactly(
-        entry("endDay.inputValue", Set.of("endDay.minDateNotMet")),
-        entry("endMonth.inputValue", Set.of("endMonth.minDateNotMet")),
-        entry("endYear.inputValue", Set.of("endYear.minDateNotMet"))
+        entry("endDay.inputValue", Set.of("endDay.minDateExclusiveNotMet")),
+        entry("endMonth.inputValue", Set.of("endMonth.minDateExclusiveNotMet")),
+        entry("endYear.inputValue", Set.of("endYear.minDateExclusiveNotMet"))
     );
   }
 

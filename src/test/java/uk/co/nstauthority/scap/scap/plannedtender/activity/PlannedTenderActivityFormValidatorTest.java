@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,8 @@ class PlannedTenderActivityFormValidatorTest {
   void setup() {
     validator = new PlannedTenderActivityFormValidator();
     form = ScapPlannedTenderDetailFormTestUtil.getValidPlannedTenderDetailForm();
+    form.setIndicativeActualTenderStartDate(LocalDate.of(2000, 1, 1));
+    form.setIndicativeContractAwardDate(LocalDate.of(2000, 2, 1));
     bindingResult = new BeanPropertyBindingResult(form, "form");
   }
 
@@ -54,12 +57,20 @@ class PlannedTenderActivityFormValidatorTest {
     var emptyFormBindingResult = new BeanPropertyBindingResult(emptyForm, "form");
     validator.validate(emptyForm, emptyFormBindingResult);
     var extractedErrors = ValidatorTestingUtil.extractErrors(emptyFormBindingResult);
+    var startDateField = PlannedTenderActivityForm.INDICATIVE_ACTUAL_TENDER_START_DATE_FIELD;
+    var awardDateField = PlannedTenderActivityForm.INDICATIVE_CONTRACT_AWARD_DATE_FIELD;
 
     assertThat(extractedErrors).containsExactly(
         entry("scopeDescription.inputValue", Set.of("scopeDescription.required")),
         entry("estimatedValue.inputValue", Set.of("estimatedValue.required")),
         entry("remunerationModel", Set.of("remunerationModel.required")),
-        entry("awardRationale.inputValue", Set.of("awardRationale.required"))
+        entry("awardRationale.inputValue", Set.of("awardRationale.required")),
+        entry("%s.dayInput.inputValue".formatted(startDateField), Set.of("%s.dayInput.required".formatted(startDateField))),
+        entry("%s.monthInput.inputValue".formatted(startDateField), Set.of("%s.monthInput.required".formatted(startDateField))),
+        entry("%s.yearInput.inputValue".formatted(startDateField), Set.of("%s.yearInput.required".formatted(startDateField))),
+        entry("%s.dayInput.inputValue".formatted(awardDateField), Set.of("%s.dayInput.required".formatted(awardDateField))),
+        entry("%s.monthInput.inputValue".formatted(awardDateField), Set.of("%s.monthInput.required".formatted(awardDateField))),
+        entry("%s.yearInput.inputValue".formatted(awardDateField), Set.of("%s.yearInput.required".formatted(awardDateField)))
     );
   }
 

@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.scap.plannedtender.activity;
 import com.google.common.annotations.VisibleForTesting;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -39,6 +40,10 @@ public class PlannedTenderActivity {
 
   private Instant createdTimestamp;
 
+  private LocalDate expectedActualTenderStartDate;
+
+  private LocalDate expectedContractAwardDate;
+
   public PlannedTenderActivity() {
   }
 
@@ -47,15 +52,8 @@ public class PlannedTenderActivity {
     this.id = id;
   }
 
-  public PlannedTenderActivity(PlannedTender plannedTender, String scopeDescription, BigDecimal estimatedValue,
-                               RemunerationModel remunerationModel, String remunerationModelName, String awardRationale,
-                               Instant createdTimestamp) {
+  public PlannedTenderActivity(PlannedTender plannedTender, Instant createdTimestamp) {
     this.plannedTender = plannedTender;
-    this.scopeDescription = scopeDescription;
-    this.estimatedValue = estimatedValue;
-    this.remunerationModel = remunerationModel;
-    this.remunerationModelName = remunerationModelName;
-    this.awardRationale = awardRationale;
     this.createdTimestamp = createdTimestamp;
   }
 
@@ -114,5 +112,21 @@ public class PlannedTenderActivity {
 
   public void setCreatedTimestamp(Instant createdTimestamp) {
     this.createdTimestamp = createdTimestamp;
+  }
+
+  public LocalDate getExpectedActualTenderStartDate() {
+    return expectedActualTenderStartDate;
+  }
+
+  public void setExpectedActualTenderStartDate(LocalDate expectedActualTenderStartDate) {
+    this.expectedActualTenderStartDate = expectedActualTenderStartDate;
+  }
+
+  public LocalDate getExpectedContractAwardDate() {
+    return expectedContractAwardDate;
+  }
+
+  public void setExpectedContractAwardDate(LocalDate expectedContractAwardDate) {
+    this.expectedContractAwardDate = expectedContractAwardDate;
   }
 }

@@ -199,14 +199,14 @@ class ProjectDetailsServiceTest {
     var createdTimestamp = Instant.ofEpochSecond(1666778603);
     var form = getFilledProjectDetailsForm();
     var startDate = LocalDate.of(
-        form.getExpectedStartDate().getYearInputValue().getAsInteger().get(),
-        form.getExpectedStartDate().getMonthInputValue().getAsInteger().get(),
-        form.getExpectedStartDate().getDayInputValue().getAsInteger().get()
+        form.getExpectedStartDate().getYearInput().getAsInteger().get(),
+        form.getExpectedStartDate().getMonthInput().getAsInteger().get(),
+        form.getExpectedStartDate().getDayInput().getAsInteger().get()
     );
     var endDate = LocalDate.of(
-        form.getExpectedEndDate().getYearInputValue().getAsInteger().get(),
-        form.getExpectedEndDate().getMonthInputValue().getAsInteger().get(),
-        form.getExpectedEndDate().getDayInputValue().getAsInteger().get()
+        form.getExpectedEndDate().getYearInput().getAsInteger().get(),
+        form.getExpectedEndDate().getMonthInput().getAsInteger().get(),
+        form.getExpectedEndDate().getDayInput().getAsInteger().get()
     );
     var projectDetailsArgumentCaptor = ArgumentCaptor.forClass(ProjectDetails.class);
     var projectDetailTypesArgumentCaptor = ArgumentCaptor.forClass(ProjectDetailType.class);
@@ -256,14 +256,14 @@ class ProjectDetailsServiceTest {
     var createdTimestamp = Instant.ofEpochSecond(1666778603);
     var form = getFilledProjectDetailsForm();
     var startDate = LocalDate.of(
-        form.getExpectedStartDate().getYearInputValue().getAsInteger().get(),
-        form.getExpectedStartDate().getMonthInputValue().getAsInteger().get(),
-        form.getExpectedStartDate().getDayInputValue().getAsInteger().get()
+        form.getExpectedStartDate().getYearInput().getAsInteger().get(),
+        form.getExpectedStartDate().getMonthInput().getAsInteger().get(),
+        form.getExpectedStartDate().getDayInput().getAsInteger().get()
     );
     var endDate = LocalDate.of(
-        form.getExpectedEndDate().getYearInputValue().getAsInteger().get(),
-        form.getExpectedEndDate().getMonthInputValue().getAsInteger().get(),
-        form.getExpectedEndDate().getDayInputValue().getAsInteger().get()
+        form.getExpectedEndDate().getYearInput().getAsInteger().get(),
+        form.getExpectedEndDate().getMonthInput().getAsInteger().get(),
+        form.getExpectedEndDate().getDayInput().getAsInteger().get()
     );
 
     var existingProjectDetails = new ProjectDetails(scapDetail, createdTimestamp);

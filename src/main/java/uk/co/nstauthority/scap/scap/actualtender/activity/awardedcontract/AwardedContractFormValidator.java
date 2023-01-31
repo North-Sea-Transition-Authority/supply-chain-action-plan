@@ -1,6 +1,7 @@
 package uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
 import org.springframework.validation.ValidationUtils;
+import uk.co.fivium.formlibrary.validator.date.ThreeFieldDateInputValidator;
 import uk.co.fivium.formlibrary.validator.decimal.DecimalInputValidator;
 import uk.co.fivium.formlibrary.validator.string.StringInputValidator;
 import uk.co.nstauthority.scap.energyportal.CountryService;
@@ -87,5 +89,9 @@ class AwardedContractFormValidator implements SmartValidator {
           "Select a valid location of the preferred bidder"
       );
     }
+
+    ThreeFieldDateInputValidator.builder()
+        .mustBeBeforeOrEqualTo(LocalDate.now())
+        .validate(form.getContractAwardDate(), errors);
   }
 }

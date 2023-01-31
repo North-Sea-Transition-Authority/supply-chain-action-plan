@@ -3,6 +3,8 @@
 
 <#assign pageTitle = "Planned tender activities" />
 
+<#-- @ftlvariable name="errorList" type="java.util.List<uk.co.nstauthority.scap.fds.ErrorItem>" -->
+
 <@defaultPage
   htmlTitle=pageTitle
   pageHeading=pageTitle
@@ -46,7 +48,7 @@
     headingText="Planned tender activity"
       cardActionsContent=cardActionsContent
   >
-    <@plannedTenderActivity.plannedTenderActivityRows plannedTenderDetail=listItem.detail()/>
+    <@plannedTenderActivity.plannedTenderActivityRows plannedTenderActivity=listItem/>
 
   </@fdsSummaryList.summaryListCard>
 </#macro>

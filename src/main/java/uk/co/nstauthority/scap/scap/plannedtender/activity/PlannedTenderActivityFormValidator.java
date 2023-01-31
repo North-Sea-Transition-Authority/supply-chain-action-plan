@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
+import uk.co.fivium.formlibrary.validator.date.ThreeFieldDateInputValidator;
 import uk.co.fivium.formlibrary.validator.decimal.DecimalInputValidator;
 import uk.co.fivium.formlibrary.validator.string.StringInputValidator;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
@@ -38,5 +39,14 @@ public class PlannedTenderActivityFormValidator implements Validator {
     }
 
     StringInputValidator.builder().validate(form.getAwardRationale(), errors);
+
+    ThreeFieldDateInputValidator.builder().validate(form.getIndicativeActualTenderStartDate(), errors);
+
+    var expectedTenderValidator = ThreeFieldDateInputValidator.builder();
+    var expectedTenderStartDateOpt = form.getIndicativeActualTenderStartDate().getAsLocalDate();
+    if (expectedTenderStartDateOpt.isPresent()) {
+      expectedTenderValidator = expectedTenderValidator.mustBeAfterDate(expectedTenderStartDateOpt.get());
+    }
+    expectedTenderValidator.validate(form.getIndicativeContractAwardDate(), errors);
   }
 }

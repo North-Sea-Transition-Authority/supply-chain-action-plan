@@ -14,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.mvc.ReverseRouter.emptyBindingResult;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +30,6 @@ import org.springframework.validation.FieldError;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
-import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivity;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityController;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityService;
@@ -73,16 +71,11 @@ class PlannedTenderControllerTest extends AbstractScapSubmitterControllerTest {
     var existingTenderDetails = List.of(
         new PlannedTenderActivity(
             plannedTender,
-            "scope description",
-            BigDecimal.valueOf(1.0),
-            RemunerationModel.LUMP_SUM,
-            null,
-            "award rationale",
             EntityTestingUtil.dateToInstant(2000, 4, 23)
         )
     );
     var listItems = List.of(
-        new PlannedTenderActivityListItem(existingTenderDetails.get(0), "#", "#")
+        new PlannedTenderActivityListItem(existingTenderDetails.get(0), null, null, "#", "#")
     );
     var form = new PlannedTenderForm();
 

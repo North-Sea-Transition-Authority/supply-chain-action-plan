@@ -36,6 +36,7 @@ class AwardedContractFormService {
     form.setAwardValue(String.valueOf(awardedContract.getAwardValue()));
     form.setAwardRationale(awardedContract.getAwardRationale());
     form.setPreferredBidderCountryId(awardedContract.getPreferredBidderCountryId());
+    form.setContractAwardDate(awardedContract.getContractAwardDate());
     return form;
   }
 

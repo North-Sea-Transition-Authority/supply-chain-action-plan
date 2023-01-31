@@ -21,6 +21,7 @@ import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderService;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivity;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityService;
 import uk.co.nstauthority.scap.scap.plannedtender.hasplannedtender.HasPlannedTenderController;
+import uk.co.nstauthority.scap.scap.plannedtender.list.PlannedTenderActivityListItem;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.util.DeletionSuccessBannerUtil;
@@ -50,8 +51,8 @@ public class DeletePlannedTenderActivityController {
   public ModelAndView renderPlannedTenderRemoval(@PathVariable("scapId") ScapId scapId,
                                                  @PathVariable("plannedTenderDetailId") Integer plannedTenderDetailId) {
     scapService.getScapById(scapId);
-    var plannedTenderDetail = plannedTenderActivityService.getPlannedTenderDetailById(plannedTenderDetailId);
-    return plannedTenderRemovalModelAndView(scapId, plannedTenderDetail);
+    var plannedTenderActivity = plannedTenderActivityService.getPlannedTenderDetailById(plannedTenderDetailId);
+    return plannedTenderRemovalModelAndView(scapId, plannedTenderActivity);
   }
 
   @PostMapping
@@ -74,13 +75,13 @@ public class DeletePlannedTenderActivityController {
     return ReverseRouter.redirect(on(HasPlannedTenderController.class).renderHasPlannedTenderActivityForm(scapId));
   }
 
-  private ModelAndView plannedTenderRemovalModelAndView(ScapId scapId, PlannedTenderActivity plannedTenderDetail) {
+  private ModelAndView plannedTenderRemovalModelAndView(ScapId scapId, PlannedTenderActivity plannedTenderActivity) {
     return new ModelAndView("scap/scap/plannedtender/plannedTenderActivityDelete")
         .addObject("backLinkUrl",
             ReverseRouter.route(on(PlannedTenderController.class).renderPlannedTenderActivities(scapId)))
-        .addObject("plannedTenderDetail", plannedTenderDetail)
+        .addObject("plannedTenderActivityView", PlannedTenderActivityListItem.from(scapId, plannedTenderActivity))
         .addObject("submitPostUrl",
             ReverseRouter.route(on(DeletePlannedTenderActivityController.class)
-                .deletePlannedTenderDetail(scapId, plannedTenderDetail.getId(), null)));
+                .deletePlannedTenderDetail(scapId, plannedTenderActivity.getId(), null)));
   }
 }

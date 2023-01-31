@@ -40,21 +40,19 @@ class PlannedTenderActivityFormServiceTest {
 
   @Test
   void getForm_assertReturnsFilledForm() {
-    var plannedTenderDetail = new PlannedTenderActivity(
-        null,
-        "some scope description",
-        BigDecimal.valueOf(33.5),
-        RemunerationModel.OTHER,
-        "some remuneration model name",
-        "some award rationale",
-        clock.instant());
+    var plannedTenderActivity = new PlannedTenderActivity(null, clock.instant());
+    plannedTenderActivity.setScopeDescription("some scope description");
+    plannedTenderActivity.setEstimatedValue(BigDecimal.valueOf(33.5));
+    plannedTenderActivity.setRemunerationModel(RemunerationModel.OTHER);
+    plannedTenderActivity.setRemunerationModelName("some remuneration model name");
+    plannedTenderActivity.setAwardRationale("some award rationale");
 
-    var form = plannedTenderActivityFormService.getForm(plannedTenderDetail);
+    var form = plannedTenderActivityFormService.getForm(plannedTenderActivity);
 
-    assertThat(form.getAwardRationale().getInputValue()).isEqualTo(plannedTenderDetail.getAwardRationale());
-    assertThat(form.getScopeDescription().getInputValue()).isEqualTo(plannedTenderDetail.getScopeDescription());
-    assertThat(form.getEstimatedValue().getAsBigDecimal()).contains(plannedTenderDetail.getEstimatedValue());
-    assertThat(form.getRemunerationModel()).isEqualTo(plannedTenderDetail.getRemunerationModel());
-    assertThat(form.getRemunerationModelName().getInputValue()).isEqualTo(plannedTenderDetail.getRemunerationModelName());
+    assertThat(form.getAwardRationale().getInputValue()).isEqualTo(plannedTenderActivity.getAwardRationale());
+    assertThat(form.getScopeDescription().getInputValue()).isEqualTo(plannedTenderActivity.getScopeDescription());
+    assertThat(form.getEstimatedValue().getAsBigDecimal()).contains(plannedTenderActivity.getEstimatedValue());
+    assertThat(form.getRemunerationModel()).isEqualTo(plannedTenderActivity.getRemunerationModel());
+    assertThat(form.getRemunerationModelName().getInputValue()).isEqualTo(plannedTenderActivity.getRemunerationModelName());
   }
 }
