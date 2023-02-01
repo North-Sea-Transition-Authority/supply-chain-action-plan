@@ -146,7 +146,7 @@ class PlannedTenderActivityControllerTest extends AbstractScapSubmitterControlle
                 .flashAttr("form", form))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/plannedtender/plannedTenderActivityDetails"))
-        .andExpect(model().attributeExists("errorItems"))
+        .andExpect(model().attributeExists("errorList"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(HasPlannedTenderController.class).renderHasPlannedTenderActivityForm(SCAP_ID))))
         .andExpect(model().attribute("submitPostUrl",

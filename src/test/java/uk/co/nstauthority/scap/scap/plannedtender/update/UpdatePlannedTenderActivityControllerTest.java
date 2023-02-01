@@ -145,7 +145,8 @@ class UpdatePlannedTenderActivityControllerTest extends AbstractScapSubmitterCon
             ReverseRouter.route(on(PlannedTenderController.class)
                 .renderPlannedTenderActivities(SCAP_ID))))
         .andExpect(model().attribute("remunerationModels", RemunerationModel.getRemunerationModels()))
-        .andExpect(model().attribute("form", form));
+        .andExpect(model().attribute("form", form))
+        .andExpect(model().attributeExists("errorList"));
 
     verify(plannedTenderActivityService, never()).updatePlannedTenderDetail(any(), any());
   }

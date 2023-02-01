@@ -2,11 +2,13 @@
 
 <#assign pageTitle = "Planned tender activity"/>
 
+<#-- @ftlvariable name="errorList" type="java.util.List<uk.co.nstauthority.scap.fds.ErrorItem>" -->
+
 <@defaultPage
   htmlTitle=pageTitle
   pageHeading=pageTitle
   pageSize=PageSize.TWO_THIRDS_COLUMN
-  errorItems=errorItems
+  errorItems=errorList
   backLinkUrl=springUrl(backLinkUrl)
 >
   <@fdsForm.htmlForm>

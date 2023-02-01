@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
@@ -25,7 +26,6 @@ import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderService;
 import uk.co.nstauthority.scap.scap.plannedtender.hasplannedtender.HasPlannedTenderController;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
-import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 
 @Controller
 @RequestMapping("{scapId}/planned-tender/activity")
@@ -38,20 +38,20 @@ public class PlannedTenderActivityController {
   private final PlannedTenderService plannedTenderService;
   private final PlannedTenderActivityService plannedTenderActivityService;
   private final PlannedTenderActivityFormService plannedTenderActivityFormService;
-  private final ValidationErrorOrderingService validationErrorOrderingService;
+  private final ControllerHelperService controllerHelperService;
 
   @Autowired
   public PlannedTenderActivityController(ScapService scapService, ScapDetailService scapDetailService,
                                          PlannedTenderService plannedTenderService,
                                          PlannedTenderActivityService plannedTenderActivityService,
                                          PlannedTenderActivityFormService plannedTenderActivityFormService,
-                                         ValidationErrorOrderingService validationErrorOrderingService) {
+                                         ControllerHelperService controllerHelperService) {
     this.scapService = scapService;
     this.scapDetailService = scapDetailService;
     this.plannedTenderService = plannedTenderService;
     this.plannedTenderActivityService = plannedTenderActivityService;
     this.plannedTenderActivityFormService = plannedTenderActivityFormService;
-    this.validationErrorOrderingService = validationErrorOrderingService;
+    this.controllerHelperService = controllerHelperService;
   }
 
   @GetMapping
@@ -73,14 +73,17 @@ public class PlannedTenderActivityController {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
     var scapPlannedTender = plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail);
-    if (bindingResult.hasErrors()) {
-      return plannedTenderDetailFormModelAndView(scapId, getBackLinkUrl(scapId, scapPlannedTender))
-          .addObject("errorItems", validationErrorOrderingService.getErrorItemsFromBindingResult(form, bindingResult));
-    }
 
-    plannedTenderActivityService.createPlannedTenderDetail(scapPlannedTender, form);
+    return controllerHelperService.checkErrorsAndRedirect(
+        bindingResult,
+        plannedTenderDetailFormModelAndView(scapId, getBackLinkUrl(scapId, scapPlannedTender)),
+        form,
+        () -> {
+          plannedTenderActivityService.createPlannedTenderDetail(scapPlannedTender, form);
 
-    return ReverseRouter.redirect(on(PlannedTenderController.class).renderPlannedTenderActivities(scapId));
+          return ReverseRouter.redirect(on(PlannedTenderController.class).renderPlannedTenderActivities(scapId));
+        }
+    );
   }
 
   private String getBackLinkUrl(ScapId scapId, PlannedTender plannedTender) {

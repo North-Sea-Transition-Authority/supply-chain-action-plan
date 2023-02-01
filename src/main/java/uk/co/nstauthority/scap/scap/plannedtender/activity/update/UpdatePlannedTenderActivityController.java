@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
@@ -33,14 +34,17 @@ public class UpdatePlannedTenderActivityController {
   private final ScapService scapService;
   private final PlannedTenderActivityService plannedTenderActivityService;
   private final PlannedTenderActivityFormService plannedTenderActivityFormService;
+  private final ControllerHelperService controllerHelperService;
 
   @Autowired
   UpdatePlannedTenderActivityController(ScapService scapService,
                                         PlannedTenderActivityService plannedTenderActivityService,
-                                        PlannedTenderActivityFormService plannedTenderActivityFormService) {
+                                        PlannedTenderActivityFormService plannedTenderActivityFormService,
+                                        ControllerHelperService controllerHelperService) {
     this.scapService = scapService;
     this.plannedTenderActivityService = plannedTenderActivityService;
     this.plannedTenderActivityFormService = plannedTenderActivityFormService;
+    this.controllerHelperService = controllerHelperService;
   }
 
   @GetMapping
@@ -63,13 +67,16 @@ public class UpdatePlannedTenderActivityController {
 
     bindingResult = plannedTenderActivityFormService.validate(bindingResult, form);
 
-    if (bindingResult.hasErrors()) {
-      return plannedTenderDetailFormModelAndView(scapId, form);
-    }
+    return controllerHelperService.checkErrorsAndRedirect(
+        bindingResult,
+        plannedTenderDetailFormModelAndView(scapId, form),
+        form,
+        () -> {
+          plannedTenderActivityService.updatePlannedTenderDetail(plannedTenderDetail, form);
 
-    plannedTenderActivityService.updatePlannedTenderDetail(plannedTenderDetail, form);
-
-    return ReverseRouter.redirect(on(PlannedTenderController.class).renderPlannedTenderActivities(scapId));
+          return ReverseRouter.redirect(on(PlannedTenderController.class).renderPlannedTenderActivities(scapId));
+        }
+    );
 
   }
 
