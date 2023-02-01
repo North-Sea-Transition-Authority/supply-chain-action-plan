@@ -47,7 +47,7 @@ class AwardedContractFormService {
   }
 
   Optional<Map<String, String>> getPreselectedBidderLocationFromForm(Integer countryId, BindingResult bindingResult) {
-    if (bindingResult.hasFieldErrors("preferredBidderLocation")) {
+    if (bindingResult.hasFieldErrors(AwardedContractFormValidator.BIDDER_LOCATION_FIELD)) {
       return Optional.empty();
     }
     return getPreselectedBidderLocation(countryId);

@@ -20,8 +20,8 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderPart
 @Service
 class AwardedContractFormValidator implements SmartValidator {
 
+  static final String BIDDER_LOCATION_FIELD = "preferredBidderCountryId";
   private static final String PREFERRED_BIDDER_FIELD = "preferredBidderId";
-  private static final String BIDDER_LOCATION_FIELD = "preferredBidderCountryId";
 
   private final CountryService countryService;
 

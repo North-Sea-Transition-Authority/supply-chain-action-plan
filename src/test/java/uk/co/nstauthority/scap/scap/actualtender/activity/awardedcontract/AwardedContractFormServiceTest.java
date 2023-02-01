@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -110,13 +111,15 @@ class AwardedContractFormServiceTest {
     var countryId = 0;
     var bindingResultWithErrors = new BeanPropertyBindingResult(new AwardedContractForm(), "form");
     bindingResultWithErrors.addError(
-        new FieldError("form", "preferredBidderLocation", "Test message")
+        new FieldError("form", AwardedContractFormValidator.BIDDER_LOCATION_FIELD, "Test message")
     );
 
     var returnedCountry = awardedContractFormService
         .getPreselectedBidderLocationFromForm(countryId, bindingResultWithErrors);
 
     assertThat(returnedCountry).isEmpty();
+
+    verifyNoInteractions(countryService);
   }
 
   @Test
