@@ -1,15 +1,28 @@
 package uk.co.nstauthority.scap.scap.casemanagement;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.CONSULTATION_REQUESTED;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTHER_INFO_REQUESTED;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.QA_COMMENT;
 
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -22,6 +35,7 @@ import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
+import uk.co.nstauthority.scap.util.DateUtil;
 import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,16 +74,22 @@ class CaseEventServiceTest {
         .withWebUserAccountId(1000L)
         .build();
 
-
-    when(caseEventService.getEventsByScapId(SCAP_ID)).thenReturn(getTimelineEvents());
+    var events = getTimelineEvents();
+    events.add(getRequestEvent());
+    when(caseEventService.getEventsByScapId(SCAP_ID)).thenReturn(events);
     when(energyPortalUserService.findByWuaIds(anyList())).thenReturn(Collections.singletonList(user));
+    when(caseEventRepository.findAllByScapIdAndEventTimeAfter(eq(SCAP_ID.scapId()),
+        any(Instant.class)))
+        .thenReturn(getTimelineEvents());
     var result = caseEventService.getEventViewByScapId(SCAP_ID);
 
     var formatter = DateTimeFormatter.ofPattern(DateUtils.SHORT_DATE).withZone(ZoneId.systemDefault());
-    assertThat(result.get(0).caseEventSubject()).isEqualTo(CaseEventSubject.SCAP_SUBMITTED.getDisplayName());
-    assertThat(result.get(0).scapId()).isEqualTo(SCAP_ID.scapId());
-    assertThat(result.get(0).userDisplayName()).isEqualTo("TEST SURNAME");
-    assertThat(result.get(0).formattedTime()).isEqualTo(formatter.format(TIME));
+    assertThat(result.get(2).caseEventSubject()).isEqualTo(CaseEventSubject.SCAP_SUBMITTED.getDisplayName());
+    assertThat(result.get(2).scapId()).isEqualTo(SCAP_ID.scapId());
+    assertThat(result.get(2).userDisplayName()).isEqualTo("TEST SURNAME");
+    assertThat(result.get(2).formattedTime()).isEqualTo(formatter.format(TIME.minus(1, ChronoUnit.DAYS)));
+    assertNull(result.get(2).dateOfResponse());
+    assertThat(result.get(1).dateOfResponse()).isEqualTo(DateUtil.instantToString(TIME.minus(1, ChronoUnit.DAYS)));
   }
 
   @Test
@@ -90,15 +110,94 @@ class CaseEventServiceTest {
     assertThat(timelineEvent.getScapId()).isEqualTo(SCAP_ID.scapId());
   }
 
+  @Test
+  void isFurtherResponseOutstanding_noRequest() {
+    when(caseEventRepository.findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(SCAP_ID.scapId(),
+        FURTHER_INFO_REQUESTED))
+        .thenReturn(Optional.empty());
+
+    assertFalse(caseEventService.isFurtherInfoResponseOutstanding(SCAP_ID));
+  }
+
+  @Test
+  void isFurtherResponseOutstanding_requestNoResponse() {
+    when(caseEventRepository.findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(SCAP_ID.scapId(),
+        FURTHER_INFO_REQUESTED))
+        .thenReturn(Optional.of(getRequestEvent()));
+
+    when(caseEventRepository.findAllByScapIdAndEventTimeAfter(SCAP_ID.scapId(),
+        getRequestEvent().getEventTime()))
+        .thenReturn(emptyList());
+
+    assertTrue(caseEventService.isFurtherInfoResponseOutstanding(SCAP_ID));
+  }
+
+  @Test
+  void isFurtherResponseOutstanding_requestAndResponse() {
+    when(caseEventRepository.findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(SCAP_ID.scapId(),
+        FURTHER_INFO_REQUESTED))
+        .thenReturn(Optional.of(getRequestEvent()));
+
+    when(caseEventRepository.findAllByScapIdAndEventTimeAfter(SCAP_ID.scapId(),
+        getRequestEvent().getEventTime()))
+        .thenReturn(getTimelineEvents());
+
+    assertFalse(caseEventService.isFurtherInfoResponseOutstanding(SCAP_ID));
+  }
+
+  @Test
+  void getApplicableActions_NoOutstandingRequests() {
+    var result = caseEventService.getApplicableActionsForScap(SCAP_ID);
+    assertThat(result).containsOnly(CONSULTATION_REQUESTED,
+        FURTHER_INFO_REQUESTED,
+        QA_COMMENT);
+
+    var action = result.iterator().next();
+    assertNotNull(action.getActionPanelId());
+    assertNotNull(action.getDisplayName());
+    assertNotNull(action.getButtonText());
+  }
+
+  @Test
+  void getApplicableActions_OutstandingRequests() {
+    when(caseEventRepository.findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(SCAP_ID.scapId(),
+        FURTHER_INFO_REQUESTED))
+        .thenReturn(Optional.of(getRequestEvent()));
+
+    var result = caseEventService.getApplicableActionsForScap(SCAP_ID);
+    assertThat(result).containsOnly(CONSULTATION_REQUESTED,
+        QA_COMMENT);
+  }
+
   private List<CaseEvent> getTimelineEvents() {
     var submissionTimelineEvent = new CaseEvent(1);
     submissionTimelineEvent.setCaseEventSubject(CaseEventSubject.SCAP_SUBMITTED);
     submissionTimelineEvent.setScapId(SCAP_ID.scapId());
     submissionTimelineEvent.setVersionNumber(1);
-    submissionTimelineEvent.setEventTime(TIME);
+    submissionTimelineEvent.setEventTime(TIME.minus(1, ChronoUnit.DAYS));
     submissionTimelineEvent.setEventByWuaId(1000L);
 
-    return List.of(submissionTimelineEvent);
+    var furtherInfoResponse = new CaseEvent(2);
+    furtherInfoResponse.setCaseEventSubject(CaseEventSubject.FURTHER_INFO_RESPONSE);
+    furtherInfoResponse.setScapId(SCAP_ID.scapId());
+    furtherInfoResponse.setVersionNumber(1);
+    furtherInfoResponse.setEventTime(TIME.plus(5, ChronoUnit.DAYS));
+    furtherInfoResponse.setEventByWuaId(1000L);
+
+    var list = new ArrayList<CaseEvent>();
+    list.add(submissionTimelineEvent);
+    list.add(furtherInfoResponse);
+    return list;
   }
 
+  private CaseEvent getRequestEvent() {
+    var infoRequestTimelineEvent = new CaseEvent(15);
+    infoRequestTimelineEvent.setCaseEventSubject(FURTHER_INFO_REQUESTED);
+    infoRequestTimelineEvent.setScapId(SCAP_ID.scapId());
+    infoRequestTimelineEvent.setVersionNumber(1);
+    infoRequestTimelineEvent.setEventTime(TIME);
+    infoRequestTimelineEvent.setEventByWuaId(1000L);
+
+    return infoRequestTimelineEvent;
+  }
 }

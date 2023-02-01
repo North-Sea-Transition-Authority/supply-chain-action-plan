@@ -22,6 +22,7 @@ import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
@@ -38,6 +39,9 @@ class WorkAreaServiceTest {
 
   @Mock
   UserDetailService userDetailService;
+
+  @Mock
+  CaseEventService caseEventService;
 
   @Mock
   TeamService teamService;
@@ -73,6 +77,7 @@ class WorkAreaServiceTest {
         Instant.now()
     );
 
+    when(caseEventService.isFurtherInfoResponseOutstanding(new ScapId(1))).thenReturn(false);
     when(userDetailService.getUserDetail()).thenReturn(userDetail);
     when(teamService.getTeamsThatUserBelongsTo(userDetail)).thenReturn(List.of(team));
     when(workAreaItemDtoRepository.getAllByScapStatusNotIn(ScapDetailStatus.DRAFT)).thenReturn(List.of(workAreaItemDto));
@@ -124,6 +129,7 @@ class WorkAreaServiceTest {
         Instant.now()
     );
 
+    when(caseEventService.isFurtherInfoResponseOutstanding(new ScapId(1))).thenReturn(false);
     when(userDetailService.getUserDetail()).thenReturn(userDetail);
     when(teamService.getTeamsThatUserBelongsTo(userDetail)).thenReturn(List.of(team));
     when(workAreaItemDtoRepository.getAllByOrganisationGroups(List.of(organisationGroup.getOrganisationGroupId())))
@@ -190,6 +196,7 @@ class WorkAreaServiceTest {
         oldDraftScapDto, newDraftScapDto, oldSubmittedScapDto, newSubmittedScapDto
     );
 
+    when(caseEventService.isFurtherInfoResponseOutstanding(new ScapId(4))).thenReturn(false);
     when(userDetailService.getUserDetail()).thenReturn(userDetail);
     when(teamService.getTeamsThatUserBelongsTo(userDetail)).thenReturn(List.of(team));
     when(workAreaItemDtoRepository.getAllByOrganisationGroups(List.of(orgGrpId)))

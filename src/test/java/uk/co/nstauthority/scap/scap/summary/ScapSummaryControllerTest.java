@@ -5,10 +5,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTHER_INFO_REQUESTED;
 import static uk.co.nstauthority.scap.scap.projectdetails.ProjectType.FIELD_DEVELOPMENT_PLAN;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getScapSummaryView;
 
@@ -16,6 +18,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -79,12 +82,14 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
     when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
+    when(caseEventService.getApplicableActionsForScap(SCAP_ID)).thenReturn(Set.of(FURTHER_INFO_REQUESTED));
 
     mockMvc.perform(get(
         ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
             .with(user(testUser)))
         .andExpect(status().isOk())
-        .andExpect(view().name("scap/scap/summary/scapSummaryOverview"));
+        .andExpect(view().name("scap/scap/summary/scapSummaryOverview"))
+        .andExpect(model().attribute("applicableActions", Set.of(FURTHER_INFO_REQUESTED)));
   }
 
 
@@ -154,7 +159,8 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
         1,
         "",
         "TEST TESTER",
-        "");
+        "",
+        null);
     return List.of(timelineEvent);
   }
 }

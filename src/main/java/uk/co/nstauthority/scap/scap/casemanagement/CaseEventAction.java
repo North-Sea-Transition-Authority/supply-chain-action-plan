@@ -14,5 +14,9 @@ public class CaseEventAction {
 
   public static final String INFO_REQUESTED = "INFO_REQUESTED";
 
+  public static final String INFO_RESPONSE = "INFO_RESPONSE";
+
   public static final String CONSULTATION_REQUESTED = "CONSULTATION_REQUESTED";
+
+  public static final String APPROVED = "APPROVED";
 }

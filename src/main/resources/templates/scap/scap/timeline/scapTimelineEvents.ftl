@@ -27,6 +27,11 @@
           <@fdsDataItems.dataValues key="Comments" value=caseEvent.comments()></@fdsDataItems.dataValues>
         </@fdsDataItems.dataItem>
       </#if>
+      <#if caseEvent.hasBeenRespondedTo()>
+          <@fdsDataItems.dataItem>
+              <@fdsDataItems.dataValues key="Responded to on" value=caseEvent.dateOfResponse()></@fdsDataItems.dataValues>
+          </@fdsDataItems.dataItem>
+      </#if>
     </@fdsTimeline.timelineEvent>
   </@fdsTimeline.timelineTimeStamp>
 </#macro>

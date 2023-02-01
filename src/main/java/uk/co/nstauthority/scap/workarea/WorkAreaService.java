@@ -15,6 +15,7 @@ import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
@@ -30,13 +31,19 @@ class WorkAreaService {
   private final UserDetailService userDetailService;
   private final TeamService teamService;
 
+  private final CaseEventService caseEventService;
+
   @Autowired
-  WorkAreaService(WorkAreaItemDtoRepository workAreaItemDtoRepository, OrganisationGroupService organisationGroupService,
-                  UserDetailService userDetailService, TeamService teamService) {
+  WorkAreaService(WorkAreaItemDtoRepository workAreaItemDtoRepository,
+                  OrganisationGroupService organisationGroupService,
+                  UserDetailService userDetailService,
+                  TeamService teamService,
+                  CaseEventService caseEventService) {
     this.workAreaItemDtoRepository = workAreaItemDtoRepository;
     this.organisationGroupService = organisationGroupService;
     this.userDetailService = userDetailService;
     this.teamService = teamService;
+    this.caseEventService = caseEventService;
   }
 
   public List<WorkAreaItem> getWorkAreaItems() {
@@ -91,7 +98,8 @@ class WorkAreaService {
             organisationGroupsMap.getOrDefault(workAreaItemDto.organisationGroupId(), "MISSING OPERATOR"),
             workAreaItemDto.projectName(),
             workAreaItemDto.status(),
-            inferStatus(workAreaItemDto)))
+            inferStatus(workAreaItemDto),
+            caseEventService.isFurtherInfoResponseOutstanding(new ScapId(workAreaItemDto.scapId()))))
         .toList();
 
   }

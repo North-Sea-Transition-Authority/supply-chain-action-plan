@@ -60,7 +60,8 @@ public class ScapSummaryController {
     var generator =
         ScapSummaryModelAndViewGenerator.generator(scapDetail, scapSummary)
             .withScapStatus(scapSummaryViewService.inferSubmissionStatusFromSummary(scapSummary))
-            .withCaseEventTimeline(getCaseEventView(scapId));
+            .withCaseEventTimeline(getCaseEventView(scapId))
+            .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);
     return generator.generate();
   }

@@ -75,6 +75,7 @@ public class ConsultationRequestController {
         .getOrganisationGroupById(scapDetail.getScap().getOrganisationGroupId(),
             "Get Org Group for Summary of SCAP ID: %s".formatted(scapId.scapId()));
 
+
     var generator =
         ScapSummaryModelAndViewGenerator.generator(scapDetail, scapSummary)
             .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))

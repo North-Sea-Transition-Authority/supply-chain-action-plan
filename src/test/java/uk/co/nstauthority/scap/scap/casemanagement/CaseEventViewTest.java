@@ -11,26 +11,54 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class CaseEventViewTest {
 
   @Test
-  void timelineEventView_HasComments_NoComment() {
+  void caseEventView_HasComments_NoComment() {
     var timelineEventView = new CaseEventView(CaseEventSubject.SCAP_SUBMITTED.getDisplayName(),
         1,
         1,
         "2020-03-02 00:00:00",
         "Testing Account",
+        null,
         null);
 
     assertFalse(timelineEventView.hasComments());
   }
 
   @Test
-  void timelineEventView_HasComments_Comments() {
+  void caseEventView_HasComments_Comments() {
     var timelineEventView = new CaseEventView(CaseEventSubject.SCAP_SUBMITTED.getDisplayName(),
         1,
         1,
         "2020-03-02 00:00:00",
         "Testing Account",
-        "this event view has comments");
+        "this event view has comments",
+        null);
 
     assertTrue(timelineEventView.hasComments());
+  }
+
+  @Test
+  void caseEventView_HasBeenResponded_NoResponse() {
+    var caseEventView = new CaseEventView(CaseEventSubject.FURTHER_INFO_REQUESTED.getDisplayName(),
+        1,
+        1,
+        "2020-03-02 00:00:00",
+        "Testing Account",
+        "this event view has comments",
+        null);
+
+    assertFalse(caseEventView.hasBeenRespondedTo());
+  }
+
+  @Test
+  void caseEventView_HasBeenResponded_HasResponse() {
+    var caseEventView = new CaseEventView(CaseEventSubject.FURTHER_INFO_REQUESTED.getDisplayName(),
+        1,
+        1,
+        "2020-03-02 00:00:00",
+        "Testing Account",
+        "this event view has comments",
+        "2020-05-02 00:00:00");
+
+    assertTrue(caseEventView.hasBeenRespondedTo());
   }
 }

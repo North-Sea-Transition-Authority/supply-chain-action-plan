@@ -42,7 +42,8 @@ class WorkAreaControllerTest extends AbstractControllerTest {
             "operator",
             "projectName",
             ScapDetailStatus.DRAFT,
-            ScapSubmissionStage.CONTRACTING_STRATEGY_PENDING
+            ScapSubmissionStage.CONTRACTING_STRATEGY_PENDING,
+            false
         ));
 
     when(workAreaService.getWorkAreaItems()).thenReturn(workAreaItems);

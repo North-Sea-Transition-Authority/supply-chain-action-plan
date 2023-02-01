@@ -1,8 +1,16 @@
 package uk.co.nstauthority.scap.scap.casemanagement;
 
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTHER_INFO_REQUESTED;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTHER_INFO_RESPONSE;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_APPROVED;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_SUBMITTED;
+
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +30,9 @@ public class CaseEventService {
   private final EnergyPortalUserService energyPortalUserService;
 
   private final CaseEventRepository caseEventRepository;
+  private static final Set<CaseEventSubject> RESPONSE_ACTIONS = Set.of(FURTHER_INFO_RESPONSE,
+      SCAP_SUBMITTED,
+      SCAP_APPROVED);
 
   @Autowired
   public CaseEventService(UserDetailService userDetailService,
@@ -78,8 +89,43 @@ public class CaseEventService {
                 caseEvent.getVersionNumber(),
                 DateUtil.instantToString(caseEvent.getEventTime()),
                 userDisplayNames.get(caseEvent.getEventByWuaId()),
-                caseEvent.getComments()
-            ))
+                caseEvent.getComments(),
+                getDateOfResponseToInfoRequest(caseEvent).map(DateUtil::instantToString).orElse(null)))
         .toList();
+  }
+
+  public boolean isFurtherInfoResponseOutstanding(ScapId scapId) {
+    var requestActionOptional = caseEventRepository
+        .findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(scapId.scapId(), FURTHER_INFO_REQUESTED);
+
+    if (requestActionOptional.isPresent()) {
+      return getDateOfResponseToInfoRequest(requestActionOptional.get()).isEmpty();
+    }
+    return false;
+  }
+
+  public Optional<Instant> getDateOfResponseToInfoRequest(CaseEvent infoRequest) {
+    if (infoRequest.getTimelineEventSubject() != FURTHER_INFO_REQUESTED) {
+      return Optional.empty();
+    }
+    var events = caseEventRepository.findAllByScapIdAndEventTimeAfter(
+        infoRequest.getScapId(),
+        infoRequest.getEventTime());
+    return events.stream()
+        .filter(event -> RESPONSE_ACTIONS.contains(event.getTimelineEventSubject()))
+        .map(CaseEvent::getEventTime)
+        .sorted()
+        .findFirst();
+  }
+
+  public Set<CaseEventSubject> getApplicableActionsForScap(ScapId scapId) {
+    var allActions = Arrays.stream(CaseEventSubject.values()).collect(Collectors.toSet());
+
+    allActions.remove(SCAP_SUBMITTED);
+    if (isFurtherInfoResponseOutstanding(scapId)) {
+      allActions.remove(FURTHER_INFO_REQUESTED);
+    }
+    allActions.removeIf(action -> action.getActionPanelId() == null);
+    return allActions;
   }
 }

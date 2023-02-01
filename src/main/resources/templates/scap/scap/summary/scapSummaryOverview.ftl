@@ -11,6 +11,7 @@
 <#-- @ftlvariable name="operator" type="java.lang.String" -->
 <#-- @ftlvariable name="scapSummaryView" type="uk.co.nstauthority.scap.scap.summary.ScapSummaryView" -->
 <#-- @ftlvariable name="caseEvents" type="java.util.List<uk.co.nstauthority.scap.scap.casemanagement.CaseEventView>" -->
+<#-- @ftlvariable name="applicableActions" type="java.util.Set<uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject>" -->
 
 <@defaultPage
 htmlTitle=pageTitle
@@ -20,10 +21,7 @@ pageSize=PageSize.FULL_WIDTH
 backLinkUrl=springUrl(backLinkUrl)
 >
   <@scapSummaryCard.summaryCard/>
-  <@fdsSlideOutPanel.slideOutPanelButton buttonText="Complete QA checks" buttonPanelId="Qa-Panel" buttonClass="govuk-button govuk-button--secondary"/>
-  <@fdsSlideOutPanel.slideOutPanelButton buttonText="Request further information" buttonPanelId="Info-Request-Panel" buttonClass="govuk-button govuk-button--secondary"/>
-  <@fdsSlideOutPanel.slideOutPanelButton buttonText="Request Consultation" buttonPanelId="Consultation-Request-Panel" buttonClass="govuk-button govuk-button--secondary"/>
-
+  <@actions applicableActions/>
   <@fdsTabs.tabs tabsHeading="SCAP overview tabs">
     <@fdsTabs.tabList>
       <@fdsTabs.tab tabLabel="Application form" tabAnchor="summary-tab"/>
@@ -44,3 +42,11 @@ backLinkUrl=springUrl(backLinkUrl)
   <#include 'caseActions/infoRequestAction.ftl'/>
   <#include 'caseActions/consultationRequestAction.ftl'/>
 </@defaultPage>
+
+<#macro actions applicableActions>
+  <#if applicableActions?has_content>
+    <#list applicableActions as action>
+      <@fdsSlideOutPanel.slideOutPanelButton buttonText=action.getButtonText() buttonPanelId=action.getActionPanelId() buttonClass="govuk-button govuk-button--secondary"/>
+    </#list>
+  </#if>
+</#macro>

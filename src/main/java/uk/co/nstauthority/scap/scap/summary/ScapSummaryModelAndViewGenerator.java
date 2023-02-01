@@ -1,14 +1,17 @@
 package uk.co.nstauthority.scap.scap.summary;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.List;
+import java.util.Set;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.error.exception.IllegalUtilClassInstantiationException;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventView;
 import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestController;
 import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestForm;
@@ -31,19 +34,14 @@ public class ScapSummaryModelAndViewGenerator {
   }
 
   public static class Generator {
-    private ScapDetail scapDetail;
-
-    private ScapSummaryView scapSummary;
-
+    private final ScapDetail scapDetail;
+    private final ScapSummaryView scapSummary;
+    private Set<CaseEventSubject> applicableActions = emptySet();
     private OrganisationGroup orgGroup;
-
     private ScapSubmissionStage scapStatus = ScapSubmissionStage.DRAFT;
-
     private List<CaseEventView> caseEventTimeline = emptyList();
-
     private FurtherInfoRequestForm furtherInfoRequestForm = new FurtherInfoRequestForm();
     private QaCommentForm qaCommentForm = new QaCommentForm();
-
     private ConsultationRequestForm consultationRequestForm = new ConsultationRequestForm();
 
     public Generator(ScapDetail scapDetail,
@@ -82,6 +80,11 @@ public class ScapSummaryModelAndViewGenerator {
       return this;
     }
 
+    public Generator withApplicableActions(Set<CaseEventSubject> applicableActions) {
+      this.applicableActions = applicableActions;
+      return this;
+    }
+
     public ModelAndView generate() {
       var modelAndView =  new ModelAndView("scap/scap/summary/scapSummaryOverview")
           .addObject("scapSummaryView", scapSummary)
@@ -90,7 +93,8 @@ public class ScapSummaryModelAndViewGenerator {
           .addObject("operator", orgGroup != null ? orgGroup.getName() : "")
           .addObject("scapStatus", scapDetail.getStatus().getDisplayName())
           .addObject("scapSubmissionStatus", scapStatus.getDisplayName())
-          .addObject("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea()));
+          .addObject("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea()))
+          .addObject("applicableActions", applicableActions);
 
 
       addCaseEventTimeline(modelAndView);

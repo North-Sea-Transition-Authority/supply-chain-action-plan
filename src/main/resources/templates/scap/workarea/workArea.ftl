@@ -22,10 +22,16 @@
 
 <#macro scapResultItem workAreaItem>
 <#-- @ftlvariable name="workAreaItem" type="uk.co.nstauthority.scap.workarea.WorkAreaItem" -->
+  <#assign tagContentInfoRequest>
+    <#if workAreaItem.outstandingInformationRequest()>
+      <@fdsResultList.resultListTag tagClass="govuk-tag--blue" tagText="Update requested"/>
+    </#if>
+  </#assign>
   <@fdsResultList.resultListItem
     linkHeadingText=workAreaItem.reference()
     linkHeadingUrl=springUrl(workAreaItem.url())
     captionHeadingText=workAreaItem.operator()
+    itemTag=tagContentInfoRequest
   >
     <@fdsResultList.resultListDataItem>
       <@fdsResultList.resultListDataValue key="Project name" value=workAreaItem.projectName()!""/>
