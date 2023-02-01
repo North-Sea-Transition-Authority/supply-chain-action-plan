@@ -24,7 +24,7 @@
 <#-- @ftlvariable name="workAreaItem" type="uk.co.nstauthority.scap.workarea.WorkAreaItem" -->
   <#assign tagContentInfoRequest>
     <#if workAreaItem.outstandingInformationRequest()>
-      <@fdsResultList.resultListTag tagClass="govuk-tag--blue" tagText="Update requested"/>
+      <@fdsResultList.resultListTag tagClass="govuk-tag--blue" tagText="Further information requested"/>
     </#if>
   </#assign>
   <@fdsResultList.resultListItem
