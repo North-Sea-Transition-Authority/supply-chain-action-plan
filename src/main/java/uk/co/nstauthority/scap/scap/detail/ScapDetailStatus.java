@@ -1,10 +1,12 @@
 package uk.co.nstauthority.scap.scap.detail;
 
+import java.util.Map;
 import uk.co.nstauthority.scap.enumutil.Displayable;
+import uk.co.nstauthority.scap.enumutil.DisplayableEnumOptionUtil;
 
 public enum ScapDetailStatus implements Displayable {
-  SUBMITTED("Submitted", 10),
-  DRAFT("Draft", 20),
+  DRAFT("Draft", 10),
+  SUBMITTED("Submitted", 20),
   DELETED("Deleted", 100);
 
   private final String displayName;
@@ -28,5 +30,11 @@ public enum ScapDetailStatus implements Displayable {
   @Override
   public String getEnumName() {
     return this.name();
+  }
+
+  public static Map<String, String> getRadioOptions() {
+    var radioOptions = DisplayableEnumOptionUtil.getDisplayableOptions(ScapDetailStatus.class);
+    radioOptions.remove(DELETED.getEnumName());
+    return radioOptions;
   }
 }

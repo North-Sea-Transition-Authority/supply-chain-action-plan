@@ -21,7 +21,7 @@ public class ScapStartController {
 
   private final UserDetailService userDetailService;
 
-  private final String workAreaUrl = ReverseRouter.route(on(WorkAreaController.class).getWorkArea());
+  private final String workAreaUrl = ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null));
   private final String startRedirectUrl = ReverseRouter.route(on(OrganisationGroupController.class)
       .renderNewScapOrganisationGroupForm(null));
 
@@ -35,7 +35,7 @@ public class ScapStartController {
     var user = userDetailService.getUserDetail();
     var userPermissions = teamMemberService.getAllPermissionsForUser(user);
     if (!(userPermissions.contains(SUBMIT_SCAP))) {
-      return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea());
+      return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(null));
     }
 
     return new ModelAndView("scap/scap/start")

@@ -8,16 +8,35 @@
 <@defaultPage
   htmlTitle=pageTitle
   pageHeading=pageTitle
-  pageSize=PageSize.TWO_THIRDS_COLUMN
+  pageSize=PageSize.FULL_WIDTH
+  wrapperWidth=true
 >
   <#if canStartScap>
     <@fdsAction.link linkText="Start new SCAP" linkClass="govuk-button" linkUrl=springUrl(startScapUrl)/>
   </#if>
-  <@fdsResultList.resultList resultCount=workAreaItems?size>
-    <#list workAreaItems as workAreaItem>
-      <@scapResultItem workAreaItem=workAreaItem />
-    </#list>
-  </@fdsResultList.resultList>
+  <@fdsSearch.searchFilter
+    oneThirdWidth=true
+  >
+    <@fdsSearch.searchFilterList
+      clearFilterUrl=springUrl(clearFiltersUrl)
+      filterButtonClass="govuk-button govuk-button--secondary"
+    >
+      <@fdsSearch.searchFilterItem itemName="SCAP status">
+        <@fdsSearch.searchCheckboxes
+          path="form.scapStatuses"
+          checkboxes=statusCheckboxes
+        />
+      </@fdsSearch.searchFilterItem>
+    </@fdsSearch.searchFilterList>
+  </@fdsSearch.searchFilter>
+  <@fdsSearch.searchPageContent twoThirdsWidth=true>
+    <#--noinspection FtlCallsInspection-->
+    <@fdsResultList.resultList resultCount=workAreaItems?size>
+      <#list workAreaItems as workAreaItem>
+        <@scapResultItem workAreaItem=workAreaItem />
+      </#list>
+    </@fdsResultList.resultList>
+  </@fdsSearch.searchPageContent>
 </@defaultPage>
 
 <#macro scapResultItem workAreaItem>

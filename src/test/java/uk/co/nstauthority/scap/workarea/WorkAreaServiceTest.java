@@ -6,19 +6,23 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAP_DETAILS;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.jooq.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
-import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
@@ -38,24 +42,29 @@ class WorkAreaServiceTest {
   OrganisationGroupService organisationGroupService;
 
   @Mock
-  UserDetailService userDetailService;
-
-  @Mock
   CaseEventService caseEventService;
 
   @Mock
   TeamService teamService;
+
+  @Mock
+  WorkAreaFilterService workAreaFilterService;
 
   @InjectMocks
   WorkAreaService workAreaService;
 
   ServiceUserDetail userDetail;
   OrganisationGroup organisationGroup;
+  WorkAreaFilter filter;
+
+  @Captor
+  ArgumentCaptor<List<Condition>> conditionsArgumentCaptor;
 
   @BeforeEach
   void setup() {
     userDetail = new ServiceUserDetail(1L, 1L, "John" , "Smith", "john.smith@example.com");
     organisationGroup = new OrganisationGroup(55, "CENTRICA", null, null, null, null);
+    filter = new WorkAreaFilter();
   }
 
   @Test
@@ -78,14 +87,14 @@ class WorkAreaServiceTest {
     );
 
     when(caseEventService.isFurtherInfoResponseOutstanding(new ScapId(1))).thenReturn(false);
-    when(userDetailService.getUserDetail()).thenReturn(userDetail);
     when(teamService.getTeamsThatUserBelongsTo(userDetail)).thenReturn(List.of(team));
-    when(workAreaItemDtoRepository.getAllByScapStatusNotIn(ScapDetailStatus.DRAFT)).thenReturn(List.of(workAreaItemDto));
+    when(workAreaItemDtoRepository.performQuery(any())).thenReturn(List.of(workAreaItemDto));
     when(organisationGroupService.getOrganisationGroupsByIds(
         List.of(workAreaItemDto.organisationGroupId()), WorkAreaService.ORGANISATION_GROUPS_REQUEST_PURPOSE))
         .thenReturn(List.of(organisationGroup));
+    when(workAreaFilterService.getConditions(filter)).thenReturn(new ArrayList<>());
 
-    var views = workAreaService.getWorkAreaItems();
+    var views = workAreaService.getWorkAreaItems(userDetail, filter);
 
     assertThat(views).extracting(workAreaItem ->
         workAreaItem.scapId().scapId(),
@@ -107,6 +116,12 @@ class WorkAreaServiceTest {
         )
     );
     verify(workAreaItemDtoRepository, never()).getAllByOrganisationGroups(any());
+    verify(workAreaFilterService).getConditions(filter);
+    verify(workAreaItemDtoRepository).performQuery(conditionsArgumentCaptor.capture());
+
+    assertThat(conditionsArgumentCaptor.getValue()).containsExactly(
+        SCAP_DETAILS.STATUS.notEqual(ScapDetailStatus.DRAFT.getEnumName())
+    );
   }
 
   @Test
@@ -130,15 +145,14 @@ class WorkAreaServiceTest {
     );
 
     when(caseEventService.isFurtherInfoResponseOutstanding(new ScapId(1))).thenReturn(false);
-    when(userDetailService.getUserDetail()).thenReturn(userDetail);
     when(teamService.getTeamsThatUserBelongsTo(userDetail)).thenReturn(List.of(team));
-    when(workAreaItemDtoRepository.getAllByOrganisationGroups(List.of(organisationGroup.getOrganisationGroupId())))
+    when(workAreaItemDtoRepository.performQuery(any()))
         .thenReturn(List.of(workAreaItemDto));
     when(organisationGroupService.getOrganisationGroupsByIds(
         List.of(workAreaItemDto.organisationGroupId()), WorkAreaService.ORGANISATION_GROUPS_REQUEST_PURPOSE))
         .thenReturn(List.of(organisationGroup));
 
-    var views = workAreaService.getWorkAreaItems();
+    var views = workAreaService.getWorkAreaItems(userDetail, new WorkAreaFilter());
 
     assertThat(views).extracting(workAreaItem ->
         workAreaItem.scapId().scapId(),
@@ -197,16 +211,14 @@ class WorkAreaServiceTest {
     );
 
     when(caseEventService.isFurtherInfoResponseOutstanding(new ScapId(4))).thenReturn(false);
-    when(userDetailService.getUserDetail()).thenReturn(userDetail);
     when(teamService.getTeamsThatUserBelongsTo(userDetail)).thenReturn(List.of(team));
-    when(workAreaItemDtoRepository.getAllByOrganisationGroups(List.of(orgGrpId)))
-        .thenReturn(workAreaItemDtoList);
+    when(workAreaItemDtoRepository.performQuery(any())).thenReturn(workAreaItemDtoList);
     when(organisationGroupService.getOrganisationGroupsByIds(
         List.of(orgGrpId, orgGrpId, orgGrpId, orgGrpId),
         WorkAreaService.ORGANISATION_GROUPS_REQUEST_PURPOSE))
         .thenReturn(List.of(organisationGroup));
 
-    var views = workAreaService.getWorkAreaItems();
+    var views = workAreaService.getWorkAreaItems(userDetail, new WorkAreaFilter());
 
     assertThat(views).extracting(
         item -> item.scapId().scapId()
@@ -220,10 +232,9 @@ class WorkAreaServiceTest {
 
   @Test
   void getWorkAreaItems_WhenNoTeam_VerifyNeverCallsRepository() {
-    when(userDetailService.getUserDetail()).thenReturn(userDetail);
     when(teamService.getTeamsThatUserBelongsTo(userDetail)).thenReturn(Collections.emptyList());
 
-    var views = workAreaService.getWorkAreaItems();
+    var views = workAreaService.getWorkAreaItems(userDetail, new WorkAreaFilter());
 
     assertThat(views).isEmpty();
 

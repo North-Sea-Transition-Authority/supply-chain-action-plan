@@ -45,7 +45,7 @@ public class ErrorService {
   }
 
   private void addCommonUrls(ModelAndView modelAndView) {
-    modelAndView.addObject("serviceHomeUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea()));
+    modelAndView.addObject("serviceHomeUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)));
   }
 
   private void addBrandingConfigs(ModelAndView modelAndView) {

@@ -19,7 +19,7 @@ public class TopNavigationService {
     var navigationItems = new ArrayList<TopNavigationItem>();
     navigationItems.add(
         new TopNavigationItem(WORK_AREA_TITLE,
-            ReverseRouter.route(on(WorkAreaController.class).getWorkArea()))
+            ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)))
     );
 
     navigationItems.add(

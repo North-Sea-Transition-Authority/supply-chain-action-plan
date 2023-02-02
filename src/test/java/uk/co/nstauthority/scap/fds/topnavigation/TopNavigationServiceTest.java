@@ -12,7 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.fds.navigation.TopNavigationItem;
 import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
-import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamManagementController;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamManagementController;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
@@ -34,7 +33,7 @@ class TopNavigationServiceTest {
         .containsExactly(
             Tuple.tuple(
                 TopNavigationService.WORK_AREA_TITLE,
-                StringUtils.stripEnd(ReverseRouter.route(on(WorkAreaController.class).getWorkArea()), "/")
+                StringUtils.stripEnd(ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)), "/")
             ),
             Tuple.tuple(
                 TopNavigationService.TEAM_MANAGEMENT_NAVIGATION_ITEM_TITLE,

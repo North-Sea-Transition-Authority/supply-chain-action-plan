@@ -59,7 +59,7 @@ class DefaultPageControllerAdviceTest extends AbstractControllerTest {
     assertThat((ServiceConfigurationProperties) modelMap.get("serviceBranding")).hasNoNullFieldsOrProperties();
     assertThat((TechnicalSupportConfigurationProperties) modelMap.get("technicalSupport")).hasNoNullFieldsOrProperties();
     assertThat(modelMap.get("serviceHomeUrl")).isEqualTo(
-        ReverseRouter.route(on(WorkAreaController.class).getWorkArea())
+        ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null))
     );
   }
 

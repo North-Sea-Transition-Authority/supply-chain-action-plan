@@ -81,7 +81,7 @@ class ScapSubmissionController {
     var scap = scapService.getScapById(scapId);
 
     return new ModelAndView("scap/scap/submit/submissionSuccess")
-        .addObject("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea()))
+        .addObject("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)))
         .addObject("scapReference", scap.getReference());
   }
 

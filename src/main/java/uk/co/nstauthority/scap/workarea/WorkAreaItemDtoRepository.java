@@ -1,6 +1,5 @@
 package uk.co.nstauthority.scap.workarea;
 
-import static org.jooq.impl.DSL.field;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.ACTUAL_TENDERS;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.CONTRACTING_PERFORMANCE_OVERVIEWS;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.PLANNED_TENDERS;
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 
+@SuppressWarnings("resource")
 @Repository
 class WorkAreaItemDtoRepository {
 
@@ -41,7 +41,7 @@ class WorkAreaItemDtoRepository {
     return performQuery(Collections.singletonList(condition));
   }
 
-  private List<WorkAreaItemDto> performQuery(List<Condition> conditions) {
+  List<WorkAreaItemDto> performQuery(List<Condition> conditions) {
     return context.select(
             SCAPS.SCAP_ID,
             SCAP_DETAILS.VERSION_NUMBER,
@@ -57,14 +57,14 @@ class WorkAreaItemDtoRepository {
             SCAP_DETAILS.SUBMITTED_TIMESTAMP
         )
         .from(SCAPS)
-        .join(SCAP_DETAILS).on((SCAP_DETAILS.SCAP_ID).eq(SCAPS.SCAP_ID))
-        .leftJoin(PROJECT_DETAILS).on(field(PROJECT_DETAILS.SCAP_DETAIL_ID).eq(SCAP_DETAILS.ID))
-        .leftJoin(PROJECT_PERFORMANCES).on(field(PROJECT_PERFORMANCES.SCAP_DETAIL_ID).eq(SCAP_DETAILS.ID))
-        .leftJoin(CONTRACTING_PERFORMANCE_OVERVIEWS).on(CONTRACTING_PERFORMANCE_OVERVIEWS.SCAP_DETAIL_ID.eq(SCAP_DETAILS.ID))
-        .leftJoin(ACTUAL_TENDERS).on(ACTUAL_TENDERS.SCAP_DETAIL_ID.eq(SCAP_DETAILS.ID))
-        .leftJoin(PLANNED_TENDERS).on(PLANNED_TENDERS.SCAP_DETAIL_ID.eq(SCAP_DETAILS.ID))
+        .join(SCAP_DETAILS).onKey(SCAP_DETAILS.SCAP_ID)
+        .leftJoin(PROJECT_DETAILS).onKey(PROJECT_DETAILS.SCAP_DETAIL_ID)
+        .leftJoin(PROJECT_PERFORMANCES).onKey(PROJECT_PERFORMANCES.SCAP_DETAIL_ID)
+        .leftJoin(CONTRACTING_PERFORMANCE_OVERVIEWS).onKey(CONTRACTING_PERFORMANCE_OVERVIEWS.SCAP_DETAIL_ID)
+        .leftJoin(ACTUAL_TENDERS).onKey(ACTUAL_TENDERS.SCAP_DETAIL_ID)
+        .leftJoin(PLANNED_TENDERS).onKey(PLANNED_TENDERS.SCAP_DETAIL_ID)
         .where(conditions)
-        .and(field(SCAP_DETAILS.TIP_FLAG).eq(true))
+        .and(SCAP_DETAILS.TIP_FLAG.eq(true))
         .fetchInto(WorkAreaItemDto.class);
   }
 }

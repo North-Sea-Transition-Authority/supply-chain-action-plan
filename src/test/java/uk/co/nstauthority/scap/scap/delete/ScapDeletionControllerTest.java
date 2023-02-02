@@ -52,7 +52,7 @@ class ScapDeletionControllerTest extends AbstractScapSubmitterControllerTest {
         post(ReverseRouter.route(on(ScapDeletionController.class).deleteScap(SCAP_ID, null)))
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl(ReverseRouter.route(on(WorkAreaController.class).getWorkArea())));
+        .andExpect(redirectedUrl(ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null))));
 
     verify(scapDetailService).deleteScapById(SCAP_ID);
   }

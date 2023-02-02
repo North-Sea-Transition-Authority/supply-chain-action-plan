@@ -27,6 +27,7 @@
   backLinkUrl=""
   caption=""
   singleErrorMessage=""
+  wrapperWidth=false
 >
   <#local serviceName = serviceBranding.name() />
   <#local customerMnemonic = customerBranding.mnemonic() />
@@ -98,6 +99,7 @@
     notificationBannerContent=notificationBannerContent
     headerContent=headerContent
     singleErrorMessage=singleErrorMessage
+    wrapperWidth=wrapperWidth
   >
     <#nested />
   </@fdsDefaultPageTemplate>

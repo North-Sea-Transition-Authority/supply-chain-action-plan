@@ -16,7 +16,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
-import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupController;
@@ -38,7 +37,7 @@ class ScapStartControllerTest extends AbstractControllerTest {
         .andExpect(model().attribute("startScapRedirectUrl",
             ReverseRouter.route(on(OrganisationGroupController.class).renderNewScapOrganisationGroupForm(null))))
         .andExpect(model().attribute("backLinkUrl",
-            ReverseRouter.route(on(WorkAreaController.class).getWorkArea())));
+            ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null))));
   }
 
 

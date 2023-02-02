@@ -1,17 +1,22 @@
 package uk.co.nstauthority.scap.workarea;
 
+import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAPS;
+import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAP_DETAILS;
+
 import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.jooq.Condition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
-import uk.co.nstauthority.scap.authentication.UserDetailService;
+import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
@@ -28,49 +33,51 @@ class WorkAreaService {
 
   private final WorkAreaItemDtoRepository workAreaItemDtoRepository;
   private final OrganisationGroupService organisationGroupService;
-  private final UserDetailService userDetailService;
   private final TeamService teamService;
+  private final WorkAreaFilterService workAreaFilterService;
 
   private final CaseEventService caseEventService;
 
   @Autowired
   WorkAreaService(WorkAreaItemDtoRepository workAreaItemDtoRepository,
                   OrganisationGroupService organisationGroupService,
-                  UserDetailService userDetailService,
                   TeamService teamService,
-                  CaseEventService caseEventService) {
+                  CaseEventService caseEventService,
+                  WorkAreaFilterService workAreaFilterService) {
     this.workAreaItemDtoRepository = workAreaItemDtoRepository;
     this.organisationGroupService = organisationGroupService;
-    this.userDetailService = userDetailService;
     this.teamService = teamService;
     this.caseEventService = caseEventService;
+    this.workAreaFilterService = workAreaFilterService;
   }
 
-  public List<WorkAreaItem> getWorkAreaItems() {
-    var user = userDetailService.getUserDetail();
+  public List<WorkAreaItem> getWorkAreaItems(ServiceUserDetail user, WorkAreaFilter filter) {
     var teams = teamService.getTeamsThatUserBelongsTo(user);
     var isRegulator = teams.stream()
         .anyMatch(team -> TeamType.REGULATOR.equals(team.getTeamType()));
+    var conditions = workAreaFilterService.getConditions(filter);
 
     if (isRegulator) {
-      return getRegulatorWorkAreaItems();
+      return getRegulatorWorkAreaItems(conditions);
     }
 
-    return getIndustryWorkAreaItems(teams);
+    return getIndustryWorkAreaItems(teams, conditions);
   }
 
-  private List<WorkAreaItem> getRegulatorWorkAreaItems() {
-    var workAreaItemDtoList = workAreaItemDtoRepository.getAllByScapStatusNotIn(ScapDetailStatus.DRAFT);
+  private List<WorkAreaItem> getRegulatorWorkAreaItems(ArrayList<Condition> conditions) {
+    conditions.add(SCAP_DETAILS.STATUS.notEqual(ScapDetailStatus.DRAFT.getEnumName()));
+    var workAreaItemDtoList = workAreaItemDtoRepository.performQuery(conditions);
 
     return getItemsFromDtoList(workAreaItemDtoList);
   }
 
-  private List<WorkAreaItem> getIndustryWorkAreaItems(List<Team> teams) {
+  private List<WorkAreaItem> getIndustryWorkAreaItems(List<Team> teams, ArrayList<Condition> conditions) {
     var organisationGroupIds = teams.stream().map(Team::getEnergyPortalOrgGroupId).toList();
     if (organisationGroupIds.isEmpty()) {
       return Collections.emptyList();
     }
-    var workAreaItemDtoList = workAreaItemDtoRepository.getAllByOrganisationGroups(organisationGroupIds);
+    conditions.add(SCAPS.ORGANISATION_GROUP_ID.in(organisationGroupIds));
+    var workAreaItemDtoList = workAreaItemDtoRepository.performQuery(conditions);
     return getItemsFromDtoList(workAreaItemDtoList);
   }
 
@@ -89,7 +96,7 @@ class WorkAreaService {
         .collect(Collectors.toMap(OrganisationGroup::getOrganisationGroupId, OrganisationGroup::getName));
     return workAreaItemDtoList.stream()
         .sorted(Comparator
-            .comparing((WorkAreaItemDto dto) -> dto.status().getDisplayOrder())
+            .comparing((WorkAreaItemDto dto) -> dto.status().getDisplayOrder()).reversed()
             .thenComparing(sortByItemDate(), Comparator.reverseOrder()))
         .map(workAreaItemDto -> new WorkAreaItem(
             new ScapId(workAreaItemDto.scapId()),

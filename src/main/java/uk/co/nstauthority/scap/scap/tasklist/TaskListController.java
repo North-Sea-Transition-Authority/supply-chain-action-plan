@@ -25,7 +25,7 @@ import uk.co.nstauthority.scap.workarea.WorkAreaController;
 @ScapHasStatus(permittedStatuses = ScapDetailStatus.DRAFT)
 public class TaskListController {
 
-  static final String WORK_AREA_URL = ReverseRouter.route(on(WorkAreaController.class).getWorkArea());
+  static final String WORK_AREA_URL = ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null));
 
   private final List<ScapTaskListSection> scapTaskListSections;
   private final List<ScapTaskListItem> scapTaskListItems;

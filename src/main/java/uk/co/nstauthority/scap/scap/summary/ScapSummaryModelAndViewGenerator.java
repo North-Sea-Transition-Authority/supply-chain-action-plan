@@ -93,7 +93,7 @@ public class ScapSummaryModelAndViewGenerator {
           .addObject("operator", orgGroup != null ? orgGroup.getName() : "")
           .addObject("scapStatus", scapDetail.getStatus().getDisplayName())
           .addObject("scapSubmissionStatus", scapStatus.getDisplayName())
-          .addObject("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea()))
+          .addObject("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)))
           .addObject("applicableActions", applicableActions);
 
 

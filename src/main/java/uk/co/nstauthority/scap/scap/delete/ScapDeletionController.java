@@ -63,6 +63,6 @@ public class ScapDeletionController {
     var successMessage = "%s deleted successfully".formatted(reference);
     DeletionSuccessBannerUtil.addRedirectionNotification(redirectAttributes, successMessage);
 
-    return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea());
+    return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(null));
   }
 }
