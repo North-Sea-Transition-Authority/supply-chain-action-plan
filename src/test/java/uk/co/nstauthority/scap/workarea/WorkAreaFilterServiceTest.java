@@ -60,4 +60,17 @@ class WorkAreaFilterServiceTest {
         upper(SCAPS.REFERENCE).contains(upper(searchTerm))
     );
   }
+
+  @Test
+  void getConditions_OrganisationSelected_AssertCondition() {
+    var organisationId = 2;
+    form.setOperatorId(organisationId);
+    filter.update(form);
+
+    var conditions = workAreaFilterService.getConditions(filter);
+
+    assertThat(conditions).containsExactly(
+        SCAPS.ORGANISATION_GROUP_ID.eq(organisationId)
+    );
+  }
 }

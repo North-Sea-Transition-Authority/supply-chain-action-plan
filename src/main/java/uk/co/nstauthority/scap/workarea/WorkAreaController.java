@@ -14,8 +14,11 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
+import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupRestController;
 import uk.co.nstauthority.scap.scap.start.ScapStartController;
 
 // Hide null warning when ReverseRouting with null parameters on WorkAreaController mappings
@@ -29,23 +32,35 @@ public class WorkAreaController {
 
   private final TeamMemberService teamMemberService;
   private final WorkAreaService workAreaService;
+  private final TeamService teamService;
+  private final WorkAreaFormService workAreaFormService;
 
   @Autowired
   public WorkAreaController(UserDetailService userDetailService,
                             TeamMemberService teamMemberService,
-                            WorkAreaService workAreaService) {
+                            WorkAreaService workAreaService,
+                            TeamService teamService,
+                            WorkAreaFormService workAreaFormService) {
     this.userDetailService = userDetailService;
     this.teamMemberService = teamMemberService;
     this.workAreaService = workAreaService;
+    this.teamService = teamService;
+    this.workAreaFormService = workAreaFormService;
   }
 
   @GetMapping
   public ModelAndView getWorkArea(@ModelAttribute("workAreaFilter") WorkAreaFilter filter) {
     var user = userDetailService.getUserDetail();
     var userPermissions = teamMemberService.getAllPermissionsForUser(user);
-    var workAreaItems = workAreaService.getWorkAreaItems(user, filter);
+    var teams = teamService.getTeamsThatUserBelongsTo(user);
+    var isRegulator = teams.stream()
+        .anyMatch(team -> TeamType.REGULATOR.equals(team.getTeamType()));
+
+    var workAreaItems = workAreaService.getWorkAreaItems(filter, isRegulator, teams);
+
     var form = WorkAreaForm.from(filter);
     var statusCheckboxes = ScapDetailStatus.getRadioOptions();
+    var prefilledOperator = workAreaFormService.getPreselectedOrganisation(form.getOperatorId());
 
     return new ModelAndView("scap/workarea/workArea")
         .addObject("startScapUrl",
@@ -55,7 +70,11 @@ public class WorkAreaController {
         .addObject("clearFiltersUrl",
             ReverseRouter.route(on(WorkAreaController.class).clearWorkAreaFilter(null, null)))
         .addObject("form", form)
-        .addObject("statusCheckboxes", statusCheckboxes);
+        .addObject("statusCheckboxes", statusCheckboxes)
+        .addObject("isRegulator", isRegulator)
+        .addObject("organisationGroupSearchUrl",
+            ReverseRouter.route(on(OrganisationGroupRestController.class).getOrganisationGroupSearchResults(null)))
+        .addObject("prefilledOperator", prefilledOperator);
   }
 
   @PostMapping

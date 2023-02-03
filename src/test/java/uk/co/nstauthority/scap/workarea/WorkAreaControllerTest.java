@@ -2,7 +2,8 @@ package uk.co.nstauthority.scap.workarea;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -42,7 +43,7 @@ class WorkAreaControllerTest extends AbstractControllerTest {
   WorkAreaService workAreaService;
 
   @MockBean
-  WorkAreaFilterService workAreaFilterService;
+  WorkAreaFormService workAreaFormService;
 
   private List<WorkAreaItem> workAreaItems;
   private Map<String, String> statusCheckboxes;
@@ -63,7 +64,7 @@ class WorkAreaControllerTest extends AbstractControllerTest {
     statusCheckboxes = ScapDetailStatus.getRadioOptions();
 
     when(userDetailService.getUserDetail()).thenReturn(testUser);
-    when(workAreaService.getWorkAreaItems(eq(testUser), any(WorkAreaFilter.class))).thenReturn(workAreaItems);
+    when(workAreaService.getWorkAreaItems(any(WorkAreaFilter.class), anyBoolean(), anyList())).thenReturn(workAreaItems);
   }
 
   @Test

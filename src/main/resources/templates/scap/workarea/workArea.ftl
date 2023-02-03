@@ -21,19 +21,30 @@
       clearFilterUrl=springUrl(clearFiltersUrl)
       filterButtonClass="govuk-button govuk-button--secondary"
     >
-      <@fdsSearch.searchFilterItem itemName="SCAP status">
+      <@fdsSearch.searchFilterItem itemName="SCAP status" expanded=form.getScapStatuses()?has_content>
         <@fdsSearch.searchCheckboxes
           path="form.scapStatuses"
           checkboxes=statusCheckboxes
         />
       </@fdsSearch.searchFilterItem>
-      <@fdsSearch.searchFilterItem itemName="SCAP reference">
+      <@fdsSearch.searchFilterItem itemName="SCAP reference" expanded=form.referenceSearchTerm?has_content>
         <@fdsSearch.searchTextInput
           path="form.referenceSearchTerm"
           labelText=""
           suffixScreenReaderPrompt="SCAP reference"
         />
       </@fdsSearch.searchFilterItem>
+      <#if isRegulator>
+        <@fdsSearch.searchFilterItem itemName="Operator" expanded=prefilledOperator.id()?has_content>
+          <@fdsSearchSelector.searchSelectorRest
+            path="form.operatorId"
+            restUrl=springUrl(organisationGroupSearchUrl)
+            labelText=""
+            selectorMinInputLength=2
+            preselectedItems={prefilledOperator.id(): prefilledOperator.text()}
+          />
+        </@fdsSearch.searchFilterItem>
+      </#if>
     </@fdsSearch.searchFilterList>
   </@fdsSearch.searchFilter>
   <@fdsSearch.searchPageContent twoThirdsWidth=true>

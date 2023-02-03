@@ -87,14 +87,13 @@ class WorkAreaServiceTest {
     );
 
     when(caseEventService.isFurtherInfoResponseOutstanding(new ScapId(1))).thenReturn(false);
-    when(teamService.getTeamsThatUserBelongsTo(userDetail)).thenReturn(List.of(team));
     when(workAreaItemDtoRepository.performQuery(any())).thenReturn(List.of(workAreaItemDto));
     when(organisationGroupService.getOrganisationGroupsByIds(
         List.of(workAreaItemDto.organisationGroupId()), WorkAreaService.ORGANISATION_GROUPS_REQUEST_PURPOSE))
         .thenReturn(List.of(organisationGroup));
     when(workAreaFilterService.getConditions(filter)).thenReturn(new ArrayList<>());
 
-    var views = workAreaService.getWorkAreaItems(userDetail, filter);
+    var views = workAreaService.getWorkAreaItems(filter, true, Collections.singletonList(team));
 
     assertThat(views).extracting(workAreaItem ->
         workAreaItem.scapId().scapId(),
@@ -145,14 +144,14 @@ class WorkAreaServiceTest {
     );
 
     when(caseEventService.isFurtherInfoResponseOutstanding(new ScapId(1))).thenReturn(false);
-    when(teamService.getTeamsThatUserBelongsTo(userDetail)).thenReturn(List.of(team));
     when(workAreaItemDtoRepository.performQuery(any()))
         .thenReturn(List.of(workAreaItemDto));
     when(organisationGroupService.getOrganisationGroupsByIds(
         List.of(workAreaItemDto.organisationGroupId()), WorkAreaService.ORGANISATION_GROUPS_REQUEST_PURPOSE))
         .thenReturn(List.of(organisationGroup));
 
-    var views = workAreaService.getWorkAreaItems(userDetail, new WorkAreaFilter());
+    var views = workAreaService
+        .getWorkAreaItems(new WorkAreaFilter(), false, Collections.singletonList(team));
 
     assertThat(views).extracting(workAreaItem ->
         workAreaItem.scapId().scapId(),
@@ -211,14 +210,14 @@ class WorkAreaServiceTest {
     );
 
     when(caseEventService.isFurtherInfoResponseOutstanding(new ScapId(4))).thenReturn(false);
-    when(teamService.getTeamsThatUserBelongsTo(userDetail)).thenReturn(List.of(team));
     when(workAreaItemDtoRepository.performQuery(any())).thenReturn(workAreaItemDtoList);
     when(organisationGroupService.getOrganisationGroupsByIds(
         List.of(orgGrpId, orgGrpId, orgGrpId, orgGrpId),
         WorkAreaService.ORGANISATION_GROUPS_REQUEST_PURPOSE))
         .thenReturn(List.of(organisationGroup));
 
-    var views = workAreaService.getWorkAreaItems(userDetail, new WorkAreaFilter());
+    var views = workAreaService
+        .getWorkAreaItems(new WorkAreaFilter(), false, Collections.singletonList(team));
 
     assertThat(views).extracting(
         item -> item.scapId().scapId()
@@ -232,9 +231,7 @@ class WorkAreaServiceTest {
 
   @Test
   void getWorkAreaItems_WhenNoTeam_VerifyNeverCallsRepository() {
-    when(teamService.getTeamsThatUserBelongsTo(userDetail)).thenReturn(Collections.emptyList());
-
-    var views = workAreaService.getWorkAreaItems(userDetail, new WorkAreaFilter());
+    var views = workAreaService.getWorkAreaItems(new WorkAreaFilter(), false, Collections.emptyList());
 
     assertThat(views).isEmpty();
 

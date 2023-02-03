@@ -16,10 +16,7 @@ import org.jooq.Condition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
-import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
-import uk.co.nstauthority.scap.permissionmanagement.TeamType;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
@@ -33,7 +30,6 @@ class WorkAreaService {
 
   private final WorkAreaItemDtoRepository workAreaItemDtoRepository;
   private final OrganisationGroupService organisationGroupService;
-  private final TeamService teamService;
   private final WorkAreaFilterService workAreaFilterService;
 
   private final CaseEventService caseEventService;
@@ -41,20 +37,17 @@ class WorkAreaService {
   @Autowired
   WorkAreaService(WorkAreaItemDtoRepository workAreaItemDtoRepository,
                   OrganisationGroupService organisationGroupService,
-                  TeamService teamService,
                   CaseEventService caseEventService,
                   WorkAreaFilterService workAreaFilterService) {
     this.workAreaItemDtoRepository = workAreaItemDtoRepository;
     this.organisationGroupService = organisationGroupService;
-    this.teamService = teamService;
     this.caseEventService = caseEventService;
     this.workAreaFilterService = workAreaFilterService;
   }
 
-  public List<WorkAreaItem> getWorkAreaItems(ServiceUserDetail user, WorkAreaFilter filter) {
-    var teams = teamService.getTeamsThatUserBelongsTo(user);
-    var isRegulator = teams.stream()
-        .anyMatch(team -> TeamType.REGULATOR.equals(team.getTeamType()));
+  public List<WorkAreaItem> getWorkAreaItems(WorkAreaFilter filter,
+                                             boolean isRegulator,
+                                             List<Team> teams) {
     var conditions = workAreaFilterService.getConditions(filter);
 
     if (isRegulator) {

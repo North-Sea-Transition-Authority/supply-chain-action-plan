@@ -26,7 +26,15 @@ class WorkAreaFilterService {
       conditions.add(getReferenceCondition(filter.getReferenceSearchTerm()));
     }
 
+    if (Objects.nonNull(filter.getOperatorId())) {
+      conditions.add(getOperatorCondition(filter.getOperatorId()));
+    }
+
     return conditions;
+  }
+
+  private Condition getOperatorCondition(Integer operatorId) {
+    return SCAPS.ORGANISATION_GROUP_ID.eq(operatorId);
   }
 
   private Condition getReferenceCondition(String referenceSearchTerm) {
