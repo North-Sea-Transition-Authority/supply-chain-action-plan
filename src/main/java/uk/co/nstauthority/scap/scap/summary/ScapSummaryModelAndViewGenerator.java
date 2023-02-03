@@ -19,6 +19,8 @@ import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.Consultat
 import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestForm;
 import uk.co.nstauthority.scap.scap.casemanagement.furtherinfo.FurtherInfoController;
 import uk.co.nstauthority.scap.scap.casemanagement.furtherinfo.FurtherInfoRequestForm;
+import uk.co.nstauthority.scap.scap.casemanagement.furtherinforesponse.FurtherInfoResponseController;
+import uk.co.nstauthority.scap.scap.casemanagement.furtherinforesponse.FurtherInfoResponseForm;
 import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentController;
 import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentForm;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
@@ -45,7 +47,7 @@ public class ScapSummaryModelAndViewGenerator {
     private FurtherInfoRequestForm furtherInfoRequestForm = new FurtherInfoRequestForm();
     private QaCommentForm qaCommentForm = new QaCommentForm();
     private ConsultationRequestForm consultationRequestForm = new ConsultationRequestForm();
-
+    private FurtherInfoResponseForm furtherInfoResponseForm = new FurtherInfoResponseForm();
     private ScapApprovalForm scapApprovalForm = new ScapApprovalForm();
 
     public Generator(ScapDetail scapDetail,
@@ -84,6 +86,11 @@ public class ScapSummaryModelAndViewGenerator {
       return this;
     }
 
+    public Generator withFurtherInfoResponseForm(FurtherInfoResponseForm furtherInfoResponseForm) {
+      this.furtherInfoResponseForm = furtherInfoResponseForm;
+      return this;
+    }  
+
     public Generator withScapApprovalForm(ScapApprovalForm scapApprovalForm) {
       this.scapApprovalForm = scapApprovalForm;
       return this;
@@ -109,6 +116,7 @@ public class ScapSummaryModelAndViewGenerator {
       addCaseEventTimeline(modelAndView);
       addQaCommentForm(modelAndView);
       addInfoRequestForm(modelAndView);
+      addInfoResponseForm(modelAndView);
       addConsultationRequestForm(modelAndView);
       addScapApprovalRequestForm(modelAndView);
 
@@ -136,6 +144,17 @@ public class ScapSummaryModelAndViewGenerator {
           ReverseRouter.route(on(FurtherInfoController.class)
               .saveInfoRequestedForm(scapDetail.getScap().getScapId(),
                   CaseEventAction.INFO_REQUESTED,
+                  true,
+                  null,
+                  null)));
+    }
+
+    private void addInfoResponseForm(ModelAndView modelAndView) {
+      modelAndView.addObject("infoResponseForm", furtherInfoResponseForm);
+      modelAndView.addObject("infoResponseSubmitUrl",
+          ReverseRouter.route(on(FurtherInfoResponseController.class)
+              .saveInfoResponseForm(scapDetail.getScap().getScapId(),
+                  CaseEventAction.INFO_RESPONSE,
                   true,
                   null,
                   null)));

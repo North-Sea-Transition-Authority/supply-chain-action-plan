@@ -1,4 +1,4 @@
-<@fdsSlideOutPanel.slideOutPanel panelId="Approve-Scap-Panel" headingText="Approve SCAP">
+<@fdsSlideOutPanel.slideOutPanel panelId="Approve-scap-Panel" headingText="Approve SCAP">
     <@fdsForm.htmlForm actionUrl=springUrl(approvalFormSubmitUrl)>
         <@fdsTextarea.textarea
         path="scapApprovalForm.approvalComments.inputValue"

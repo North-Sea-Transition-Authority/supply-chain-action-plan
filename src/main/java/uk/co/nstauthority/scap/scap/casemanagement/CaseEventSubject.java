@@ -17,8 +17,8 @@ public enum CaseEventSubject {
       "Info-Request-Panel"),
   FURTHER_INFO_RESPONSE(INFO_RESPONSE,
       "Additional Information Response",
-      null,
-      null),
+      "Further Information Response",
+      "Info-Response-Panel"),
   SCAP_SUBMITTED(SUBMIT,
       "Submitted SCAP",
       null,
@@ -30,7 +30,7 @@ public enum CaseEventSubject {
   SCAP_APPROVED(APPROVED,
       "SCAP Approved",
       "Approve SCAP",
-      "Approve-Scap-Panel");
+      "Approve-scap-Panel");
 
   private String displayName;
 

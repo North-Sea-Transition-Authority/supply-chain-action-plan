@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.scap.casemanagement.approval;
+package uk.co.nstauthority.scap.scap.casemanagement.furtherinforesponse;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -33,6 +33,9 @@ import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
+import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentController;
+import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentForm;
+import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentFormValidator;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
@@ -42,8 +45,8 @@ import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 
 @ExtendWith(MockitoExtension.class)
 @WithMockUser
-@ContextConfiguration(classes = ScapApprovalController.class)
-class ScapApprovalControllerTest extends AbstractControllerTest {
+@ContextConfiguration(classes = FurtherInfoResponseController.class)
+class FurtherInfoResponseControllerTest extends AbstractControllerTest {
 
   @MockBean
   private CaseEventService caseEventService;
@@ -58,7 +61,7 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
   private OrganisationGroupService organisationGroupService;
 
   @MockBean
-  private ScapApprovalFormValidator scapApprovalFormValidator;
+  private FurtherInfoResponseFormValidator furtherInfoResponseFormValidator;
 
   private static final ScapId SCAP_ID = new ScapId(1111);
 
@@ -79,67 +82,66 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
 
   @Test
   void saveQaComments_ValidationSuccesful_saved() throws Exception {
-    mockMvc.perform(post(ReverseRouter.route(on(ScapApprovalController.class)
-            .saveScapApprovalForm(
-                SCAP_ID,
-                CaseEventAction.QA,
-                false,
-                null,
-                null)))
-            .with(user(testUser))
-            .with(csrf()))
+    mockMvc.perform(post(ReverseRouter.route(on(FurtherInfoResponseController.class)
+        .saveInfoResponseForm(
+            SCAP_ID,
+            CaseEventAction.INFO_RESPONSE,
+            false,
+            null,
+            null)))
+        .with(user(testUser))
+        .with(csrf()))
         .andExpect(status().is3xxRedirection());
 
-    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_APPROVED, SCAP_ID, 1, null);
-    verify(scapDetailService).approveScap(any(ScapDetail.class));
+    verify(caseEventService).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_ID, 1, null);
   }
 
   @Test
-  void saveApproval_ValidationSuccesful_savedWithComments() throws Exception {
-    mockMvc.perform(post(ReverseRouter.route(on(ScapApprovalController.class)
-            .saveScapApprovalForm(
+  void saveQaComments_ValidationSuccesful_savedWithComments() throws Exception {
+    mockMvc.perform(post(ReverseRouter.route(on(FurtherInfoResponseController.class)
+            .saveInfoResponseForm(
                 SCAP_ID,
-                CaseEventAction.APPROVED,
+                CaseEventAction.INFO_RESPONSE,
                 false,
-                getScapApprovalForm(),
+                getFurtherInfoResponseForm(),
                 null)))
             .with(user(testUser))
             .with(csrf())
-            .flashAttr("scapApprovalForm", getScapApprovalForm()))
+            .flashAttr("infoResponseForm", getFurtherInfoResponseForm()))
         .andExpect(status().is3xxRedirection());
 
-    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_APPROVED, SCAP_ID, 1, TEST_STRING);
-    verify(scapDetailService).approveScap(any(ScapDetail.class));
+    verify(caseEventService).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_ID, 1, TEST_STRING);
   }
 
   @Test
   void saveQaComments_ValidationFailed_Reroute() throws Exception {
     doAnswer(invocation -> {
       var bindingResult = (BindingResult) invocation.getArgument(1);
-      bindingResult.rejectValue("approvalComments.inputValue", "testError", "This is an error message");
+      bindingResult.rejectValue("infoResponse.inputValue", "testError", "This is an error message");
       return bindingResult;
-    }).when(scapApprovalFormValidator).validate(any(), any());
+    }).when(furtherInfoResponseFormValidator).validate(any(), any());
 
-    mockMvc.perform(post(ReverseRouter.route(on(ScapApprovalController.class)
-            .saveScapApprovalForm(
+    mockMvc.perform(post(ReverseRouter.route(on(FurtherInfoResponseController.class)
+            .saveInfoResponseForm(
                 SCAP_ID,
-                CaseEventAction.INFO_REQUESTED,
+                CaseEventAction.INFO_RESPONSE,
                 false,
-                getScapApprovalForm(),
+                getFurtherInfoResponseForm(),
                 null)))
             .with(user(testUser))
-            .with(csrf()))
+            .with(csrf())
+            .flashAttr("qaForm", getFurtherInfoResponseForm()))
         .andExpect(status().isOk());
 
-    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.SCAP_APPROVED, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_ID, 1, TEST_STRING);
   }
 
-  private ScapApprovalForm getScapApprovalForm() {
-    var form = new ScapApprovalForm();
-    var input = form.getApprovalComments();
+  private FurtherInfoResponseForm getFurtherInfoResponseForm() {
+    var form = new FurtherInfoResponseForm();
+    var input = form.getInfoResponse();
     input.setInputValue(TEST_STRING);
 
-    form.setApprovalComments(input);
+    form.setInfoResponse(input);
     return form;
   }
 

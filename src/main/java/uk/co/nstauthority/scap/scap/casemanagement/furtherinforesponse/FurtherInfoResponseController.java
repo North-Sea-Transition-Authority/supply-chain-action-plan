@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.scap.casemanagement.approval;
+package uk.co.nstauthority.scap.scap.casemanagement.furtherinforesponse;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -31,7 +31,7 @@ import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 @RequestMapping("{scapId}/")
 @PermissionsRequired(permissions = RolePermission.REVIEW_SCAP)
 @ScapHasStatus(permittedStatuses = ScapDetailStatus.SUBMITTED)
-public class ScapApprovalController {
+public class FurtherInfoResponseController {
 
   private final CaseEventService caseEventService;
 
@@ -43,31 +43,31 @@ public class ScapApprovalController {
 
   private final OrganisationGroupService organisationGroupService;
 
-  private final ScapApprovalFormValidator scapApprovalFormValidator;
+  private final FurtherInfoResponseFormValidator furtherInfoResponseFormValidator;
 
   @Autowired
-  public ScapApprovalController(CaseEventService caseEventService,
-                                ControllerHelperService controllerHelperService,
-                                ScapDetailService scapDetailService,
-                                ScapSummaryViewService scapSummaryViewService,
-                                OrganisationGroupService organisationGroupService,
-                                ScapApprovalFormValidator scapApprovalFormValidator) {
+  public FurtherInfoResponseController(CaseEventService caseEventService,
+                                       ControllerHelperService controllerHelperService,
+                                       ScapDetailService scapDetailService,
+                                       ScapSummaryViewService scapSummaryViewService,
+                                       OrganisationGroupService organisationGroupService,
+                                       FurtherInfoResponseFormValidator furtherInfoResponseFormValidator) {
     this.caseEventService = caseEventService;
     this.controllerHelperService = controllerHelperService;
     this.scapDetailService = scapDetailService;
     this.scapSummaryViewService = scapSummaryViewService;
     this.organisationGroupService = organisationGroupService;
-    this.scapApprovalFormValidator = scapApprovalFormValidator;
+    this.furtherInfoResponseFormValidator = furtherInfoResponseFormValidator;
   }
 
-  @PostMapping(params = CaseEventAction.APPROVED)
-  public ModelAndView saveScapApprovalForm(@PathVariable("scapId") ScapId scapId,
-                                           @RequestParam(CaseEventAction.APPROVED) String caseEventAction,
-                                           @RequestParam("Approve-scap-Panel") Boolean slideOutPanelOpen,
-                                           @ModelAttribute("scapApprovalForm")
-                                             ScapApprovalForm scapApprovalForm,
+  @PostMapping(params = CaseEventAction.INFO_RESPONSE)
+  public ModelAndView saveInfoResponseForm(@PathVariable("scapId") ScapId scapId,
+                                           @RequestParam(CaseEventAction.INFO_RESPONSE) String caseEventAction,
+                                           @RequestParam("Info-Response-Panel") Boolean slideOutPanelOpen,
+                                           @ModelAttribute("infoResponseForm") FurtherInfoResponseForm furtherInfoResponseForm,
                                            BindingResult bindingResult) {
-    scapApprovalFormValidator.validate(scapApprovalForm, bindingResult);
+
+    furtherInfoResponseFormValidator.validate(furtherInfoResponseForm, bindingResult);
 
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
     var scapSummary = scapSummaryViewService.getScapSummaryView(scapDetail);
@@ -78,20 +78,18 @@ public class ScapApprovalController {
     var generator =
         ScapSummaryModelAndViewGenerator.generator(scapDetail, scapSummary)
             .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
-            .withScapApprovalForm(scapApprovalForm)
-            .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId));
+            .withFurtherInfoResponseForm(furtherInfoResponseForm);
     orgGroup.ifPresent(generator::withOrgGroup);
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
         generator.generate(),
-        scapApprovalForm,
+        furtherInfoResponseForm,
         () -> {
-          caseEventService.recordNewEvent(CaseEventSubject.SCAP_APPROVED,
+          caseEventService.recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE,
               scapId,
               scapDetail.getVersionNumber(),
-              scapApprovalForm.getApprovalComments().getInputValue());
-          scapDetailService.approveScap(scapDetail);
+              furtherInfoResponseForm.getInfoResponse().getInputValue());
           return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
         });
   }

@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.CONSULTATION_REQUESTED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTHER_INFO_REQUESTED;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTHER_INFO_RESPONSE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.QA_COMMENT;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_APPROVED;
 
@@ -150,6 +151,7 @@ class CaseEventServiceTest {
   void getApplicableActions_NoOutstandingRequests() {
     var result = caseEventService.getApplicableActionsForScap(SCAP_ID);
     assertThat(result).containsOnly(CONSULTATION_REQUESTED,
+        FURTHER_INFO_RESPONSE,
         SCAP_APPROVED,
         FURTHER_INFO_REQUESTED,
         QA_COMMENT);
@@ -168,6 +170,7 @@ class CaseEventServiceTest {
 
     var result = caseEventService.getApplicableActionsForScap(SCAP_ID);
     assertThat(result).containsOnly(CONSULTATION_REQUESTED,
+        FURTHER_INFO_RESPONSE,
         SCAP_APPROVED,
         QA_COMMENT);
   }
