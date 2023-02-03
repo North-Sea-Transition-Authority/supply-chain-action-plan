@@ -37,6 +37,8 @@ public class ScapDetail {
 
   private Instant submittedTimestamp;
 
+  private Instant approvedTimestamp;
+
   private Boolean approvedByStakeholders;
 
   public ScapDetail() {
@@ -117,6 +119,14 @@ public class ScapDetail {
 
   public void setSubmittedTimestamp(Instant submittedTimestamp) {
     this.submittedTimestamp = submittedTimestamp;
+  }
+
+  public Instant getApprovedTimestamp() {
+    return approvedTimestamp;
+  }
+
+  public void setApprovedTimestamp(Instant approvedTimestamp) {
+    this.approvedTimestamp = approvedTimestamp;
   }
 
   public Boolean getApprovedByStakeholders() {

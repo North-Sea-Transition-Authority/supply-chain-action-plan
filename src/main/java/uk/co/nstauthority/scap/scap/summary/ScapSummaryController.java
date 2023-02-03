@@ -49,7 +49,7 @@ public class ScapSummaryController {
   }
 
   @GetMapping
-  @ScapHasStatus(permittedStatuses = {ScapDetailStatus.DRAFT, ScapDetailStatus.SUBMITTED})
+  @ScapHasStatus(permittedStatuses = {ScapDetailStatus.DRAFT, ScapDetailStatus.SUBMITTED, ScapDetailStatus.APPROVED})
   public ModelAndView getScapSummary(@PathVariable("scapId") ScapId scapId) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
     var scapSummary = scapSummaryViewService.getScapSummaryView(scapDetail);

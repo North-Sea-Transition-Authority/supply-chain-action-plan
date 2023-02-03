@@ -15,7 +15,6 @@ public enum CaseEventSubject {
       "Addional Information Requested",
       "Request further information",
       "Info-Request-Panel"),
-
   FURTHER_INFO_RESPONSE(INFO_RESPONSE,
       "Additional Information Response",
       null,
@@ -30,9 +29,8 @@ public enum CaseEventSubject {
       "Consultation-Request-Panel"),
   SCAP_APPROVED(APPROVED,
       "SCAP Approved",
-      null,
-      null);
-
+      "Approve SCAP",
+      "Approve-Scap-Panel");
 
   private String displayName;
 

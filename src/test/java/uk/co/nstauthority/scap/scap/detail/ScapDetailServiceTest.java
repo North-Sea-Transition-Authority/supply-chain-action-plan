@@ -25,6 +25,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
+import uk.co.nstauthority.scap.error.exception.ScapBadRequestException;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.submit.ReviewAndSubmitForm;
@@ -72,15 +73,20 @@ class ScapDetailServiceTest {
 
   @Test
   void getLatestScapDetailByScap_verifyCalls() {
-    var scapDetailList = List.of(
-        new ScapDetail(scap, 1, false, ScapDetailStatus.DRAFT, EntityTestingUtil.dateToInstant(2000, 4, 23), 1),
-        new ScapDetail(scap, 2, true, ScapDetailStatus.DRAFT, EntityTestingUtil.dateToInstant(2000, 4, 23), 1)
-    );
-    when(scapDetailRepository.findAllByScap(scap)).thenReturn(scapDetailList);
+    var details = getListScapDetail();
+    when(scapDetailRepository.findAllByScap(scap)).thenReturn(details);
 
     var scapDetail = scapDetailService.getLatestScapDetailByScap(scap);
+    assertThat(scapDetail).contains(details.get(1));
+  }
 
-    assertThat(scapDetail).contains(scapDetailList.get(1));
+  @Test
+  void getLatestScapDetailByScapOrThrow_assertReturns() {
+    var details = getListScapDetail();
+    when(scapDetailRepository.findAllByScap(scap)).thenReturn(details);
+
+    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    assertThat(scapDetail).isEqualTo(details.get(1));
   }
 
   @Test
@@ -168,6 +174,33 @@ class ScapDetailServiceTest {
   }
 
   @Test
+  void approveScap_VerifySaves() {
+    var scapDetail = new ScapDetail();
+    scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
+
+    var argumentCaptor = ArgumentCaptor.forClass(ScapDetail.class);
+    scapDetailService.approveScap(scapDetail);
+
+    verify(scapDetailRepository).save(argumentCaptor.capture());
+    assertThat(argumentCaptor.getValue()).extracting(
+        ScapDetail::getStatus,
+        ScapDetail::getApprovedTimestamp
+    ).containsExactly(
+        ScapDetailStatus.APPROVED,
+        clock.instant()
+    );
+  }
+
+  @Test
+  void approveScap_VerifyRejects() {
+    var scapDetail = new ScapDetail();
+    scapDetail.setStatus(ScapDetailStatus.DRAFT);
+
+    assertThatThrownBy(() -> scapDetailService.approveScap(scapDetail))
+        .isInstanceOf(ScapBadRequestException.class);
+  }
+
+  @Test
   void deleteScapDetail_WhenNotFirstDraft() {
     var versionNumber = 2;
     var latestScapDetail = mock(ScapDetail.class);
@@ -207,5 +240,13 @@ class ScapDetailServiceTest {
 
   private ServiceUserDetail getUserDetail() {
     return new ServiceUserDetail(1000L, 1000L, "Test", "Testerson", "test@test.com");
+  }
+
+  private List<ScapDetail> getListScapDetail() {
+    var scapDetailList = List.of(
+        new ScapDetail(scap, 1, false, ScapDetailStatus.DRAFT, EntityTestingUtil.dateToInstant(2000, 4, 23), 1),
+        new ScapDetail(scap, 2, true, ScapDetailStatus.DRAFT, EntityTestingUtil.dateToInstant(2000, 4, 23), 1)
+    );
+    return scapDetailList;
   }
 }

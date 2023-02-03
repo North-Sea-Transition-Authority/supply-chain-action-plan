@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.CONSULTATION_REQUESTED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTHER_INFO_REQUESTED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.QA_COMMENT;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_APPROVED;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -149,6 +150,7 @@ class CaseEventServiceTest {
   void getApplicableActions_NoOutstandingRequests() {
     var result = caseEventService.getApplicableActionsForScap(SCAP_ID);
     assertThat(result).containsOnly(CONSULTATION_REQUESTED,
+        SCAP_APPROVED,
         FURTHER_INFO_REQUESTED,
         QA_COMMENT);
 
@@ -166,6 +168,7 @@ class CaseEventServiceTest {
 
     var result = caseEventService.getApplicableActionsForScap(SCAP_ID);
     assertThat(result).containsOnly(CONSULTATION_REQUESTED,
+        SCAP_APPROVED,
         QA_COMMENT);
   }
 

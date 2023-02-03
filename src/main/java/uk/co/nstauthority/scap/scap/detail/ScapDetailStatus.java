@@ -7,6 +7,7 @@ import uk.co.nstauthority.scap.enumutil.DisplayableEnumOptionUtil;
 public enum ScapDetailStatus implements Displayable {
   DRAFT("Draft", 10),
   SUBMITTED("Submitted", 20),
+  APPROVED("Approved", 30),
   DELETED("Deleted", 100);
 
   private final String displayName;

@@ -6,6 +6,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
+import uk.co.nstauthority.scap.error.exception.ScapBadRequestException;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
@@ -72,6 +73,17 @@ public class ScapDetailService {
     scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
     scapDetail.setSubmittedTimestamp(clock.instant());
     scapDetail.setApprovedByStakeholders(form.getApprovedByStakeholders());
+    scapDetailRepository.save(scapDetail);
+  }
+
+  @Transactional
+  public void approveScap(ScapDetail scapDetail) {
+    if (!scapDetail.getStatus().equals(ScapDetailStatus.SUBMITTED)) {
+      throw new ScapBadRequestException("Cannot approve a SCAP that has not been submitted");
+    }
+
+    scapDetail.setApprovedTimestamp(clock.instant());
+    scapDetail.setStatus(ScapDetailStatus.APPROVED);
     scapDetailRepository.save(scapDetail);
   }
 

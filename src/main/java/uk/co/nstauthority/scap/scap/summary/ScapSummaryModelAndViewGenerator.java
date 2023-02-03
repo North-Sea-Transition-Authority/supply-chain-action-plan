@@ -13,6 +13,8 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventView;
+import uk.co.nstauthority.scap.scap.casemanagement.approval.ScapApprovalController;
+import uk.co.nstauthority.scap.scap.casemanagement.approval.ScapApprovalForm;
 import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestController;
 import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestForm;
 import uk.co.nstauthority.scap.scap.casemanagement.furtherinfo.FurtherInfoController;
@@ -43,6 +45,8 @@ public class ScapSummaryModelAndViewGenerator {
     private FurtherInfoRequestForm furtherInfoRequestForm = new FurtherInfoRequestForm();
     private QaCommentForm qaCommentForm = new QaCommentForm();
     private ConsultationRequestForm consultationRequestForm = new ConsultationRequestForm();
+
+    private ScapApprovalForm scapApprovalForm = new ScapApprovalForm();
 
     public Generator(ScapDetail scapDetail,
                      ScapSummaryView scapSummary) {
@@ -80,6 +84,11 @@ public class ScapSummaryModelAndViewGenerator {
       return this;
     }
 
+    public Generator withScapApprovalForm(ScapApprovalForm scapApprovalForm) {
+      this.scapApprovalForm = scapApprovalForm;
+      return this;
+    }
+
     public Generator withApplicableActions(Set<CaseEventSubject> applicableActions) {
       this.applicableActions = applicableActions;
       return this;
@@ -101,6 +110,7 @@ public class ScapSummaryModelAndViewGenerator {
       addQaCommentForm(modelAndView);
       addInfoRequestForm(modelAndView);
       addConsultationRequestForm(modelAndView);
+      addScapApprovalRequestForm(modelAndView);
 
       return modelAndView;
     }
@@ -137,6 +147,17 @@ public class ScapSummaryModelAndViewGenerator {
           ReverseRouter.route(on(ConsultationRequestController.class)
               .saveConsultationRequestForm(scapDetail.getScap().getScapId(),
                   CaseEventAction.CONSULTATION_REQUESTED,
+                  true,
+                  null,
+                  null)));
+    }
+
+    private void addScapApprovalRequestForm(ModelAndView modelAndView) {
+      modelAndView.addObject("scapApprovalForm", scapApprovalForm);
+      modelAndView.addObject("approvalFormSubmitUrl",
+          ReverseRouter.route(on(ScapApprovalController.class)
+              .saveScapApprovalForm(scapDetail.getScap().getScapId(),
+                  CaseEventAction.APPROVED,
                   true,
                   null,
                   null)));
