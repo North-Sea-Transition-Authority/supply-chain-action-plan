@@ -116,6 +116,7 @@ class WorkAreaControllerTest extends AbstractControllerTest {
   void filterWorkArea() throws Exception {
     var form = new WorkAreaForm();
     form.setScapStatuses(Collections.singletonList(ScapDetailStatus.DRAFT));
+    form.setReferenceSearchTerm("1");
     var filter = new WorkAreaFilter();
     var expectedRedirectUrl = ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null));
 
@@ -127,9 +128,13 @@ class WorkAreaControllerTest extends AbstractControllerTest {
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl(expectedRedirectUrl));
 
-    assertThat(filter)
-        .extracting(WorkAreaFilter::getScapStatuses)
-        .isEqualTo(form.getScapStatuses());
+    assertThat(filter).extracting(
+        WorkAreaFilter::getScapStatuses,
+        WorkAreaFilter::getReferenceSearchTerm
+    ).containsExactly(
+        form.getScapStatuses(),
+        form.getReferenceSearchTerm()
+    );
   }
 
   @Test
@@ -146,7 +151,8 @@ class WorkAreaControllerTest extends AbstractControllerTest {
         .andExpect(redirectedUrl(ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null))));
 
     assertThat(filter).extracting(
-        WorkAreaFilter::getScapStatuses
-    ).isNull();
+        WorkAreaFilter::getScapStatuses,
+        WorkAreaFilter::getReferenceSearchTerm
+    ).containsOnlyNulls();
   }
 }

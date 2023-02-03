@@ -9,17 +9,23 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 class WorkAreaFilter implements Serializable {
 
   private List<ScapDetailStatus> scapStatuses;
+  private String referenceSearchTerm;
 
   void update(WorkAreaForm form) {
     scapStatuses = form.getScapStatuses();
+    referenceSearchTerm = form.getReferenceSearchTerm();
   }
 
   void clearFilter() {
     scapStatuses = null;
+    referenceSearchTerm = null;
   }
 
   List<ScapDetailStatus> getScapStatuses() {
     return scapStatuses;
   }
 
+  public String getReferenceSearchTerm() {
+    return referenceSearchTerm;
+  }
 }

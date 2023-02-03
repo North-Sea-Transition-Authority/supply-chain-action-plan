@@ -27,6 +27,13 @@
           checkboxes=statusCheckboxes
         />
       </@fdsSearch.searchFilterItem>
+      <@fdsSearch.searchFilterItem itemName="SCAP reference">
+        <@fdsSearch.searchTextInput
+          path="form.referenceSearchTerm"
+          labelText=""
+          suffixScreenReaderPrompt="SCAP reference"
+        />
+      </@fdsSearch.searchFilterItem>
     </@fdsSearch.searchFilterList>
   </@fdsSearch.searchFilter>
   <@fdsSearch.searchPageContent twoThirdsWidth=true>

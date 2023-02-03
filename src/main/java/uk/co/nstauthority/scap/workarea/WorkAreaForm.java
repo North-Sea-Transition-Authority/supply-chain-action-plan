@@ -6,6 +6,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 public class WorkAreaForm {
 
   private List<ScapDetailStatus> scapStatuses;
+  private String referenceSearchTerm;
 
   public List<ScapDetailStatus> getScapStatuses() {
     return scapStatuses;
@@ -15,9 +16,18 @@ public class WorkAreaForm {
     this.scapStatuses = scapStatuses;
   }
 
+  public String getReferenceSearchTerm() {
+    return referenceSearchTerm;
+  }
+
+  public void setReferenceSearchTerm(String referenceSearchTerm) {
+    this.referenceSearchTerm = referenceSearchTerm;
+  }
+
   public static WorkAreaForm from(WorkAreaFilter filter) {
     var form = new WorkAreaForm();
     form.setScapStatuses(filter.getScapStatuses());
+    form.setReferenceSearchTerm(filter.getReferenceSearchTerm());
     return form;
   }
 }
