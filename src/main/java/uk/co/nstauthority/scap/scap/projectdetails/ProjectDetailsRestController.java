@@ -11,7 +11,7 @@ import uk.co.nstauthority.scap.fds.searchselector.RestSearchResult;
 
 @RestController
 @RequestMapping("/data")
-class ProjectDetailsRestController {
+public class ProjectDetailsRestController {
 
   static final String FIELD_SEARCH_REQUEST_PURPOSE = "Search fields for SCAP project details";
   static final String FACILITIES_SEARCH_REQUEST_PURPOSE = "Get facilities for SCAP project details";

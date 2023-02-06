@@ -19,6 +19,7 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupRestController;
+import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsRestController;
 import uk.co.nstauthority.scap.scap.start.ScapStartController;
 
 // Hide null warning when ReverseRouting with null parameters on WorkAreaController mappings
@@ -34,6 +35,9 @@ public class WorkAreaController {
   private final WorkAreaService workAreaService;
   private final TeamService teamService;
   private final WorkAreaFormService workAreaFormService;
+
+  static final String FIELD_SEARCH_URL =
+      ReverseRouter.route(on(ProjectDetailsRestController.class).getFieldSearchResults(null));
 
   @Autowired
   public WorkAreaController(UserDetailService userDetailService,
@@ -61,6 +65,7 @@ public class WorkAreaController {
     var form = WorkAreaForm.from(filter);
     var statusCheckboxes = ScapDetailStatus.getRadioOptions();
     var prefilledOperator = workAreaFormService.getPreselectedOrganisation(form.getOperatorId());
+    var prefilledField = workAreaFormService.getPreselectedField(form.getFieldId());
 
     return new ModelAndView("scap/workarea/workArea")
         .addObject("startScapUrl",
@@ -74,7 +79,9 @@ public class WorkAreaController {
         .addObject("isRegulator", isRegulator)
         .addObject("organisationGroupSearchUrl",
             ReverseRouter.route(on(OrganisationGroupRestController.class).getOrganisationGroupSearchResults(null)))
-        .addObject("prefilledOperator", prefilledOperator);
+        .addObject("prefilledOperator", prefilledOperator)
+        .addObject("fieldSearchUrl", FIELD_SEARCH_URL)
+        .addObject("prefilledField", prefilledField);
   }
 
   @PostMapping

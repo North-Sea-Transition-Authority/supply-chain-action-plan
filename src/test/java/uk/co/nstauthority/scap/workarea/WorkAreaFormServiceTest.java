@@ -12,7 +12,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
+import uk.co.nstauthority.scap.energyportal.FieldService;
 import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 
@@ -21,6 +23,9 @@ class WorkAreaFormServiceTest {
 
   @Mock
   OrganisationGroupService organisationGroupService;
+
+  @Mock
+  FieldService fieldService;
 
   @InjectMocks
   WorkAreaFormService workAreaFormService;
@@ -68,6 +73,52 @@ class WorkAreaFormServiceTest {
     ).containsExactly(
         String.valueOf(organisationId),
         organisationName
+    );
+  }
+
+  @Test
+  void getPreselectedField_NullFieldGroupId() {
+    var preselectedField = workAreaFormService.getPreselectedField(null);
+
+    verifyNoInteractions(fieldService);
+    assertThat(preselectedField).isEqualTo(WorkAreaFormService.EMPTY_PREFILLED_ITEM);
+  }
+
+  @Test
+  void getPreselectedField_NonExistentField() {
+    var fieldId = 1;
+
+    var preselectedField = workAreaFormService.getPreselectedField(fieldId);
+
+    verify(fieldService).getFieldById(fieldId, WorkAreaFormService.FIELD_SEARCH_REQUEST_PURPOSE);
+    verifyNoMoreInteractions(fieldService);
+
+    assertThat(preselectedField).isEqualTo(WorkAreaFormService.EMPTY_PREFILLED_ITEM);
+  }
+
+  @Test
+  void getPreselectedField() {
+    var fieldId = 1;
+    var fieldName = "field name";
+    var field = Field.newBuilder()
+        .fieldId(fieldId)
+        .fieldName(fieldName)
+        .build();
+
+    when(fieldService.getFieldById(fieldId, WorkAreaFormService.FIELD_SEARCH_REQUEST_PURPOSE))
+        .thenReturn(Optional.ofNullable(field));
+
+    var preselectedField = workAreaFormService.getPreselectedField(fieldId);
+
+    verify(fieldService).getFieldById(fieldId, WorkAreaFormService.FIELD_SEARCH_REQUEST_PURPOSE);
+    verifyNoMoreInteractions(fieldService);
+
+    assertThat(preselectedField).extracting(
+        RestSearchItem::id,
+        RestSearchItem::text
+    ).containsExactly(
+        String.valueOf(fieldId),
+        fieldName
     );
   }
 }

@@ -1,7 +1,11 @@
 package uk.co.nstauthority.scap.workarea;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.jooq.impl.DSL.exists;
+import static org.jooq.impl.DSL.select;
 import static org.jooq.impl.DSL.upper;
+import static uk.co.nstauthority.scap.generated.jooq.Tables.PROJECT_DETAILS;
+import static uk.co.nstauthority.scap.generated.jooq.Tables.PROJECT_FIELDS;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAPS;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAP_DETAILS;
 
@@ -71,6 +75,24 @@ class WorkAreaFilterServiceTest {
 
     assertThat(conditions).containsExactly(
         SCAPS.ORGANISATION_GROUP_ID.eq(organisationId)
+    );
+  }
+
+  @Test
+  void getConditions_FieldSelected_AssertCondition() {
+    var fieldId = 2;
+    form.setFieldId(fieldId);
+    filter.update(form);
+
+    var conditions = workAreaFilterService.getConditions(filter);
+
+    assertThat(conditions).containsExactly(
+        exists(
+            select(PROJECT_FIELDS.FIELD_ID)
+                .from(PROJECT_FIELDS)
+                .where(PROJECT_FIELDS.FIELD_ID.eq(fieldId))
+                .and(PROJECT_DETAILS.ID.eq(PROJECT_FIELDS.PROJECT_DETAILS_ID))
+        )
     );
   }
 }

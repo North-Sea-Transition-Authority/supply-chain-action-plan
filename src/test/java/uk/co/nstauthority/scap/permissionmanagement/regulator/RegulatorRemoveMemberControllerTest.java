@@ -34,7 +34,6 @@ import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
-import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryRemoveMemberController;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRemovalService;
 
 @WithMockUser
@@ -133,6 +132,7 @@ class RegulatorRemoveMemberControllerTest extends AbstractRegulatorTeamControlle
 
   @Test
   void removeMember_noTeam_redirectsToMemberList() throws Exception {
+    //noinspection unchecked
     when(teamMemberService.findTeamMember(any(), any())).thenReturn(Optional.of(teamMember),Optional.empty());
     mockMvc.perform(post(ReverseRouter.route(on(RegulatorRemoveMemberController.class)
             .removeMember(teamId,

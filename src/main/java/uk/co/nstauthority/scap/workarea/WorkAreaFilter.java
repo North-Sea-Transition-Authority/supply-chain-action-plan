@@ -11,17 +11,20 @@ class WorkAreaFilter implements Serializable {
   private List<ScapDetailStatus> scapStatuses;
   private String referenceSearchTerm;
   private Integer operatorId;
+  private Integer fieldId;
 
   void update(WorkAreaForm form) {
     scapStatuses = form.getScapStatuses();
     referenceSearchTerm = form.getReferenceSearchTerm();
     operatorId = form.getOperatorId();
+    fieldId = form.getFieldId();
   }
 
   void clearFilter() {
     scapStatuses = null;
     referenceSearchTerm = null;
     operatorId = null;
+    fieldId = null;
   }
 
   List<ScapDetailStatus> getScapStatuses() {
@@ -34,5 +37,9 @@ class WorkAreaFilter implements Serializable {
 
   public Integer getOperatorId() {
     return operatorId;
+  }
+
+  Integer getFieldId() {
+    return fieldId;
   }
 }

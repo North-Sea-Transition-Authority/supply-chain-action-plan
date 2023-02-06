@@ -65,6 +65,7 @@ class WorkAreaControllerTest extends AbstractControllerTest {
 
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(workAreaService.getWorkAreaItems(any(WorkAreaFilter.class), anyBoolean(), anyList())).thenReturn(workAreaItems);
+    when(workAreaFormService.getPreselectedField(null)).thenReturn(WorkAreaFormService.EMPTY_PREFILLED_ITEM);
   }
 
   @Test

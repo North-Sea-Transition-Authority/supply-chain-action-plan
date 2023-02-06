@@ -8,6 +8,7 @@ public class WorkAreaForm {
   private List<ScapDetailStatus> scapStatuses;
   private String referenceSearchTerm;
   private Integer operatorId;
+  private Integer fieldId;
 
   public List<ScapDetailStatus> getScapStatuses() {
     return scapStatuses;
@@ -33,11 +34,20 @@ public class WorkAreaForm {
     this.operatorId = operatorId;
   }
 
+  public Integer getFieldId() {
+    return fieldId;
+  }
+
+  public void setFieldId(Integer fieldId) {
+    this.fieldId = fieldId;
+  }
+
   public static WorkAreaForm from(WorkAreaFilter filter) {
     var form = new WorkAreaForm();
     form.setScapStatuses(filter.getScapStatuses());
     form.setReferenceSearchTerm(filter.getReferenceSearchTerm());
     form.setOperatorId(filter.getOperatorId());
+    form.setFieldId(filter.getFieldId());
     return form;
   }
 }

@@ -21,30 +21,12 @@
       clearFilterUrl=springUrl(clearFiltersUrl)
       filterButtonClass="govuk-button govuk-button--secondary"
     >
-      <@fdsSearch.searchFilterItem itemName="SCAP status" expanded=form.getScapStatuses()?has_content>
-        <@fdsSearch.searchCheckboxes
-          path="form.scapStatuses"
-          checkboxes=statusCheckboxes
-        />
-      </@fdsSearch.searchFilterItem>
-      <@fdsSearch.searchFilterItem itemName="SCAP reference" expanded=form.referenceSearchTerm?has_content>
-        <@fdsSearch.searchTextInput
-          path="form.referenceSearchTerm"
-          labelText=""
-          suffixScreenReaderPrompt="SCAP reference"
-        />
-      </@fdsSearch.searchFilterItem>
+      <@referenceFilter form=form />
       <#if isRegulator>
-        <@fdsSearch.searchFilterItem itemName="Operator" expanded=prefilledOperator.id()?has_content>
-          <@fdsSearchSelector.searchSelectorRest
-            path="form.operatorId"
-            restUrl=springUrl(organisationGroupSearchUrl)
-            labelText=""
-            selectorMinInputLength=2
-            preselectedItems={prefilledOperator.id(): prefilledOperator.text()}
-          />
-        </@fdsSearch.searchFilterItem>
+        <@operatorFilter form=form preselectedOperator=prefilledOperator />
       </#if>
+      <@fieldFilter form=form preselectedField=prefilledField />
+      <@statusFilter form=form statusCheckboxes=statusCheckboxes />
     </@fdsSearch.searchFilterList>
   </@fdsSearch.searchFilter>
   <@fdsSearch.searchPageContent twoThirdsWidth=true>
@@ -76,4 +58,49 @@
       <@fdsResultList.resultListDataValue key="Submission stage" value=workAreaItem.submissionStage().displayName!""/>
     </@fdsResultList.resultListDataItem>
   </@fdsResultList.resultListItem>
+</#macro>
+
+<#macro statusFilter form statusCheckboxes>
+  <@fdsSearch.searchFilterItem itemName="Status" expanded=form.getScapStatuses()?has_content>
+    <@fdsSearch.searchCheckboxes
+      path="form.scapStatuses"
+      checkboxes=statusCheckboxes
+    />
+  </@fdsSearch.searchFilterItem>
+</#macro>
+
+<#macro referenceFilter form>
+  <@fdsSearch.searchFilterItem itemName="Reference" expanded=form.referenceSearchTerm?has_content>
+    <@fdsSearch.searchTextInput
+      path="form.referenceSearchTerm"
+      labelText=""
+      suffixScreenReaderPrompt="SCAP reference"
+    />
+  </@fdsSearch.searchFilterItem>
+</#macro>
+
+<#macro operatorFilter form preselectedOperator>
+<#-- @ftlvariable name="preselectedOperator" type="uk.co.nstauthority.scap.fds.searchselector.RestSearchItem" -->
+  <@fdsSearch.searchFilterItem itemName="Operator" expanded=prefilledOperator.id()?has_content>
+    <@fdsSearchSelector.searchSelectorRest
+      path="form.operatorId"
+      restUrl=springUrl(organisationGroupSearchUrl)
+      labelText=""
+      selectorMinInputLength=2
+      preselectedItems={prefilledOperator.id(): prefilledOperator.text()}
+    />
+  </@fdsSearch.searchFilterItem>
+</#macro>
+
+<#macro fieldFilter form preselectedField>
+<#-- @ftlvariable name="preselectedField" type="uk.co.nstauthority.scap.fds.searchselector.RestSearchItem" -->
+  <@fdsSearch.searchFilterItem itemName="Field" expanded=form.getFieldId()?has_content>
+    <@fdsSearchSelector.searchSelectorRest
+      path="form.fieldId"
+      restUrl=springUrl(fieldSearchUrl)
+      labelText=""
+      selectorMinInputLength=3
+      preselectedItems={prefilledField.id() : prefilledField.text()}
+    />
+  </@fdsSearch.searchFilterItem>
 </#macro>
