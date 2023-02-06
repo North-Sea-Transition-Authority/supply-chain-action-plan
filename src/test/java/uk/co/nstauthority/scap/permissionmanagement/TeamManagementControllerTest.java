@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.permissionmanagement;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -12,9 +13,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 import static uk.co.nstauthority.scap.mvc.ReverseRouter.emptyBindingResult;
+import static uk.co.nstauthority.scap.utils.ControllerTestingUtil.redirectUrl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
@@ -22,6 +25,7 @@ import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.industry.AbstractIndustryTeamControllerTest;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.teams.NewTeamForm;
 import uk.co.nstauthority.scap.permissionmanagement.teams.NewTeamFormvalidator;
@@ -30,7 +34,7 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamView;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 
 @ContextConfiguration(classes = TeamManagementController.class)
-class IndustryTeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
+class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
 
   @MockBean
   private OrganisationGroupService organisationGroupService;
@@ -174,5 +178,66 @@ class IndustryTeamManagementControllerTest extends AbstractIndustryTeamControlle
                 .with(user(user)))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/addTeam"));
+  }
+
+  @Test
+  void renderArchiveTeamConfirmation_userNotPermitted() throws Exception {
+    var teamId = new TeamId(new UUID(1, 1));
+    var user = ServiceUserDetailTestUtil.Builder().withWuaId(100L).build();
+
+    when(teamMemberService.getAllPermissionsForUser(user)).thenReturn(List.of(RolePermission.GRANT_ROLES));
+
+    mockMvc.perform(
+        get(ReverseRouter.route(on(TeamManagementController.class).renderArchiveTeamConfirmation(teamId)))
+            .with(csrf())
+            .with(user(user)))
+        .andExpect(status().is4xxClientError());
+  }
+
+  @Test
+  void archiveTeamConfirmation_userPermitted() throws Exception {
+    var teamId = new TeamId(new UUID(1, 1));
+    var user = ServiceUserDetailTestUtil.Builder().withWuaId(100L).build();
+
+    mockMvc.perform(
+        get(ReverseRouter.route(on(TeamManagementController.class).renderArchiveTeamConfirmation(teamId)))
+            .with(csrf())
+            .with(user(user)))
+        .andExpect(status().isOk())
+        .andExpect(view().name("scap/permissionmanagement/removeTeam"));
+  }
+
+  @Test
+  void renderArchiveTeamConfirmation_userNotPermittedReroute() throws Exception {
+    var teamId = new TeamId(new UUID(1, 1));
+    var user = ServiceUserDetailTestUtil.Builder().withWuaId(100L).build();
+
+    when(teamMemberService.getAllPermissionsForUser(user)).thenReturn(List.of(RolePermission.GRANT_ROLES));
+
+    mockMvc.perform(
+            get(ReverseRouter.route(on(TeamManagementController.class).renderArchiveTeamConfirmation(teamId)))
+                .with(csrf())
+                .with(user(user)))
+        .andExpect(status().is4xxClientError());
+  }
+
+  @Test
+  void archiveTeam_VerifyCalls() throws Exception {
+    var user = ServiceUserDetailTestUtil.Builder().withWuaId(100L).build();
+    var teamId = new TeamId(new UUID(1, 1));
+    var team = TeamTestUtil
+        .Builder()
+        .withId(teamId.uuid())
+        .build();
+    when(teamService.getTeam(teamId)).thenReturn(team);
+
+    mockMvc.perform(
+            post(ReverseRouter.route(on(TeamManagementController.class).archiveTeam(teamId, null)))
+                .with(csrf())
+                .with(user(user)))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectUrl("/permission-management/"));
+
+    verify(teamService).archiveTeam(team);
   }
 }

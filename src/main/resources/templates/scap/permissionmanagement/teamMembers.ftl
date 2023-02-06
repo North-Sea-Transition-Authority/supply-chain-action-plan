@@ -7,6 +7,7 @@
 <#-- @ftlvariable name="canRemoveUsers" type="java.lang.Boolean" -->
 <#-- @ftlvariable name="canEditUsers" type="java.lang.Boolean" -->
 <#-- @ftlvariable name="addTeamMemberUrl" type="java.lang.String" -->
+<#-- @ftlvariable name="removeTeamUrl" type="java.lang.String" -->
 <#include "../layout/layout.ftl">
 <#import '_teamMembers.ftl' as teamMembersMacro>
 <#import '_roleDescriptions.ftl' as roleDescriptions>
@@ -21,15 +22,24 @@
 >
 
   <@roleDescriptions.roleDescriptions roles=teamRoles/>
-
-  <#if addTeamMemberUrl?has_content>
-    <@fdsAction.link
-      linkText="Add user"
-      linkUrl=springUrl(addTeamMemberUrl)
-      linkClass="govuk-button govuk-button--secondary"
-      role=true
-    />
-  </#if>
+  <@fdsAction.buttonGroup>
+    <#if addTeamMemberUrl?has_content>
+      <@fdsAction.link
+        linkText="Add user"
+        linkUrl=springUrl(addTeamMemberUrl)
+        linkClass="govuk-button govuk-button--secondary"
+        role=true
+      />
+    </#if>
+    <#if removeTeamUrl?has_content>
+        <@fdsAction.link
+        linkText="Archive Team"
+        linkUrl=springUrl(removeTeamUrl)
+        linkClass="govuk-button govuk-button--warning"
+        role=true
+        />
+    </#if>
+  </@fdsAction.buttonGroup>
 
   <#if teamMembers?has_content>
       <@teamMembersMacro.teamMembers name=teamName members=teamMembers canRemoveUsers=canRemoveUsers!false canEditUsers=canEditUsers!false/>

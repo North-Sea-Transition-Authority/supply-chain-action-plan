@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.envers.Audited;
 
 @Entity
 @Table(name = "teams")
@@ -17,6 +18,7 @@ public class Team {
   @Id
   @GeneratedValue(generator = "uuid")
   @GenericGenerator(name = "uuid", strategy = "uuid2")
+  @Audited
   private UUID uuid;
 
   @Column(name = "type")
@@ -24,9 +26,11 @@ public class Team {
   private TeamType teamType;
 
   @Column(name = "display_name")
+  @Audited
   private String displayName;
 
   @Column(name = "organisation_group_id")
+  @Audited
   private Integer energyPortalOrgGroupId;
 
   public Team() {

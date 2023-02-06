@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -195,5 +196,15 @@ class TeamServiceTest {
     var team = TeamTestUtil.Builder().withTeamType(TeamType.INDUSTRY).build();
     when(teamRepository.findAllTeamsThatUserIsMemberOf(user.wuaId())).thenReturn(List.of(team));
     assertFalse(teamService.userIsMemberOfRegulatorTeam(user));
+  }
+
+  @Test
+  void archiveTeam_VerifyCalls() {
+    var team = TeamTestUtil.Builder().withTeamType(TeamType.INDUSTRY).build();
+    teamService.archiveTeam(team);
+
+    var inOrder = inOrder(teamMemberRoleService, teamRepository);
+    inOrder.verify(teamMemberRoleService).deleteUsersInTeam(team);
+    inOrder.verify(teamRepository).delete(team);
   }
 }

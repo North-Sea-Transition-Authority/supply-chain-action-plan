@@ -1,11 +1,13 @@
 package uk.co.nstauthority.scap.permissionmanagement.teams;
 
 import static uk.co.nstauthority.scap.permissionmanagement.TeamType.REGULATOR;
+import static uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -61,6 +63,7 @@ public class TeamService {
             "Could not find Team associated with energy portal organisation group ID: %s".formatted(epGroupId)));
   }
 
+  @Transactional
   public Team createTeam(String groupName, int energyPortalGroupId) {
     var team = new Team();
     team.setTeamType(TeamType.INDUSTRY);
@@ -102,5 +105,11 @@ public class TeamService {
         .collect(Collectors.toSet());
 
     teamMemberRoleService.addUserTeamRoles(team, userToAdd, rolesAsStrings);
+  }
+
+  @Transactional
+  public void archiveTeam(Team team) {
+    teamMemberRoleService.deleteUsersInTeam(team);
+    teamRepository.delete(team);
   }
 }

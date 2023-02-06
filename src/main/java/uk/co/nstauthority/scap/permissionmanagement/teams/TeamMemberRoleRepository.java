@@ -20,5 +20,7 @@ interface TeamMemberRoleRepository extends CrudRepository<TeamMemberRole, UUID> 
 
   void deleteAllByTeamAndWuaId(Team team, Long wuaId);
 
+  void deleteAllByTeam(Team team);
+
   List<TeamMemberRole> findAllByWuaId(Long wuaId);
 }

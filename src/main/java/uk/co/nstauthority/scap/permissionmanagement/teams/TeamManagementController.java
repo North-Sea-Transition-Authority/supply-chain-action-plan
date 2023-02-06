@@ -7,21 +7,30 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerBodyLine;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
+import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequired;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamManagementController;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupRestController;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
+import uk.co.nstauthority.scap.util.DeletionSuccessBannerUtil;
 import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 
 @Controller
@@ -64,6 +73,31 @@ public class TeamManagementController {
         .addObject("allTeams", getTeamList())
         .addObject("newTeamFormUrl",
             ReverseRouter.route(on(TeamManagementController.class).renderNewIndustryTeamForm(null)));
+  }
+
+  @GetMapping("/delete/{teamId}")
+  @PermissionsRequired(permissions = RolePermission.MANAGE_ORGANISATIONS)
+  public ModelAndView renderArchiveTeamConfirmation(@PathVariable("teamId") TeamId teamId) {
+    return new ModelAndView("scap/permissionmanagement/removeTeam")
+        .addObject("pageTitle", "Are you sure you want to archive this team?")
+        .addObject("team", teamService.getTeam(teamId))
+        .addObject("removeUrl",
+            ReverseRouter.route(on(TeamManagementController.class).archiveTeam(teamId, null)))
+        .addObject("backLinkUrl",
+            ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId)));
+  }
+
+  @PostMapping("/delete/{teamId}")
+  @PermissionsRequired(permissions = RolePermission.MANAGE_ORGANISATIONS)
+  public ModelAndView archiveTeam(@PathVariable("teamId") TeamId teamId,
+                                  RedirectAttributes redirectAttributes) {
+    var team = teamService.getTeam(teamId);
+    teamService.archiveTeam(team);
+
+    var successMessage = "%s has been successfully deleted".formatted(team.getDisplayName());
+    DeletionSuccessBannerUtil.addRedirectionNotification(redirectAttributes, successMessage);
+
+    return ReverseRouter.redirect(on(TeamManagementController.class).renderTeamList());
   }
 
   @GetMapping("/new-team")

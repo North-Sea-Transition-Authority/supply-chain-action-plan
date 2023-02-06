@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
@@ -45,6 +46,24 @@ class TeamMemberRoleServiceTest {
     var role = "ROLE_NAME";
 
     teamMemberRoleService.addUserTeamRoles(team, userToAdd, Set.of(role));
+
+    verify(teamMemberRoleRepository).deleteAllByTeamAndWuaId(team, userToAdd.webUserAccountId());
+    verify(teamMemberRoleRepository).saveAll(teamMemberRoleCaptor.capture());
+
+    Assertions.assertThat(teamMemberRoleCaptor.getValue())
+        .extracting(TeamMemberRole::getTeam, TeamMemberRole::getWuaId, TeamMemberRole::getRole)
+        .containsExactly(tuple(team, userToAdd.webUserAccountId(), role));
+  }
+
+  @Test
+  void addUserTeamRoles_whenAddingUserWithId_thenVerifyCalls() {
+    var team = TeamTestUtil.Builder().build();
+    var userToAdd = EnergyPortalUserDtoTestUtil.Builder()
+        .withWebUserAccountId(100)
+        .build();
+    var role = "ROLE_NAME";
+
+    teamMemberRoleService.addUserTeamRoles(team, 100L, Set.of(role));
 
     verify(teamMemberRoleRepository).deleteAllByTeamAndWuaId(team, userToAdd.webUserAccountId());
     verify(teamMemberRoleRepository).saveAll(teamMemberRoleCaptor.capture());
@@ -106,4 +125,11 @@ class TeamMemberRoleServiceTest {
     verify(teamMemberRoleRepository).deleteAllByTeamAndWuaId(team, existingUser.wuaId().id());
   }
 
+  @Test
+  void deleteAllByTeam_verifyCalls() {
+    var team = new Team();
+    teamMemberRoleService.deleteUsersInTeam(team);
+
+    verify(teamMemberRoleRepository).deleteAllByTeam(team);
+  }
 }
