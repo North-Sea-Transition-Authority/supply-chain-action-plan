@@ -23,6 +23,11 @@ public enum CaseEventSubject {
       "Submitted SCAP",
       null,
       null),
+  SCAP_CLOSED_OUT(
+      CaseEventAction.CLOSED_OUT,
+      "Project completed",
+      null,
+      null),
   CONSULTATION_REQUESTED(CaseEventAction.CONSULTATION_REQUESTED,
       "Consultation Requested",
       "Request Consultation",

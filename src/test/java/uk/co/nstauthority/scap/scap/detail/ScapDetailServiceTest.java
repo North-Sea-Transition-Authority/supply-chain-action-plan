@@ -192,11 +192,46 @@ class ScapDetailServiceTest {
   }
 
   @Test
-  void approveScap_VerifyRejects() {
+  void closeOutScap_VerifySavesAsCloseOut() {
     var scapDetail = new ScapDetail();
+    scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
+
+    var argumentCaptor = ArgumentCaptor.forClass(ScapDetail.class);
+    scapDetailService.closeOutScap(scapDetail);
+
+    verify(scapDetailRepository).save(argumentCaptor.capture());
+    assertThat(argumentCaptor.getValue()).extracting(
+        ScapDetail::getStatus,
+        ScapDetail::getApprovedTimestamp
+    ).containsExactly(
+        ScapDetailStatus.CLOSED_OUT,
+        clock.instant()
+    );
+  }
+
+  @Test
+  void approveScap_VerifyRejects() {
+    var scap = new Scap();
+    scap.setReference("TEST/2023/01");
+
+    var scapDetail = new ScapDetail();
+    scapDetail.setScap(scap);
     scapDetail.setStatus(ScapDetailStatus.DRAFT);
 
     assertThatThrownBy(() -> scapDetailService.approveScap(scapDetail))
+        .isInstanceOf(ScapBadRequestException.class);
+  }
+
+  @Test
+  void closeOutScap_VerifyRejects() {
+    var scap = new Scap();
+    scap.setReference("TEST/2023/01");
+
+    var scapDetail = new ScapDetail();
+    scapDetail.setScap(scap);
+    scapDetail.setStatus(ScapDetailStatus.DRAFT);
+
+    assertThatThrownBy(() -> scapDetailService.closeOutScap(scapDetail))
         .isInstanceOf(ScapBadRequestException.class);
   }
 

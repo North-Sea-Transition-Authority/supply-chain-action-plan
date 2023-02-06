@@ -1,6 +1,8 @@
 package uk.co.nstauthority.scap.scap.casemanagement.approval;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_APPROVED;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_CLOSED_OUT;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,12 +15,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
+import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequired;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
-import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
@@ -87,11 +89,17 @@ public class ScapApprovalController {
         generator.generate(),
         scapApprovalForm,
         () -> {
-          caseEventService.recordNewEvent(CaseEventSubject.SCAP_APPROVED,
+          caseEventService.recordNewEvent(
+              scapApprovalForm.getProjectClosedOut().equals(YesNo.YES) ? SCAP_CLOSED_OUT : SCAP_APPROVED,
               scapId,
               scapDetail.getVersionNumber(),
               scapApprovalForm.getApprovalComments().getInputValue());
-          scapDetailService.approveScap(scapDetail);
+          if (scapApprovalForm.getProjectClosedOut().equals(YesNo.YES)) {
+            scapDetailService.closeOutScap(scapDetail);
+          } else {
+            scapDetailService.approveScap(scapDetail);
+          }
+
           return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
         });
   }

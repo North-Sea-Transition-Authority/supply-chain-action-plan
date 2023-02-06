@@ -48,8 +48,12 @@ public class ScapSummaryController {
     this.userDetailService = userDetailService;
   }
 
+  //TODO:SCAP2022-232 - Smoke test all statuses against this method
   @GetMapping
-  @ScapHasStatus(permittedStatuses = {ScapDetailStatus.DRAFT, ScapDetailStatus.SUBMITTED, ScapDetailStatus.APPROVED})
+  @ScapHasStatus(permittedStatuses = {ScapDetailStatus.DRAFT,
+      ScapDetailStatus.SUBMITTED,
+      ScapDetailStatus.APPROVED,
+      ScapDetailStatus.CLOSED_OUT})
   public ModelAndView getScapSummary(@PathVariable("scapId") ScapId scapId) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
     var scapSummary = scapSummaryViewService.getScapSummaryView(scapDetail);

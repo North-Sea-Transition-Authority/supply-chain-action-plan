@@ -89,7 +89,7 @@ public class ScapSummaryModelAndViewGenerator {
     public Generator withFurtherInfoResponseForm(FurtherInfoResponseForm furtherInfoResponseForm) {
       this.furtherInfoResponseForm = furtherInfoResponseForm;
       return this;
-    }  
+    }
 
     public Generator withScapApprovalForm(ScapApprovalForm scapApprovalForm) {
       this.scapApprovalForm = scapApprovalForm;
@@ -173,6 +173,7 @@ public class ScapSummaryModelAndViewGenerator {
 
     private void addScapApprovalRequestForm(ModelAndView modelAndView) {
       modelAndView.addObject("scapApprovalForm", scapApprovalForm);
+      modelAndView.addObject("projectClosedOut", scapSummary.projectPerformanceSummaryView().isProjectCompleted());
       modelAndView.addObject("approvalFormSubmitUrl",
           ReverseRouter.route(on(ScapApprovalController.class)
               .saveScapApprovalForm(scapDetail.getScap().getScapId(),

@@ -79,11 +79,23 @@ public class ScapDetailService {
   @Transactional
   public void approveScap(ScapDetail scapDetail) {
     if (!scapDetail.getStatus().equals(ScapDetailStatus.SUBMITTED)) {
-      throw new ScapBadRequestException("Cannot approve a SCAP that has not been submitted");
+      throw new ScapBadRequestException("Cannot approve SCAP reference: %s that has not been submitted"
+          .formatted(scapDetail.getScap().getReference()));
     }
 
-    scapDetail.setApprovedTimestamp(clock.instant());
     scapDetail.setStatus(ScapDetailStatus.APPROVED);
+    scapDetail.setApprovedTimestamp(clock.instant());
+    scapDetailRepository.save(scapDetail);
+  }
+
+  @Transactional
+  public void closeOutScap(ScapDetail scapDetail) {
+    if (!scapDetail.getStatus().equals(ScapDetailStatus.SUBMITTED)) {
+      throw new ScapBadRequestException("Cannot approve SCAP reference: %s that has not been submitted"
+          .formatted(scapDetail.getScap().getReference()));
+    }
+    scapDetail.setStatus(ScapDetailStatus.CLOSED_OUT);
+    scapDetail.setApprovedTimestamp(clock.instant());
     scapDetailRepository.save(scapDetail);
   }
 

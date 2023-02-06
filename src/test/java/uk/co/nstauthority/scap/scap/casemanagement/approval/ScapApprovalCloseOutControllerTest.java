@@ -2,14 +2,15 @@ package uk.co.nstauthority.scap.scap.casemanagement.approval;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getScapSummaryView;
@@ -34,17 +35,21 @@ import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
+import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestController;
+import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestForm;
+import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestFormValidator;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
+import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 
 @ExtendWith(MockitoExtension.class)
 @WithMockUser
 @ContextConfiguration(classes = ScapApprovalController.class)
-class ScapApprovalControllerTest extends AbstractControllerTest {
+class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
 
   @MockBean
   private CaseEventService caseEventService;
@@ -59,7 +64,7 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
   private OrganisationGroupService organisationGroupService;
 
   @MockBean
-  private ScapApprovalFormValidator scapApprovalFormValidator;
+  private ScapApprovalFormValidator consultationRequestFormValidator;
 
   private static final ScapId SCAP_ID = new ScapId(1111);
 
@@ -67,78 +72,67 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
 
   private static final String TEST_STRING = "This is a test comment";
 
-  private ScapDetail scapDetail = getScapDetail();
+  private static final String PURPOSE = "Get Org Group for Summary of SCAP ID: %s".formatted(SCAP_ID.scapId());
+
+  private ScapDetail scapDetail;
+
+  private Scap scap = new Scap();
 
   @BeforeEach
   void setup() {
+    scapDetail = getScapDetail();
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
-    when(scapService.getScapById(anyInt())).thenReturn(new Scap());
+    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
+    when(scapService.getScapById(SCAP_ID.scapId())).thenReturn(scap);
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(any(Scap.class))).thenReturn(scapDetail);
-    when(organisationGroupService.getOrganisationGroupById(eq(ORG_GROUP_ID), any())).thenReturn(Optional.of(getOrgGroup()));
-    when(scapSummaryViewService.getScapSummaryView(any())).thenReturn(getScapSummaryView());
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(organisationGroupService.getOrganisationGroupById(ORG_GROUP_ID, PURPOSE)).thenReturn(Optional.of(getOrgGroup()));
+    when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
   }
 
   @Test
-  void saveQaComments_ValidationSuccesful_saved() throws Exception {
+  void approveScap_CloseOut_ValidationSuccesful_savedWithComments() throws Exception {
+    var expectedRedirect = ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID));
+
     mockMvc.perform(post(ReverseRouter.route(on(ScapApprovalController.class)
             .saveScapApprovalForm(
                 SCAP_ID,
-                CaseEventAction.QA,
+                CaseEventAction.CLOSED_OUT,
                 false,
                 getScapApprovalForm(),
                 null)))
             .with(user(testUser))
             .with(csrf())
-            .flashAttr("scapApprovalForm", getScapApprovalForm()))
-        .andExpect(status().is3xxRedirection());
-
-    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_APPROVED,
-        SCAP_ID,
-        1,
-        getScapApprovalForm().getApprovalComments().getInputValue());
-    verify(scapDetailService).approveScap(scapDetail);
+            .flashAttr("scapApprovalForm", getScapApprovalForm())
+            .flashAttr("scapId", SCAP_ID))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl(expectedRedirect));
+    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_CLOSED_OUT, SCAP_ID, 1, TEST_STRING);
+    verify(scapDetailService).closeOutScap(scapDetail);
   }
 
   @Test
-  void saveApproval_ValidationSuccesful_savedWithComments() throws Exception {
-    mockMvc.perform(post(ReverseRouter.route(on(ScapApprovalController.class)
-            .saveScapApprovalForm(
-                SCAP_ID,
-                CaseEventAction.APPROVED,
-                false,
-                getScapApprovalForm(),
-                null)))
-            .with(user(testUser))
-            .with(csrf())
-            .flashAttr("scapApprovalForm", getScapApprovalForm()))
-        .andExpect(status().is3xxRedirection());
-
-    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_APPROVED, SCAP_ID, 1, TEST_STRING);
-    verify(scapDetailService).approveScap(scapDetail);
-  }
-
-  @Test
-  void saveApproval_ValidationFailed_Reroute() throws Exception {
+  void saveQaComments_ValidationFailed_Reroute() throws Exception {
     doAnswer(invocation -> {
       var bindingResult = (BindingResult) invocation.getArgument(1);
       bindingResult.rejectValue("approvalComments.inputValue", "testError", "This is an error message");
       return bindingResult;
-    }).when(scapApprovalFormValidator).validate(any(), any());
+    }).when(consultationRequestFormValidator).validate(any(), any());
 
     mockMvc.perform(post(ReverseRouter.route(on(ScapApprovalController.class)
             .saveScapApprovalForm(
                 SCAP_ID,
-                CaseEventAction.INFO_REQUESTED,
+                CaseEventAction.CONSULTATION_REQUESTED,
                 false,
                 getScapApprovalForm(),
                 null)))
             .with(user(testUser))
-            .with(csrf()))
-        .andExpect(status().isOk());
-
-    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.SCAP_APPROVED, SCAP_ID, 1, TEST_STRING);
+            .with(csrf())
+            .flashAttr("scapId", SCAP_ID))
+        .andExpect(status().isOk())
+        .andExpect(view().name("scap/scap/summary/scapSummaryOverview"));
+    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.SCAP_CLOSED_OUT, SCAP_ID, 1, TEST_STRING);
   }
 
   private ScapApprovalForm getScapApprovalForm() {
@@ -147,7 +141,7 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
     input.setInputValue(TEST_STRING);
 
     form.setApprovalComments(input);
-    form.setProjectClosedOut(YesNo.NO);
+    form.setProjectClosedOut(YesNo.YES);
     return form;
   }
 
