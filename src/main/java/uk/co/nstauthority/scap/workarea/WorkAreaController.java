@@ -20,6 +20,7 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupRestController;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsRestController;
+import uk.co.nstauthority.scap.scap.projectdetails.ProjectType;
 import uk.co.nstauthority.scap.scap.start.ScapStartController;
 
 // Hide null warning when ReverseRouting with null parameters on WorkAreaController mappings
@@ -81,7 +82,8 @@ public class WorkAreaController {
             ReverseRouter.route(on(OrganisationGroupRestController.class).getOrganisationGroupSearchResults(null)))
         .addObject("prefilledOperator", prefilledOperator)
         .addObject("fieldSearchUrl", FIELD_SEARCH_URL)
-        .addObject("prefilledField", prefilledField);
+        .addObject("prefilledField", prefilledField)
+        .addObject("projectTypeCheckboxes", ProjectType.getCheckboxItems());
   }
 
   @PostMapping

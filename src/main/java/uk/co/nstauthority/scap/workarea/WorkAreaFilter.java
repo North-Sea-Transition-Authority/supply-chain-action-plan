@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
+import uk.co.nstauthority.scap.scap.projectdetails.ProjectType;
 
 @SessionAttributes({"workAreaFilter"})
 class WorkAreaFilter implements Serializable {
@@ -12,12 +13,14 @@ class WorkAreaFilter implements Serializable {
   private String referenceSearchTerm;
   private Integer operatorId;
   private Integer fieldId;
+  private List<ProjectType> projectTypes;
 
   void update(WorkAreaForm form) {
     scapStatuses = form.getScapStatuses();
     referenceSearchTerm = form.getReferenceSearchTerm();
     operatorId = form.getOperatorId();
     fieldId = form.getFieldId();
+    projectTypes = form.getProjectTypes();
   }
 
   void clearFilter() {
@@ -25,6 +28,7 @@ class WorkAreaFilter implements Serializable {
     referenceSearchTerm = null;
     operatorId = null;
     fieldId = null;
+    projectTypes = null;
   }
 
   List<ScapDetailStatus> getScapStatuses() {
@@ -41,5 +45,9 @@ class WorkAreaFilter implements Serializable {
 
   Integer getFieldId() {
     return fieldId;
+  }
+
+  List<ProjectType> getProjectTypes() {
+    return projectTypes;
   }
 }

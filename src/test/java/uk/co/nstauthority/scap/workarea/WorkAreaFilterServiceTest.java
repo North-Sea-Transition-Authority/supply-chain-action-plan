@@ -5,6 +5,7 @@ import static org.jooq.impl.DSL.exists;
 import static org.jooq.impl.DSL.select;
 import static org.jooq.impl.DSL.upper;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.PROJECT_DETAILS;
+import static uk.co.nstauthority.scap.generated.jooq.Tables.PROJECT_DETAIL_TYPES;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.PROJECT_FIELDS;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAPS;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAP_DETAILS;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
+import uk.co.nstauthority.scap.scap.projectdetails.ProjectType;
 
 @ExtendWith(MockitoExtension.class)
 class WorkAreaFilterServiceTest {
@@ -92,6 +94,27 @@ class WorkAreaFilterServiceTest {
                 .from(PROJECT_FIELDS)
                 .where(PROJECT_FIELDS.FIELD_ID.eq(fieldId))
                 .and(PROJECT_DETAILS.ID.eq(PROJECT_FIELDS.PROJECT_DETAILS_ID))
+        )
+    );
+  }
+
+  @Test
+  void getConditions_ProjectTypeSelected_AssertCondition() {
+    var projectType = ProjectType.CARBON_STORAGE_PERMIT;
+    var projectTypes = Collections.singletonList(projectType);
+    var projectTypeStrings = Collections.singletonList(projectType.getEnumName());
+
+    form.setProjectTypes(projectTypes);
+    filter.update(form);
+
+    var conditions = workAreaFilterService.getConditions(filter);
+
+    assertThat(conditions).containsExactly(
+        exists(
+            select(PROJECT_DETAIL_TYPES.ID)
+                .from(PROJECT_DETAIL_TYPES)
+                .where(PROJECT_DETAIL_TYPES.PROJECT_TYPE.in(projectTypeStrings))
+                .and(PROJECT_DETAILS.ID.eq(PROJECT_DETAIL_TYPES.PROJECT_DETAIL_ID))
         )
     );
   }

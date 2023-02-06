@@ -4,6 +4,7 @@ import static org.jooq.impl.DSL.exists;
 import static org.jooq.impl.DSL.select;
 import static org.jooq.impl.DSL.upper;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.PROJECT_DETAILS;
+import static uk.co.nstauthority.scap.generated.jooq.Tables.PROJECT_DETAIL_TYPES;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.PROJECT_FIELDS;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAPS;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAP_DETAILS;
@@ -15,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jooq.Condition;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
+import uk.co.nstauthority.scap.scap.projectdetails.ProjectType;
 
 @Service
 class WorkAreaFilterService {
@@ -38,7 +40,24 @@ class WorkAreaFilterService {
       conditions.add(getFieldCondition(filter.getFieldId()));
     }
 
+    if (Objects.nonNull(filter.getProjectTypes())) {
+      conditions.add(getProjectTypesCondition(filter.getProjectTypes()));
+    }
+
     return conditions;
+  }
+
+  private Condition getProjectTypesCondition(List<ProjectType> projectTypes) {
+    var projectTypeStrings = projectTypes.stream()
+        .map(ProjectType::getEnumName)
+        .toList();
+
+    return exists(
+        select(PROJECT_DETAIL_TYPES.ID)
+            .from(PROJECT_DETAIL_TYPES)
+            .where(PROJECT_DETAIL_TYPES.PROJECT_TYPE.in(projectTypeStrings))
+            .and(PROJECT_DETAILS.ID.eq(PROJECT_DETAIL_TYPES.PROJECT_DETAIL_ID))
+    );
   }
 
   private Condition getFieldCondition(Integer fieldId) {

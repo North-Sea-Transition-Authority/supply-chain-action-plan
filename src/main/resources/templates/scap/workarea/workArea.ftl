@@ -27,6 +27,7 @@
       </#if>
       <@fieldFilter form=form preselectedField=prefilledField />
       <@statusFilter form=form statusCheckboxes=statusCheckboxes />
+      <@projectTypeFilter form=form projectTypeCheckboxes=projectTypeCheckboxes />
     </@fdsSearch.searchFilterList>
   </@fdsSearch.searchFilter>
   <@fdsSearch.searchPageContent twoThirdsWidth=true>
@@ -102,5 +103,11 @@
       selectorMinInputLength=3
       preselectedItems={prefilledField.id() : prefilledField.text()}
     />
+  </@fdsSearch.searchFilterItem>
+</#macro>
+
+<#macro projectTypeFilter form projectTypeCheckboxes>
+  <@fdsSearch.searchFilterItem itemName="Project types" expanded=form.getProjectTypes()?has_content>
+      <@fdsSearch.searchCheckboxes path="form.projectTypes" checkboxes=projectTypeCheckboxes />
   </@fdsSearch.searchFilterItem>
 </#macro>
