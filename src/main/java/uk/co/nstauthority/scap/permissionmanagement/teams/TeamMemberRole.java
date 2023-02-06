@@ -8,6 +8,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.RelationTargetAuditMode;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 
 @Entity
@@ -17,14 +19,18 @@ class TeamMemberRole {
   @Id
   @GeneratedValue(generator = "uuid")
   @GenericGenerator(name = "uuid", strategy = "uuid2")
+  @Audited
   private UUID uuid;
 
+  @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
   @JoinColumn(name = "team_id")
   @ManyToOne
   private Team team;
 
+  @Audited
   private Long wuaId;
 
+  @Audited
   private String role;
 
   protected TeamMemberRole() {

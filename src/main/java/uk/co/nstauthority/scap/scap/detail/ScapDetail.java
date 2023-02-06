@@ -11,12 +11,14 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import org.hibernate.envers.Audited;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 
 @Entity
 @Table(name = "scap_details")
 public class ScapDetail {
   @Id
+  @Audited
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
@@ -29,12 +31,15 @@ public class ScapDetail {
   private Boolean tipFlag;
 
   @Enumerated(EnumType.STRING)
+  @Audited
   private ScapDetailStatus status;
 
+  @Audited
   private Instant createdTimestamp;
 
   private Integer createdByUserId;
 
+  @Audited
   private Instant submittedTimestamp;
 
   private Instant approvedTimestamp;
