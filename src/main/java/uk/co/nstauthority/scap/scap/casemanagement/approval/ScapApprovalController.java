@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.scap.casemanagement.approval;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_APPROVED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_CLOSED_OUT;
+import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.CONSULTATION_REPORT;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,6 +25,7 @@ import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
@@ -47,19 +49,23 @@ public class ScapApprovalController {
 
   private final ScapApprovalFormValidator scapApprovalFormValidator;
 
+  private final SupportingDocumentService supportingDocumentService;
+
   @Autowired
   public ScapApprovalController(CaseEventService caseEventService,
                                 ControllerHelperService controllerHelperService,
                                 ScapDetailService scapDetailService,
                                 ScapSummaryViewService scapSummaryViewService,
                                 OrganisationGroupService organisationGroupService,
-                                ScapApprovalFormValidator scapApprovalFormValidator) {
+                                ScapApprovalFormValidator scapApprovalFormValidator,
+                                SupportingDocumentService supportingDocumentService) {
     this.caseEventService = caseEventService;
     this.controllerHelperService = controllerHelperService;
     this.scapDetailService = scapDetailService;
     this.scapSummaryViewService = scapSummaryViewService;
     this.organisationGroupService = organisationGroupService;
     this.scapApprovalFormValidator = scapApprovalFormValidator;
+    this.supportingDocumentService = supportingDocumentService;
   }
 
   @PostMapping(params = CaseEventAction.APPROVED)
@@ -77,8 +83,11 @@ public class ScapApprovalController {
         .getOrganisationGroupById(scapDetail.getScap().getOrganisationGroupId(),
             "Get Org Group for Summary of SCAP ID: %s".formatted(scapId.scapId()));
 
+    supportingDocumentService.getFileUploadFormListForScapDetailAndType(scapDetail, CONSULTATION_REPORT);
     var generator =
-        ScapSummaryModelAndViewGenerator.generator(scapDetail, scapSummary)
+        ScapSummaryModelAndViewGenerator.generator(scapDetail,
+                scapSummary,
+                supportingDocumentService.buildFileUploadTemplate(scapId, CONSULTATION_REPORT))
             .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
             .withScapApprovalForm(scapApprovalForm)
             .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId));

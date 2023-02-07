@@ -1,7 +1,6 @@
-package uk.co.nstauthority.scap.scap.casemanagement.withdraw;
+package uk.co.nstauthority.scap.scap.casemanagement.consultationresponse;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_WITHDRAWN;
 import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.CONSULTATION_REPORT;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,15 +12,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
-import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerBodyLine;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequired;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
@@ -30,13 +28,12 @@ import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
-import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 
 @Controller
 @RequestMapping("{scapId}/")
 @PermissionsRequired(permissions = RolePermission.REVIEW_SCAP)
 @ScapHasStatus(permittedStatuses = ScapDetailStatus.SUBMITTED)
-public class ScapWithdrawController {
+public class ConsultationResponseController {
 
   private final CaseEventService caseEventService;
 
@@ -47,69 +44,62 @@ public class ScapWithdrawController {
   private final ScapSummaryViewService scapSummaryViewService;
 
   private final OrganisationGroupService organisationGroupService;
-  private final ScapWithdrawalFormValidator scapWithdrawalFormValidator;
+
+  private final ConsultationResponseFormValidator consultationResponseFormValidator;
+
   private final SupportingDocumentService supportingDocumentService;
 
   @Autowired
-  public ScapWithdrawController(CaseEventService caseEventService,
-                                ControllerHelperService controllerHelperService,
-                                ScapDetailService scapDetailService,
-                                ScapSummaryViewService scapSummaryViewService,
-                                OrganisationGroupService organisationGroupService,
-                                ScapWithdrawalFormValidator scapWithdrawalFormValidator,
-                                SupportingDocumentService supportingDocumentService) {
+  public ConsultationResponseController(CaseEventService caseEventService,
+                                        ControllerHelperService controllerHelperService,
+                                        ScapDetailService scapDetailService,
+                                        ScapSummaryViewService scapSummaryViewService,
+                                        OrganisationGroupService organisationGroupService,
+                                        ConsultationResponseFormValidator consultationRequestFormValidator,
+                                        SupportingDocumentService supportingDocumentService) {
     this.caseEventService = caseEventService;
     this.controllerHelperService = controllerHelperService;
     this.scapDetailService = scapDetailService;
     this.scapSummaryViewService = scapSummaryViewService;
     this.organisationGroupService = organisationGroupService;
-    this.scapWithdrawalFormValidator = scapWithdrawalFormValidator;
+    this.consultationResponseFormValidator = consultationRequestFormValidator;
     this.supportingDocumentService = supportingDocumentService;
   }
 
-  @PostMapping(params = CaseEventAction.WITHDRAWN)
-  public ModelAndView withdrawScap(@PathVariable("scapId") ScapId scapId,
-                                   @RequestParam(CaseEventAction.WITHDRAWN) String caseEventAction,
-                                   @RequestParam("Withdraw-scap-panel") Boolean slideOutPanelOpen,
-                                   @ModelAttribute("scapWithdrawForm") ScapWithdrawalForm scapWithdrawalForm,
-                                   BindingResult bindingResult,
-                                   RedirectAttributes redirectAttributes) {
-    scapWithdrawalFormValidator.validate(scapWithdrawalForm, bindingResult);
+  @PostMapping(params = CaseEventAction.CONSULTATION_RESPONSE)
+  public ModelAndView saveConsultationResponseForm(@PathVariable("scapId") ScapId scapId,
+                                                  @RequestParam(CaseEventAction.CONSULTATION_RESPONSE) String caseEventAction,
+                                                  @RequestParam("Consultation-Response-Panel") Boolean slideOutPanelOpen,
+                                                  @ModelAttribute("form")
+                                                    ConsultationResponseForm consultationResponseForm,
+                                                  BindingResult bindingResult) {
+    consultationResponseFormValidator.validate(consultationResponseForm, bindingResult);
 
-    var scapDetail = scapDetailService.getLatestSubmittedScapDetail(scapId);
+    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
     var scapSummary = scapSummaryViewService.getScapSummaryView(scapDetail);
     var orgGroup = organisationGroupService
         .getOrganisationGroupById(scapDetail.getScap().getOrganisationGroupId(),
             "Get Org Group for Summary of SCAP ID: %s".formatted(scapId.scapId()));
 
-    var generator =
-        ScapSummaryModelAndViewGenerator.generator(scapDetail,
-                scapSummary,
-                supportingDocumentService.buildFileUploadTemplate(scapId, CONSULTATION_REPORT))
-            .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
-            .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
-            .withScapWithdrawalForm(scapWithdrawalForm);
+    supportingDocumentService.getFileUploadFormListForScapDetailAndType(scapDetail, CONSULTATION_REPORT);
+    var generator = ScapSummaryModelAndViewGenerator.generator(
+            scapDetail,
+            scapSummary,
+            supportingDocumentService.buildFileUploadTemplate(scapId, CONSULTATION_REPORT))
+        .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
+        .withConsultationResponseForm(consultationResponseForm);
     orgGroup.ifPresent(generator::withOrgGroup);
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
         generator.generate(),
-        scapWithdrawalForm,
+        consultationResponseForm,
         () -> {
-          scapDetailService.withdrawScap(scapDetail);
-          caseEventService.recordNewEvent(
-              SCAP_WITHDRAWN,
+          caseEventService.recordNewEvent(CaseEventSubject.SCAP_CONSULTATION_RESPONSE,
               scapId,
               scapDetail.getVersionNumber(),
-              scapWithdrawalForm.getWithdrawComments().getInputValue());
-          var modelAndView =  ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
-
-          NotificationBannerUtils.successBannerRedirect(
-              "Success",
-              new NotificationBannerBodyLine(
-                  "%s has been withdrawn".formatted(scapDetail.getScap().getReference()), "govuk-!-font-weight-bold"
-              ), redirectAttributes);
-          return modelAndView;
+              consultationResponseForm.getResponseComments().getInputValue());
+          return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
         });
   }
 }

@@ -18,6 +18,8 @@ public class CaseEventAction {
 
   public static final String CONSULTATION_REQUESTED = "CONSULTATION_REQUESTED";
 
+  public static final String CONSULTATION_RESPONSE = "CONSULTATION_RESPONSE";
+
   public static final String APPROVED = "APPROVED";
 
   public static final String CLOSED_OUT = "CLOSED_OUT";

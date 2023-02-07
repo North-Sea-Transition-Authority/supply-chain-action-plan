@@ -28,6 +28,7 @@ import org.springframework.validation.BindingResult;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
+import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
@@ -36,6 +37,8 @@ import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
@@ -60,6 +63,9 @@ class FurtherInfoControllerTest extends AbstractControllerTest {
   @MockBean
   private FurtherInfoRequestFormValidator furtherInfoRequestFormValidator;
 
+  @MockBean
+  private SupportingDocumentService supportingDocumentService;
+
   private static final ScapId SCAP_ID = new ScapId(1111);
 
   private static final Integer ORG_GROUP_ID = 1000;
@@ -69,6 +75,8 @@ class FurtherInfoControllerTest extends AbstractControllerTest {
   @BeforeEach
   void setup() {
     var scapDetail = getScapDetail();
+    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
+        .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
     when(scapService.getScapById(anyInt())).thenReturn(new Scap());

@@ -161,17 +161,32 @@ class SupportingDocumentServiceTest {
   }
 
   @Test
-  void buildFileUploadTemplate() {
+  void buildFileUploadTemplate_AdditionDocumentType() {
     var supportingDocumentType = SupportingDocumentType.ADDITIONAL_DOCUMENT;
 
     var fileUploadTemplate = supportingDocumentService.buildFileUploadTemplate(
         scapId, supportingDocumentType);
 
     verify(fileUploadService).buildFileUploadTemplate(
-        ReverseRouter.route(on(SupportingDocumentsController.class).download(scapId, null)),
-        ReverseRouter.route(on(SupportingDocumentsController.class)
-            .upload(scapId, supportingDocumentType, null)),
-        ReverseRouter.route(on(SupportingDocumentsController.class).delete(scapId, null))
+        ReverseRouter.route(on(AdditionalDocumentsController.class).download(scapId, null)),
+        ReverseRouter.route(on(AdditionalDocumentsController.class)
+            .upload(scapId, null)),
+        ReverseRouter.route(on(AdditionalDocumentsController.class).delete(scapId, null))
+    );
+  }
+
+  @Test
+  void buildFileUploadTemplate_ConsultationResponseType() {
+    var supportingDocumentType = SupportingDocumentType.CONSULTATION_REPORT;
+
+    var fileUploadTemplate = supportingDocumentService.buildFileUploadTemplate(
+        scapId, supportingDocumentType);
+
+    verify(fileUploadService).buildFileUploadTemplate(
+        ReverseRouter.route(on(ConsultationDocumentsController.class).download(scapId, null)),
+        ReverseRouter.route(on(ConsultationDocumentsController.class)
+            .upload(scapId, null)),
+        ReverseRouter.route(on(ConsultationDocumentsController.class).delete(scapId, null))
     );
   }
 

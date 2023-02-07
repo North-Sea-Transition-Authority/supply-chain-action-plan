@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.scap.casemanagement.furtherinforesponse;
+package uk.co.nstauthority.scap.scap.casemanagement.consultationresponse;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -28,16 +28,15 @@ import org.springframework.validation.BindingResult;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
-import uk.co.nstauthority.scap.file.FileUploadService;
 import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
-import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentController;
-import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentForm;
-import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentFormValidator;
+import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestController;
+import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestForm;
+import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestFormValidator;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
@@ -49,8 +48,8 @@ import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 
 @ExtendWith(MockitoExtension.class)
 @WithMockUser
-@ContextConfiguration(classes = FurtherInfoResponseController.class)
-class FurtherInfoResponseControllerTest extends AbstractControllerTest {
+@ContextConfiguration(classes = ConsultationResponseController.class)
+class ConsultationResponseControllerTest extends AbstractControllerTest {
 
   @MockBean
   private CaseEventService caseEventService;
@@ -65,10 +64,10 @@ class FurtherInfoResponseControllerTest extends AbstractControllerTest {
   private OrganisationGroupService organisationGroupService;
 
   @MockBean
-  private FurtherInfoResponseFormValidator furtherInfoResponseFormValidator;
+  private ConsultationResponseFormValidator consultationResponseFormValidator;
 
   @MockBean
-  SupportingDocumentService supportingDocumentService;
+  private SupportingDocumentService supportingDocumentService;
 
   private static final ScapId SCAP_ID = new ScapId(1111);
 
@@ -76,81 +75,66 @@ class FurtherInfoResponseControllerTest extends AbstractControllerTest {
 
   private static final String TEST_STRING = "This is a test comment";
 
+  private static final String PURPOSE = "Get Org Group for Summary of SCAP ID: %s".formatted(SCAP_ID.scapId());
+
   @BeforeEach
   void setup() {
+    var scapDetail = getScapDetail();
     when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
     when(scapService.getScapById(anyInt())).thenReturn(new Scap());
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(getScapDetail());
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(any(Scap.class))).thenReturn(getScapDetail());
-    when(organisationGroupService.getOrganisationGroupById(eq(ORG_GROUP_ID), any())).thenReturn(Optional.of(getOrgGroup()));
-    when(scapSummaryViewService.getScapSummaryView(any())).thenReturn(getScapSummaryView());
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(any(Scap.class))).thenReturn(scapDetail);
+    when(organisationGroupService.getOrganisationGroupById(ORG_GROUP_ID, PURPOSE)).thenReturn(Optional.of(getOrgGroup()));
+    when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
   }
 
   @Test
-  void saveQaComments_ValidationSuccesful_saved() throws Exception {
-    mockMvc.perform(post(ReverseRouter.route(on(FurtherInfoResponseController.class)
-        .saveInfoResponseForm(
-            SCAP_ID,
-            CaseEventAction.INFO_RESPONSE,
-            false,
-            null,
-            null)))
-        .with(user(testUser))
-        .with(csrf()))
-        .andExpect(status().is3xxRedirection());
-
-    verify(caseEventService).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_ID, 1, null);
-  }
-
-  @Test
-  void saveQaComments_ValidationSuccesful_savedWithComments() throws Exception {
-    mockMvc.perform(post(ReverseRouter.route(on(FurtherInfoResponseController.class)
-            .saveInfoResponseForm(
+  void consultationResponse_ValidationSuccesful_savedWithComments() throws Exception {
+    mockMvc.perform(post(ReverseRouter.route(on(ConsultationResponseController.class)
+            .saveConsultationResponseForm(
                 SCAP_ID,
-                CaseEventAction.INFO_RESPONSE,
+                CaseEventAction.CONSULTATION_RESPONSE,
                 false,
-                getFurtherInfoResponseForm(),
+                getConsultationResponseForm(),
                 null)))
             .with(user(testUser))
             .with(csrf())
-            .flashAttr("infoResponseForm", getFurtherInfoResponseForm()))
+            .flashAttr("form", getConsultationResponseForm()))
         .andExpect(status().is3xxRedirection());
-
-    verify(caseEventService).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_CONSULTATION_RESPONSE, SCAP_ID, 1, TEST_STRING);
   }
 
   @Test
-  void saveQaComments_ValidationFailed_Reroute() throws Exception {
+  void consultationResponse_ValidationFailed_Reroute() throws Exception {
     doAnswer(invocation -> {
       var bindingResult = (BindingResult) invocation.getArgument(1);
-      bindingResult.rejectValue("infoResponse.inputValue", "testError", "This is an error message");
+      bindingResult.rejectValue("responseComments.inputValue", "testError", "This is an error message");
       return bindingResult;
-    }).when(furtherInfoResponseFormValidator).validate(any(), any());
+    }).when(consultationResponseFormValidator).validate(any(), any());
 
-    mockMvc.perform(post(ReverseRouter.route(on(FurtherInfoResponseController.class)
-            .saveInfoResponseForm(
+    mockMvc.perform(post(ReverseRouter.route(on(ConsultationResponseController.class)
+            .saveConsultationResponseForm(
                 SCAP_ID,
-                CaseEventAction.INFO_RESPONSE,
+                CaseEventAction.CONSULTATION_REQUESTED,
                 false,
-                getFurtherInfoResponseForm(),
+                getConsultationResponseForm(),
                 null)))
             .with(user(testUser))
             .with(csrf())
-            .flashAttr("qaForm", getFurtherInfoResponseForm()))
+            .flashAttr("consultationRequestForm", getConsultationResponseForm()))
         .andExpect(status().isOk());
-
-    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.SCAP_CONSULTATION_REQUESTED, SCAP_ID, 1, TEST_STRING);
   }
 
-  private FurtherInfoResponseForm getFurtherInfoResponseForm() {
-    var form = new FurtherInfoResponseForm();
-    var input = form.getInfoResponse();
+  private ConsultationResponseForm getConsultationResponseForm() {
+    var form = new ConsultationResponseForm();
+    var input = form.getResponseComments();
     input.setInputValue(TEST_STRING);
 
-    form.setInfoResponse(input);
+    form.setResponseComments(input);
     return form;
   }
 

@@ -1,6 +1,7 @@
 package uk.co.nstauthority.scap.scap.casemanagement.furtherinfo;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.CONSULTATION_REPORT;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,7 @@ import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
@@ -45,19 +47,23 @@ public class FurtherInfoController {
 
   private final FurtherInfoRequestFormValidator furtherInfoRequestFormValidator;
 
+  private final SupportingDocumentService supportingDocumentService;
+
   @Autowired
   public FurtherInfoController(CaseEventService caseEventService,
                                ScapDetailService scapDetailService,
                                ControllerHelperService controllerHelperService,
                                ScapSummaryViewService scapSummaryViewService,
                                OrganisationGroupService organisationGroupService,
-                               FurtherInfoRequestFormValidator furtherInfoRequestFormValidator) {
+                               FurtherInfoRequestFormValidator furtherInfoRequestFormValidator,
+                               SupportingDocumentService supportingDocumentService) {
     this.caseEventService = caseEventService;
     this.scapDetailService = scapDetailService;
     this.controllerHelperService = controllerHelperService;
     this.scapSummaryViewService = scapSummaryViewService;
     this.organisationGroupService = organisationGroupService;
     this.furtherInfoRequestFormValidator = furtherInfoRequestFormValidator;
+    this.supportingDocumentService = supportingDocumentService;
   }
 
   @PostMapping(params = CaseEventAction.INFO_REQUESTED)
@@ -74,8 +80,10 @@ public class FurtherInfoController {
         .getOrganisationGroupById(scapDetail.getScap().getOrganisationGroupId(),
             "Get Org Group for Summary of SCAP ID: %s".formatted(scapId.scapId()));
 
-    var generator =
-        ScapSummaryModelAndViewGenerator.generator(scapDetail, scapSummary)
+    var generator = ScapSummaryModelAndViewGenerator.generator(
+                scapDetail,
+                scapSummary,
+                supportingDocumentService.buildFileUploadTemplate(scapId, CONSULTATION_REPORT))
             .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
             .withFurtherInfoRequestFrom(infoRequestForm);
     orgGroup.ifPresent(generator::withOrgGroup);

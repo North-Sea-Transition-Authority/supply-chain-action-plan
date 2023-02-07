@@ -20,7 +20,7 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
-import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentsController;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.AdditionalDocumentsController;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 
@@ -70,7 +70,7 @@ class FileUploadSummaryViewServiceTest {
         tuple(
             fileName,
             fileDesc,
-            ReverseRouter.route(on(SupportingDocumentsController.class).download(scapId, fileId))
+            ReverseRouter.route(on(AdditionalDocumentsController.class).download(scapId, fileId))
         )
     );
   }

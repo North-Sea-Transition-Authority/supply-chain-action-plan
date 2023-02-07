@@ -1,6 +1,7 @@
 package uk.co.nstauthority.scap.scap.summary;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,6 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
+import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
@@ -35,6 +37,8 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetails;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsService;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryView;
@@ -58,6 +62,9 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
   @MockBean
   EnergyPortalUserService energyPortalUserService;
 
+  @MockBean
+  SupportingDocumentService supportingDocumentService;
+
   private ScapDetail scapDetail;
 
   private static final ScapId SCAP_ID = new ScapId(1000);
@@ -70,17 +77,19 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     scapDetail.setScap(scap);
     scapDetail.setStatus(ScapDetailStatus.DRAFT);
 
+
+    when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(scapService.getScapById(SCAP_ID.scapId())).thenReturn(scap);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
+    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
+        .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
   }
 
   @Test
   void renderSummary_fullSCAPDetails() throws Exception {
-    var projectDetails = new ProjectDetails();
 
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
-    when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
-    when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
     when(caseEventService.getApplicableActionsForScap(SCAP_ID)).thenReturn(Set.of(FURTHER_INFO_REQUESTED));
 
@@ -95,13 +104,10 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
 
   @Test
   void renderSummary_RegulatorUser_CaseEventEmpty() throws Exception {
-    var projectDetails = new ProjectDetails();
-
+    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
+        .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(true);
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
-    when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
-    when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
     when(caseEventService.getEventViewByScapId(SCAP_ID)).thenReturn(getTimelineView());
 
@@ -115,12 +121,9 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
 
   @Test
   void renderSummary_IndustryUser_CaseEventEmpty() throws Exception {
-    var projectDetails = new ProjectDetails();
-
+    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
+        .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(false);
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
-    when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
-    when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getSummaryView());
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
     when(caseEventService.getEventViewByScapId(SCAP_ID)).thenReturn(getTimelineView());
 

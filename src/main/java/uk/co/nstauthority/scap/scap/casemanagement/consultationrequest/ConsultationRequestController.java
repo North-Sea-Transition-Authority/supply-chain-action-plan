@@ -1,6 +1,7 @@
 package uk.co.nstauthority.scap.scap.casemanagement.consultationrequest;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.CONSULTATION_REPORT;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,7 @@ import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
@@ -45,19 +47,23 @@ public class ConsultationRequestController {
 
   private final ConsultationRequestFormValidator consultationRequestFormValidator;
 
+  private final SupportingDocumentService supportingDocumentService;
+
   @Autowired
   public ConsultationRequestController(CaseEventService caseEventService,
                                        ControllerHelperService controllerHelperService,
                                        ScapDetailService scapDetailService,
                                        ScapSummaryViewService scapSummaryViewService,
                                        OrganisationGroupService organisationGroupService,
-                                       ConsultationRequestFormValidator consultationRequestFormValidator) {
+                                       ConsultationRequestFormValidator consultationRequestFormValidator,
+                                       SupportingDocumentService supportingDocumentService) {
     this.caseEventService = caseEventService;
     this.controllerHelperService = controllerHelperService;
     this.scapDetailService = scapDetailService;
     this.scapSummaryViewService = scapSummaryViewService;
     this.organisationGroupService = organisationGroupService;
     this.consultationRequestFormValidator = consultationRequestFormValidator;
+    this.supportingDocumentService = supportingDocumentService;
   }
 
   @PostMapping(params = CaseEventAction.CONSULTATION_REQUESTED)
@@ -75,9 +81,10 @@ public class ConsultationRequestController {
         .getOrganisationGroupById(scapDetail.getScap().getOrganisationGroupId(),
             "Get Org Group for Summary of SCAP ID: %s".formatted(scapId.scapId()));
 
-
-    var generator =
-        ScapSummaryModelAndViewGenerator.generator(scapDetail, scapSummary)
+    var generator = ScapSummaryModelAndViewGenerator.generator(
+                scapDetail,
+                scapSummary,
+                supportingDocumentService.buildFileUploadTemplate(scapId, CONSULTATION_REPORT))
             .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
             .withConsultationRequestForm(consultationRequestForm);
     orgGroup.ifPresent(generator::withOrgGroup);
@@ -87,7 +94,7 @@ public class ConsultationRequestController {
         generator.generate(),
         consultationRequestForm,
         () -> {
-          caseEventService.recordNewEvent(CaseEventSubject.CONSULTATION_REQUESTED,
+          caseEventService.recordNewEvent(CaseEventSubject.SCAP_CONSULTATION_REQUESTED,
               scapId,
               scapDetail.getVersionNumber(),
               consultationRequestForm.getRequestComments().getInputValue());

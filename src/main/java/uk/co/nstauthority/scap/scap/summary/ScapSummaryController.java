@@ -1,6 +1,8 @@
 package uk.co.nstauthority.scap.scap.summary;
 
 
+import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.CONSULTATION_REPORT;
+
 import java.util.Collections;
 import java.util.List;
 import org.springframework.stereotype.Controller;
@@ -16,6 +18,7 @@ import uk.co.nstauthority.scap.scap.casemanagement.CaseEventView;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @Controller
@@ -34,18 +37,22 @@ public class ScapSummaryController {
 
   private final UserDetailService userDetailService;
 
+  private final SupportingDocumentService supportingDocumentService;
+
   public ScapSummaryController(ScapDetailService scapDetailService,
                                ScapSummaryViewService scapSummaryViewService,
                                CaseEventService caseEventService,
                                OrganisationGroupService organisationGroupService,
                                TeamService teamService,
-                               UserDetailService userDetailService) {
+                               UserDetailService userDetailService,
+                               SupportingDocumentService supportingDocumentService) {
     this.scapDetailService = scapDetailService;
     this.scapSummaryViewService = scapSummaryViewService;
     this.caseEventService = caseEventService;
     this.organisationGroupService = organisationGroupService;
     this.teamService = teamService;
     this.userDetailService = userDetailService;
+    this.supportingDocumentService = supportingDocumentService;
   }
 
   //TODO:SCAP2022-232 - Smoke test all statuses against this method
@@ -62,8 +69,10 @@ public class ScapSummaryController {
     var orgGroup = organisationGroupService
         .getOrganisationGroupById(scapDetail.getScap().getOrganisationGroupId(), "Get Org Group for Summary");
 
-    var generator =
-        ScapSummaryModelAndViewGenerator.generator(scapDetail, scapSummary)
+    var generator = ScapSummaryModelAndViewGenerator.generator(
+                scapDetail,
+                scapSummary,
+                supportingDocumentService.buildFileUploadTemplate(scapId, CONSULTATION_REPORT))
             .withScapStatus(scapSummaryViewService.inferSubmissionStatusFromSummary(scapSummary))
             .withCaseEventTimeline(getCaseEventView(scapId))
             .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId));

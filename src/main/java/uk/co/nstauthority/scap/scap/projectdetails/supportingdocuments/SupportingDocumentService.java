@@ -9,6 +9,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.file.FileDeleteResult;
 import uk.co.nstauthority.scap.file.FileUploadForm;
 import uk.co.nstauthority.scap.file.FileUploadResult;
@@ -80,12 +81,21 @@ public class SupportingDocumentService {
   }
 
   public FileUploadTemplate buildFileUploadTemplate(ScapId scapDetailId, SupportingDocumentType supportingDocumentType) {
-    return fileUploadService.buildFileUploadTemplate(
-        ReverseRouter.route(on(SupportingDocumentsController.class).download(scapDetailId, null)),
-        ReverseRouter.route(
-            on(SupportingDocumentsController.class).upload(scapDetailId, supportingDocumentType, null)),
-        ReverseRouter.route(on(SupportingDocumentsController.class).delete(scapDetailId, null))
-    );
+    return switch (supportingDocumentType) {
+      case ADDITIONAL_DOCUMENT -> fileUploadService.buildFileUploadTemplate(
+          ReverseRouter.route(on(AdditionalDocumentsController.class).download(scapDetailId, null)),
+          ReverseRouter.route(
+              on(AdditionalDocumentsController.class).upload(scapDetailId, null)),
+          ReverseRouter.route(on(AdditionalDocumentsController.class).delete(scapDetailId, null))
+      );
+      case CONSULTATION_REPORT -> fileUploadService.buildFileUploadTemplate(
+          ReverseRouter.route(on(ConsultationDocumentsController.class).download(scapDetailId, null)),
+          ReverseRouter.route(
+              on(ConsultationDocumentsController.class).upload(scapDetailId, null)),
+          ReverseRouter.route(on(ConsultationDocumentsController.class).delete(scapDetailId, null))
+      );
+      default -> throw new ScapEntityNotFoundException("Could not find document management paths for document type");
+    };
   }
 
   @Transactional

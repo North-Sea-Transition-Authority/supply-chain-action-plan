@@ -30,8 +30,8 @@ import uk.co.nstauthority.scap.file.UploadedFile;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
-@ContextConfiguration(classes = SupportingDocumentsController.class)
-class SupportingDocumentsControllerTest extends AbstractScapSubmitterControllerTest {
+@ContextConfiguration(classes = AdditionalDocumentsController.class)
+class AdditionalDocumentsControllerTest extends AbstractScapSubmitterControllerTest {
 
   private static final ServiceUserDetail USER = ServiceUserDetailTestUtil.Builder().build();
 
@@ -59,7 +59,7 @@ class SupportingDocumentsControllerTest extends AbstractScapSubmitterControllerT
 
     MockMultipartFile mockMultipartFile = new MockMultipartFile("file", (byte[]) null);
     mockMvc.perform(multipart(ReverseRouter.route(
-            on(SupportingDocumentsController.class).upload(SCAP_ID, supportingDocumentType, null)))
+            on(AdditionalDocumentsController.class).upload(SCAP_ID, null)))
             .file(mockMultipartFile)
             .with(user(USER))
             .with(csrf()))
@@ -77,7 +77,7 @@ class SupportingDocumentsControllerTest extends AbstractScapSubmitterControllerT
 
     var response = mockMvc.perform(
             get(ReverseRouter.route(
-                on(SupportingDocumentsController.class).download(SCAP_ID, uploadedFile.getId())))
+                on(AdditionalDocumentsController.class).download(SCAP_ID, uploadedFile.getId())))
                 .with(user(USER)))
         .andExpect(status().isOk())
         .andReturn().getResponse();
@@ -100,7 +100,7 @@ class SupportingDocumentsControllerTest extends AbstractScapSubmitterControllerT
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
 
     mockMvc.perform(post(
-            ReverseRouter.route(on(SupportingDocumentsController.class).delete(SCAP_ID, uploadedFile.getId())))
+            ReverseRouter.route(on(AdditionalDocumentsController.class).delete(SCAP_ID, uploadedFile.getId())))
             .with(user(USER))
             .with(csrf()))
         .andExpect(status().isOk());

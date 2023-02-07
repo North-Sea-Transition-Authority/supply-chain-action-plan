@@ -1,6 +1,11 @@
 package uk.co.nstauthority.scap.scap.casemanagement;
 
+
+
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.APPROVED;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.CLOSED_OUT;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.CONSULTATION_REQUESTED;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.CONSULTATION_RESPONSE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.INFO_REQUESTED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.INFO_RESPONSE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.QA;
@@ -25,14 +30,18 @@ public enum CaseEventSubject {
       null,
       null),
   SCAP_CLOSED_OUT(
-      CaseEventAction.CLOSED_OUT,
+      CLOSED_OUT,
       "Project completed",
       null,
       null),
-  CONSULTATION_REQUESTED(CaseEventAction.CONSULTATION_REQUESTED,
+  SCAP_CONSULTATION_REQUESTED(CONSULTATION_REQUESTED,
       "Consultation Requested",
       "Request Consultation",
       "Consultation-Request-Panel"),
+  SCAP_CONSULTATION_RESPONSE(CONSULTATION_RESPONSE,
+      "Consultation Response",
+      "Consultation Response",
+      "Consultation-Response-Panel"),
   SCAP_APPROVED(APPROVED,
       "SCAP Approved",
       "Approve SCAP",

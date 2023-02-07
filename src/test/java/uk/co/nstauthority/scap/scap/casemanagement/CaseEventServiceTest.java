@@ -11,11 +11,12 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.CONSULTATION_REQUESTED;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_CONSULTATION_REQUESTED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTHER_INFO_REQUESTED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTHER_INFO_RESPONSE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.QA_COMMENT;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_APPROVED;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_CONSULTATION_RESPONSE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_WITHDRAWN;
 
 import java.time.Instant;
@@ -151,7 +152,8 @@ class CaseEventServiceTest {
   @Test
   void getApplicableActions_NoOutstandingRequests() {
     var result = caseEventService.getApplicableActionsForScap(SCAP_ID);
-    assertThat(result).containsOnly(CONSULTATION_REQUESTED,
+    assertThat(result).containsOnly(SCAP_CONSULTATION_RESPONSE,
+        SCAP_CONSULTATION_REQUESTED,
         SCAP_WITHDRAWN,
         FURTHER_INFO_RESPONSE,
         SCAP_APPROVED,
@@ -171,7 +173,8 @@ class CaseEventServiceTest {
         .thenReturn(Optional.of(getRequestEvent()));
 
     var result = caseEventService.getApplicableActionsForScap(SCAP_ID);
-    assertThat(result).containsOnly(CONSULTATION_REQUESTED,
+    assertThat(result).containsOnly(SCAP_CONSULTATION_RESPONSE,
+        SCAP_CONSULTATION_REQUESTED,
         SCAP_WITHDRAWN,
         FURTHER_INFO_RESPONSE,
         SCAP_APPROVED,

@@ -1,6 +1,7 @@
 package uk.co.nstauthority.scap.scap.casemanagement.qacomments;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.CONSULTATION_REPORT;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,7 @@ import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
@@ -45,19 +47,23 @@ public class QaCommentController {
 
   private final QaCommentFormValidator qaCommentFormValidator;
 
+  private final SupportingDocumentService supportingDocumentService;
+
   @Autowired
   public QaCommentController(CaseEventService caseEventService,
                              ControllerHelperService controllerHelperService,
                              ScapDetailService scapDetailService,
                              ScapSummaryViewService scapSummaryViewService,
                              OrganisationGroupService organisationGroupService,
-                             QaCommentFormValidator qaCommentFormValidator) {
+                             QaCommentFormValidator qaCommentFormValidator,
+                             SupportingDocumentService supportingDocumentService) {
     this.caseEventService = caseEventService;
     this.controllerHelperService = controllerHelperService;
     this.scapDetailService = scapDetailService;
     this.scapSummaryViewService = scapSummaryViewService;
     this.organisationGroupService = organisationGroupService;
     this.qaCommentFormValidator = qaCommentFormValidator;
+    this.supportingDocumentService = supportingDocumentService;
   }
 
   @PostMapping(params = CaseEventAction.QA)
@@ -75,8 +81,10 @@ public class QaCommentController {
         .getOrganisationGroupById(scapDetail.getScap().getOrganisationGroupId(),
             "Get Org Group for Summary of SCAP ID: %s".formatted(scapId.scapId()));
 
-    var generator =
-        ScapSummaryModelAndViewGenerator.generator(scapDetail, scapSummary)
+    var generator = ScapSummaryModelAndViewGenerator.generator(
+                scapDetail,
+                scapSummary,
+                supportingDocumentService.buildFileUploadTemplate(scapId, CONSULTATION_REPORT))
             .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
             .withQaCommentForm(qaCommentForm);
     orgGroup.ifPresent(generator::withOrgGroup);

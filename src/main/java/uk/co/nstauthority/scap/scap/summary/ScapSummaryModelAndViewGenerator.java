@@ -9,6 +9,8 @@ import java.util.Set;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.error.exception.IllegalUtilClassInstantiationException;
+import uk.co.nstauthority.scap.file.FileUploadForm;
+import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
@@ -17,6 +19,8 @@ import uk.co.nstauthority.scap.scap.casemanagement.approval.ScapApprovalControll
 import uk.co.nstauthority.scap.scap.casemanagement.approval.ScapApprovalForm;
 import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestController;
 import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestForm;
+import uk.co.nstauthority.scap.scap.casemanagement.consultationresponse.ConsultationResponseController;
+import uk.co.nstauthority.scap.scap.casemanagement.consultationresponse.ConsultationResponseForm;
 import uk.co.nstauthority.scap.scap.casemanagement.furtherinfo.FurtherInfoController;
 import uk.co.nstauthority.scap.scap.casemanagement.furtherinfo.FurtherInfoRequestForm;
 import uk.co.nstauthority.scap.scap.casemanagement.furtherinforesponse.FurtherInfoResponseController;
@@ -35,8 +39,9 @@ public class ScapSummaryModelAndViewGenerator {
   }
 
   public static Generator generator(ScapDetail scapDetail,
-                                    ScapSummaryView scapSummaryView) {
-    return new Generator(scapDetail, scapSummaryView);
+                                    ScapSummaryView scapSummaryView,
+                                    FileUploadTemplate fileUploadTemplate) {
+    return new Generator(scapDetail, scapSummaryView, fileUploadTemplate);
   }
 
   public static class Generator {
@@ -51,13 +56,17 @@ public class ScapSummaryModelAndViewGenerator {
     private ConsultationRequestForm consultationRequestForm = new ConsultationRequestForm();
     private FurtherInfoResponseForm furtherInfoResponseForm = new FurtherInfoResponseForm();
     private ScapApprovalForm scapApprovalForm = new ScapApprovalForm();
-
+    private ConsultationResponseForm consultationResponseForm = new ConsultationResponseForm();
+    private FileUploadTemplate fileUploadTemplate = null;
+    private List<FileUploadForm> existingFiles = null;
     private ScapWithdrawalForm scapWithdrawalForm = new ScapWithdrawalForm();
 
     public Generator(ScapDetail scapDetail,
-                     ScapSummaryView scapSummary) {
+                     ScapSummaryView scapSummary,
+                     FileUploadTemplate fileUploadTemplate) {
       this.scapDetail = scapDetail;
       this.scapSummary = scapSummary;
+      this.fileUploadTemplate = fileUploadTemplate;
     }
 
     public Generator withOrgGroup(OrganisationGroup organisationGroup) {
@@ -87,6 +96,11 @@ public class ScapSummaryModelAndViewGenerator {
 
     public Generator withConsultationRequestForm(ConsultationRequestForm consultationRequestForm) {
       this.consultationRequestForm = consultationRequestForm;
+      return this;
+    }
+
+    public Generator withConsultationResponseForm(ConsultationResponseForm consultationResponseForm) {
+      this.consultationResponseForm = consultationResponseForm;
       return this;
     }
 
@@ -127,6 +141,7 @@ public class ScapSummaryModelAndViewGenerator {
       addInfoRequestForm(modelAndView);
       addInfoResponseForm(modelAndView);
       addConsultationRequestForm(modelAndView);
+      addConsultationResponseForm(modelAndView);
       addScapApprovalRequestForm(modelAndView);
       addWithdrawForm(modelAndView);
 
@@ -179,6 +194,19 @@ public class ScapSummaryModelAndViewGenerator {
                   true,
                   null,
                   null)));
+    }
+
+    private void addConsultationResponseForm(ModelAndView modelAndView) {
+      consultationResponseForm.setSupportingDocuments(existingFiles);
+      modelAndView.addObject("form", consultationResponseForm);
+      modelAndView.addObject("consultationResponseSubmitUrl",
+          ReverseRouter.route(on(ConsultationResponseController.class)
+              .saveConsultationResponseForm(scapDetail.getScap().getScapId(),
+                  CaseEventAction.CONSULTATION_RESPONSE,
+                  true,
+                  null,
+                  null)));
+      modelAndView.addObject("supportingDocumentsTemplate", fileUploadTemplate);
     }
 
     private void addScapApprovalRequestForm(ModelAndView modelAndView) {

@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.casemanagement.consultationRequest;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -27,6 +28,7 @@ import org.springframework.validation.BindingResult;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
+import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
@@ -38,6 +40,8 @@ import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.Consultat
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
@@ -62,6 +66,9 @@ class ConsultationRequestControllerTest extends AbstractControllerTest {
   @MockBean
   private ConsultationRequestFormValidator consultationRequestFormValidator;
 
+  @MockBean
+  private SupportingDocumentService supportingDocumentService;
+
   private static final ScapId SCAP_ID = new ScapId(1111);
 
   private static final Integer ORG_GROUP_ID = 1000;
@@ -73,6 +80,8 @@ class ConsultationRequestControllerTest extends AbstractControllerTest {
   @BeforeEach
   void setup() {
     var scapDetail = getScapDetail();
+    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
+        .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
     when(scapService.getScapById(anyInt())).thenReturn(new Scap());
@@ -95,7 +104,7 @@ class ConsultationRequestControllerTest extends AbstractControllerTest {
             .with(csrf())
             .flashAttr("consultationRequestForm", getConsultationRequestedForm()))
         .andExpect(status().is3xxRedirection());
-    verify(caseEventService).recordNewEvent(CaseEventSubject.CONSULTATION_REQUESTED, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_CONSULTATION_REQUESTED, SCAP_ID, 1, TEST_STRING);
   }
 
   @Test
@@ -117,7 +126,7 @@ class ConsultationRequestControllerTest extends AbstractControllerTest {
             .with(csrf())
             .flashAttr("consultationRequestForm", getConsultationRequestedForm()))
         .andExpect(status().isOk());
-    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.CONSULTATION_REQUESTED, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.SCAP_CONSULTATION_REQUESTED, SCAP_ID, 1, TEST_STRING);
   }
 
   private ConsultationRequestForm getConsultationRequestedForm() {

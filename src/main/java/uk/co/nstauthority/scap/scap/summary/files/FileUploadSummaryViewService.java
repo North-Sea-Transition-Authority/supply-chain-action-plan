@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.file.FileUploadService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.AdditionalDocumentsController;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
-import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentsController;
 
 @Service
 public class FileUploadSummaryViewService {
@@ -33,7 +33,7 @@ public class FileUploadSummaryViewService {
         .map(uploadedFile -> new FileUploadSummaryView(
             uploadedFile.getFilename(),
             uploadedFile.getDescription(),
-            ReverseRouter.route(on(SupportingDocumentsController.class)
+            ReverseRouter.route(on(AdditionalDocumentsController.class)
                 .download(scapDetail.getScap().getScapId(), uploadedFile.getId()))))
         .toList();
   }

@@ -1,5 +1,7 @@
 package uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments;
 
+import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.CONSULTATION_REPORT;
+
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -24,31 +26,30 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @RestController
-@RequestMapping("/{scapId}/supporting-documents")
-@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
-@ScapHasStatus(permittedStatuses = ScapDetailStatus.DRAFT)
-public class SupportingDocumentsController {
+@RequestMapping("/{scapId}/consulting-documents")
+@PermissionsRequiredForScap(permissions = {RolePermission.SUBMIT_SCAP, RolePermission.REVIEW_SCAP})
+@ScapHasStatus(permittedStatuses = ScapDetailStatus.SUBMITTED)
+public class ConsultationDocumentsController {
 
   private final SupportingDocumentService supportingDocumentService;
   private final ScapDetailService scapDetailService;
   private final FileUploadService fileUploadService;
 
   @Autowired
-  public SupportingDocumentsController(SupportingDocumentService supportingDocumentService,
-                                       ScapDetailService scapDetailService,
-                                       FileUploadService fileUploadService) {
+  public ConsultationDocumentsController(SupportingDocumentService supportingDocumentService,
+                                         ScapDetailService scapDetailService,
+                                         FileUploadService fileUploadService) {
     this.supportingDocumentService = supportingDocumentService;
     this.scapDetailService = scapDetailService;
     this.fileUploadService = fileUploadService;
   }
 
-  @PostMapping("upload/{supportingDocumentType}")
+  @PostMapping("upload")
   @ResponseBody
   public FileUploadResult upload(@PathVariable("scapId") ScapId scapId,
-                                 @PathVariable("supportingDocumentType") SupportingDocumentType supportingDocumentType,
                                  @RequestParam("file") MultipartFile multipartFile) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
-    return supportingDocumentService.processFileUpload(scapDetail, supportingDocumentType, multipartFile);
+    return supportingDocumentService.processFileUpload(scapDetail, CONSULTATION_REPORT, multipartFile);
   }
 
   @GetMapping("download/{uploadedFileId}")
