@@ -9,6 +9,7 @@ public enum ScapDetailStatus implements Displayable {
   SUBMITTED("Submitted", 20),
   APPROVED("Approved", 30),
   CLOSED_OUT("Project Completed", 40),
+  WITHDRAWN("Withdrawn", 50),
   DELETED("Deleted", 100);
 
   private final String displayName;

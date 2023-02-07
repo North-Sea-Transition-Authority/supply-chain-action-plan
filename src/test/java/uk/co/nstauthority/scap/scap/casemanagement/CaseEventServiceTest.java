@@ -16,6 +16,7 @@ import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTH
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTHER_INFO_RESPONSE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.QA_COMMENT;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_APPROVED;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_WITHDRAWN;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -151,6 +152,7 @@ class CaseEventServiceTest {
   void getApplicableActions_NoOutstandingRequests() {
     var result = caseEventService.getApplicableActionsForScap(SCAP_ID);
     assertThat(result).containsOnly(CONSULTATION_REQUESTED,
+        SCAP_WITHDRAWN,
         FURTHER_INFO_RESPONSE,
         SCAP_APPROVED,
         FURTHER_INFO_REQUESTED,
@@ -170,6 +172,7 @@ class CaseEventServiceTest {
 
     var result = caseEventService.getApplicableActionsForScap(SCAP_ID);
     assertThat(result).containsOnly(CONSULTATION_REQUESTED,
+        SCAP_WITHDRAWN,
         FURTHER_INFO_RESPONSE,
         SCAP_APPROVED,
         QA_COMMENT);

@@ -23,6 +23,8 @@ import uk.co.nstauthority.scap.scap.casemanagement.furtherinforesponse.FurtherIn
 import uk.co.nstauthority.scap.scap.casemanagement.furtherinforesponse.FurtherInfoResponseForm;
 import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentController;
 import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentForm;
+import uk.co.nstauthority.scap.scap.casemanagement.withdraw.ScapWithdrawController;
+import uk.co.nstauthority.scap.scap.casemanagement.withdraw.ScapWithdrawalForm;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
@@ -49,6 +51,8 @@ public class ScapSummaryModelAndViewGenerator {
     private ConsultationRequestForm consultationRequestForm = new ConsultationRequestForm();
     private FurtherInfoResponseForm furtherInfoResponseForm = new FurtherInfoResponseForm();
     private ScapApprovalForm scapApprovalForm = new ScapApprovalForm();
+
+    private ScapWithdrawalForm scapWithdrawalForm = new ScapWithdrawalForm();
 
     public Generator(ScapDetail scapDetail,
                      ScapSummaryView scapSummary) {
@@ -96,6 +100,11 @@ public class ScapSummaryModelAndViewGenerator {
       return this;
     }
 
+    public Generator withScapWithdrawalForm(ScapWithdrawalForm scapWithdrawalForm) {
+      this.scapWithdrawalForm = scapWithdrawalForm;
+      return this;
+    }
+
     public Generator withApplicableActions(Set<CaseEventSubject> applicableActions) {
       this.applicableActions = applicableActions;
       return this;
@@ -119,6 +128,7 @@ public class ScapSummaryModelAndViewGenerator {
       addInfoResponseForm(modelAndView);
       addConsultationRequestForm(modelAndView);
       addScapApprovalRequestForm(modelAndView);
+      addWithdrawForm(modelAndView);
 
       return modelAndView;
     }
@@ -181,6 +191,16 @@ public class ScapSummaryModelAndViewGenerator {
                   true,
                   null,
                   null)));
+    }
+
+    private void addWithdrawForm(ModelAndView modelAndView) {
+      modelAndView.addObject("scapWithdrawForm", scapWithdrawalForm);
+      modelAndView.addObject("WithdrawScapUrl",
+          ReverseRouter.route(on(ScapWithdrawController.class).withdrawScap(scapDetail.getScap().getScapId(),
+              CaseEventAction.WITHDRAWN,
+              true,
+              null,
+              null)));
     }
   }
 }

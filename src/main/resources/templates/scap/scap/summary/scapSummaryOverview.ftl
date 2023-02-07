@@ -43,6 +43,7 @@ backLinkUrl=springUrl(backLinkUrl)
   <#include 'caseActions/consultationRequestAction.ftl'/>
   <#include 'caseActions/infoResponseAction.ftl'/>
   <#include 'caseActions/approveScap.ftl'/>
+  <#include 'caseActions/withdrawScap.ftl'/>
 </@defaultPage>
 
 <#macro actions applicableActions>

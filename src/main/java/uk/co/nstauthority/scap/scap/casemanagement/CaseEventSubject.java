@@ -5,6 +5,7 @@ import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.INFO_R
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.INFO_RESPONSE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.QA;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.SUBMIT;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.WITHDRAWN;
 
 public enum CaseEventSubject {
   QA_COMMENT(QA,
@@ -35,7 +36,11 @@ public enum CaseEventSubject {
   SCAP_APPROVED(APPROVED,
       "SCAP Approved",
       "Approve SCAP",
-      "Approve-scap-Panel");
+      "Approve-scap-Panel"),
+  SCAP_WITHDRAWN(WITHDRAWN,
+      "SCAP Withdrawn",
+      "Withdraw SCAP",
+      "Withdraw-scap-panel");
 
   private String displayName;
 

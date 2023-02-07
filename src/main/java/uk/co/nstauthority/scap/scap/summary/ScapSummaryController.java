@@ -53,7 +53,8 @@ public class ScapSummaryController {
   @ScapHasStatus(permittedStatuses = {ScapDetailStatus.DRAFT,
       ScapDetailStatus.SUBMITTED,
       ScapDetailStatus.APPROVED,
-      ScapDetailStatus.CLOSED_OUT})
+      ScapDetailStatus.CLOSED_OUT,
+      ScapDetailStatus.WITHDRAWN})
   public ModelAndView getScapSummary(@PathVariable("scapId") ScapId scapId) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
     var scapSummary = scapSummaryViewService.getScapSummaryView(scapDetail);

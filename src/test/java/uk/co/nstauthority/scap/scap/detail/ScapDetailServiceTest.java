@@ -4,11 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.DRAFT;
+import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.SUBMITTED;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -16,6 +20,7 @@ import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -128,6 +133,41 @@ class ScapDetailServiceTest {
   }
 
   @Test
+  void findLatestScapDetailByScapIdAndStatus_NotFound_ReturnsEmpty() {
+    when(scapDetailRepository.findFirstByScapIdAndTipFlagAndStatus(scap.getId(), true, SUBMITTED))
+        .thenReturn(Optional.empty());
+
+    assertThat(scapDetailService.findLatestSubmittedScapDetail(scap.getScapId())).isEmpty();
+  }
+
+  @Test
+  void findLatestScapDetailByScapIdAndStatus_Found_Returns() {
+    var scapDetail = new ScapDetail();
+    when(scapDetailRepository.findFirstByScapIdAndTipFlagAndStatus(scap.getId(), true, SUBMITTED))
+        .thenReturn(Optional.of(scapDetail));
+
+    assertThat(scapDetailService.findLatestSubmittedScapDetail(scap.getScapId())).isNotEmpty();
+  }
+
+  @Test
+  void getLatestScapDetailByScapIdAndStatus_NotFound_Throws() {
+    when(scapDetailRepository.findFirstByScapIdAndTipFlagAndStatus(scap.getId(), true, SUBMITTED))
+        .thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> scapDetailService.getLatestSubmittedScapDetail(scap.getScapId()))
+        .isInstanceOf(ScapEntityNotFoundException.class);
+  }
+
+  @Test
+  void getLatestScapDetailByScapIdAndStatus_Found_Returns() {
+    var scapDetail = new ScapDetail();
+    when(scapDetailRepository.findFirstByScapIdAndTipFlagAndStatus(scap.getId(), true, SUBMITTED))
+        .thenReturn(Optional.of(scapDetail));
+
+    assertThat(scapDetailService.getLatestSubmittedScapDetail(scap.getScapId())).isEqualTo(scapDetail);
+  }
+
+  @Test
   void submitScap_VerifySaves() {
     var scapDetail = new ScapDetail();
     scapDetail.setStatus(ScapDetailStatus.DRAFT);
@@ -144,7 +184,7 @@ class ScapDetailServiceTest {
         ScapDetail::getSubmittedTimestamp,
         ScapDetail::getApprovedByStakeholders
     ).containsExactly(
-        ScapDetailStatus.SUBMITTED,
+        SUBMITTED,
         clock.instant(),
         true
     );
@@ -167,7 +207,7 @@ class ScapDetailServiceTest {
         ScapDetail::getSubmittedTimestamp,
         ScapDetail::getApprovedByStakeholders
     ).containsExactly(
-        ScapDetailStatus.SUBMITTED,
+        SUBMITTED,
         clock.instant(),
         false
     );
@@ -176,7 +216,7 @@ class ScapDetailServiceTest {
   @Test
   void approveScap_VerifySaves() {
     var scapDetail = new ScapDetail();
-    scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
+    scapDetail.setStatus(SUBMITTED);
 
     var argumentCaptor = ArgumentCaptor.forClass(ScapDetail.class);
     scapDetailService.approveScap(scapDetail);
@@ -194,7 +234,7 @@ class ScapDetailServiceTest {
   @Test
   void closeOutScap_VerifySavesAsCloseOut() {
     var scapDetail = new ScapDetail();
-    scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
+    scapDetail.setStatus(SUBMITTED);
 
     var argumentCaptor = ArgumentCaptor.forClass(ScapDetail.class);
     scapDetailService.closeOutScap(scapDetail);
@@ -233,6 +273,69 @@ class ScapDetailServiceTest {
 
     assertThatThrownBy(() -> scapDetailService.closeOutScap(scapDetail))
         .isInstanceOf(ScapBadRequestException.class);
+  }
+
+  @Test
+  void withdrawScap_VerifyRejects() {
+    var scap = new Scap();
+    scap.setReference("TEST/2023/01");
+
+    var scapDetail = new ScapDetail();
+    scapDetail.setScap(scap);
+    scapDetail.setStatus(ScapDetailStatus.DRAFT);
+
+    assertThatThrownBy(() -> scapDetailService.withdrawScap(scapDetail))
+        .isInstanceOf(ScapBadRequestException.class);
+  }
+
+  @Test
+  void withdrawScap_VerifyWithdraws() {
+    var scap = new Scap(100);
+    var scapDetail = new ScapDetail();
+    scapDetail.setScap(scap);
+    scapDetail.setStatus(SUBMITTED);
+
+    scapDetailService.withdrawScap(scapDetail);
+    ArgumentCaptor<List<ScapDetail>> argumentCaptor = ArgumentCaptor.forClass(List.class);
+
+    verify(scapDetailRepository).saveAll(argumentCaptor.capture());
+    assertThat(argumentCaptor.getValue()).extracting(
+        ScapDetail::getStatus,
+        ScapDetail::getApprovedTimestamp
+    ).containsExactly(new Tuple(
+        ScapDetailStatus.WITHDRAWN,
+        clock.instant())
+    );
+  }
+
+  @Test
+  void withdrawScap_VerifyDeletesDraft() {
+    var scap = new Scap(100);
+    var scapDetail = new ScapDetail();
+    scapDetail.setScap(scap);
+    scapDetail.setStatus(SUBMITTED);
+
+    var draftDetail = new ScapDetail();
+    draftDetail.setScap(scap);
+    draftDetail.setStatus(DRAFT);
+
+    when(scapDetailRepository.findAllByScapIdAndStatus(scapDetail.getScap().getId(),
+        ScapDetailStatus.DRAFT)).thenReturn(List.of(draftDetail));
+
+    ArgumentCaptor<List<ScapDetail>> argumentCaptor = ArgumentCaptor.forClass(List.class);
+    scapDetailService.withdrawScap(scapDetail);
+
+    verify(scapDetailRepository).saveAll(argumentCaptor.capture());
+    assertThat(argumentCaptor.getAllValues().get(0)).extracting(
+        ScapDetail::getStatus,
+        ScapDetail::getApprovedTimestamp
+    ).containsExactly(new Tuple(
+        ScapDetailStatus.DELETED,
+        clock.instant()),
+        new Tuple(
+        ScapDetailStatus.WITHDRAWN,
+        clock.instant())
+    );
   }
 
   @Test
