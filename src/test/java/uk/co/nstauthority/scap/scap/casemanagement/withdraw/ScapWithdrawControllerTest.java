@@ -88,6 +88,7 @@ class ScapWithdrawControllerTest extends AbstractControllerTest {
                 CaseEventAction.INFO_RESPONSE,
                 false,
                 getWithdrawalForm(),
+                null,
                 null)))
             .with(user(testUser))
             .with(csrf())
@@ -111,6 +112,7 @@ class ScapWithdrawControllerTest extends AbstractControllerTest {
                 CaseEventAction.INFO_RESPONSE,
                 false,
                 getWithdrawalForm(),
+                null,
                 null)))
             .with(user(testUser))
             .with(csrf()))

@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
+import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerBodyLine;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequired;
@@ -26,6 +28,7 @@ import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
+import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 
 @Controller
 @RequestMapping("{scapId}/")
@@ -64,7 +67,8 @@ public class ScapWithdrawController {
                                    @RequestParam(CaseEventAction.WITHDRAWN) String caseEventAction,
                                    @RequestParam("Withdraw-scap-panel") Boolean slideOutPanelOpen,
                                    @ModelAttribute("scapWithdrawForm") ScapWithdrawalForm scapWithdrawalForm,
-                                   BindingResult bindingResult) {
+                                   BindingResult bindingResult,
+                                   RedirectAttributes redirectAttributes) {
     scapWithdrawalFormValidator.validate(scapWithdrawalForm, bindingResult);
 
     var scapDetail = scapDetailService.getLatestSubmittedScapDetail(scapId);
@@ -91,7 +95,14 @@ public class ScapWithdrawController {
               scapId,
               scapDetail.getVersionNumber(),
               scapWithdrawalForm.getWithdrawComments().getInputValue());
-          return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
+          var modelAndView =  ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
+
+          NotificationBannerUtils.successBannerRedirect(
+              "Success",
+              new NotificationBannerBodyLine(
+                  "%s has been withdrawn".formatted(scapDetail.getScap().getReference()), "govuk-!-font-weight-bold"
+              ), redirectAttributes);
+          return modelAndView;
         });
   }
 }

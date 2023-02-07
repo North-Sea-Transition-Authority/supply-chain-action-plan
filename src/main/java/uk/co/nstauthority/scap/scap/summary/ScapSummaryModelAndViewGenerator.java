@@ -200,6 +200,7 @@ public class ScapSummaryModelAndViewGenerator {
               CaseEventAction.WITHDRAWN,
               true,
               null,
+              null,
               null)));
     }
   }
