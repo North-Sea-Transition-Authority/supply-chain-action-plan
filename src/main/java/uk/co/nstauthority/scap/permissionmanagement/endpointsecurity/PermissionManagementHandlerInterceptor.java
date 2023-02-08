@@ -49,7 +49,7 @@ public class PermissionManagementHandlerInterceptor extends AbstractHandlerInter
   private void checkUserHasPermission(ServiceUserDetail user, RolePermission[] permissions) {
     var userPermissions = teamMemberService.getAllPermissionsForUser(user);
     var hasPermission = Arrays.stream(permissions)
-        .allMatch(userPermissions::contains);
+        .anyMatch(userPermissions::contains);
 
     if (hasPermission) {
       return;
