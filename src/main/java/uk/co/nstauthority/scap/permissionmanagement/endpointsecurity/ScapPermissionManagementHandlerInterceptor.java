@@ -73,7 +73,7 @@ public class ScapPermissionManagementHandlerInterceptor extends AbstractHandlerI
         .stream()
         .map(TeamRole::getRolePermissions)
         .flatMap(Collection::stream)
-        .allMatch(permissions::contains);
+        .anyMatch(permissions::contains);
 
     if (teamMemberPermissions) {
       return;
