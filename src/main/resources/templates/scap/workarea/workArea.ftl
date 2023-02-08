@@ -14,30 +14,32 @@
   <#if canStartScap>
     <@fdsAction.link linkText="Start new SCAP" linkClass="govuk-button" linkUrl=springUrl(startScapUrl)/>
   </#if>
-  <@fdsSearch.searchFilter
-    oneThirdWidth=true
-  >
-    <@fdsSearch.searchFilterList
-      clearFilterUrl=springUrl(clearFiltersUrl)
-      filterButtonClass="govuk-button govuk-button--secondary"
+  <@fdsSearch.searchPage>
+    <@fdsSearch.searchFilter
+      oneThirdWidth=true
     >
-      <@referenceFilter form=form />
-      <#if isRegulator>
-        <@operatorFilter form=form preselectedOperator=prefilledOperator />
-      </#if>
-      <@fieldFilter form=form preselectedField=prefilledField />
-      <@statusFilter form=form statusCheckboxes=statusCheckboxes />
-      <@projectTypeFilter form=form projectTypeCheckboxes=projectTypeCheckboxes />
-    </@fdsSearch.searchFilterList>
-  </@fdsSearch.searchFilter>
-  <@fdsSearch.searchPageContent twoThirdsWidth=true>
-    <#--noinspection FtlCallsInspection-->
-    <@fdsResultList.resultList resultCount=workAreaItems?size>
-      <#list workAreaItems as workAreaItem>
-        <@scapResultItem workAreaItem=workAreaItem />
-      </#list>
-    </@fdsResultList.resultList>
-  </@fdsSearch.searchPageContent>
+      <@fdsSearch.searchFilterList
+        clearFilterUrl=springUrl(clearFiltersUrl)
+        filterButtonClass="govuk-button govuk-button--secondary"
+      >
+        <@referenceFilter form=form />
+        <#if isRegulator>
+          <@operatorFilter form=form preselectedOperator=prefilledOperator />
+        </#if>
+        <@fieldFilter form=form preselectedField=prefilledField />
+        <@statusFilter form=form statusCheckboxes=statusCheckboxes />
+        <@projectTypeFilter form=form projectTypeCheckboxes=projectTypeCheckboxes />
+      </@fdsSearch.searchFilterList>
+    </@fdsSearch.searchFilter>
+    <@fdsSearch.searchPageContent twoThirdsWidth=true>
+      <#--noinspection FtlCallsInspection-->
+      <@fdsResultList.resultList resultCount=workAreaItems?size>
+        <#list workAreaItems as workAreaItem>
+          <@scapResultItem workAreaItem=workAreaItem />
+        </#list>
+      </@fdsResultList.resultList>
+    </@fdsSearch.searchPageContent>
+  </@fdsSearch.searchPage>
 </@defaultPage>
 
 <#macro scapResultItem workAreaItem>

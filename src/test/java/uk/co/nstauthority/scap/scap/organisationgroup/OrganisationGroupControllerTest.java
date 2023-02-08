@@ -13,7 +13,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.mvc.ReverseRouter.emptyBindingResult;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,8 +28,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
+import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
+import uk.co.nstauthority.scap.authentication.TestUserProvider;
 import uk.co.nstauthority.scap.fds.ErrorItem;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
+import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.start.ScapStartController;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
@@ -48,9 +54,17 @@ class OrganisationGroupControllerTest extends AbstractScapSubmitterControllerTes
   OrganisationGroupService organisationGroupService;
 
   static final Integer ORGANISATION_GROUP_ID = 1664;
+  static final ServiceUserDetail USER = TestUserProvider.getUser();
 
   @Test
   void renderNewScapOrganisationGroupForm() throws Exception {
+    var team = new Team();
+    team.setDisplayName("org group name");
+    team.setEnergyPortalOrgGroupId(1);
+
+    when(userDetailService.getUserDetail()).thenReturn(USER);
+    when(teamService.getTeamsOfTypeThatUserBelongsTo(USER, TeamType.INDUSTRY)).thenReturn(Collections.singletonList(team));
+
     mockMvc.perform(
         get(
             ReverseRouter.route(on(OrganisationGroupController.class).renderNewScapOrganisationGroupForm(null))))
@@ -58,11 +72,9 @@ class OrganisationGroupControllerTest extends AbstractScapSubmitterControllerTes
         .andExpect(view().name("scap/scap/organisationGroup"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(ScapStartController.class).renderStartNewScap())))
-        .andExpect(model().attribute("submitPostUrl",
-            ReverseRouter.route(on(OrganisationGroupController.class).saveNewScapOrganisationGroup(null, emptyBindingResult()))))
-        .andExpect(model().attribute("organisationGroupSearchRestUrl",
-            ReverseRouter.route(on(OrganisationGroupRestController.class).getOrganisationGroupSearchResults(null))))
-        .andExpect(model().attributeExists("form"));
+        .andExpect(model().attributeExists("form"))
+        .andExpect(model().attribute("permittedOrganisationGroups",
+            Map.of(String.valueOf(team.getEnergyPortalOrgGroupId()), team.getDisplayName())));
   }
 
   @Test
@@ -130,12 +142,6 @@ class OrganisationGroupControllerTest extends AbstractScapSubmitterControllerTes
         .andExpect(view().name("scap/scap/organisationGroup"))
         .andExpect(model().attribute("backLinkUrl",
             ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID))))
-        .andExpect(model().attribute("submitPostUrl",
-            ReverseRouter.route(on(OrganisationGroupController.class)
-                .saveExistingScapOrganisationGroup(null, SCAP_ID, emptyBindingResult()))))
-        .andExpect(model().attribute("organisationGroupSearchRestUrl",
-            ReverseRouter.route(on(OrganisationGroupRestController.class)
-                .getOrganisationGroupSearchResults(null))))
         .andExpect(model().attributeExists("form"));
   }
 

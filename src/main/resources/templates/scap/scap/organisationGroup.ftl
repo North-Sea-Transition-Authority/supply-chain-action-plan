@@ -7,17 +7,14 @@
 <@defaultPage
   htmlTitle=pageTitle
   pageHeading=""
-  pageSize=PageSize.TWO_THIRDS_COLUMN
   errorItems=errorItems
   backLinkUrl=springUrl(backLinkUrl)
   >
-  <@fdsForm.htmlForm actionUrl=springUrl(submitPostUrl)>
-    <@fdsSearchSelector.searchSelectorRest path="form.organisationGroupId.inputValue"
-    restUrl=springUrl(organisationGroupSearchRestUrl)
-    labelText=pageTitle
-    pageHeading=true
-    selectorMinInputLength=2
-    preselectedItems=preselectedItems
+  <@fdsForm.htmlForm>
+    <@fdsSelect.select
+      path="form.organisationGroupId.inputValue"
+      labelText=pageTitle
+      options=permittedOrganisationGroups
     />
 
     <@fdsDetails.summaryDetails summaryTitle="The operator I want to create a SCAP for is not listed">
