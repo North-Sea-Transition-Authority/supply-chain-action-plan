@@ -2,7 +2,7 @@
     <@fdsForm.htmlForm actionUrl=springUrl(consultationResponseSubmitUrl)>
         <@fdsTextarea.textarea
         path="form.responseComments.inputValue"
-        optionalLabel=true
+        optionalLabel=false
         labelText="Comments"/>
 
         <@fdsFieldset.fieldset
