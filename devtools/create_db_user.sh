@@ -3,4 +3,5 @@ set -e
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
     CREATE USER scap_app WITH PASSWORD 'dev1';
     GRANT ALL PRIVILEGES ON DATABASE $POSTGRES_DB TO scap_app;
+    ALTER USER scap_app WITH CREATEROLE;
 EOSQL

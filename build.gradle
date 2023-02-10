@@ -87,6 +87,9 @@ flyway {
   user = 'scap_app'
   password = 'dev1'
   schemas = ['scap']
+  placeholders = [
+    'powerbiAuthentication' : "powerbiUser"
+  ]
 }
 
 //Set the url before the build to dynamically set the port
