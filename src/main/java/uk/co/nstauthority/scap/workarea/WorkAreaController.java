@@ -103,6 +103,8 @@ public class WorkAreaController {
 
   @ModelAttribute("workAreaFilter")
   private WorkAreaFilter getDefaultFilter() {
-    return new WorkAreaFilter();
+    var defaultFilter = new WorkAreaFilter();
+    defaultFilter.setScapStatuses(ScapDetailStatus.getDefaultStatuses());
+    return defaultFilter;
   }
 }

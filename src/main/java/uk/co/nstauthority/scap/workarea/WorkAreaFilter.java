@@ -35,6 +35,10 @@ class WorkAreaFilter implements Serializable {
     return scapStatuses;
   }
 
+  void setScapStatuses(List<ScapDetailStatus> scapStatuses) {
+    this.scapStatuses = scapStatuses;
+  }
+
   public String getReferenceSearchTerm() {
     return referenceSearchTerm;
   }

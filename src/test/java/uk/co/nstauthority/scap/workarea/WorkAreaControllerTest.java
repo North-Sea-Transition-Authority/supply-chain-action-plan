@@ -70,7 +70,7 @@ class WorkAreaControllerTest extends AbstractControllerTest {
 
   @Test
   void getWorkArea() throws Exception {
-    mockMvc.perform(
+    var modelAndView = mockMvc.perform(
         get(ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/workarea/workArea"))
@@ -78,7 +78,24 @@ class WorkAreaControllerTest extends AbstractControllerTest {
             ReverseRouter.route(on(ScapStartController.class).renderStartNewScap())))
         .andExpect(model().attribute("workAreaItems", workAreaItems))
         .andExpect(model().attribute("statusCheckboxes", statusCheckboxes))
-        .andExpect(model().attributeExists("form"));
+        .andExpect(model().attributeExists("form"))
+        .andReturn()
+        .getModelAndView();
+
+    assertThat(modelAndView).isNotNull();
+    assertThat((WorkAreaFilter) modelAndView.getModel().get("workAreaFilter")).extracting(
+        WorkAreaFilter::getFieldId,
+        WorkAreaFilter::getOperatorId,
+        WorkAreaFilter::getScapStatuses,
+        WorkAreaFilter::getProjectTypes,
+        WorkAreaFilter::getReferenceSearchTerm
+    ).containsExactly(
+        null,
+        null,
+        ScapDetailStatus.getDefaultStatuses(),
+        null,
+        null
+    );
 
   }
 

@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.scap.detail;
 
+import java.util.List;
 import java.util.Map;
 import uk.co.nstauthority.scap.enumutil.Displayable;
 import uk.co.nstauthority.scap.enumutil.DisplayableEnumOptionUtil;
@@ -39,5 +40,9 @@ public enum ScapDetailStatus implements Displayable {
     var radioOptions = DisplayableEnumOptionUtil.getDisplayableOptions(ScapDetailStatus.class);
     radioOptions.remove(DELETED.getEnumName());
     return radioOptions;
+  }
+
+  public static List<ScapDetailStatus> getDefaultStatuses() {
+    return List.of(DRAFT, SUBMITTED, APPROVED);
   }
 }
