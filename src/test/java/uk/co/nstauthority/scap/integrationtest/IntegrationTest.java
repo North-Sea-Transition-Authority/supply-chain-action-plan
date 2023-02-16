@@ -7,6 +7,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("integration-test")
+@ActiveProfiles(value = {"integration-test", "debug"})
 public @interface IntegrationTest {
 }

@@ -3,6 +3,8 @@ package uk.co.nstauthority.scap.mvc;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import javax.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.ui.Model;
@@ -12,12 +14,15 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.branding.ServiceBrandingConfigurationProperties;
+import uk.co.nstauthority.scap.error.exception.InvalidAuthenticationException;
 import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
 import uk.co.nstauthority.scap.technicalsupport.TechnicalSupportConfiguration;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @ControllerAdvice
 class DefaultPageControllerAdvice {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultPageControllerAdvice.class);
 
   private final ServiceBrandingConfigurationProperties serviceBrandingConfigurationProperties;
   private final TechnicalSupportConfiguration technicalSupportConfiguration;
@@ -64,7 +69,11 @@ class DefaultPageControllerAdvice {
   }
 
   private void addUser(Model model) {
-    model.addAttribute("loggedInUser", userDetailService.getUserDetail());
+    try {
+      model.addAttribute("loggedInUser", userDetailService.getUserDetail());
+    } catch (InvalidAuthenticationException e) {
+      LOGGER.error("Could not get logged in user", e);
+    }
   }
 
   private void addTopNavigationItems(Model model, HttpServletRequest request) {

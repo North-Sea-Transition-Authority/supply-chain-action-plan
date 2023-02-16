@@ -45,8 +45,13 @@ public class WebSecurityConfiguration {
     authenticationProvider.setResponseAuthenticationConverter(r -> samlResponseParser.parseSamlResponse(r.getResponse()));
 
     httpSecurity
+        .csrf().ignoringAntMatchers("/notify/callback")
+        .and()
         .authorizeHttpRequests()
-          .mvcMatchers("/assets/**")
+          .mvcMatchers(
+              "/assets/**",
+              "/notify/callback"
+          )
         .permitAll()
           .anyRequest()
           .authenticated()
@@ -54,12 +59,13 @@ public class WebSecurityConfiguration {
         .saml2Login(saml2 -> saml2.authenticationManager(new ProviderManager(authenticationProvider)))
           .logout()
           .logoutSuccessHandler(serviceLogoutSuccessHandler);
+
     return httpSecurity.build();
   }
 
   @Bean
   protected RelyingPartyRegistrationRepository relyingPartyRegistrations() throws Exception {
-    RelyingPartyRegistration registration = getRelyingPartyRegistration();
+    var registration = getRelyingPartyRegistration();
     return new InMemoryRelyingPartyRegistrationRepository(registration);
   }
 
@@ -68,10 +74,10 @@ public class WebSecurityConfiguration {
 
     var certificateStream = new ByteArrayInputStream(samlProperties.getCertificate().getBytes(StandardCharsets.UTF_8));
 
-    X509Certificate certificate = (X509Certificate) CertificateFactory.getInstance("X.509")
+    var certificate = (X509Certificate) CertificateFactory.getInstance("X.509")
         .generateCertificate(certificateStream);
 
-    Saml2X509Credential credential = Saml2X509Credential.verification(Objects.requireNonNull(certificate));
+    var credential = Saml2X509Credential.verification(Objects.requireNonNull(certificate));
 
     return RelyingPartyRegistration
         .withRegistrationId(samlProperties.getRegistrationId())

@@ -41,15 +41,19 @@ Note that this template uses a Postgres database, so make sure that the database
 - In your IntelliJ run configuration for the Spring app, include `production` in your active profiles
 - The following environment variables are required when using this profile:
 
-| Environment Variable           | Description                                    |
-|--------------------------------|------------------------------------------------|
-| SCAP_DATABASE_URL              | The URL to the database the service connect to |
-| SCAP_DATABASE_PASSWORD         | Database schema password for the `XYZT` user   |
-| S3_ACCESS_KEY                  | S3 username for document uploads / downloads   |
-| S3_SECRET_KEY                  | S3 secret for document uploads / downloads     |
-| CLAMAV_HOST                    | Virus scanner host location                    |
-| FILE_UPLOAD_MAX_ALLOWED_SIZE   | Maximum file upload size in bytes              |
-| FILE_UPLOAD_ALLOWED_EXTENSIONS | Allowed file extensions for document uploads   |
+| Environment Variable           | Description                                                                                     |
+|--------------------------------|-------------------------------------------------------------------------------------------------|
+| SCAP_DATABASE_URL              | The URL to the database the service connect to                                                  |
+| SCAP_DATABASE_PASSWORD         | Database schema password for the `XYZT` user                                                    |
+| S3_ACCESS_KEY                  | S3 username for document uploads / downloads                                                    |
+| S3_SECRET_KEY                  | S3 secret for document uploads / downloads                                                      |
+| CLAMAV_HOST                    | Virus scanner host location                                                                     |
+| FILE_UPLOAD_MAX_ALLOWED_SIZE   | Maximum file upload size in bytes                                                               |
+| FILE_UPLOAD_ALLOWED_EXTENSIONS | Allowed file extensions for document uploads                                                    |
+| SCAP_EMAIL_MODE                | Can be test or production. Test mode will redirect all outbound emails to the test recipient(s) |
+| SCAP_EMAIL_TEST_RECIPIENT      | If email is test mode, who to send emails to. Value can be a CSV list                           |
+| NOTIFY_API_KEY                 | The GOV.UK Notify key                                                                           |
+| NOTIFY_CALLBACK_TOKEN          | The GOV.UK Notify callback token                                                                |
 
 
 ### 3. Initialise the Fivium Design System
