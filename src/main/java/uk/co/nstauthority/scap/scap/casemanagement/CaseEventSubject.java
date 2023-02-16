@@ -10,6 +10,7 @@ import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.INFO_R
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.INFO_RESPONSE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.QA;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.SUBMIT;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.UPDATE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.WITHDRAWN;
 
 public enum CaseEventSubject {
@@ -27,6 +28,10 @@ public enum CaseEventSubject {
       "Info-Response-Panel"),
   SCAP_SUBMITTED(SUBMIT,
       "Submitted SCAP",
+      null,
+      null),
+  UPDATE_SCAP(UPDATE,
+      "SCAP UPDATE",
       null,
       null),
   SCAP_CLOSED_OUT(

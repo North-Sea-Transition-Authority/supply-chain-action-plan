@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.scap.detail;
 
+import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.DRAFT;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.SUBMITTED;
 
 import java.time.Clock;
@@ -32,14 +33,29 @@ public class ScapDetailService {
 
   @Transactional
   public void createDraftScapDetail(Scap scap) {
+    var latestScapDetail = getLatestScapDetailByScap(scap);
+    var versionNumber = latestScapDetail.map(ScapDetail::getVersionNumber).orElse(0) + 1;
+
     var isLatestScapDetail = true;
     var userId = userDetailService
         .getUserDetail()
         .wuaId()
         .intValue();
 
-    var scapDetail = new ScapDetail(scap, 1, isLatestScapDetail, ScapDetailStatus.DRAFT, clock.instant(), userId);
+    if (latestScapDetail.isPresent()) {
+      var detail = latestScapDetail.get();
+      detail.setTipFlag(false);
+      scapDetailRepository.save(detail);
+    }
+    var scapDetail = new ScapDetail(scap, versionNumber, isLatestScapDetail, ScapDetailStatus.DRAFT, clock.instant(), userId);
     scapDetailRepository.save(scapDetail);
+  }
+
+  public ScapDetail getById(Integer scapDetailId) {
+    return scapDetailRepository.findById(scapDetailId).orElseThrow(
+        () -> new ScapEntityNotFoundException(
+            String.format("Could not find a ScapDetail with ID [%d]", scapDetailId)
+        ));
   }
 
   public Optional<ScapDetail> getLatestScapDetailByScap(Scap scap) {
@@ -60,6 +76,10 @@ public class ScapDetailService {
     return scapDetailRepository.findFirstByScapIdAndTipFlag(scapId.scapId(), true);
   }
 
+  public Optional<ScapDetail> findLatestByScapIdAndStatus(ScapId scapId, ScapDetailStatus status) {
+    return scapDetailRepository.findFirstByScapIdAndStatusOrderByVersionNumberDesc(scapId.scapId(), status);
+  }
+
   public ScapDetail getLatestScapDetailByScapIdOrThrow(ScapId scapId) {
     return getLatestScapDetailByScapId(scapId).orElseThrow(
         () -> new ScapEntityNotFoundException(
@@ -78,8 +98,20 @@ public class ScapDetailService {
         ));
   }
 
-  public Optional<ScapDetail> getByScapIdAndVersionNumber(ScapId scapId, Integer versionNumber) {
+  public Optional<ScapDetail> findByScapIdAndVersionNumber(ScapId scapId, Integer versionNumber) {
     return scapDetailRepository.findByScapIdAndVersionNumber(scapId.scapId(), versionNumber);
+  }
+
+  public ScapDetail getByScapIdAndVersionNumber(ScapId scapId, Integer versionNumber) {
+    return findByScapIdAndVersionNumber(scapId, versionNumber).orElseThrow(
+        () -> new ScapEntityNotFoundException(
+            String.format("Could not find a ScapDetail for Scap with ID [%s]", scapId.scapId())
+        ));
+  }
+
+  public boolean isUpdateInProgress(ScapId scapId) {
+    var optionalDraftUpdate = findLatestByScapIdAndStatus(scapId, DRAFT);
+    return optionalDraftUpdate.map(scapDetail -> scapDetail.getVersionNumber() > 1).orElse(false);
   }
 
   @Transactional
@@ -138,7 +170,7 @@ public class ScapDetailService {
     var scapDetail = getLatestScapDetailByScapIdOrThrow(scapId);
     if (scapDetail.getVersionNumber() != 1) {
       var previousVersion = scapDetail.getVersionNumber() - 1;
-      getByScapIdAndVersionNumber(scapId, previousVersion)
+      findByScapIdAndVersionNumber(scapId, previousVersion)
           .ifPresent(previousScapDetail -> {
             previousScapDetail.setTipFlag(true);
             scapDetailRepository.save(previousScapDetail);

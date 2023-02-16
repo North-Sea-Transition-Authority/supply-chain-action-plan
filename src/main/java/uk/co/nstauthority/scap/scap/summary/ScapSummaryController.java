@@ -73,9 +73,10 @@ public class ScapSummaryController {
                 scapDetail,
                 scapSummary,
                 supportingDocumentService.buildFileUploadTemplate(scapId, CONSULTATION_REPORT))
-            .withScapStatus(scapSummaryViewService.inferSubmissionStatusFromSummary(scapSummary))
-            .withCaseEventTimeline(getCaseEventView(scapId))
-            .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId));
+        .withScapStatus(scapSummaryViewService.inferSubmissionStatusFromSummary(scapSummary))
+        .withCaseEventTimeline(getCaseEventView(scapId))
+        .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
+        .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);
     return generator.generate();
   }

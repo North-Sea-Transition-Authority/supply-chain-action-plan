@@ -45,7 +45,9 @@
 <#macro scapResultItem workAreaItem>
 <#-- @ftlvariable name="workAreaItem" type="uk.co.nstauthority.scap.workarea.WorkAreaItem" -->
   <#assign tagContentInfoRequest>
-    <#if workAreaItem.outstandingInformationRequest()>
+    <#if workAreaItem.updateInProgress()>
+      <@fdsResultList.resultListTag tagClass="govuk-tag--blue" tagText="Update In Progress"/>
+    <#elseif workAreaItem.outstandingInformationRequest()>
       <@fdsResultList.resultListTag tagClass="govuk-tag--blue" tagText="Further information requested"/>
     </#if>
   </#assign>

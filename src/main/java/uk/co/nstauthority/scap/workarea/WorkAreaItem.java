@@ -16,7 +16,8 @@ public record WorkAreaItem(ScapId scapId,
                            String projectName,
                            ScapDetailStatus status,
                            ScapSubmissionStage submissionStage,
-                           Boolean outstandingInformationRequest) {
+                           Boolean outstandingInformationRequest,
+                           Boolean updateInProgress) {
 
   public String url() {
     if (ScapDetailStatus.DRAFT.equals(status) && scapVersion == 1) {

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAP_DETAILS;
@@ -27,6 +28,7 @@ import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
@@ -40,6 +42,9 @@ class WorkAreaServiceTest {
 
   @Mock
   OrganisationGroupService organisationGroupService;
+
+  @Mock
+  ScapDetailService scapDetailService;
 
   @Mock
   CaseEventService caseEventService;
@@ -174,6 +179,7 @@ class WorkAreaServiceTest {
     );
 
     verify(workAreaItemDtoRepository, never()).getAllByScapStatusNotIn(any());
+    verify(scapDetailService).isUpdateInProgress(new ScapId(workAreaItemDto.scapId()));
   }
 
   @Test
@@ -219,6 +225,8 @@ class WorkAreaServiceTest {
     var views = workAreaService
         .getWorkAreaItems(new WorkAreaFilter(), false, Collections.singletonList(team));
 
+    verify(scapDetailService, times(4)).isUpdateInProgress(any());
+
     assertThat(views).extracting(
         item -> item.scapId().scapId()
     ).containsExactly(
@@ -238,6 +246,7 @@ class WorkAreaServiceTest {
     verify(workAreaItemDtoRepository, never()).getAllByScapStatusNotIn();
     verify(workAreaItemDtoRepository, never()).getAllByOrganisationGroups(any());
     verify(organisationGroupService, never()).getOrganisationGroupsByIds(any(), any());
+    verify(scapDetailService, never()).isUpdateInProgress(any());
   }
 
   @Test

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
@@ -31,18 +32,20 @@ class WorkAreaService {
   private final WorkAreaItemDtoRepository workAreaItemDtoRepository;
   private final OrganisationGroupService organisationGroupService;
   private final WorkAreaFilterService workAreaFilterService;
-
   private final CaseEventService caseEventService;
+  private final ScapDetailService scapDetailService;
 
   @Autowired
   WorkAreaService(WorkAreaItemDtoRepository workAreaItemDtoRepository,
                   OrganisationGroupService organisationGroupService,
                   CaseEventService caseEventService,
-                  WorkAreaFilterService workAreaFilterService) {
+                  WorkAreaFilterService workAreaFilterService,
+                  ScapDetailService scapDetailService) {
     this.workAreaItemDtoRepository = workAreaItemDtoRepository;
     this.organisationGroupService = organisationGroupService;
     this.caseEventService = caseEventService;
     this.workAreaFilterService = workAreaFilterService;
+    this.scapDetailService = scapDetailService;
   }
 
   public List<WorkAreaItem> getWorkAreaItems(WorkAreaFilter filter,
@@ -99,7 +102,8 @@ class WorkAreaService {
             workAreaItemDto.projectName(),
             workAreaItemDto.status(),
             inferStatus(workAreaItemDto),
-            caseEventService.isFurtherInfoResponseOutstanding(new ScapId(workAreaItemDto.scapId()))))
+            caseEventService.isFurtherInfoResponseOutstanding(new ScapId(workAreaItemDto.scapId())),
+            scapDetailService.isUpdateInProgress(new ScapId(workAreaItemDto.scapId()))))
         .toList();
 
   }

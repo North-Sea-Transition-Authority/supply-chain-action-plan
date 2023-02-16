@@ -85,8 +85,9 @@ public class QaCommentController {
                 scapDetail,
                 scapSummary,
                 supportingDocumentService.buildFileUploadTemplate(scapId, CONSULTATION_REPORT))
-            .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
-            .withQaCommentForm(qaCommentForm);
+        .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
+        .withQaCommentForm(qaCommentForm)
+        .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);
 
     return controllerHelperService.checkErrorsAndRedirect(

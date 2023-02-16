@@ -87,7 +87,8 @@ public class ConsultationResponseController {
             scapSummary,
             supportingDocumentService.buildFileUploadTemplate(scapId, CONSULTATION_REPORT))
         .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
-        .withConsultationResponseForm(consultationResponseForm);
+        .withConsultationResponseForm(consultationResponseForm)
+        .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);
 
     return controllerHelperService.checkErrorsAndRedirect(

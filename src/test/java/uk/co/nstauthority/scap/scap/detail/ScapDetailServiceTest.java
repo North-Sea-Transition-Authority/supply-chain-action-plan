@@ -2,9 +2,10 @@ package uk.co.nstauthority.scap.scap.detail;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -33,6 +34,7 @@ import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.error.exception.ScapBadRequestException;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.scap.scap.Scap;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.submit.ReviewAndSubmitForm;
 import uk.co.nstauthority.scap.utils.EntityTestingUtil;
 
@@ -53,9 +55,13 @@ class ScapDetailServiceTest {
 
   private Scap scap;
 
+  private static final int SCAP_ID = 1000;
+
+  private static final int SCAP_DETAIL_ID = 10001;
+
   @BeforeEach
   void setup() {
-    scap = new Scap(1664);
+    scap = new Scap(SCAP_ID);
   }
 
   @Test
@@ -64,7 +70,6 @@ class ScapDetailServiceTest {
     scapDetailService.createDraftScapDetail(scap);
 
     var argumentCaptor = ArgumentCaptor.forClass(ScapDetail.class);
-
     verify(scapDetailRepository).save(argumentCaptor.capture());
 
     var scapDetail = argumentCaptor.getValue();
@@ -73,7 +78,44 @@ class ScapDetailServiceTest {
     assertThat(scapDetail.getScap()).isEqualTo(scap);
     assertThat(scapDetail.getStatus()).isEqualTo(ScapDetailStatus.DRAFT);
     assertThat(scapDetail.getVersionNumber()).isEqualTo(1);
-    assertThat(scapDetail.getCreatedByUserId()).isEqualTo(1000);
+    assertThat(scapDetail.getCreatedByUserId()).isEqualTo(getUserDetail().getWebUserAccountId().toInt());
+  }
+
+  @Test
+  void createDraftScapDetail_updateSavesNewTipFlag() {
+    var scapDetail = new ScapDetail(scap, 1, true, SUBMITTED, EntityTestingUtil.dateToInstant(2000, 4, 23), getUserDetail().getWebUserAccountId().toInt());
+
+    when(userDetailService.getUserDetail()).thenReturn(getUserDetail());
+    when(scapDetailRepository.findAllByScap(scap)).thenReturn(List.of(scapDetail));
+
+    scapDetailService.createDraftScapDetail(scap);
+
+    var argumentCaptor = ArgumentCaptor.forClass(ScapDetail.class);
+    verify(scapDetailRepository, times(2)).save(argumentCaptor.capture());
+
+    assertThat(argumentCaptor.getAllValues())
+        .extracting(
+            ScapDetail::getTipFlag,
+            ScapDetail::getScap,
+            ScapDetail::getStatus,
+            ScapDetail::getVersionNumber,
+            ScapDetail::getCreatedByUserId)
+        .containsExactly(
+            tuple(false, scap, SUBMITTED, 1, getUserDetail().getWebUserAccountId().toInt()),
+            tuple(true, scap, DRAFT, 2, getUserDetail().getWebUserAccountId().toInt()));
+  }
+
+  @Test
+  void getById_NoneFoundThrows() {
+    when(scapDetailRepository.findById(SCAP_DETAIL_ID)).thenReturn(Optional.empty());
+    assertThatThrownBy(() -> scapDetailService.getById(SCAP_DETAIL_ID)).isInstanceOf(ScapEntityNotFoundException.class);
+  }
+
+  @Test
+  void getById_WhenFoundNotThrows() {
+    var scapDetail = new ScapDetail(SCAP_DETAIL_ID);
+    when(scapDetailRepository.findById(SCAP_DETAIL_ID)).thenReturn(Optional.of(scapDetail));
+    assertThat(scapDetailService.getById(SCAP_DETAIL_ID)).isEqualTo(scapDetail);
   }
 
   @Test
@@ -168,8 +210,61 @@ class ScapDetailServiceTest {
   }
 
   @Test
+  void getByScapIdAndVersionNumber_NotFound_Throws() {
+    when(scapDetailRepository.findByScapIdAndVersionNumber(SCAP_ID, 1)).thenReturn(Optional.empty());
+    assertThatThrownBy(() -> scapDetailService.getByScapIdAndVersionNumber(new ScapId(SCAP_ID), 1))
+        .isInstanceOf(ScapEntityNotFoundException.class);
+  }
+
+  @Test
+  void getByScapIdAndVersionNumber_Found_Returns() {
+    var scapDetail = new ScapDetail(SCAP_DETAIL_ID);
+    when(scapDetailRepository.findByScapIdAndVersionNumber(SCAP_ID, 1)).thenReturn(Optional.of(scapDetail));
+    assertThat(scapDetailService.getByScapIdAndVersionNumber(new ScapId(SCAP_ID), 1)).isEqualTo(scapDetail);
+  }
+
+  @Test
+  void findLatestByIdAndStatus_verifyCalls() {
+    var scapId = new ScapId(SCAP_ID);
+    scapDetailService.findLatestByScapIdAndStatus(scapId, DRAFT);
+    verify(scapDetailRepository).findFirstByScapIdAndStatusOrderByVersionNumberDesc(scapId.scapId(), DRAFT);
+  }
+
+  @Test
+  void isUpdateInProgress_NoDraft_ReturnsFalse() {
+    var scapId = new ScapId(1000);
+    assertFalse(scapDetailService.isUpdateInProgress(scapId));
+    verify(scapDetailRepository).findFirstByScapIdAndStatusOrderByVersionNumberDesc(scapId.scapId(), DRAFT);
+  }
+
+  @Test
+  void isUpdateInProgress_IntialDraft_ReturnsFalse() {
+    var scapId = new ScapId(SCAP_ID
+    );
+    var scapDetail = new ScapDetail(SCAP_DETAIL_ID);
+
+    //Version Number of Intial Draft scap before first submission
+    scapDetail.setVersionNumber(1);
+    when(scapDetailRepository.findFirstByScapIdAndStatusOrderByVersionNumberDesc(scapId.scapId(), DRAFT)).thenReturn(Optional.of(scapDetail));
+
+    assertFalse(scapDetailService.isUpdateInProgress(scapId));
+  }
+
+  @Test
+  void isUpdateInProgress_DraftUpdate_ReturnsTrue() {
+    var scapId = new ScapId(SCAP_ID);
+    var scapDetail = new ScapDetail(SCAP_DETAIL_ID);
+
+    //Version Number of Intial Draft scap before first submission
+    scapDetail.setVersionNumber(2);
+    when(scapDetailRepository.findFirstByScapIdAndStatusOrderByVersionNumberDesc(scapId.scapId(), DRAFT)).thenReturn(Optional.of(scapDetail));
+
+    assertTrue(scapDetailService.isUpdateInProgress(scapId));
+  }
+
+  @Test
   void submitScap_VerifySaves() {
-    var scapDetail = new ScapDetail();
+    var scapDetail = new ScapDetail(SCAP_DETAIL_ID);
     scapDetail.setStatus(ScapDetailStatus.DRAFT);
     var argumentCaptor = ArgumentCaptor.forClass(ScapDetail.class);
     var form = new ReviewAndSubmitForm();
@@ -290,7 +385,7 @@ class ScapDetailServiceTest {
 
   @Test
   void withdrawScap_VerifyWithdraws() {
-    var scap = new Scap(100);
+    var scap = new Scap(SCAP_ID);
     var scapDetail = new ScapDetail();
     scapDetail.setScap(scap);
     scapDetail.setStatus(SUBMITTED);
@@ -310,7 +405,7 @@ class ScapDetailServiceTest {
 
   @Test
   void withdrawScap_VerifyDeletesDraft() {
-    var scap = new Scap(100);
+    var scap = new Scap(SCAP_ID);
     var scapDetail = new ScapDetail();
     scapDetail.setScap(scap);
     scapDetail.setStatus(SUBMITTED);

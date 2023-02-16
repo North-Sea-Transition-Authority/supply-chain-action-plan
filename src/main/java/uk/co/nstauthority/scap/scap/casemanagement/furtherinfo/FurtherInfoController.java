@@ -84,8 +84,9 @@ public class FurtherInfoController {
                 scapDetail,
                 scapSummary,
                 supportingDocumentService.buildFileUploadTemplate(scapId, CONSULTATION_REPORT))
-            .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
-            .withFurtherInfoRequestFrom(infoRequestForm);
+        .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
+        .withFurtherInfoRequestFrom(infoRequestForm)
+        .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);
 
     return controllerHelperService.checkErrorsAndRedirect(bindingResult,

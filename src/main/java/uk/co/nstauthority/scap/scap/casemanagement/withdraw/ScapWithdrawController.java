@@ -88,7 +88,8 @@ public class ScapWithdrawController {
                 supportingDocumentService.buildFileUploadTemplate(scapId, CONSULTATION_REPORT))
             .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
             .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
-            .withScapWithdrawalForm(scapWithdrawalForm);
+            .withScapWithdrawalForm(scapWithdrawalForm)
+            .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);
 
     return controllerHelperService.checkErrorsAndRedirect(

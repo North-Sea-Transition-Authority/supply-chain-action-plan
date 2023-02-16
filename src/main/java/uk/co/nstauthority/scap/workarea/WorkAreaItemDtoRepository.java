@@ -42,6 +42,15 @@ class WorkAreaItemDtoRepository {
   }
 
   List<WorkAreaItemDto> performQuery(List<Condition> conditions) {
+    //Generates sub query to return SCAP Detail ID's that are applicable for work area, based on conditions.
+    //Only allows one SCAP Detail ID per SCAP
+    var detailsSubQuery = context.select(SCAP_DETAILS.ID)
+        .distinctOn(SCAPS.SCAP_ID)
+        .from(SCAPS)
+        .join(SCAP_DETAILS).onKey(SCAP_DETAILS.SCAP_ID)
+        .where(conditions)
+        .orderBy(SCAPS.SCAP_ID, SCAP_DETAILS.VERSION_NUMBER.desc());
+
     return context.select(
             SCAPS.SCAP_ID,
             SCAP_DETAILS.VERSION_NUMBER,
@@ -63,8 +72,8 @@ class WorkAreaItemDtoRepository {
         .leftJoin(CONTRACTING_PERFORMANCE_OVERVIEWS).onKey(CONTRACTING_PERFORMANCE_OVERVIEWS.SCAP_DETAIL_ID)
         .leftJoin(ACTUAL_TENDERS).onKey(ACTUAL_TENDERS.SCAP_DETAIL_ID)
         .leftJoin(PLANNED_TENDERS).onKey(PLANNED_TENDERS.SCAP_DETAIL_ID)
-        .where(conditions)
-        .and(SCAP_DETAILS.TIP_FLAG.eq(true))
+        .where(SCAP_DETAILS.ID.in(detailsSubQuery))
+
         .fetchInto(WorkAreaItemDto.class);
   }
 }

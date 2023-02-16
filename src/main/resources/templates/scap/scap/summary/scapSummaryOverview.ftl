@@ -6,12 +6,14 @@
 <#assign pageTitle = projectName!'' />
 
 <#-- @ftlvariable name="backLinkUrl" type="java.lang.String" -->
+<#-- @ftlvariable name="updateScapUrl" type="java.lang.String" -->
 <#-- @ftlvariable name="projectReference" type="java.lang.String"-->
 <#-- @ftlvariable name="projectName" type="java.lang.String"-->
 <#-- @ftlvariable name="operator" type="java.lang.String" -->
 <#-- @ftlvariable name="scapSummaryView" type="uk.co.nstauthority.scap.scap.summary.ScapSummaryView" -->
 <#-- @ftlvariable name="caseEvents" type="java.util.List<uk.co.nstauthority.scap.scap.casemanagement.CaseEventView>" -->
 <#-- @ftlvariable name="applicableActions" type="java.util.Set<uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject>" -->
+<#-- @ftlvariable name="updateInProgress" type="java.lang.Boolean" -->
 
 <@defaultPage
 htmlTitle=pageTitle
@@ -53,4 +55,11 @@ backLinkUrl=springUrl(backLinkUrl)
       <@fdsSlideOutPanel.slideOutPanelButton buttonText=action.getButtonText() buttonPanelId=action.getActionPanelId() buttonClass="govuk-button govuk-button--secondary"/>
     </#list>
   </#if>
+  <@fdsForm.htmlForm springUrl(updateScapUrl)>
+    <#if updateInProgress>
+      <@fdsAction.button buttonText="Resume SCAP update"/>
+    <#else>
+      <@fdsAction.button buttonText="Update SCAP"/>
+    </#if>
+  </@fdsForm.htmlForm>
 </#macro>

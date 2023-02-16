@@ -28,6 +28,7 @@ class WorkAreaItemTest {
         "Some project name",
         ScapDetailStatus.DRAFT,
         ScapSubmissionStage.CONTRACTING_STRATEGY_PENDING,
+        false,
         false
     );
     var expectedUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(workAreaItem.scapId()));
@@ -45,6 +46,7 @@ class WorkAreaItemTest {
         "Some project name",
         ScapDetailStatus.DRAFT,
         ScapSubmissionStage.CONTRACTING_STRATEGY_PENDING,
+        false,
         false
     );
     var expectedUrl = ReverseRouter.route(on(ScapSummaryController.class)
@@ -63,6 +65,7 @@ class WorkAreaItemTest {
         "Some project name",
         ScapDetailStatus.SUBMITTED,
         ScapSubmissionStage.CONTRACTING_STRATEGY_PENDING,
+        false,
         false
     );
     var expectedUrl = ReverseRouter.route(on(ScapSummaryController.class)
@@ -81,6 +84,7 @@ class WorkAreaItemTest {
         "Some project name",
         ScapDetailStatus.SUBMITTED,
         ScapSubmissionStage.CONTRACTING_STRATEGY_PENDING,
+        false,
         false
     );
     var expectedUrl = ReverseRouter.route(on(ScapSummaryController.class)

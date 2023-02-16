@@ -90,7 +90,8 @@ public class ScapApprovalController {
                 supportingDocumentService.buildFileUploadTemplate(scapId, CONSULTATION_REPORT))
             .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
             .withScapApprovalForm(scapApprovalForm)
-            .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId));
+            .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
+            .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);
 
     return controllerHelperService.checkErrorsAndRedirect(

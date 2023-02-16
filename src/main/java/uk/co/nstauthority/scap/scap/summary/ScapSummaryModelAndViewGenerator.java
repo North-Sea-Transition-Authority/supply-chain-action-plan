@@ -27,6 +27,7 @@ import uk.co.nstauthority.scap.scap.casemanagement.furtherinforesponse.FurtherIn
 import uk.co.nstauthority.scap.scap.casemanagement.furtherinforesponse.FurtherInfoResponseForm;
 import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentController;
 import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentForm;
+import uk.co.nstauthority.scap.scap.casemanagement.update.ScapUpdateController;
 import uk.co.nstauthority.scap.scap.casemanagement.withdraw.ScapWithdrawController;
 import uk.co.nstauthority.scap.scap.casemanagement.withdraw.ScapWithdrawalForm;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
@@ -49,6 +50,7 @@ public class ScapSummaryModelAndViewGenerator {
     private final ScapSummaryView scapSummary;
     private Set<CaseEventSubject> applicableActions = emptySet();
     private OrganisationGroup orgGroup;
+    private boolean updateInProgress = false;
     private ScapSubmissionStage scapStatus = ScapSubmissionStage.DRAFT;
     private List<CaseEventView> caseEventTimeline = emptyList();
     private FurtherInfoRequestForm furtherInfoRequestForm = new FurtherInfoRequestForm();
@@ -76,6 +78,11 @@ public class ScapSummaryModelAndViewGenerator {
 
     public Generator withScapStatus(ScapSubmissionStage status) {
       this.scapStatus = status;
+      return this;
+    }
+
+    public Generator withUpdateInProgress(boolean updateInProgress) {
+      this.updateInProgress = updateInProgress;
       return this;
     }
 
@@ -133,7 +140,10 @@ public class ScapSummaryModelAndViewGenerator {
           .addObject("scapStatus", scapDetail.getStatus().getDisplayName())
           .addObject("scapSubmissionStatus", scapStatus.getDisplayName())
           .addObject("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)))
-          .addObject("applicableActions", applicableActions);
+          .addObject("updateScapUrl", ReverseRouter.route(
+              on(ScapUpdateController.class).startScapUpdate(scapDetail.getScap().getScapId(), CaseEventAction.UPDATE)))
+          .addObject("applicableActions", applicableActions)
+          .addObject("updateInProgress", updateInProgress);
 
 
       addCaseEventTimeline(modelAndView);
