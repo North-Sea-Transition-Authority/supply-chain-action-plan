@@ -114,7 +114,7 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
         .andExpect(redirectedUrl(expectedRedirect));
     verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_CLOSED_OUT, SCAP_ID, 1, TEST_STRING);
     verify(scapDetailService).closeOutScap(scapDetail);
-    verify(scapEmailService).sendScapApprovalEmails(scapDetail, testUser, null);
+    verify(scapEmailService).sendScapApprovalEmails(scapDetail, null);
   }
 
   @Test

@@ -18,6 +18,7 @@ import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerBodyLine;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.notify.ScapEmailService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequired;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
@@ -49,6 +50,7 @@ public class ScapWithdrawController {
   private final OrganisationGroupService organisationGroupService;
   private final ScapWithdrawalFormValidator scapWithdrawalFormValidator;
   private final SupportingDocumentService supportingDocumentService;
+  private final ScapEmailService scapEmailService;
 
   @Autowired
   public ScapWithdrawController(CaseEventService caseEventService,
@@ -57,7 +59,8 @@ public class ScapWithdrawController {
                                 ScapSummaryViewService scapSummaryViewService,
                                 OrganisationGroupService organisationGroupService,
                                 ScapWithdrawalFormValidator scapWithdrawalFormValidator,
-                                SupportingDocumentService supportingDocumentService) {
+                                SupportingDocumentService supportingDocumentService,
+                                ScapEmailService scapEmailService) {
     this.caseEventService = caseEventService;
     this.controllerHelperService = controllerHelperService;
     this.scapDetailService = scapDetailService;
@@ -65,6 +68,7 @@ public class ScapWithdrawController {
     this.organisationGroupService = organisationGroupService;
     this.scapWithdrawalFormValidator = scapWithdrawalFormValidator;
     this.supportingDocumentService = supportingDocumentService;
+    this.scapEmailService = scapEmailService;
   }
 
   @PostMapping(params = CaseEventAction.WITHDRAWN)
@@ -98,6 +102,7 @@ public class ScapWithdrawController {
         scapWithdrawalForm,
         () -> {
           scapDetailService.withdrawScap(scapDetail);
+          scapEmailService.sendScapWithdrawalEmails(scapDetail);
           caseEventService.recordNewEvent(
               SCAP_WITHDRAWN,
               scapId,

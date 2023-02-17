@@ -25,6 +25,7 @@ import uk.co.fivium.energyportalapi.generated.types.User;
 import uk.co.nstauthority.scap.TestEntityProvider;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.TestUserProvider;
+import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
@@ -56,6 +57,9 @@ class ScapEmailServiceTest {
   @Mock
   private EnergyPortalUserService energyPortalUserService;
 
+  @Mock
+  private UserDetailService userDetailService;
+
   @InjectMocks
   private ScapEmailService scapEmailService;
 
@@ -63,10 +67,12 @@ class ScapEmailServiceTest {
   ArgumentCaptor<EmailProperties> argumentCaptor;
 
   private static final ScapDetail SCAP_DETAIL = TestEntityProvider.getScapDetail();
-  private static final ServiceUserDetail USER = TestUserProvider.getUser();
+  private static final ServiceUserDetail REGULATOR_USER = TestUserProvider.getUser();
   private static final ScapSubmissionStage SCAP_SUBMISSION_STAGE = ScapSubmissionStage.CONTRACTING_PERFORMANCE;
   private static final String CONTEXT_PATH = "/scap";
   private static final String SERVICE_URL = "http://localhost" + CONTEXT_PATH;
+  private static final String SCAP_SUMMARY_URL = SERVICE_URL +
+      ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_DETAIL.getScap().getScapId()));
 
   private User recipient;
   private Team team;
@@ -102,14 +108,12 @@ class ScapEmailServiceTest {
     when(teamMemberService.getTeamMembers(team)).thenReturn(List.of(teamMember1, teamMember2));
     when(energyPortalUserService.searchUsersByIds(Collections.singletonList(teamMember1.wuaId())))
         .thenReturn(Collections.singletonList(recipient));
+    when(userDetailService.getUserDetail()).thenReturn(REGULATOR_USER);
   }
 
   @Test
   void sendScapApprovalEmails() {
-    var expectedScapCaseUrl = SERVICE_URL +
-        ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_DETAIL.getScap().getScapId()));
-
-    scapEmailService.sendScapApprovalEmails(SCAP_DETAIL, USER, SCAP_SUBMISSION_STAGE);
+    scapEmailService.sendScapApprovalEmails(SCAP_DETAIL, SCAP_SUBMISSION_STAGE);
 
     verify(notifyEmailService).sendEmail(argumentCaptor.capture(), eq(recipient.getPrimaryEmailAddress()));
 
@@ -121,8 +125,29 @@ class ScapEmailServiceTest {
         Map.of(
             "SCAP reference", SCAP_DETAIL.getScap().getReference(),
             "SCAP submission stage", SCAP_SUBMISSION_STAGE.getDisplayName(),
-            "approving user name", USER.forename(),
-            "SCAP case url", expectedScapCaseUrl,
+            "regulator user name", REGULATOR_USER.displayName(),
+            "SCAP case url", SCAP_SUMMARY_URL,
+            "recipient name", recipient.getForename(),
+            "TEST_EMAIL", "no"
+        )
+    );
+  }
+
+  @Test
+  void sendScapWithdrawalEmails() {
+    scapEmailService.sendScapWithdrawalEmails(SCAP_DETAIL);
+
+    verify(notifyEmailService).sendEmail(argumentCaptor.capture(), eq(recipient.getPrimaryEmailAddress()));
+
+    assertThat(argumentCaptor.getValue()).extracting(
+        EmailProperties::getTemplate,
+        EmailProperties::getEmailPersonalisations
+    ).containsExactly(
+        NotifyTemplate.SCAP_WITHDRAWN,
+        Map.of(
+            "SCAP reference", SCAP_DETAIL.getScap().getReference(),
+            "regulator user name", REGULATOR_USER.displayName(),
+            "SCAP case url", SCAP_SUMMARY_URL,
             "recipient name", recipient.getForename(),
             "TEST_EMAIL", "no"
         )

@@ -31,12 +31,12 @@ import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.notify.ScapEmailService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
@@ -67,24 +67,30 @@ class ScapWithdrawControllerTest extends AbstractControllerTest {
   @MockBean
   private SupportingDocumentService supportingDocumentService;
 
+  @MockBean
+  private ScapEmailService scapEmailService;
+
   private static final ScapId SCAP_ID = new ScapId(1111);
-
   private static final Integer ORG_GROUP_ID = 1000;
-
   private static final String TEST_STRING = "This is a test comment";
+
+  private ScapDetail scapDetail;
 
   @BeforeEach
   void setup() {
     var scap = new Scap();
+    scapDetail = getScapDetail();
+
     when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
     when(scapService.getScapById(anyInt())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(getScapDetail());
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(getScapDetail());
-    when(scapDetailService.getLatestSubmittedScapDetail(SCAP_ID)).thenReturn(getScapDetail());
-    when(organisationGroupService.getOrganisationGroupById(eq(ORG_GROUP_ID), any())).thenReturn(Optional.of(getOrgGroup()));
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestSubmittedScapDetail(SCAP_ID)).thenReturn(scapDetail);
+    when(organisationGroupService.getOrganisationGroupById(eq(ORG_GROUP_ID), any()))
+        .thenReturn(Optional.of(OrganisationGroup.newBuilder().build()));
     when(scapSummaryViewService.getScapSummaryView(any())).thenReturn(getScapSummaryView());
   }
 
@@ -104,6 +110,7 @@ class ScapWithdrawControllerTest extends AbstractControllerTest {
         .andExpect(status().is3xxRedirection());
 
     verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_WITHDRAWN, SCAP_ID, 1, TEST_STRING);
+    verify(scapEmailService).sendScapWithdrawalEmails(scapDetail);
   }
 
   @Test
@@ -148,10 +155,5 @@ class ScapWithdrawControllerTest extends AbstractControllerTest {
     scapDetail.setScap(scap);
 
     return scapDetail;
-  }
-
-  private OrganisationGroup getOrgGroup() {
-    var orgGroup = new OrganisationGroup();
-    return orgGroup;
   }
 }

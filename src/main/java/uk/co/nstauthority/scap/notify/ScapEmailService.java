@@ -3,11 +3,12 @@ package uk.co.nstauthority.scap.notify;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.co.fivium.energyportalapi.generated.types.User;
-import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
+import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
@@ -27,30 +28,48 @@ public class ScapEmailService {
   private final TeamService teamService;
   private final TeamMemberService teamMemberService;
   private final EnergyPortalUserService energyPortalUserService;
+  private final UserDetailService userDetailService;
 
   @Autowired
   ScapEmailService(NotifyEmailService notifyEmailService,
                    TeamService teamService,
                    TeamMemberService teamMemberService,
-                   EnergyPortalUserService energyPortalUserService) {
+                   EnergyPortalUserService energyPortalUserService,
+                   UserDetailService userDetailService) {
     this.notifyEmailService = notifyEmailService;
     this.teamService = teamService;
     this.teamMemberService = teamMemberService;
     this.energyPortalUserService = energyPortalUserService;
+    this.userDetailService = userDetailService;
   }
 
   public void sendScapApprovalEmails(ScapDetail scapDetail,
-                                     ServiceUserDetail approvingUser,
                                      ScapSubmissionStage scapSubmissionStage) {
     var scap = scapDetail.getScap();
     var emailProperties = new EmailProperties(NotifyTemplate.SCAP_APPROVED);
     var personalisations = emailProperties.getEmailPersonalisations();
-    personalisations.put("SCAP reference", scap.getReference());
+    addDefaultPersonalisations(personalisations, scap);
     personalisations.put("SCAP submission stage", scapSubmissionStage.getDisplayName());
-    personalisations.put("approving user name", approvingUser.forename());
-    personalisations.put("SCAP case url", getScapCaseUrl(scap.getScapId()));
     var recipients = getScapSubmitterRecipients(scap);
     sendEmailsWithRecipientNames(emailProperties, recipients);
+  }
+
+  public void sendScapWithdrawalEmails(ScapDetail scapDetail) {
+    var scap = scapDetail.getScap();
+    var emailProperties = new EmailProperties(NotifyTemplate.SCAP_WITHDRAWN);
+    var personalisations = emailProperties.getEmailPersonalisations();
+    addDefaultPersonalisations(personalisations, scap);
+
+    var recipients = getScapSubmitterRecipients(scap);
+    sendEmailsWithRecipientNames(emailProperties, recipients);
+  }
+
+  private void addDefaultPersonalisations(Map<String, String> personalisations, Scap scap) {
+    var regulatorUser = userDetailService.getUserDetail();
+
+    personalisations.put("regulator user name", regulatorUser.displayName());
+    personalisations.put("SCAP reference", scap.getReference());
+    personalisations.put("SCAP case url", getScapCaseUrl(scap.getScapId()));
   }
 
   private List<User> getScapSubmitterRecipients(Scap scap) {

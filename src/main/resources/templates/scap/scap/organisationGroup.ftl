@@ -14,6 +14,7 @@
     <@fdsSelect.select
       path="form.organisationGroupId.inputValue"
       labelText=pageTitle
+      pageHeading=true
       options=permittedOrganisationGroups
     />
 
