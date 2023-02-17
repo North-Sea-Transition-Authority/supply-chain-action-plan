@@ -36,6 +36,13 @@ Note that this template uses a Postgres database, so make sure that the database
 
 ### Development
 - In your IntelliJ run configuration for the Spring app, include `development` in your active profiles
+- The following environment variables are required when using this profile:
+
+| Environment Variable        | Description                                                                                 |
+|-----------------------------|---------------------------------------------------------------------------------------------|
+| NOTIFY_TEST_EMAIL_RECIPIENT | The email you want to receive emails on when running locally                                |
+| NOTIFY_API_KEY              | The GovUK notify development key from TPM: https://tpm.fivium.co.uk/index.php/pwd/view/2082 |
+
 
 ### Production
 - In your IntelliJ run configuration for the Spring app, include `production` in your active profiles
@@ -51,7 +58,7 @@ Note that this template uses a Postgres database, so make sure that the database
 | FILE_UPLOAD_MAX_ALLOWED_SIZE   | Maximum file upload size in bytes                                                               |
 | FILE_UPLOAD_ALLOWED_EXTENSIONS | Allowed file extensions for document uploads                                                    |
 | SCAP_EMAIL_MODE                | Can be test or production. Test mode will redirect all outbound emails to the test recipient(s) |
-| SCAP_EMAIL_TEST_RECIPIENT      | If email is test mode, who to send emails to. Value can be a CSV list                           |
+| NOTIFY_TEST_EMAIL_RECIPIENT    | If email is test mode, who to send emails to. Value can be a CSV list                           |
 | NOTIFY_API_KEY                 | The GOV.UK Notify key                                                                           |
 | NOTIFY_CALLBACK_TOKEN          | The GOV.UK Notify callback token                                                                |
 

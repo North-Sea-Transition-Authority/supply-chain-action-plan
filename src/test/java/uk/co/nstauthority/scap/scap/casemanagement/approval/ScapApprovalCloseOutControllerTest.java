@@ -1,10 +1,10 @@
 package uk.co.nstauthority.scap.scap.casemanagement.approval;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -22,23 +22,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.validation.BindingResult;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.AbstractControllerTest;
-import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.notify.ScapEmailService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
-import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestController;
-import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestForm;
-import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestFormValidator;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
@@ -57,9 +53,6 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
   @MockBean
   private CaseEventService caseEventService;
 
-  @SpyBean
-  private ControllerHelperService controllerHelperService;
-
   @MockBean
   private ScapSummaryViewService scapSummaryViewService;
 
@@ -71,6 +64,9 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
 
   @MockBean
   private SupportingDocumentService supportingDocumentService;
+
+  @MockBean
+  private ScapEmailService scapEmailService;
 
   private static final ScapId SCAP_ID = new ScapId(1111);
 
@@ -118,6 +114,7 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
         .andExpect(redirectedUrl(expectedRedirect));
     verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_CLOSED_OUT, SCAP_ID, 1, TEST_STRING);
     verify(scapDetailService).closeOutScap(scapDetail);
+    verify(scapEmailService).sendScapApprovalEmails(scapDetail, testUser, null);
   }
 
   @Test
@@ -141,6 +138,7 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/summary/scapSummaryOverview"));
     verify(caseEventService, never()).recordNewEvent(CaseEventSubject.SCAP_CLOSED_OUT, SCAP_ID, 1, TEST_STRING);
+    verifyNoInteractions(scapEmailService);
   }
 
   private ScapApprovalForm getScapApprovalForm() {

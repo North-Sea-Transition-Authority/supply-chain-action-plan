@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.notify.ScapEmailService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequired;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
@@ -50,6 +52,8 @@ public class ScapApprovalController {
   private final ScapApprovalFormValidator scapApprovalFormValidator;
 
   private final SupportingDocumentService supportingDocumentService;
+  private final ScapEmailService scapEmailService;
+  private final UserDetailService userDetailService;
 
   @Autowired
   public ScapApprovalController(CaseEventService caseEventService,
@@ -58,7 +62,9 @@ public class ScapApprovalController {
                                 ScapSummaryViewService scapSummaryViewService,
                                 OrganisationGroupService organisationGroupService,
                                 ScapApprovalFormValidator scapApprovalFormValidator,
-                                SupportingDocumentService supportingDocumentService) {
+                                SupportingDocumentService supportingDocumentService,
+                                ScapEmailService scapEmailService,
+                                UserDetailService userDetailService) {
     this.caseEventService = caseEventService;
     this.controllerHelperService = controllerHelperService;
     this.scapDetailService = scapDetailService;
@@ -66,14 +72,17 @@ public class ScapApprovalController {
     this.organisationGroupService = organisationGroupService;
     this.scapApprovalFormValidator = scapApprovalFormValidator;
     this.supportingDocumentService = supportingDocumentService;
+    this.scapEmailService = scapEmailService;
+    this.userDetailService = userDetailService;
   }
 
+  @SuppressWarnings("ConstantConditions")
+  // Hide IntelliJ warning when ReverseRouting with null parameters
   @PostMapping(params = CaseEventAction.APPROVED)
   public ModelAndView saveScapApprovalForm(@PathVariable("scapId") ScapId scapId,
                                            @RequestParam(CaseEventAction.APPROVED) String caseEventAction,
                                            @RequestParam("Approve-scap-Panel") Boolean slideOutPanelOpen,
-                                           @ModelAttribute("scapApprovalForm")
-                                             ScapApprovalForm scapApprovalForm,
+                                           @ModelAttribute("scapApprovalForm") ScapApprovalForm scapApprovalForm,
                                            BindingResult bindingResult) {
     scapApprovalFormValidator.validate(scapApprovalForm, bindingResult);
 
@@ -104,11 +113,15 @@ public class ScapApprovalController {
               scapId,
               scapDetail.getVersionNumber(),
               scapApprovalForm.getApprovalComments().getInputValue());
+          var approvingUser = userDetailService.getUserDetail();
           if (scapApprovalForm.getProjectClosedOut().equals(YesNo.YES)) {
             scapDetailService.closeOutScap(scapDetail);
           } else {
             scapDetailService.approveScap(scapDetail);
           }
+          scapEmailService.sendScapApprovalEmails(
+              scapDetail, approvingUser, scapSummaryViewService.inferSubmissionStatusFromSummary(scapSummary)
+          );
 
           return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
         });

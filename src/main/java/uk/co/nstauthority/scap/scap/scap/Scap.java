@@ -56,6 +56,11 @@ public class Scap {
     return createdTimestamp;
   }
 
+  @VisibleForTesting
+  public void setCreatedTimestamp(Instant createdTimestamp) {
+    this.createdTimestamp = createdTimestamp;
+  }
+
   public Integer getOrganisationGroupId() {
     return organisationGroupId;
   }

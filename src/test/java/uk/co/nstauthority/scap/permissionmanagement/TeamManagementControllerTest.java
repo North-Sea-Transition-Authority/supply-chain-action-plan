@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.permissionmanagement;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -25,7 +26,6 @@ import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.industry.AbstractIndustryTeamControllerTest;
-import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.teams.NewTeamForm;
 import uk.co.nstauthority.scap.permissionmanagement.teams.NewTeamFormvalidator;
@@ -186,6 +186,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
     var user = ServiceUserDetailTestUtil.Builder().withWuaId(100L).build();
 
     when(teamMemberService.getAllPermissionsForUser(user)).thenReturn(List.of(RolePermission.GRANT_ROLES));
+    doReturn(user).when(userDetailService).getUserDetail();
 
     mockMvc.perform(
         get(ReverseRouter.route(on(TeamManagementController.class).renderArchiveTeamConfirmation(teamId)))
@@ -213,6 +214,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
     var user = ServiceUserDetailTestUtil.Builder().withWuaId(100L).build();
 
     when(teamMemberService.getAllPermissionsForUser(user)).thenReturn(List.of(RolePermission.GRANT_ROLES));
+    doReturn(user).when(userDetailService).getUserDetail();
 
     mockMvc.perform(
             get(ReverseRouter.route(on(TeamManagementController.class).renderArchiveTeamConfirmation(teamId)))

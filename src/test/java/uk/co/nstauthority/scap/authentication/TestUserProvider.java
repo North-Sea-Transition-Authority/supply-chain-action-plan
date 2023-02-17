@@ -32,6 +32,8 @@ public class TestUserProvider {
   public static ServiceUserDetail getUser() {
     return ServiceUserDetailTestUtil.Builder()
         .withWuaId(100L)
+        .withEmailAddress("test.user@scap.uk")
+        .withForename("test-forename")
         .build();
   }
 }
