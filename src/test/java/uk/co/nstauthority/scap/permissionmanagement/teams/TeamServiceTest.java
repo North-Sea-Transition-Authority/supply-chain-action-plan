@@ -207,4 +207,15 @@ class TeamServiceTest {
     inOrder.verify(teamMemberRoleService).deleteUsersInTeam(team);
     inOrder.verify(teamRepository).delete(team);
   }
+
+  @Test
+  void getRegulatorTeam() {
+    var regTeam = new Team();
+
+    when(teamRepository.getTeamByTeamType(TeamType.REGULATOR)).thenReturn(regTeam);
+
+    var returnedTeam = teamService.getRegulatorTeam();
+
+    assertThat(returnedTeam).isEqualTo(regTeam);
+  }
 }

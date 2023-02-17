@@ -33,4 +33,6 @@ public interface TeamRepository extends CrudRepository<Team, UUID> {
 
   Optional<Team> findByEnergyPortalOrgGroupId(int energyPortalOrgGroupId);
 
+  Team getTeamByTeamType(TeamType teamType);
+
 }

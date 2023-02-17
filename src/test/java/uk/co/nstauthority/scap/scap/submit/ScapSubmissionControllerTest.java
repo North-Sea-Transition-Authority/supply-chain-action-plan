@@ -34,6 +34,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.validation.BindingResult;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.notify.ScapEmailService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
@@ -60,6 +61,9 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
 
   @MockBean
   ReviewAndSubmitFormService reviewAndSubmitFormService;
+
+  @MockBean
+  ScapEmailService scapEmailService;
 
   @BeforeEach
   void setup() {
@@ -135,6 +139,7 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
         eq(SCAP_ID),
         eq(scapDetail.getVersionNumber()),
         eq(null));
+    verify(scapEmailService).sendScapSubmissionEmails(scapDetail);
   }
 
   @Test

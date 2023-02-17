@@ -1,7 +1,6 @@
 package uk.co.nstauthority.scap.permissionmanagement.teams;
 
 import static uk.co.nstauthority.scap.permissionmanagement.TeamType.REGULATOR;
-import static uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER;
 
 import java.util.List;
 import java.util.Optional;
@@ -71,6 +70,10 @@ public class TeamService {
     team.setEnergyPortalOrgGroupId(energyPortalGroupId);
     team = teamRepository.save(team);
     return team;
+  }
+
+  public Team getRegulatorTeam() {
+    return teamRepository.getTeamByTeamType(REGULATOR);
   }
 
   public List<Team> getTeamsOfTypeThatUserBelongsTo(ServiceUserDetail user, TeamType teamType) {

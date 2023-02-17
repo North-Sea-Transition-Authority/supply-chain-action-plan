@@ -18,6 +18,7 @@ import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.error.exception.ScapBadRequestException;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.notify.ScapEmailService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
@@ -48,6 +49,7 @@ class ScapSubmissionController {
   private final List<ScapTaskListItem> scapTaskListItems;
   private final ReviewAndSubmitFormService reviewAndSubmitFormService;
   private final ControllerHelperService controllerHelperService;
+  private final ScapEmailService scapEmailService;
 
   @Autowired
   ScapSubmissionController(ScapService scapService,
@@ -56,7 +58,8 @@ class ScapSubmissionController {
                            CaseEventService caseEventService,
                            List<ScapTaskListItem> scapTaskListItems,
                            ReviewAndSubmitFormService reviewAndSubmitFormService,
-                           ControllerHelperService controllerHelperService) {
+                           ControllerHelperService controllerHelperService,
+                           ScapEmailService scapEmailService) {
     this.scapService = scapService;
     this.scapDetailService = scapDetailService;
     this.scapSummaryViewService = scapSummaryViewService;
@@ -64,6 +67,7 @@ class ScapSubmissionController {
     this.scapTaskListItems = scapTaskListItems;
     this.reviewAndSubmitFormService = reviewAndSubmitFormService;
     this.controllerHelperService = controllerHelperService;
+    this.scapEmailService = scapEmailService;
   }
 
   @GetMapping
@@ -103,6 +107,7 @@ class ScapSubmissionController {
         form,
         () -> {
           scapDetailService.submitScap(scapDetail, form);
+          scapEmailService.sendScapSubmissionEmails(scapDetail);
           caseEventService.recordNewEvent(SCAP_SUBMITTED, scapId, scapDetail.getVersionNumber(), null);
 
           return ReverseRouter.redirect(on(ScapSubmissionController.class).renderScapSubmissionSuccess(scapId));
