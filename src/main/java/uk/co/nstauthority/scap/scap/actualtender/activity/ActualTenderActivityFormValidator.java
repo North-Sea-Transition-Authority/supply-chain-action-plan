@@ -1,6 +1,7 @@
 package uk.co.nstauthority.scap.scap.actualtender.activity;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -11,6 +12,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
 import org.springframework.validation.ValidationUtils;
 import uk.co.fivium.formlibrary.validator.string.StringInputValidator;
+import uk.co.nstauthority.scap.fds.searchselector.ManualEntryUtil;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 
@@ -20,8 +22,9 @@ class ActualTenderActivityFormValidator implements SmartValidator {
   public static final Integer MAX_SCOPE_TITLE_LENGTH = 40;
   private static final String MISSING_REMUNERATION_MODEL_ERROR =  "Select a remuneration model";
   private static final String MISSING_CONTRACT_STAGE_ERROR = "Select the stage the contract is at";
-  private static final String ITT_PARTICIPANTS_FIELD_NAME = "invitationToTenderParticipants";
+  static final String ITT_PARTICIPANTS_SELECTOR_NAME = "ittParticipantsSelector";
   private static final String MISSING_ITT_PARTICIPANTS_ERROR = "Enter at least one invitation to tender participant";
+  private static final String INVALID_ITT_PARTICIPANTS_ERROR = "Enter valid invitation to tender participants only";
 
   private final ActualTenderActivityService actualTenderActivityService;
 
@@ -74,15 +77,7 @@ class ActualTenderActivityFormValidator implements SmartValidator {
         "contractStage.required",
         MISSING_CONTRACT_STAGE_ERROR);
 
-    // If FDS is updated or for some reason the Add a list returns a truly empty list - as opposed to a List.of(null),
-    // the below will still work as Collections.emptyList().stream().noneMatch(Objects::nonNull) returns true
-    if (form.getInvitationToTenderParticipants().stream().noneMatch(Objects::nonNull)) {
-      errors.rejectValue(
-          "%s[0]".formatted(ITT_PARTICIPANTS_FIELD_NAME),
-          "%s.required".formatted(ITT_PARTICIPANTS_FIELD_NAME),
-          MISSING_ITT_PARTICIPANTS_ERROR
-      );
-    }
+    validateInvitationToTenderParticipants(form.getInvitationToTenderParticipants(), errors);
   }
 
   private void validateScopeTitle(ActualTenderActivityForm form, Errors errors, ActualTender actualTender,
@@ -113,6 +108,27 @@ class ActualTenderActivityFormValidator implements SmartValidator {
             "There is already an actual tender activity with the scope title \"%s\"".formatted(inputScopeTitle)
         );
       }
+    }
+  }
+
+  private void validateInvitationToTenderParticipants(List<String> ittParticipants, Errors errors) {
+    if (Objects.isNull(ittParticipants) || ittParticipants.isEmpty()) {
+      errors.rejectValue(
+          ITT_PARTICIPANTS_SELECTOR_NAME,
+          "%s.required".formatted(ITT_PARTICIPANTS_SELECTOR_NAME),
+          MISSING_ITT_PARTICIPANTS_ERROR
+      );
+      return;
+    }
+
+    try {
+      ManualEntryUtil.partitionManualEntries(ittParticipants);
+    } catch (NumberFormatException e) {
+      errors.rejectValue(
+          ITT_PARTICIPANTS_SELECTOR_NAME,
+          "%s.invalid".formatted(ITT_PARTICIPANTS_SELECTOR_NAME),
+          INVALID_ITT_PARTICIPANTS_ERROR
+      );
     }
   }
 }

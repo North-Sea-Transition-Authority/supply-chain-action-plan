@@ -12,6 +12,7 @@ public class ActualTenderActivityForm {
   private final StringInput remunerationModelName;
   private ContractStage contractStage;
   private List<String> invitationToTenderParticipants;
+  private Object ittParticipantsSelector;
 
   public ActualTenderActivityForm() {
     this.scopeTitle = new StringInput("scopeTitle", "Scope title");
@@ -65,5 +66,13 @@ public class ActualTenderActivityForm {
 
   public void setInvitationToTenderParticipants(List<String> invitationToTenderParticipants) {
     this.invitationToTenderParticipants = invitationToTenderParticipants;
+  }
+
+  public Object getIttParticipantsSelector() {
+    return ittParticipantsSelector;
+  }
+
+  public void setIttParticipantsSelector(Object ittParticipantsSelector) {
+    this.ittParticipantsSelector = ittParticipantsSelector;
   }
 }

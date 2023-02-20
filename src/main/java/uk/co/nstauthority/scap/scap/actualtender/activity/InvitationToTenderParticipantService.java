@@ -5,20 +5,27 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.nstauthority.scap.energyportal.OrganisationUnitService;
+import uk.co.nstauthority.scap.fds.searchselector.ManualEntryUtil;
 
 @Service
 public class InvitationToTenderParticipantService {
 
   private final InvitationToTenderParticipantRepository invitationToTenderParticipantRepository;
+  private final OrganisationUnitService organisationUnitService;
   private final Clock clock;
+
+  static final String ORGANISATION_UNIT_REQUEST_PURPOSE = "Get selected org units for SCAP actual tender activity";
 
   @Autowired
   InvitationToTenderParticipantService(InvitationToTenderParticipantRepository invitationToTenderParticipantRepository,
-                                       Clock clock) {
+                                       OrganisationUnitService organisationUnitService, Clock clock) {
     this.invitationToTenderParticipantRepository = invitationToTenderParticipantRepository;
+    this.organisationUnitService = organisationUnitService;
     this.clock = clock;
   }
 
@@ -62,25 +69,50 @@ public class InvitationToTenderParticipantService {
   public void updateInvitationToTenderParticipants(ActualTenderActivity actualTenderActivity,
                                                    List<String> participantsFromForm) {
     var existingParticipants = getInvitationToTenderParticipants(actualTenderActivity);
+    var existingCompanyNames = existingParticipants.stream()
+        .map(InvitationToTenderParticipant::getCompanyName)
+        .collect(Collectors.toSet());
+    var existingCompanyIds = existingParticipants.stream()
+        .map(InvitationToTenderParticipant::getOrganisationUnitId)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toSet());
+
+    var partitionedParticipants = ManualEntryUtil.partitionManualEntries(participantsFromForm);
 
     // Get the participants that have been removed
     var removedParticipants = existingParticipants.stream()
-        .filter(participant -> !participantsFromForm.contains(participant.getCompanyName()))
+        .filter(participant -> !partitionedParticipants.ids().contains(participant.getOrganisationUnitId())
+            && !partitionedParticipants.manualEntries().contains(participant.getCompanyName()))
         .collect(Collectors.toSet());
 
     // Create the participants that have been added
-    var existingParticipantNames = existingParticipants.stream()
-        .map(InvitationToTenderParticipant::getCompanyName)
+    // Participants that are on the energy portal
+    var newCompanyIds = partitionedParticipants.ids()
+        .stream()
+        .filter(companyIdFromForm -> !existingCompanyIds.contains(companyIdFromForm))
+        .toList();
+    var organisationUnits = organisationUnitService.findAllByIds(newCompanyIds, ORGANISATION_UNIT_REQUEST_PURPOSE);
+    var addedIttParticipantsFromEpa = organisationUnits.stream()
+        .map(organisationUnit -> {
+          var newParticipant = new InvitationToTenderParticipant(
+              actualTenderActivity, clock.instant(), organisationUnit.getName());
+          newParticipant.setOrganisationUnitId(organisationUnit.getOrganisationUnitId());
+          return newParticipant;
+        }).collect(Collectors.toSet());
+
+    // Participants that are not on the energy portal
+    var addedNonEpaIttParticipants = partitionedParticipants.manualEntries()
+        .stream()
+        .filter(companyNameFromForm -> !existingCompanyNames.contains(companyNameFromForm))
+        .map(newCompanyName -> new InvitationToTenderParticipant(actualTenderActivity, clock.instant(), newCompanyName))
         .collect(Collectors.toSet());
-    var addedParticipants = participantsFromForm.stream()
-        .filter(participantName -> !existingParticipantNames.contains(participantName))
-        .filter(Objects::nonNull)
-        .map(newParticipantName -> new InvitationToTenderParticipant(actualTenderActivity, clock.instant(), newParticipantName))
+
+    var newIttParticipants = Stream.concat(addedNonEpaIttParticipants.stream(), addedIttParticipantsFromEpa.stream())
         .collect(Collectors.toSet());
 
     // Delete the removed participants and save the added participants
     invitationToTenderParticipantRepository.deleteAll(removedParticipants);
-    invitationToTenderParticipantRepository.saveAll(addedParticipants);
+    invitationToTenderParticipantRepository.saveAll(newIttParticipants);
   }
 
 }

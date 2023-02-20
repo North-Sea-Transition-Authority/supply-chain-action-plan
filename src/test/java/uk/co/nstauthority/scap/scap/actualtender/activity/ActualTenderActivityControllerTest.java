@@ -15,6 +15,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import static uk.co.nstauthority.scap.mvc.ReverseRouter.emptyBindingResult;
 
 import java.time.Clock;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -156,6 +157,9 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender)))
         .thenReturn(bindingResult);
+    when(actualTenderActivityFormService
+        .getPreselectedIttParticipants(form.getInvitationToTenderParticipants(), bindingResult))
+        .thenReturn(Collections.emptyList());
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ActualTenderActivityController.class)
@@ -170,7 +174,8 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
         .andExpect(model().attribute("contractStages", ContractStage.getContractStages()))
         .andExpect(model().attributeExists("errorList"))
         .andExpect(model().attribute("scopeTitleMaxLength",
-            ActualTenderActivityFormValidator.MAX_SCOPE_TITLE_LENGTH.toString()));
+            ActualTenderActivityFormValidator.MAX_SCOPE_TITLE_LENGTH.toString()))
+        .andExpect(model().attribute(ActualTenderActivityController.PRESELECTED_ITT_PARTICIPANTS_OBJECT, Collections.emptyList()));
 
     verify(actualTenderActivityService, never()).createActualTenderActivity(any(), any());
   }
@@ -189,6 +194,8 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
         .thenReturn(invitationToTenderParticipants);
     when(actualTenderActivityFormService.getForm(actualTenderActivity, invitationToTenderParticipants))
         .thenReturn(form);
+    when(actualTenderActivityFormService.getPreselectedIttParticipants(invitationToTenderParticipants))
+        .thenReturn(Collections.emptyList());
 
     mockMvc.perform(get(
         ReverseRouter.route(on(ActualTenderActivityController.class)
@@ -201,7 +208,8 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
         .andExpect(model().attribute("remunerationModels", RemunerationModel.getRemunerationModels()))
         .andExpect(model().attribute("contractStages", ContractStage.getContractStages()))
         .andExpect(model().attribute("scopeTitleMaxLength",
-            ActualTenderActivityFormValidator.MAX_SCOPE_TITLE_LENGTH.toString()));
+            ActualTenderActivityFormValidator.MAX_SCOPE_TITLE_LENGTH.toString()))
+        .andExpect(model().attribute(ActualTenderActivityController.PRESELECTED_ITT_PARTICIPANTS_OBJECT, Collections.emptyList()));
   }
 
   @Test
@@ -277,6 +285,9 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender), eq(actualTenderActivity)))
         .thenReturn(bindingResultWithErrors);
+    when(actualTenderActivityFormService
+        .getPreselectedIttParticipants(form.getInvitationToTenderParticipants(), bindingResultWithErrors))
+        .thenReturn(Collections.emptyList());
 
     mockMvc.perform(post(
         ReverseRouter.route(on(ActualTenderActivityController.class)
@@ -293,7 +304,8 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
         .andExpect(model().attribute("contractStages", ContractStage.getContractStages()))
         .andExpect(model().attributeExists("errorList"))
         .andExpect(model().attribute("scopeTitleMaxLength",
-            ActualTenderActivityFormValidator.MAX_SCOPE_TITLE_LENGTH.toString()));
+            ActualTenderActivityFormValidator.MAX_SCOPE_TITLE_LENGTH.toString()))
+        .andExpect(model().attribute(ActualTenderActivityController.PRESELECTED_ITT_PARTICIPANTS_OBJECT, Collections.emptyList()));
 
     verify(updateActualTenderActivityService, never()).updateActualTenderActivity(any(), any());
   }

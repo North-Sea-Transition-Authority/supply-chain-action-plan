@@ -1,9 +1,14 @@
 package uk.co.nstauthority.scap.scap.actualtender.activity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+import static uk.co.nstauthority.scap.mvc.ReverseRouter.emptyBindingResult;
 
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +17,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.fivium.energyportalapi.generated.types.OrganisationUnit;
+import uk.co.nstauthority.scap.energyportal.OrganisationUnitService;
+import uk.co.nstauthority.scap.fds.addtolist.AddToListItem;
+import uk.co.nstauthority.scap.fds.searchselector.ManualEntryUtil;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 
@@ -20,6 +29,9 @@ class ActualTenderActivityFormServiceTest {
 
   @Mock
   ActualTenderActivityFormValidator actualTenderActivityFormValidator;
+
+  @Mock
+  OrganisationUnitService organisationUnitService;
 
   @InjectMocks
   ActualTenderActivityFormService actualTenderActivityFormService;
@@ -66,7 +78,12 @@ class ActualTenderActivityFormServiceTest {
     actualTenderActivity.setContractStage(ContractStage.CONTRACT_AWARDED);
     var invitationToTenderParticipant1 = new InvitationToTenderParticipant(451);
     invitationToTenderParticipant1.setCompanyName("test company 1");
-    var invitationToTenderParticipants = List.of(invitationToTenderParticipant1);
+    var invitationToTenderParticipant2 = new InvitationToTenderParticipant(452);
+    invitationToTenderParticipant2.setCompanyName("portal org unit name");
+    invitationToTenderParticipant2.setOrganisationUnitId(11);
+    var invitationToTenderParticipants = List.of(
+        invitationToTenderParticipant1, invitationToTenderParticipant2
+    );
 
     var form = actualTenderActivityFormService.getForm(
         actualTenderActivity, invitationToTenderParticipants
@@ -85,7 +102,86 @@ class ActualTenderActivityFormServiceTest {
         actualTenderActivity.getRemunerationModel(),
         actualTenderActivity.getRemunerationModelName(),
         actualTenderActivity.getContractStage(),
-        List.of(invitationToTenderParticipant1.getCompanyName())
+        List.of(
+            ManualEntryUtil.addFreeTextPrefix(invitationToTenderParticipant1.getCompanyName()),
+            String.valueOf(invitationToTenderParticipant2.getOrganisationUnitId())
+        )
     );
+  }
+
+  @Test
+  void getPreselectedIttParticipants_FromIttParticipants() {
+    var nonPortalIttParticipant = new InvitationToTenderParticipantBuilder()
+        .withCompanyName("Manually added company name")
+        .build();
+    var ittParticipantFromPortal = new InvitationToTenderParticipantBuilder()
+        .withOrganisationUnitId(1)
+        .withCompanyName("EPA organisation unit name")
+        .build();
+
+    var addToListItems = actualTenderActivityFormService.getPreselectedIttParticipants(
+        List.of(nonPortalIttParticipant, ittParticipantFromPortal)
+    );
+
+    assertThat(addToListItems).extracting(
+        AddToListItem::getId,
+        AddToListItem::getName
+    ).containsExactly(
+        tuple(ManualEntryUtil.addFreeTextPrefix(nonPortalIttParticipant.getCompanyName()), nonPortalIttParticipant.getCompanyName()),
+        tuple(String.valueOf(ittParticipantFromPortal.getOrganisationUnitId()), ittParticipantFromPortal.getCompanyName())
+    );
+  }
+
+  @Test
+  void getPreselectedIttParticipants_FromForm_NoErrors() {
+    var organisationUnit = OrganisationUnit.newBuilder()
+        .organisationUnitId(55)
+        .name("EPA org unit")
+        .build();
+    var manuallyAddedCompanyName = "Manually added company";
+
+    var form = new ActualTenderActivityForm();
+    form.setInvitationToTenderParticipants(List.of(
+        String.valueOf(organisationUnit.getOrganisationUnitId()),
+        ManualEntryUtil.addFreeTextPrefix(manuallyAddedCompanyName)
+    ));
+
+    when(organisationUnitService.findAllByIds(
+        Collections.singletonList(organisationUnit.getOrganisationUnitId()),
+        ActualTenderActivityFormService.ORG_UNIT_REQUEST_PURPOSE))
+        .thenReturn(Collections.singletonList(organisationUnit));
+
+    var addToListItems = actualTenderActivityFormService.getPreselectedIttParticipants(
+        form.getInvitationToTenderParticipants(), emptyBindingResult()
+    );
+
+    assertThat(addToListItems).extracting(
+        AddToListItem::getId,
+        AddToListItem::getName
+    ).containsExactly(
+        tuple(ManualEntryUtil.addFreeTextPrefix(manuallyAddedCompanyName), manuallyAddedCompanyName),
+        tuple(String.valueOf(organisationUnit.getOrganisationUnitId()), organisationUnit.getName())
+    );
+  }
+
+  @Test
+  void getPreselectedIttParticipants_FromForm_HasErrors() {
+    var manuallyAddedCompanyName = "Manually added company";
+
+    var form = new ActualTenderActivityForm();
+    form.setInvitationToTenderParticipants(List.of(
+        "9999",
+        ManualEntryUtil.addFreeTextPrefix(manuallyAddedCompanyName)
+    ));
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult.rejectValue(ActualTenderActivityFormValidator.ITT_PARTICIPANTS_SELECTOR_NAME, "invalid");
+
+    var addToListItems = actualTenderActivityFormService.getPreselectedIttParticipants(
+        form.getInvitationToTenderParticipants(), bindingResult
+    );
+
+    verifyNoInteractions(organisationUnitService);
+
+    assertThat(addToListItems).isEmpty();
   }
 }

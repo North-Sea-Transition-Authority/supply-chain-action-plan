@@ -43,18 +43,15 @@ backLinkUrl=springUrl(backLinkUrl)
       radioItems=contractStages
     />
 
-    <#if form.getInvitationToTenderParticipants()?has_content>
-      <#assign fieldListSize = form.getInvitationToTenderParticipants()?size>
-    <#else>
-      <#assign fieldListSize = 0>
-    </#if>
-    <@fdsAddAField.addAField
-      path="form.invitationToTenderParticipants"
-      fieldListSize=fieldListSize
-      fieldLabelText="Invitation to tender participants"
-      actionLinkText="Add another invitation to tender participant"
+    <h2 class="govuk-heading-m">Invitation to tender participants</h2>
+    <@fdsAddToList.addToList
+      pathForList="form.invitationToTenderParticipants"
+      pathForSelector="form.ittParticipantsSelector"
+      alreadyAdded=preselectedIttParticipants![]
+      restUrl=springUrl(organisationUnitSearchUrl)
+      itemName="Invitation to tender participant"
+      selectorLabelText="Enter the invitation to tender participants"
     />
-
     <#if contractingPerformanceWarning?has_content>
         <@fdsWarning.warning>
             ${contractingPerformanceWarning}

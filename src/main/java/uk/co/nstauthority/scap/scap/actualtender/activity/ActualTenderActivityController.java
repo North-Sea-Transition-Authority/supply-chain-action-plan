@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
+import uk.co.nstauthority.scap.energyportal.rest.OrganisationUnitRestController;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
@@ -36,6 +37,8 @@ public class ActualTenderActivityController {
   static final String DELETES_CONTRACTING_PERFORMANCE_WARNING =
       "This actual tendering activity has associated contracting performance. " +
       "On changing the stage of this contract, the related contracting performance information will be deleted.";
+  static final String PRESELECTED_ITT_PARTICIPANTS_OBJECT = "preselectedIttParticipants";
+
   private final ScapService scapService;
   private final ScapDetailService scapDetailService;
   private final ActualTenderService actualTenderService;
@@ -91,9 +94,13 @@ public class ActualTenderActivityController {
 
     bindingResult = actualTenderActivityFormService.validate(form, bindingResult, actualTender);
 
+    var preselectedIttParticipants = actualTenderActivityFormService
+        .getPreselectedIttParticipants(form.getInvitationToTenderParticipants(), bindingResult);
+
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        actualTenderDetailFormModelAndView(backLinkUrl),
+        actualTenderDetailFormModelAndView(backLinkUrl)
+            .addObject(PRESELECTED_ITT_PARTICIPANTS_OBJECT, preselectedIttParticipants),
         form,
         () -> {
           var actualTenderActivity = actualTenderActivityService
@@ -115,13 +122,16 @@ public class ActualTenderActivityController {
         .getInvitationToTenderParticipants(actualTenderActivity);
     var form = actualTenderActivityFormService
         .getForm(actualTenderActivity, invitationToTenderParticipants);
+    var preselectedIttParticipants = actualTenderActivityFormService
+        .getPreselectedIttParticipants(invitationToTenderParticipants);
     var backLinkUrl = ReverseRouter.route(on(ActualTenderSummaryController.class).renderActualTenderSummary(scapId));
 
     var contractingPerformanceWarning = getContractingPerformanceWarning(actualTenderActivity);
 
     return actualTenderDetailFormModelAndView(backLinkUrl)
         .addObject("form", form)
-        .addObject("contractingPerformanceWarning", contractingPerformanceWarning);
+        .addObject("contractingPerformanceWarning", contractingPerformanceWarning)
+        .addObject(PRESELECTED_ITT_PARTICIPANTS_OBJECT, preselectedIttParticipants);
   }
 
   @PostMapping("/{activityId}")
@@ -138,11 +148,14 @@ public class ActualTenderActivityController {
     bindingResult = actualTenderActivityFormService.validate(form, bindingResult, actualTender, actualTenderActivity);
 
     var contractingPerformanceWarning = getContractingPerformanceWarning(actualTenderActivity);
+    var preselectedIttParticipants = actualTenderActivityFormService
+        .getPreselectedIttParticipants(form.getInvitationToTenderParticipants(), bindingResult);
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
         actualTenderDetailFormModelAndView(backLinkUrl)
-            .addObject("contractingPerformanceWarning", contractingPerformanceWarning),
+            .addObject("contractingPerformanceWarning", contractingPerformanceWarning)
+            .addObject(PRESELECTED_ITT_PARTICIPANTS_OBJECT, preselectedIttParticipants),
         form,
         () -> {
           updateActualTenderActivityService.updateActualTenderActivity(actualTenderActivity, form);
@@ -158,7 +171,9 @@ public class ActualTenderActivityController {
         .addObject("backLinkUrl", backLinkUrl)
         .addObject("remunerationModels", RemunerationModel.getRemunerationModels())
         .addObject("contractStages", ContractStage.getContractStages())
-        .addObject("scopeTitleMaxLength", ActualTenderActivityFormValidator.MAX_SCOPE_TITLE_LENGTH.toString());
+        .addObject("scopeTitleMaxLength", ActualTenderActivityFormValidator.MAX_SCOPE_TITLE_LENGTH.toString())
+        .addObject("organisationUnitSearchUrl",
+            ReverseRouter.route(on(OrganisationUnitRestController.class).searchOrganisationUnitsWithManualEntry(null)));
   }
 
   private String getContractingPerformanceWarning(ActualTenderActivity actualTenderActivity) {

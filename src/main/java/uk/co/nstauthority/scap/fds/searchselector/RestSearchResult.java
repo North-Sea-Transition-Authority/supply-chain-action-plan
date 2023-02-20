@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.fds.searchselector;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /**
@@ -8,7 +9,7 @@ import java.util.List;
 public class RestSearchResult {
   List<RestSearchItem> results;
 
-  public RestSearchResult(List<RestSearchItem> results) {
+  public RestSearchResult(@JsonProperty("results") List<RestSearchItem> results) {
     this.results = results;
   }
 

@@ -9,6 +9,7 @@ public class InvitationToTenderParticipantBuilder {
   private Boolean isBidParticipant;
   private String companyName;
   private ActualTenderActivity actualTenderActivity;
+  private Integer organisationUnitId;
 
   public InvitationToTenderParticipantBuilder() {
     this.createdTimestamp = Instant.now();
@@ -44,12 +45,18 @@ public class InvitationToTenderParticipantBuilder {
     return this;
   }
 
+  public InvitationToTenderParticipantBuilder withOrganisationUnitId(Integer organisationUnitId) {
+    this.organisationUnitId = organisationUnitId;
+    return this;
+  }
+
   public InvitationToTenderParticipant build() {
     var invitationToTenderParticipant = new InvitationToTenderParticipant(id);
     invitationToTenderParticipant.setActualTenderActivity(actualTenderActivity);
     invitationToTenderParticipant.setCompanyName(companyName);
     invitationToTenderParticipant.setCreatedTimestamp(createdTimestamp);
     invitationToTenderParticipant.setBidParticipant(isBidParticipant);
+    invitationToTenderParticipant.setOrganisationUnitId(organisationUnitId);
     return invitationToTenderParticipant;
   }
 }

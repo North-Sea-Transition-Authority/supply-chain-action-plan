@@ -35,7 +35,6 @@
 <#macro plannedTenderActivityRows plannedTenderActivity>
 <#-- @ftlvariable name="plannedTenderActivity" type="uk.co.nstauthority.scap.scap.plannedtender.list.PlannedTenderActivityListItem" -->
   <@fdsSummaryList.summaryListRowNoAction keyText="Scope description">
-    ${plannedTenderActivity.indicativeContractAwardDate()!""}
     ${plannedTenderActivity.detail().scopeDescription!""}
   </@fdsSummaryList.summaryListRowNoAction>
   <@fdsSummaryList.summaryListRowNoAction keyText="Estimated value">

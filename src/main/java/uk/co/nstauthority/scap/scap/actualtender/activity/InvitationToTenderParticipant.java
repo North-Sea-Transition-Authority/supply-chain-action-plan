@@ -28,6 +28,8 @@ public class InvitationToTenderParticipant {
 
   private Boolean isBidParticipant;
 
+  private Integer organisationUnitId;
+
   public InvitationToTenderParticipant() {
   }
 
@@ -81,5 +83,13 @@ public class InvitationToTenderParticipant {
 
   public void setBidParticipant(Boolean bidParticipant) {
     isBidParticipant = bidParticipant;
+  }
+
+  public Integer getOrganisationUnitId() {
+    return organisationUnitId;
+  }
+
+  public void setOrganisationUnitId(Integer organisationUnitId) {
+    this.organisationUnitId = organisationUnitId;
   }
 }

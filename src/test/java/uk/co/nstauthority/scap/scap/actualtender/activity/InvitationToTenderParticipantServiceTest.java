@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,9 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.fivium.energyportalapi.generated.types.OrganisationUnit;
+import uk.co.nstauthority.scap.energyportal.OrganisationUnitService;
+import uk.co.nstauthority.scap.fds.searchselector.ManualEntryUtil;
 
 @ExtendWith(MockitoExtension.class)
 class InvitationToTenderParticipantServiceTest {
@@ -25,6 +29,9 @@ class InvitationToTenderParticipantServiceTest {
 
   @Mock
   Clock clock;
+
+  @Mock
+  OrganisationUnitService organisationUnitService;
 
   @InjectMocks
   InvitationToTenderParticipantService invitationToTenderParticipantService;
@@ -136,35 +143,59 @@ class InvitationToTenderParticipantServiceTest {
         .withActualTenderActivity(actualTenderActivity)
         .withCompanyName("existing company name")
         .build();
+    var keptParticipantFromPortal = new InvitationToTenderParticipantBuilder()
+        .withActualTenderActivity(actualTenderActivity)
+        .withCompanyName("kept EPA org unit name")
+        .withOrganisationUnitId(17)
+        .build();
     var removedParticipant = new InvitationToTenderParticipantBuilder()
         .withActualTenderActivity(actualTenderActivity)
         .withCompanyName("removed company name")
         .build();
+    var removedParticipantFromPortal = new InvitationToTenderParticipantBuilder()
+        .withActualTenderActivity(actualTenderActivity)
+        .withCompanyName("removed company name")
+        .withOrganisationUnitId(1)
+        .build();
     var addedParticipantName = "new company name";
+    var addedOrganisationUnitId = 5;
+    var addedOrganisation = OrganisationUnit.newBuilder()
+        .organisationUnitId(addedOrganisationUnitId)
+        .name("portal company name")
+        .build();
 
     var participantsFromForm = List.of(
-        keptParticipant.getCompanyName(),
-        addedParticipantName
+        ManualEntryUtil.addFreeTextPrefix(keptParticipant.getCompanyName()),
+        String.valueOf(keptParticipantFromPortal.getOrganisationUnitId()),
+        ManualEntryUtil.addFreeTextPrefix(addedParticipantName),
+        String.valueOf(addedOrganisationUnitId)
     );
     var currentInstant = Instant.now();
 
     when(clock.instant()).thenReturn(currentInstant);
     when(invitationToTenderParticipantRepository.findAllByActualTenderActivity(actualTenderActivity))
-        .thenReturn(List.of(keptParticipant, removedParticipant));
+        .thenReturn(List.of(keptParticipant, keptParticipantFromPortal, removedParticipant, removedParticipantFromPortal));
+    when(organisationUnitService.findAllByIds(
+        Collections.singletonList(addedOrganisationUnitId),
+        InvitationToTenderParticipantService.ORGANISATION_UNIT_REQUEST_PURPOSE))
+        .thenReturn(Collections.singletonList(addedOrganisation));
 
     invitationToTenderParticipantService.updateInvitationToTenderParticipants(actualTenderActivity, participantsFromForm);
 
     verify(invitationToTenderParticipantRepository).saveAll(participantSetArgumentCaptor.capture());
     verify(invitationToTenderParticipantRepository).deleteAll(participantSetArgumentCaptor2.capture());
 
-    assertThat(participantSetArgumentCaptor2.getValue()).containsExactly(
-        removedParticipant
+    assertThat(participantSetArgumentCaptor2.getValue()).containsExactlyInAnyOrder(
+        removedParticipant,
+        removedParticipantFromPortal
     );
     assertThat(participantSetArgumentCaptor.getValue()).extracting(
         InvitationToTenderParticipant::getCompanyName,
-        InvitationToTenderParticipant::getCreatedTimestamp
-    ).containsExactly(
-        tuple(addedParticipantName, currentInstant)
+        InvitationToTenderParticipant::getCreatedTimestamp,
+        InvitationToTenderParticipant::getOrganisationUnitId
+    ).containsExactlyInAnyOrder(
+        tuple(addedParticipantName, currentInstant, null),
+        tuple(addedOrganisation.getName(), currentInstant, addedOrganisationUnitId)
     );
   }
 }
