@@ -18,6 +18,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
+import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.util.DeletionSuccessBannerUtil;
@@ -58,11 +59,14 @@ public class ScapDeletionController {
   ModelAndView deleteScap(@PathVariable("scapId") ScapId scapId,
                           RedirectAttributes redirectAttributes) {
     var reference = scapService.getScapById(scapId).getReference();
-    scapDetailService.deleteScapById(scapId);
+    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
+    scapDetailService.deleteScapDetail(scapDetail);
 
     var successMessage = "%s deleted successfully".formatted(reference);
     DeletionSuccessBannerUtil.addRedirectionNotification(redirectAttributes, successMessage);
-
+    if (scapDetail.getVersionNumber() > 1) {
+      return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
+    }
     return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(null));
   }
 }

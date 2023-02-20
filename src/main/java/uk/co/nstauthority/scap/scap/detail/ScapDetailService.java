@@ -33,7 +33,7 @@ public class ScapDetailService {
 
   @Transactional
   public void createDraftScapDetail(Scap scap) {
-    var latestScapDetail = getLatestScapDetailByScap(scap);
+    var latestScapDetail = findLatestByScapIdAndStatus(scap.getScapId(), SUBMITTED);
     var versionNumber = latestScapDetail.map(ScapDetail::getVersionNumber).orElse(0) + 1;
 
     var isLatestScapDetail = true;
@@ -78,6 +78,15 @@ public class ScapDetailService {
 
   public Optional<ScapDetail> findLatestByScapIdAndStatus(ScapId scapId, ScapDetailStatus status) {
     return scapDetailRepository.findFirstByScapIdAndStatusOrderByVersionNumberDesc(scapId.scapId(), status);
+  }
+
+  public ScapDetail getLatestByScapIdAndStatus(ScapId scapId, ScapDetailStatus status) {
+    return findLatestByScapIdAndStatus(scapId, status).orElseThrow(
+        () -> new ScapEntityNotFoundException(
+            String.format("Could not find a ScapDetail for Scap with ID: [%d] in status: %s",
+                scapId.scapId(),
+                status.getEnumName())
+        ));
   }
 
   public ScapDetail getLatestScapDetailByScapIdOrThrow(ScapId scapId) {
@@ -167,17 +176,21 @@ public class ScapDetailService {
 
   @Transactional
   public void deleteScapById(ScapId scapId) {
-    var scapDetail = getLatestScapDetailByScapIdOrThrow(scapId);
+    var scapDetail = getLatestByScapIdAndStatus(scapId, DRAFT);
+    deleteScapDetail(scapDetail);
+  }
+
+  @Transactional
+  public void deleteScapDetail(ScapDetail scapDetail) {
     if (scapDetail.getVersionNumber() != 1) {
       var previousVersion = scapDetail.getVersionNumber() - 1;
-      findByScapIdAndVersionNumber(scapId, previousVersion)
+      findByScapIdAndVersionNumber(scapDetail.getScap().getScapId(), previousVersion)
           .ifPresent(previousScapDetail -> {
             previousScapDetail.setTipFlag(true);
             scapDetailRepository.save(previousScapDetail);
           });
     }
 
-    scapDetail.setVersionNumber(-1);
     scapDetail.setTipFlag(false);
     scapDetail.setStatus(ScapDetailStatus.DELETED);
 

@@ -30,6 +30,7 @@ import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentForm;
 import uk.co.nstauthority.scap.scap.casemanagement.update.ScapUpdateController;
 import uk.co.nstauthority.scap.scap.casemanagement.withdraw.ScapWithdrawController;
 import uk.co.nstauthority.scap.scap.casemanagement.withdraw.ScapWithdrawalForm;
+import uk.co.nstauthority.scap.scap.delete.ScapDeletionController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
@@ -143,7 +144,9 @@ public class ScapSummaryModelAndViewGenerator {
           .addObject("updateScapUrl", ReverseRouter.route(
               on(ScapUpdateController.class).startScapUpdate(scapDetail.getScap().getScapId(), CaseEventAction.UPDATE)))
           .addObject("applicableActions", applicableActions)
-          .addObject("updateInProgress", updateInProgress);
+          .addObject("updateInProgress", updateInProgress)
+          .addObject("deleteScapUrl", ReverseRouter.route(
+              on(ScapDeletionController.class).renderScapDeletionConfirmation(scapDetail.getScap().getScapId())));
 
 
       addCaseEventTimeline(modelAndView);

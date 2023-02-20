@@ -58,8 +58,10 @@ backLinkUrl=springUrl(backLinkUrl)
   <@fdsForm.htmlForm springUrl(updateScapUrl)>
     <#if updateInProgress>
       <@fdsAction.button buttonText="Resume SCAP update"/>
+      <@fdsAction.link linkText="Delete draft update" linkUrl=springUrl(deleteScapUrl) linkClass="govuk-button govuk-button--secondary" role=true />
     <#else>
       <@fdsAction.button buttonText="Update SCAP"/>
     </#if>
   </@fdsForm.htmlForm>
+
 </#macro>

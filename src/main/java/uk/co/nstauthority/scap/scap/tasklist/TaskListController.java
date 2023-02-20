@@ -14,6 +14,7 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.delete.ScapDeletionController;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.util.TaskListSectionUtil;
@@ -30,15 +31,21 @@ public class TaskListController {
   private final List<ScapTaskListSection> scapTaskListSections;
   private final List<ScapTaskListItem> scapTaskListItems;
 
+  private final ScapDetailService scapDetailService;
+
   @Autowired
   public TaskListController(List<ScapTaskListSection> scapTaskListSections,
-                            List<ScapTaskListItem> scapTaskListItems) {
+                            List<ScapTaskListItem> scapTaskListItems,
+                            ScapDetailService scapDetailService) {
     this.scapTaskListSections = scapTaskListSections;
     this.scapTaskListItems = scapTaskListItems;
+    this.scapDetailService = scapDetailService;
   }
 
   @GetMapping
   public ModelAndView renderTaskList(@PathVariable("scapId") ScapId scapId) {
+    var deleteActionText = scapDetailService.isUpdateInProgress(scapId) ? "Delete draft update" : "Delete SCAP";
+
     return new ModelAndView("scap/scap/taskList")
         .addObject("backLinkUrl", WORK_AREA_URL)
         .addObject("taskListSections",
@@ -46,6 +53,7 @@ public class TaskListController {
                 scapTaskListItems,
                 scapId.scapId()))
         .addObject("deleteScapUrl",
-            ReverseRouter.route(on(ScapDeletionController.class).renderScapDeletionConfirmation(scapId)));
+            ReverseRouter.route(on(ScapDeletionController.class).renderScapDeletionConfirmation(scapId)))
+        .addObject("deleteActionText", deleteActionText);
   }
 }

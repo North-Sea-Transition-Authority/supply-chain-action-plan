@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.delete;
 
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -20,6 +21,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
@@ -47,13 +50,30 @@ class ScapDeletionControllerTest extends AbstractScapSubmitterControllerTest {
   }
 
   @Test
-  void deleteScap() throws Exception {
+  void deleteScap_firstDraft() throws Exception {
+    var scapDetail = new ScapDetail();
+    scapDetail.setVersionNumber(1);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
     mockMvc.perform(
         post(ReverseRouter.route(on(ScapDeletionController.class).deleteScap(SCAP_ID, null)))
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl(ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null))));
 
-    verify(scapDetailService).deleteScapById(SCAP_ID);
+    verify(scapDetailService).deleteScapDetail(scapDetail);
+  }
+
+  @Test
+  void deleteScap_draftUpdate() throws Exception {
+    var scapDetail = new ScapDetail();
+    scapDetail.setVersionNumber(2);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    mockMvc.perform(
+            post(ReverseRouter.route(on(ScapDeletionController.class).deleteScap(SCAP_ID, null)))
+                .with(csrf()))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl(ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID))));
+
+    verify(scapDetailService).deleteScapDetail(scapDetail);
   }
 }

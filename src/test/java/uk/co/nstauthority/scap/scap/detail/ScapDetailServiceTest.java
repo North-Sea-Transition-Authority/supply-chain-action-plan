@@ -86,7 +86,7 @@ class ScapDetailServiceTest {
     var scapDetail = new ScapDetail(scap, 1, true, SUBMITTED, EntityTestingUtil.dateToInstant(2000, 4, 23), getUserDetail().getWebUserAccountId().toInt());
 
     when(userDetailService.getUserDetail()).thenReturn(getUserDetail());
-    when(scapDetailRepository.findAllByScap(scap)).thenReturn(List.of(scapDetail));
+    when(scapDetailRepository.findFirstByScapIdAndStatusOrderByVersionNumberDesc(SCAP_ID, SUBMITTED)).thenReturn(Optional.of(scapDetail));
 
     scapDetailService.createDraftScapDetail(scap);
 
@@ -193,20 +193,17 @@ class ScapDetailServiceTest {
 
   @Test
   void getLatestScapDetailByScapIdAndStatus_NotFound_Throws() {
-    when(scapDetailRepository.findFirstByScapIdAndTipFlagAndStatus(scap.getId(), true, SUBMITTED))
-        .thenReturn(Optional.empty());
-
-    assertThatThrownBy(() -> scapDetailService.getLatestSubmittedScapDetail(scap.getScapId()))
+    assertThatThrownBy(() -> scapDetailService.getLatestByScapIdAndStatus(scap.getScapId(), SUBMITTED))
         .isInstanceOf(ScapEntityNotFoundException.class);
   }
 
   @Test
   void getLatestScapDetailByScapIdAndStatus_Found_Returns() {
     var scapDetail = new ScapDetail();
-    when(scapDetailRepository.findFirstByScapIdAndTipFlagAndStatus(scap.getId(), true, SUBMITTED))
+    when(scapDetailRepository.findFirstByScapIdAndStatusOrderByVersionNumberDesc(scap.getId(), SUBMITTED))
         .thenReturn(Optional.of(scapDetail));
 
-    assertThat(scapDetailService.getLatestSubmittedScapDetail(scap.getScapId())).isEqualTo(scapDetail);
+    assertThat(scapDetailService.getLatestByScapIdAndStatus(scap.getScapId(), SUBMITTED)).isEqualTo(scapDetail);
   }
 
   @Test
@@ -439,8 +436,9 @@ class ScapDetailServiceTest {
     var latestScapDetail = mock(ScapDetail.class);
     var previousScapDetail = mock(ScapDetail.class);
 
-    doReturn(Optional.of(latestScapDetail)).when(scapDetailRepository).findFirstByScapIdAndTipFlag(scap.getId(), true);
+    doReturn(Optional.of(latestScapDetail)).when(scapDetailRepository).findFirstByScapIdAndStatusOrderByVersionNumberDesc(scap.getId(), DRAFT);
     doReturn(versionNumber).when(latestScapDetail).getVersionNumber();
+    doReturn(new Scap(1000)).when(latestScapDetail).getScap();
     doReturn(Optional.of(previousScapDetail)).when(scapDetailRepository).findByScapIdAndVersionNumber(scap.getId(), versionNumber - 1);
 
     scapDetailService.deleteScapById(scap.getScapId());
@@ -448,7 +446,6 @@ class ScapDetailServiceTest {
     verify(previousScapDetail).setTipFlag(true);
     verify(scapDetailRepository).save(previousScapDetail);
 
-    verify(latestScapDetail).setVersionNumber(-1);
     verify(latestScapDetail).setTipFlag(false);
     verify(latestScapDetail).setStatus(ScapDetailStatus.DELETED);
     verify(scapDetailRepository).save(latestScapDetail);
@@ -459,12 +456,11 @@ class ScapDetailServiceTest {
     var versionNumber = 1;
     var latestScapDetail = mock(ScapDetail.class);
 
-    doReturn(Optional.of(latestScapDetail)).when(scapDetailRepository).findFirstByScapIdAndTipFlag(scap.getId(), true);
+    doReturn(Optional.of(latestScapDetail)).when(scapDetailRepository).findFirstByScapIdAndStatusOrderByVersionNumberDesc(scap.getId(), DRAFT);
     doReturn(versionNumber).when(latestScapDetail).getVersionNumber();
 
     scapDetailService.deleteScapById(scap.getScapId());
 
-    verify(latestScapDetail).setVersionNumber(-1);
     verify(latestScapDetail).setTipFlag(false);
     verify(latestScapDetail).setStatus(ScapDetailStatus.DELETED);
     verify(scapDetailRepository, never()).findByScapIdAndVersionNumber(any(), any());
