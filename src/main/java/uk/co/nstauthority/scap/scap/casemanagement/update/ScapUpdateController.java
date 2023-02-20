@@ -22,7 +22,7 @@ import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 @Controller
 @RequestMapping("{scapId}/")
 @PermissionsRequired(permissions = RolePermission.SUBMIT_SCAP)
-@ScapHasStatus(permittedStatuses = {ScapDetailStatus.SUBMITTED, ScapDetailStatus.DRAFT})
+@ScapHasStatus(permittedStatuses = {ScapDetailStatus.SUBMITTED, ScapDetailStatus.APPROVED, ScapDetailStatus.DRAFT})
 public class ScapUpdateController {
 
   private final ScapDetailService scapDetailService;
