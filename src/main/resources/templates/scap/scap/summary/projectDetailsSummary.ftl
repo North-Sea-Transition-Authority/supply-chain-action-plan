@@ -12,7 +12,7 @@
     <@fdsSummaryList.summaryListRowNoAction keyText="Project types">
       <ul class="govuk-list">
         <#list projectDetailsView.projectTypes() as projectType>
-          <p>${projectType.displayName}</p>
+          <li>${projectType.displayName}</li>
         </#list>
       </ul>
     </@fdsSummaryList.summaryListRowNoAction>
@@ -42,7 +42,7 @@
       <@fdsSummaryList.summaryListRowNoAction keyText="Related installations and subsea infrastructure">
         <ul class="govuk-list">
           <#list projectDetailsView.projectFacilities() as projectFacility>
-            <p>${projectFacility}</p>
+            <li>${projectFacility}</li>
           </#list>
         </ul>
       </@fdsSummaryList.summaryListRowNoAction>
