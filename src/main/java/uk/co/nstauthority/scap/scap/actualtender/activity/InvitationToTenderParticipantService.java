@@ -90,8 +90,9 @@ public class InvitationToTenderParticipantService {
     var newCompanyIds = partitionedParticipants.ids()
         .stream()
         .filter(companyIdFromForm -> !existingCompanyIds.contains(companyIdFromForm))
-        .toList();
-    var organisationUnits = organisationUnitService.findAllByIds(newCompanyIds, ORGANISATION_UNIT_REQUEST_PURPOSE);
+        .collect(Collectors.toSet());
+    var organisationUnits = organisationUnitService
+        .findAllByIds(newCompanyIds.stream().toList(), ORGANISATION_UNIT_REQUEST_PURPOSE);
     var addedIttParticipantsFromEpa = organisationUnits.stream()
         .map(organisationUnit -> {
           var newParticipant = new InvitationToTenderParticipant(
