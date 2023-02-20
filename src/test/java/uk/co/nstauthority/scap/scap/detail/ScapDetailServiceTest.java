@@ -12,6 +12,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.APPROVED;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.DRAFT;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.SUBMITTED;
 
@@ -86,6 +87,7 @@ class ScapDetailServiceTest {
     var scapDetail = new ScapDetail(scap, 1, true, SUBMITTED, EntityTestingUtil.dateToInstant(2000, 4, 23), getUserDetail().getWebUserAccountId().toInt());
 
     when(userDetailService.getUserDetail()).thenReturn(getUserDetail());
+    when(scapDetailRepository.findFirstByScapIdAndStatusOrderByVersionNumberDesc(SCAP_ID, APPROVED)).thenReturn(Optional.empty());
     when(scapDetailRepository.findFirstByScapIdAndStatusOrderByVersionNumberDesc(SCAP_ID, SUBMITTED)).thenReturn(Optional.of(scapDetail));
 
     scapDetailService.createDraftScapDetail(scap);
@@ -102,6 +104,30 @@ class ScapDetailServiceTest {
             ScapDetail::getCreatedByUserId)
         .containsExactly(
             tuple(false, scap, SUBMITTED, 1, getUserDetail().getWebUserAccountId().toInt()),
+            tuple(true, scap, DRAFT, 2, getUserDetail().getWebUserAccountId().toInt()));
+  }
+
+  @Test
+  void createDraftScapDetail_updateSavesNewTipFlagOnApproved() {
+    var scapDetail = new ScapDetail(scap, 1, true, APPROVED, EntityTestingUtil.dateToInstant(2000, 4, 23), getUserDetail().getWebUserAccountId().toInt());
+
+    when(userDetailService.getUserDetail()).thenReturn(getUserDetail());
+    when(scapDetailRepository.findFirstByScapIdAndStatusOrderByVersionNumberDesc(SCAP_ID, APPROVED)).thenReturn(Optional.of(scapDetail));
+
+    scapDetailService.createDraftScapDetail(scap);
+
+    var argumentCaptor = ArgumentCaptor.forClass(ScapDetail.class);
+    verify(scapDetailRepository, times(2)).save(argumentCaptor.capture());
+    verify(scapDetailRepository, never()).findFirstByScapIdAndStatusOrderByVersionNumberDesc(SCAP_ID, SUBMITTED);
+    assertThat(argumentCaptor.getAllValues())
+        .extracting(
+            ScapDetail::getTipFlag,
+            ScapDetail::getScap,
+            ScapDetail::getStatus,
+            ScapDetail::getVersionNumber,
+            ScapDetail::getCreatedByUserId)
+        .containsExactly(
+            tuple(false, scap, APPROVED, 1, getUserDetail().getWebUserAccountId().toInt()),
             tuple(true, scap, DRAFT, 2, getUserDetail().getWebUserAccountId().toInt()));
   }
 

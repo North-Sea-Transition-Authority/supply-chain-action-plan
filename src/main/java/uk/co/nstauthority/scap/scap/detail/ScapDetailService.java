@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.scap.detail;
 
+import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.APPROVED;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.DRAFT;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.SUBMITTED;
 
@@ -33,7 +34,10 @@ public class ScapDetailService {
 
   @Transactional
   public void createDraftScapDetail(Scap scap) {
-    var latestScapDetail = findLatestByScapIdAndStatus(scap.getScapId(), SUBMITTED);
+    var latestScapDetail = findLatestByScapIdAndStatus(scap.getScapId(), APPROVED);
+    if (latestScapDetail.isEmpty()) {
+      latestScapDetail = findLatestByScapIdAndStatus(scap.getScapId(), SUBMITTED);
+    }
     var versionNumber = latestScapDetail.map(ScapDetail::getVersionNumber).orElse(0) + 1;
 
     var isLatestScapDetail = true;

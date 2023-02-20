@@ -70,7 +70,7 @@ class ScapUpdateControllerTest extends AbstractControllerTest {
   @ParameterizedTest
   @EnumSource(
       value = ScapDetailStatus.class,
-      names = {"DRAFT", "SUBMITTED"},
+      names = {"DRAFT", "SUBMITTED", "APPROVED"},
       mode = EnumSource.Mode.EXCLUDE)
   void updateScap_NotInState_Throws(ScapDetailStatus status) throws Exception {
     scapDetail.setStatus(status);
