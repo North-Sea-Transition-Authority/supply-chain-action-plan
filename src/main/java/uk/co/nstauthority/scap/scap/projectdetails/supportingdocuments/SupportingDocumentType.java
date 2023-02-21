@@ -2,5 +2,6 @@ package uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments;
 
 public enum SupportingDocumentType {
   ADDITIONAL_DOCUMENT,
-  CONSULTATION_REPORT
+  CONSULTATION_REPORT,
+  APPROVAL_DOCUMENT
 }

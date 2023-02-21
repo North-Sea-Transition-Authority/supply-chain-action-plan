@@ -78,11 +78,13 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
 
   private ScapDetail scapDetail;
 
-  private Scap scap = new Scap();
+  private Scap scap = new Scap(SCAP_ID);
 
   @BeforeEach
   void setup() {
     scapDetail = getScapDetail();
+    when(supportingDocumentService.buildFileUploadTemplate(SCAP_ID, SupportingDocumentType.APPROVAL_DOCUMENT))
+        .thenReturn(new FileUploadTemplate("TEST", "TEST", "TEST", "100", ".xml"));
     when(supportingDocumentService.buildFileUploadTemplate(SCAP_ID, SupportingDocumentType.CONSULTATION_REPORT))
         .thenReturn(new FileUploadTemplate("TEST", "TEST", "TEST", "100", ".xml"));
     when(userDetailService.getUserDetail()).thenReturn(testUser);
@@ -156,7 +158,6 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
     scapDetail.setVersionNumber(1);
     scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
 
-    var scap = new Scap();
     scap.setOrganisationGroupId(ORG_GROUP_ID);
     scapDetail.setScap(scap);
 

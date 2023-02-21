@@ -3,14 +3,16 @@ package uk.co.nstauthority.scap.scap.summary;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.APPROVAL_DOCUMENT;
+import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.CONSULTATION_REPORT;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.error.exception.IllegalUtilClassInstantiationException;
 import uk.co.nstauthority.scap.file.FileUploadForm;
-import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
@@ -32,6 +34,7 @@ import uk.co.nstauthority.scap.scap.casemanagement.withdraw.ScapWithdrawControll
 import uk.co.nstauthority.scap.scap.casemanagement.withdraw.ScapWithdrawalForm;
 import uk.co.nstauthority.scap.scap.delete.ScapDeletionController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 public class ScapSummaryModelAndViewGenerator {
@@ -42,8 +45,8 @@ public class ScapSummaryModelAndViewGenerator {
 
   public static Generator generator(ScapDetail scapDetail,
                                     ScapSummaryView scapSummaryView,
-                                    FileUploadTemplate fileUploadTemplate) {
-    return new Generator(scapDetail, scapSummaryView, fileUploadTemplate);
+                                    SupportingDocumentService supportingDocumentService) {
+    return new Generator(scapDetail, scapSummaryView, supportingDocumentService);
   }
 
   public static class Generator {
@@ -52,6 +55,7 @@ public class ScapSummaryModelAndViewGenerator {
     private Set<CaseEventSubject> applicableActions = emptySet();
     private OrganisationGroup orgGroup;
     private boolean updateInProgress = false;
+    private final SupportingDocumentService supportingDocumentService;
     private ScapSubmissionStage scapStatus = ScapSubmissionStage.DRAFT;
     private List<CaseEventView> caseEventTimeline = emptyList();
     private FurtherInfoRequestForm furtherInfoRequestForm = new FurtherInfoRequestForm();
@@ -60,16 +64,16 @@ public class ScapSummaryModelAndViewGenerator {
     private FurtherInfoResponseForm furtherInfoResponseForm = new FurtherInfoResponseForm();
     private ScapApprovalForm scapApprovalForm = new ScapApprovalForm();
     private ConsultationResponseForm consultationResponseForm = new ConsultationResponseForm();
-    private FileUploadTemplate fileUploadTemplate = null;
-    private List<FileUploadForm> existingFiles = null;
     private ScapWithdrawalForm scapWithdrawalForm = new ScapWithdrawalForm();
+
+    private List<FileUploadForm> existingApprovalFiles = new ArrayList<>();
 
     public Generator(ScapDetail scapDetail,
                      ScapSummaryView scapSummary,
-                     FileUploadTemplate fileUploadTemplate) {
+                     SupportingDocumentService supportingDocumentService) {
       this.scapDetail = scapDetail;
       this.scapSummary = scapSummary;
-      this.fileUploadTemplate = fileUploadTemplate;
+      this.supportingDocumentService = supportingDocumentService;
     }
 
     public Generator withOrgGroup(OrganisationGroup organisationGroup) {
@@ -119,6 +123,11 @@ public class ScapSummaryModelAndViewGenerator {
 
     public Generator withScapApprovalForm(ScapApprovalForm scapApprovalForm) {
       this.scapApprovalForm = scapApprovalForm;
+      return this;
+    }
+
+    public Generator withScapApprovalDocuments(List<FileUploadForm> existingApprovalFiles) {
+      this.existingApprovalFiles = existingApprovalFiles;
       return this;
     }
 
@@ -210,8 +219,7 @@ public class ScapSummaryModelAndViewGenerator {
     }
 
     private void addConsultationResponseForm(ModelAndView modelAndView) {
-      consultationResponseForm.setSupportingDocuments(existingFiles);
-      modelAndView.addObject("form", consultationResponseForm);
+      modelAndView.addObject("consultationResponseForm", consultationResponseForm);
       modelAndView.addObject("consultationResponseSubmitUrl",
           ReverseRouter.route(on(ConsultationResponseController.class)
               .saveConsultationResponseForm(scapDetail.getScap().getScapId(),
@@ -219,12 +227,14 @@ public class ScapSummaryModelAndViewGenerator {
                   true,
                   null,
                   null)));
-      modelAndView.addObject("supportingDocumentsTemplate", fileUploadTemplate);
+      modelAndView.addObject("supportingDocumentsTemplate",
+          supportingDocumentService.buildFileUploadTemplate(scapDetail.getScap().getScapId(), CONSULTATION_REPORT));
     }
 
     private void addScapApprovalRequestForm(ModelAndView modelAndView) {
       modelAndView.addObject("scapApprovalForm", scapApprovalForm);
       modelAndView.addObject("projectClosedOut", scapSummary.projectPerformanceSummaryView().isProjectCompleted());
+      modelAndView.addObject("approvalDocumentUploads", existingApprovalFiles);
       modelAndView.addObject("approvalFormSubmitUrl",
           ReverseRouter.route(on(ScapApprovalController.class)
               .saveScapApprovalForm(scapDetail.getScap().getScapId(),
@@ -232,6 +242,8 @@ public class ScapSummaryModelAndViewGenerator {
                   true,
                   null,
                   null)));
+      modelAndView.addObject("approvalDocumentsTemplate",
+          supportingDocumentService.buildFileUploadTemplate(scapDetail.getScap().getScapId(), APPROVAL_DOCUMENT));
     }
 
     private void addWithdrawForm(ModelAndView modelAndView) {

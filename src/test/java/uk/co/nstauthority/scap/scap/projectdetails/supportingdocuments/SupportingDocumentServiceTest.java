@@ -183,10 +183,10 @@ class SupportingDocumentServiceTest {
         scapId, supportingDocumentType);
 
     verify(fileUploadService).buildFileUploadTemplate(
-        ReverseRouter.route(on(ConsultationDocumentsController.class).download(scapId, null)),
-        ReverseRouter.route(on(ConsultationDocumentsController.class)
-            .upload(scapId, null)),
-        ReverseRouter.route(on(ConsultationDocumentsController.class).delete(scapId, null))
+        ReverseRouter.route(on(CaseEventsDocumentController.class).download(scapId, null)),
+        ReverseRouter.route(on(CaseEventsDocumentController.class)
+            .upload(scapId, supportingDocumentType, null)),
+        ReverseRouter.route(on(CaseEventsDocumentController.class).delete(scapId, null))
     );
   }
 

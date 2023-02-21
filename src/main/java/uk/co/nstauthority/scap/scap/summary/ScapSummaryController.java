@@ -1,8 +1,6 @@
 package uk.co.nstauthority.scap.scap.summary;
 
 
-import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.CONSULTATION_REPORT;
-
 import java.util.Collections;
 import java.util.List;
 import org.springframework.stereotype.Controller;
@@ -72,7 +70,7 @@ public class ScapSummaryController {
     var generator = ScapSummaryModelAndViewGenerator.generator(
                 scapDetail,
                 scapSummary,
-                supportingDocumentService.buildFileUploadTemplate(scapId, CONSULTATION_REPORT))
+                supportingDocumentService)
         .withScapStatus(scapSummaryViewService.inferSubmissionStatusFromSummary(scapSummary))
         .withCaseEventTimeline(getCaseEventView(scapId))
         .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))

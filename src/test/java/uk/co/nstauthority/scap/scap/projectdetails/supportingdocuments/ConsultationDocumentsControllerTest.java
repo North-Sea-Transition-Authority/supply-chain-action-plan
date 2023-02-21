@@ -31,7 +31,7 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 
-@ContextConfiguration(classes = ConsultationDocumentsController.class)
+@ContextConfiguration(classes = CaseEventsDocumentController.class)
 class ConsultationDocumentsControllerTest extends AbstractScapSubmitterControllerTest {
 
   private static final ServiceUserDetail USER = ServiceUserDetailTestUtil.Builder().build();
@@ -63,7 +63,7 @@ class ConsultationDocumentsControllerTest extends AbstractScapSubmitterControlle
 
     MockMultipartFile mockMultipartFile = new MockMultipartFile("file", (byte[]) null);
     mockMvc.perform(multipart(ReverseRouter.route(
-            on(ConsultationDocumentsController.class).upload(SCAP_ID, null)))
+            on(CaseEventsDocumentController.class).upload(SCAP_ID, supportingDocumentType, null)))
             .file(mockMultipartFile)
             .with(user(USER))
             .with(csrf()))
@@ -81,7 +81,7 @@ class ConsultationDocumentsControllerTest extends AbstractScapSubmitterControlle
 
     var response = mockMvc.perform(
             get(ReverseRouter.route(
-                on(ConsultationDocumentsController.class).download(SCAP_ID, uploadedFile.getId())))
+                on(CaseEventsDocumentController.class).download(SCAP_ID, uploadedFile.getId())))
                 .with(user(USER)))
         .andExpect(status().isOk())
         .andReturn().getResponse();
@@ -104,7 +104,7 @@ class ConsultationDocumentsControllerTest extends AbstractScapSubmitterControlle
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
 
     mockMvc.perform(post(
-            ReverseRouter.route(on(ConsultationDocumentsController.class).delete(SCAP_ID, uploadedFile.getId())))
+            ReverseRouter.route(on(CaseEventsDocumentController.class).delete(SCAP_ID, uploadedFile.getId())))
             .with(user(USER))
             .with(csrf()))
         .andExpect(status().isOk());

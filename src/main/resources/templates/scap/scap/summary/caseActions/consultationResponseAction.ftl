@@ -1,7 +1,7 @@
 <@fdsSlideOutPanel.slideOutPanel panelId="Consultation-Response-Panel" headingText="Consultation response">
     <@fdsForm.htmlForm actionUrl=springUrl(consultationResponseSubmitUrl)>
         <@fdsTextarea.textarea
-        path="form.responseComments.inputValue"
+        path="consultationResponseForm.responseComments.inputValue"
         optionalLabel=false
         labelText="Comments"/>
 
@@ -13,7 +13,8 @@
         >
             <@fdsFileUpload.fileUpload
             id="supportingDocuments"
-            path="form.supportingDocuments"
+            formName="consultationResponseForm"
+            path="consultationResponseForm.supportingDocuments"
             downloadUrl=supportingDocumentsTemplate.downloadUrl()
             uploadUrl=supportingDocumentsTemplate.uploadUrl()
             deleteUrl=supportingDocumentsTemplate.deleteUrl()

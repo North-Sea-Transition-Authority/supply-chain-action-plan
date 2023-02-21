@@ -1,7 +1,6 @@
 package uk.co.nstauthority.scap.scap.casemanagement.furtherinfo;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.CONSULTATION_REPORT;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -83,7 +82,7 @@ public class FurtherInfoController {
     var generator = ScapSummaryModelAndViewGenerator.generator(
                 scapDetail,
                 scapSummary,
-                supportingDocumentService.buildFileUploadTemplate(scapId, CONSULTATION_REPORT))
+                supportingDocumentService)
         .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
         .withFurtherInfoRequestFrom(infoRequestForm)
         .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));

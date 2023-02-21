@@ -83,6 +83,8 @@ class ScapWithdrawControllerTest extends AbstractControllerTest {
 
     when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
+    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.APPROVAL_DOCUMENT)))
+        .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
     when(scapService.getScapById(anyInt())).thenReturn(scap);
@@ -150,7 +152,7 @@ class ScapWithdrawControllerTest extends AbstractControllerTest {
     scapDetail.setVersionNumber(1);
     scapDetail.setStatus(SUBMITTED);
 
-    var scap = new Scap();
+    var scap = new Scap(SCAP_ID);
     scap.setOrganisationGroupId(ORG_GROUP_ID);
     scapDetail.setScap(scap);
 

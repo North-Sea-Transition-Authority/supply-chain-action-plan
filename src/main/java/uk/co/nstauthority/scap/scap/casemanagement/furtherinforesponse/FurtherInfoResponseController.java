@@ -85,7 +85,7 @@ public class FurtherInfoResponseController {
     var generator =
         ScapSummaryModelAndViewGenerator.generator(scapDetail,
                 scapSummary,
-                supportingDocumentService.buildFileUploadTemplate(scapId, CONSULTATION_REPORT))
+                supportingDocumentService)
             .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
             .withFurtherInfoResponseForm(furtherInfoResponseForm)
             .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));

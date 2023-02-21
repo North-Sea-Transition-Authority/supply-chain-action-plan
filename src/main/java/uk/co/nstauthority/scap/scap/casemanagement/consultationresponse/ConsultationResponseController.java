@@ -1,7 +1,6 @@
 package uk.co.nstauthority.scap.scap.casemanagement.consultationresponse;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.CONSULTATION_REPORT;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -81,11 +80,10 @@ public class ConsultationResponseController {
         .getOrganisationGroupById(scapDetail.getScap().getOrganisationGroupId(),
             "Get Org Group for Summary of SCAP ID: %s".formatted(scapId.scapId()));
 
-    supportingDocumentService.getFileUploadFormListForScapDetailAndType(scapDetail, CONSULTATION_REPORT);
     var generator = ScapSummaryModelAndViewGenerator.generator(
             scapDetail,
             scapSummary,
-            supportingDocumentService.buildFileUploadTemplate(scapId, CONSULTATION_REPORT))
+            supportingDocumentService)
         .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
         .withConsultationResponseForm(consultationResponseForm)
         .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));

@@ -88,11 +88,11 @@ public class SupportingDocumentService {
               on(AdditionalDocumentsController.class).upload(scapDetailId, null)),
           ReverseRouter.route(on(AdditionalDocumentsController.class).delete(scapDetailId, null))
       );
-      case CONSULTATION_REPORT -> fileUploadService.buildFileUploadTemplate(
-          ReverseRouter.route(on(ConsultationDocumentsController.class).download(scapDetailId, null)),
+      case CONSULTATION_REPORT, APPROVAL_DOCUMENT -> fileUploadService.buildFileUploadTemplate(
+          ReverseRouter.route(on(CaseEventsDocumentController.class).download(scapDetailId, null)),
           ReverseRouter.route(
-              on(ConsultationDocumentsController.class).upload(scapDetailId, null)),
-          ReverseRouter.route(on(ConsultationDocumentsController.class).delete(scapDetailId, null))
+              on(CaseEventsDocumentController.class).upload(scapDetailId, supportingDocumentType, null)),
+          ReverseRouter.route(on(CaseEventsDocumentController.class).delete(scapDetailId, null))
       );
       default -> throw new ScapEntityNotFoundException("Could not find document management paths for document type");
     };

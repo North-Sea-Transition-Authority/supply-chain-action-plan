@@ -77,6 +77,8 @@ class FurtherInfoControllerTest extends AbstractControllerTest {
     var scapDetail = getScapDetail();
     when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
+    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.APPROVAL_DOCUMENT)))
+        .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
     when(scapService.getScapById(anyInt())).thenReturn(new Scap());
@@ -139,7 +141,7 @@ class FurtherInfoControllerTest extends AbstractControllerTest {
     scapDetail.setVersionNumber(1);
     scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
 
-    var scap = new Scap();
+    var scap = new Scap(SCAP_ID);
     scap.setOrganisationGroupId(ORG_GROUP_ID);
     scapDetail.setScap(scap);
 
