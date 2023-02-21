@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.nstauthority.scap.enumutil.YesNo;
+import uk.co.nstauthority.scap.file.FileUploadForm;
 import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestForm;
 import uk.co.nstauthority.scap.scap.casemanagement.furtherinfo.FurtherInfoRequestForm;
 import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentForm;
@@ -55,6 +57,7 @@ class ScapApprovalFormValidatorTest {
     input.setInputValue("This is a Test String");
     form.setApprovalComments(input);
     form.setProjectClosedOut(YesNo.YES);
+    form.setApprovalDocuments(List.of(new FileUploadForm()));
 
     bindingResult = new BeanPropertyBindingResult(form, "form");
 

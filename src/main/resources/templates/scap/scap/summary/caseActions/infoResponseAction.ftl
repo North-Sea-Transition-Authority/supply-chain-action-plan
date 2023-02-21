@@ -4,7 +4,19 @@
         path="infoResponseForm.infoResponse.inputValue"
         labelText=""
         hintText=""/>
-
+        <@fdsFileUpload.fileUpload
+        id="infoResponseDocuments"
+        formName="infoResponseForm"
+        path="infoResponseForm.infoResponseDocuments"
+        downloadUrl=furtherInfoDocumentTemplate.downloadUrl()
+        uploadUrl=furtherInfoDocumentTemplate.uploadUrl()
+        deleteUrl=furtherInfoDocumentTemplate.deleteUrl()
+        maxAllowedSize=furtherInfoDocumentTemplate.maxAllowedSize()
+        allowedExtensions=furtherInfoDocumentTemplate.allowedExtensions()
+        dropzoneLinkScreenReaderText="Choose a file to upload"
+        existingFiles=furtherInfoDocumentUploads
+        multiFile=true
+        />
         <@fdsAction.button buttonText="Update SCAP" buttonName="INFO_RESPONSE"/>
     </@fdsForm.htmlForm>
 </@fdsSlideOutPanel.slideOutPanel>

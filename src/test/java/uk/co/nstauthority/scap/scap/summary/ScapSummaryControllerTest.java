@@ -87,7 +87,8 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.APPROVAL_DOCUMENT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
-
+    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.FURTHER_INFORMATION)))
+        .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
   }
 
   @Test

@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.casemanagement.furtherinforesponse;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.CONSULTATION_REPORT;
+import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.FURTHER_INFORMATION;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -80,6 +81,10 @@ public class FurtherInfoResponseController {
     var orgGroup = organisationGroupService
         .getOrganisationGroupById(scapDetail.getScap().getOrganisationGroupId(),
             "Get Org Group for Summary of SCAP ID: %s".formatted(scapId.scapId()));
+
+    var existingFiles = supportingDocumentService.getFileUploadFormListForScapDetailAndType(
+        scapDetail,
+        FURTHER_INFORMATION);
 
     supportingDocumentService.getFileUploadFormListForScapDetailAndType(scapDetail, CONSULTATION_REPORT);
     var generator =

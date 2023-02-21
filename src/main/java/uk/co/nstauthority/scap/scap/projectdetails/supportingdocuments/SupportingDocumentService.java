@@ -88,7 +88,7 @@ public class SupportingDocumentService {
               on(AdditionalDocumentsController.class).upload(scapDetailId, null)),
           ReverseRouter.route(on(AdditionalDocumentsController.class).delete(scapDetailId, null))
       );
-      case CONSULTATION_REPORT, APPROVAL_DOCUMENT -> fileUploadService.buildFileUploadTemplate(
+      case CONSULTATION_REPORT, APPROVAL_DOCUMENT, FURTHER_INFORMATION -> fileUploadService.buildFileUploadTemplate(
           ReverseRouter.route(on(CaseEventsDocumentController.class).download(scapDetailId, null)),
           ReverseRouter.route(
               on(CaseEventsDocumentController.class).upload(scapDetailId, supportingDocumentType, null)),

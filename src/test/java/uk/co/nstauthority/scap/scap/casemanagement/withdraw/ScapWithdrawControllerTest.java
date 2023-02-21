@@ -85,6 +85,8 @@ class ScapWithdrawControllerTest extends AbstractControllerTest {
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.APPROVAL_DOCUMENT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
+    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.FURTHER_INFORMATION)))
+        .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
     when(scapService.getScapById(anyInt())).thenReturn(scap);

@@ -5,6 +5,7 @@ import static java.util.Collections.emptySet;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.APPROVAL_DOCUMENT;
 import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.CONSULTATION_REPORT;
+import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.FURTHER_INFORMATION;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,13 +60,13 @@ public class ScapSummaryModelAndViewGenerator {
     private ScapSubmissionStage scapStatus = ScapSubmissionStage.DRAFT;
     private List<CaseEventView> caseEventTimeline = emptyList();
     private FurtherInfoRequestForm furtherInfoRequestForm = new FurtherInfoRequestForm();
+    private List<FileUploadForm> existingFurtherInfoFiles;
     private QaCommentForm qaCommentForm = new QaCommentForm();
     private ConsultationRequestForm consultationRequestForm = new ConsultationRequestForm();
     private FurtherInfoResponseForm furtherInfoResponseForm = new FurtherInfoResponseForm();
     private ScapApprovalForm scapApprovalForm = new ScapApprovalForm();
     private ConsultationResponseForm consultationResponseForm = new ConsultationResponseForm();
     private ScapWithdrawalForm scapWithdrawalForm = new ScapWithdrawalForm();
-
     private List<FileUploadForm> existingApprovalFiles = new ArrayList<>();
 
     public Generator(ScapDetail scapDetail,
@@ -118,6 +119,11 @@ public class ScapSummaryModelAndViewGenerator {
 
     public Generator withFurtherInfoResponseForm(FurtherInfoResponseForm furtherInfoResponseForm) {
       this.furtherInfoResponseForm = furtherInfoResponseForm;
+      return this;
+    }
+
+    public Generator withScapFurtherInfoDocuments(List<FileUploadForm> existingFurtherInfoFiles) {
+      this.existingFurtherInfoFiles = existingFurtherInfoFiles;
       return this;
     }
 
@@ -198,6 +204,7 @@ public class ScapSummaryModelAndViewGenerator {
 
     private void addInfoResponseForm(ModelAndView modelAndView) {
       modelAndView.addObject("infoResponseForm", furtherInfoResponseForm);
+      modelAndView.addObject("furtherInfoDocumentUploads", existingFurtherInfoFiles);
       modelAndView.addObject("infoResponseSubmitUrl",
           ReverseRouter.route(on(FurtherInfoResponseController.class)
               .saveInfoResponseForm(scapDetail.getScap().getScapId(),
@@ -205,6 +212,8 @@ public class ScapSummaryModelAndViewGenerator {
                   true,
                   null,
                   null)));
+      modelAndView.addObject("furtherInfoDocumentTemplate",
+          supportingDocumentService.buildFileUploadTemplate(scapDetail.getScap().getScapId(), FURTHER_INFORMATION));
     }
 
     private void addConsultationRequestForm(ModelAndView modelAndView) {

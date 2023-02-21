@@ -84,6 +84,8 @@ class ConsultationRequestControllerTest extends AbstractControllerTest {
         .thenReturn(new FileUploadTemplate("TEST", "TEST", "TEST", "100", ".xml"));
     when(supportingDocumentService.buildFileUploadTemplate(SCAP_ID, SupportingDocumentType.CONSULTATION_REPORT))
         .thenReturn(new FileUploadTemplate("TEST", "TEST", "TEST", "100", ".xml"));
+    when(supportingDocumentService.buildFileUploadTemplate(SCAP_ID, SupportingDocumentType.FURTHER_INFORMATION))
+        .thenReturn(new FileUploadTemplate("TEST", "TEST", "TEST", "100", ".xml"));
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
     when(scapService.getScapById(anyInt())).thenReturn(new Scap());
