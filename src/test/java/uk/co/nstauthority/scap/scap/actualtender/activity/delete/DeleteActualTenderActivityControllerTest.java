@@ -73,7 +73,7 @@ class DeleteActualTenderActivityControllerTest extends AbstractScapSubmitterCont
         "test scope description",
         RemunerationModel.LUMP_SUM,
         null,
-        ContractStage.REQUEST_FOR_INFORMATION,
+        ContractStage.INVITATION_TO_TENDER_IS_LIVE,
         List.of("company name"),
         Collections.emptyList(),
         null
@@ -103,7 +103,7 @@ class DeleteActualTenderActivityControllerTest extends AbstractScapSubmitterCont
         "test scope description",
         RemunerationModel.LUMP_SUM,
         null,
-        ContractStage.REQUEST_FOR_INFORMATION,
+        ContractStage.INVITATION_TO_TENDER_IS_LIVE,
         List.of("company name"),
         Collections.emptyList(),
         null

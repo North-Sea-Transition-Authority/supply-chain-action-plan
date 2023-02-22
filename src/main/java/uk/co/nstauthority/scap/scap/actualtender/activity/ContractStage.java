@@ -5,8 +5,8 @@ import uk.co.nstauthority.scap.enumutil.Displayable;
 import uk.co.nstauthority.scap.enumutil.DisplayableEnumOptionUtil;
 
 public enum ContractStage implements Displayable {
-  REQUEST_FOR_INFORMATION("Request for information", 10),
-  INVITATION_TO_TENDER("Invitation to tender is live", 20),
+  INVITATION_TO_TENDER_IS_LIVE("Invitation to tender is live", 10),
+  BID_APPRAISAL("Bid appraisal", 20),
   CONTRACT_AWARDED("Contract has been awarded", 30);
 
 

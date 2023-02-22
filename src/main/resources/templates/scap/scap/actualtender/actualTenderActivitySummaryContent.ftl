@@ -26,7 +26,7 @@
     </#if>
   </@fdsSummaryList.summaryListRowNoAction>
   <#list actualTenderActivity.ittParticipants() as invitationToTenderParticipant>
-    <@fdsSummaryList.summaryListRowNoAction keyText="Invitation to tender participant ${invitationToTenderParticipant_index + 1}">
+    <@fdsSummaryList.summaryListRowNoAction keyText="Invitation to tender recipient ${invitationToTenderParticipant_index + 1}">
       ${invitationToTenderParticipant!""}
     </@fdsSummaryList.summaryListRowNoAction>
   </#list>

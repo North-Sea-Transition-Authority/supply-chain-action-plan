@@ -98,7 +98,7 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
     var form = new ActualTenderActivityForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     var createdTenderActivity = new ActualTenderActivity(8735);
-    createdTenderActivity.setContractStage(ContractStage.INVITATION_TO_TENDER);
+    createdTenderActivity.setContractStage(ContractStage.BID_APPRAISAL);
     var expectedRedirectUrl = ReverseRouter.route(on(BidParticipantsController.class)
         .renderBidParticipantsForm(scap.getScapId(), createdTenderActivity.getId(), null));
 
@@ -125,7 +125,7 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
     var form = new ActualTenderActivityForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     var createdTenderActivity = new ActualTenderActivity(8735);
-    createdTenderActivity.setContractStage(ContractStage.REQUEST_FOR_INFORMATION);
+    createdTenderActivity.setContractStage(ContractStage.INVITATION_TO_TENDER_IS_LIVE);
     var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderSummaryController.class)
         .renderActualTenderSummary(scap.getScapId()));
 
@@ -247,7 +247,7 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
   @Test
   void saveExistingActualTenderActivityForm_NoErrors_VerifyUpdates() throws Exception {
     var actualTenderActivity = new ActualTenderActivity(45);
-    actualTenderActivity.setContractStage(ContractStage.REQUEST_FOR_INFORMATION);
+    actualTenderActivity.setContractStage(ContractStage.INVITATION_TO_TENDER_IS_LIVE);
     var form = new ActualTenderActivityForm();
     var bindingResultWithoutErrors = new BeanPropertyBindingResult(form, "form");
     var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderSummaryController.class)

@@ -37,25 +37,26 @@ backLinkUrl=springUrl(backLinkUrl)
       </#list>
     </@fdsRadio.radioGroup>
 
+    <h2 class="govuk-heading-m">Invitation to tender recipients</h2>
+    <@fdsAddToList.addToList
+      pathForList="form.invitationToTenderParticipants"
+      pathForSelector="form.ittParticipantsSelector"
+      alreadyAdded=preselectedIttParticipants![]
+      restUrl=springUrl(organisationUnitSearchUrl)
+      itemName="Invitation to tender recipient"
+      selectorLabelText="Enter the invitation to tender recipients"
+    />
+
     <@fdsRadio.radio
       path="form.contractStage"
       labelText="Contract stage"
       radioItems=contractStages
     />
 
-    <h2 class="govuk-heading-m">Invitation to tender participants</h2>
-    <@fdsAddToList.addToList
-      pathForList="form.invitationToTenderParticipants"
-      pathForSelector="form.ittParticipantsSelector"
-      alreadyAdded=preselectedIttParticipants![]
-      restUrl=springUrl(organisationUnitSearchUrl)
-      itemName="Invitation to tender participant"
-      selectorLabelText="Enter the invitation to tender participants"
-    />
     <#if contractingPerformanceWarning?has_content>
-        <@fdsWarning.warning>
-            ${contractingPerformanceWarning}
-        </@fdsWarning.warning>
+      <@fdsWarning.warning>
+        ${contractingPerformanceWarning}
+      </@fdsWarning.warning>
     </#if>
     <@fdsAction.button buttonText="Save and continue"/>
   </@fdsForm.htmlForm>

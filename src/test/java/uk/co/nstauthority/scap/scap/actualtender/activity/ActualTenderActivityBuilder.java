@@ -12,7 +12,7 @@ public class ActualTenderActivityBuilder {
   private String scopeDescription = "Test scope description";
   private RemunerationModel remunerationModel = RemunerationModel.LUMP_SUM;
   private String remunerationModelName;
-  private ContractStage contractStage = ContractStage.REQUEST_FOR_INFORMATION;
+  private ContractStage contractStage = ContractStage.INVITATION_TO_TENDER_IS_LIVE;
   private Instant createdTimestamp = Instant.now();
 
   public ActualTenderActivityBuilder withId(Integer id) {

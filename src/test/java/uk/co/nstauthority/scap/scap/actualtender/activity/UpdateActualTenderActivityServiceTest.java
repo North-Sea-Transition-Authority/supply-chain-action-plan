@@ -40,7 +40,7 @@ class UpdateActualTenderActivityServiceTest {
 
   @Test
   void updateActualTenderActivity_RemovingAwardedContract_AssertSaveAndDelete() {
-    var form = getFilledActualTenderActivityForm(ContractStage.REQUEST_FOR_INFORMATION);
+    var form = getFilledActualTenderActivityForm(ContractStage.INVITATION_TO_TENDER_IS_LIVE);
 
     var actualTenderActivity = new ActualTenderActivity();
     actualTenderActivity.setContractStage(ContractStage.CONTRACT_AWARDED);

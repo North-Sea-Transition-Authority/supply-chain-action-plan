@@ -21,7 +21,7 @@ import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 public class ActualTenderControllerRedirectionService {
 
   private static final Set<ContractStage> BID_PARTICIPANT_ALLOWED_STAGES =
-      Set.of(ContractStage.CONTRACT_AWARDED, ContractStage.INVITATION_TO_TENDER);
+      Set.of(ContractStage.CONTRACT_AWARDED, ContractStage.BID_APPRAISAL);
 
   public ModelAndView redirectFromActualTenderActivityForm(ScapId scapId, ActualTenderActivity actualTenderDetail) {
     if (BID_PARTICIPANT_ALLOWED_STAGES.contains(actualTenderDetail.getContractStage())) {

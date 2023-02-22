@@ -48,7 +48,7 @@ class ActualTenderSummaryViewServiceTest {
     actualTenderActivity.setScopeTitle("test scope title 1");
     actualTenderActivity.setScopeDescription("test scope description 1");
     actualTenderActivity.setRemunerationModel(RemunerationModel.LUMP_SUM);
-    actualTenderActivity.setContractStage(ContractStage.REQUEST_FOR_INFORMATION);
+    actualTenderActivity.setContractStage(ContractStage.INVITATION_TO_TENDER_IS_LIVE);
     var participant = new InvitationToTenderParticipant(210);
     participant.setCompanyName("company name 1");
     participant.setActualTenderActivity(actualTenderActivity);
@@ -93,7 +93,7 @@ class ActualTenderSummaryViewServiceTest {
     actualTenderActivity1.setScopeTitle("test scope title 1");
     actualTenderActivity1.setScopeDescription("test scope description 1");
     actualTenderActivity1.setRemunerationModel(RemunerationModel.LUMP_SUM);
-    actualTenderActivity1.setContractStage(ContractStage.REQUEST_FOR_INFORMATION);
+    actualTenderActivity1.setContractStage(ContractStage.INVITATION_TO_TENDER_IS_LIVE);
     var participant1 = new InvitationToTenderParticipant(210);
     participant1.setCompanyName("company name 1");
     participant1.setActualTenderActivity(actualTenderActivity1);
@@ -103,7 +103,7 @@ class ActualTenderSummaryViewServiceTest {
     actualTenderActivity2.setScopeDescription("test scope description 2");
     actualTenderActivity2.setRemunerationModel(RemunerationModel.OTHER);
     actualTenderActivity2.setRemunerationModelName("remuneration model name");
-    actualTenderActivity2.setContractStage(ContractStage.INVITATION_TO_TENDER);
+    actualTenderActivity2.setContractStage(ContractStage.BID_APPRAISAL);
     var participant2 = new InvitationToTenderParticipant(211);
     participant2.setCompanyName("company name 2");
     participant2.setBidParticipant(true);
