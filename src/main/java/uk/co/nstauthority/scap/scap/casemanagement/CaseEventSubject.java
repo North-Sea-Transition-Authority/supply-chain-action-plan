@@ -33,7 +33,7 @@ public enum CaseEventSubject {
   UPDATE_SCAP(UPDATE,
       "SCAP UPDATE",
       null,
-      null),
+      "Update-Panel"),
   SCAP_CLOSED_OUT(
       CLOSED_OUT,
       "Project completed",

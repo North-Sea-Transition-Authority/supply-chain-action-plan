@@ -38,6 +38,7 @@ import uk.co.fivium.formlibrary.validator.date.DateUtils;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.util.DateUtil;
 import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
@@ -52,6 +53,9 @@ class CaseEventServiceTest {
 
   @Mock
   EnergyPortalUserService energyPortalUserService;
+
+  @Mock
+  TeamService teamService;
 
   @Captor
   private ArgumentCaptor<CaseEvent> timelineEventArgumentCaptor;
@@ -150,35 +154,69 @@ class CaseEventServiceTest {
   }
 
   @Test
-  void getApplicableActions_NoOutstandingRequests() {
-    var result = caseEventService.getApplicableActionsForScap(SCAP_ID);
-    assertThat(result).containsOnly(SCAP_CONSULTATION_RESPONSE,
-        SCAP_CONSULTATION_REQUESTED,
-        SCAP_WITHDRAWN,
-        FURTHER_INFO_RESPONSE,
-        SCAP_APPROVED,
-        FURTHER_INFO_REQUESTED,
-        QA_COMMENT);
+  void getApplicableActions_isRegulator() {
+    var user = ServiceUserDetailTestUtil.Builder().build();
+    when(userDetailService.getUserDetail()).thenReturn(user);
+    when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(true);
 
-    var action = result.iterator().next();
-    assertNotNull(action.getActionPanelId());
-    assertNotNull(action.getDisplayName());
-    assertNotNull(action.getButtonText());
+    var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
+
+    assertThat(actions.get("QA")).containsExactly(QA_COMMENT);
+    assertThat(actions.get("Consultations")).containsExactly(SCAP_CONSULTATION_REQUESTED, SCAP_CONSULTATION_RESPONSE);
+    assertThat(actions.get("Decisions")).containsExactly(SCAP_APPROVED, SCAP_WITHDRAWN);
+    assertThat(actions.get("Further Info")).containsExactly(FURTHER_INFO_REQUESTED);
   }
 
   @Test
-  void getApplicableActions_OutstandingRequests() {
+  void getApplicableActions_isRegulatorOutstandingResponse() {
     when(caseEventRepository.findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(SCAP_ID.scapId(),
         FURTHER_INFO_REQUESTED))
         .thenReturn(Optional.of(getRequestEvent()));
+    when(caseEventRepository.findAllByScapIdAndEventTimeAfter(SCAP_ID.scapId(),
+        getRequestEvent().getEventTime()))
+        .thenReturn(emptyList());
 
-    var result = caseEventService.getApplicableActionsForScap(SCAP_ID);
-    assertThat(result).containsOnly(SCAP_CONSULTATION_RESPONSE,
-        SCAP_CONSULTATION_REQUESTED,
-        SCAP_WITHDRAWN,
-        FURTHER_INFO_RESPONSE,
-        SCAP_APPROVED,
-        QA_COMMENT);
+    var user = ServiceUserDetailTestUtil.Builder().build();
+    when(userDetailService.getUserDetail()).thenReturn(user);
+    when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(true);
+
+    var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
+
+    assertThat(actions.get("QA")).containsExactly(QA_COMMENT);
+    assertThat(actions.get("Consultations")).containsExactly(SCAP_CONSULTATION_REQUESTED, SCAP_CONSULTATION_RESPONSE);
+    assertThat(actions.get("Decisions")).containsExactly(SCAP_APPROVED, SCAP_WITHDRAWN);
+    assertThat(actions.get("Further Info")).containsExactly(FURTHER_INFO_RESPONSE);
+  }
+
+  @Test
+  void getApplicableActions_isIndustry() {
+    var user = ServiceUserDetailTestUtil.Builder().build();
+    when(userDetailService.getUserDetail()).thenReturn(user);
+    when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(false);
+
+    var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
+
+    assertThat(actions.get("Consultations")).containsExactly(SCAP_CONSULTATION_RESPONSE);
+    assertThat(actions.get("Further Info")).isEmpty();
+  }
+
+  @Test
+  void getApplicableActions_isIndustryRequestOutstanding() {
+    when(caseEventRepository.findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(SCAP_ID.scapId(),
+        FURTHER_INFO_REQUESTED))
+        .thenReturn(Optional.of(getRequestEvent()));
+    when(caseEventRepository.findAllByScapIdAndEventTimeAfter(SCAP_ID.scapId(),
+        getRequestEvent().getEventTime()))
+        .thenReturn(emptyList());
+
+    var user = ServiceUserDetailTestUtil.Builder().build();
+    when(userDetailService.getUserDetail()).thenReturn(user);
+    when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(false);
+
+    var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
+
+    assertThat(actions.get("Consultations")).containsExactly(SCAP_CONSULTATION_RESPONSE);
+    assertThat(actions.get("Further Info")).containsExactly(FURTHER_INFO_RESPONSE);
   }
 
   private List<CaseEvent> getTimelineEvents() {

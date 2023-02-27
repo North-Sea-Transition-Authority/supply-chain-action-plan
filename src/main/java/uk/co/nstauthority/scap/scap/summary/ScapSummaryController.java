@@ -74,6 +74,7 @@ public class ScapSummaryController {
         .withScapStatus(scapSummaryViewService.inferSubmissionStatusFromSummary(scapSummary))
         .withCaseEventTimeline(getCaseEventView(scapId))
         .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
+        .withUpdatePermission(teamService.userIsMemberOfRegulatorTeam(userDetailService.getUserDetail()))
         .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);
     return generator.generate();

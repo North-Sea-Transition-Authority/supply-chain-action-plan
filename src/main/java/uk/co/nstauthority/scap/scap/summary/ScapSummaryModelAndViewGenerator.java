@@ -1,15 +1,15 @@
 package uk.co.nstauthority.scap.scap.summary;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.APPROVAL_DOCUMENT;
 import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.CONSULTATION_REPORT;
 import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.FURTHER_INFORMATION;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.error.exception.IllegalUtilClassInstantiationException;
@@ -53,9 +53,10 @@ public class ScapSummaryModelAndViewGenerator {
   public static class Generator {
     private final ScapDetail scapDetail;
     private final ScapSummaryView scapSummary;
-    private Set<CaseEventSubject> applicableActions = emptySet();
+    private Map<String, List<CaseEventSubject>> applicableActions = new LinkedHashMap<>();
     private OrganisationGroup orgGroup;
     private boolean updateInProgress = false;
+    private boolean updatePermission = false;
     private final SupportingDocumentService supportingDocumentService;
     private ScapSubmissionStage scapStatus = ScapSubmissionStage.DRAFT;
     private List<CaseEventView> caseEventTimeline = emptyList();
@@ -89,6 +90,11 @@ public class ScapSummaryModelAndViewGenerator {
 
     public Generator withUpdateInProgress(boolean updateInProgress) {
       this.updateInProgress = updateInProgress;
+      return this;
+    }
+
+    public Generator withUpdatePermission(boolean updatePermission) {
+      this.updatePermission = updatePermission;
       return this;
     }
 
@@ -142,7 +148,7 @@ public class ScapSummaryModelAndViewGenerator {
       return this;
     }
 
-    public Generator withApplicableActions(Set<CaseEventSubject> applicableActions) {
+    public Generator withApplicableActions(Map<String, List<CaseEventSubject>> applicableActions) {
       this.applicableActions = applicableActions;
       return this;
     }
@@ -160,6 +166,7 @@ public class ScapSummaryModelAndViewGenerator {
               on(ScapUpdateController.class).startScapUpdate(scapDetail.getScap().getScapId(), CaseEventAction.UPDATE)))
           .addObject("applicableActions", applicableActions)
           .addObject("updateInProgress", updateInProgress)
+          .addObject("updatePermission", updatePermission)
           .addObject("deleteScapUrl", ReverseRouter.route(
               on(ScapDeletionController.class).renderScapDeletionConfirmation(scapDetail.getScap().getScapId())));
 

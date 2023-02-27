@@ -2,13 +2,20 @@ package uk.co.nstauthority.scap.scap.casemanagement;
 
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTHER_INFO_REQUESTED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTHER_INFO_RESPONSE;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.QA_COMMENT;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_APPROVED;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_CONSULTATION_REQUESTED;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_CONSULTATION_RESPONSE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_SUBMITTED;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_WITHDRAWN;
 
 import java.time.Instant;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,6 +26,7 @@ import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.util.DateUtil;
 
@@ -30,6 +38,14 @@ public class CaseEventService {
   private final EnergyPortalUserService energyPortalUserService;
 
   private final CaseEventRepository caseEventRepository;
+
+  private final TeamService teamService;
+
+  private static final String CONSULTATIONS = "Consultations";
+
+  private static final String DECISIONS = "Decisions";
+  private static final String FURTHER_INFO = "Further Info";
+  private static final String QA = "QA";
   private static final Set<CaseEventSubject> RESPONSE_ACTIONS = Set.of(FURTHER_INFO_RESPONSE,
       SCAP_SUBMITTED,
       SCAP_APPROVED);
@@ -37,10 +53,12 @@ public class CaseEventService {
   @Autowired
   public CaseEventService(UserDetailService userDetailService,
                           EnergyPortalUserService energyPortalUserService,
-                          CaseEventRepository caseEventRepository) {
+                          CaseEventRepository caseEventRepository,
+                          TeamService teamService) {
     this.userDetailService = userDetailService;
     this.energyPortalUserService = energyPortalUserService;
     this.caseEventRepository = caseEventRepository;
+    this.teamService = teamService;
   }
 
   @Transactional
@@ -118,14 +136,48 @@ public class CaseEventService {
         .findFirst();
   }
 
-  public Set<CaseEventSubject> getApplicableActionsForScap(ScapId scapId) {
-    var allActions = Arrays.stream(CaseEventSubject.values()).collect(Collectors.toSet());
+  public Map<String, List<CaseEventSubject>> getApplicableActionsForScap(ScapId scapId) {
+    var user = userDetailService.getUserDetail();
 
-    allActions.remove(SCAP_SUBMITTED);
-    if (isFurtherInfoResponseOutstanding(scapId)) {
-      allActions.remove(FURTHER_INFO_REQUESTED);
+    var actionMap = new LinkedHashMap<String, List<CaseEventSubject>>();
+    if (teamService.userIsMemberOfRegulatorTeam(user)) {
+      actionMap.putAll(getRegulatorTeamActions(scapId));
+    } else {
+      var furtherInfo = new ArrayList<CaseEventSubject>();
+      var consultations = new ArrayList<CaseEventSubject>();
+      if (isFurtherInfoResponseOutstanding(scapId)) {
+        furtherInfo.add(FURTHER_INFO_RESPONSE);
+      }
+      consultations.add(SCAP_CONSULTATION_RESPONSE);
+      actionMap.put(FURTHER_INFO, furtherInfo);
+      actionMap.put(CONSULTATIONS, consultations);
     }
-    allActions.removeIf(action -> action.getActionPanelId() == null);
-    return allActions;
+    return actionMap;
+  }
+
+  private Map<String, List<CaseEventSubject>> getRegulatorTeamActions(ScapId scapId) {
+    var regulatorMap = new HashMap<String, List<CaseEventSubject>>();
+    var qa = new ArrayList<CaseEventSubject>();
+    qa.add(QA_COMMENT);
+
+    var consultations = new ArrayList<CaseEventSubject>();
+    consultations.add(SCAP_CONSULTATION_REQUESTED);
+    consultations.add(SCAP_CONSULTATION_RESPONSE);
+
+    var descisions = new ArrayList<CaseEventSubject>();
+    descisions.add(SCAP_APPROVED);
+    descisions.add(SCAP_WITHDRAWN);
+
+    var furtherInfo = new ArrayList<CaseEventSubject>();
+    if (isFurtherInfoResponseOutstanding(scapId)) {
+      furtherInfo.add(FURTHER_INFO_RESPONSE);
+    } else {
+      furtherInfo.add(FURTHER_INFO_REQUESTED);
+    }
+    regulatorMap.put(QA, qa);
+    regulatorMap.put(DECISIONS, descisions);
+    regulatorMap.put(CONSULTATIONS, consultations);
+    regulatorMap.put(FURTHER_INFO, furtherInfo);
+    return regulatorMap;
   }
 }

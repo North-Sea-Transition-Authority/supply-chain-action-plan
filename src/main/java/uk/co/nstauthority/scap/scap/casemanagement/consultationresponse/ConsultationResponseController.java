@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequired;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
@@ -48,6 +50,10 @@ public class ConsultationResponseController {
 
   private final SupportingDocumentService supportingDocumentService;
 
+  private final TeamService teamService;
+
+  private final UserDetailService userDetailService;
+
   @Autowired
   public ConsultationResponseController(CaseEventService caseEventService,
                                         ControllerHelperService controllerHelperService,
@@ -55,7 +61,9 @@ public class ConsultationResponseController {
                                         ScapSummaryViewService scapSummaryViewService,
                                         OrganisationGroupService organisationGroupService,
                                         ConsultationResponseFormValidator consultationRequestFormValidator,
-                                        SupportingDocumentService supportingDocumentService) {
+                                        SupportingDocumentService supportingDocumentService,
+                                        TeamService teamService,
+                                        UserDetailService userDetailService) {
     this.caseEventService = caseEventService;
     this.controllerHelperService = controllerHelperService;
     this.scapDetailService = scapDetailService;
@@ -63,6 +71,8 @@ public class ConsultationResponseController {
     this.organisationGroupService = organisationGroupService;
     this.consultationResponseFormValidator = consultationRequestFormValidator;
     this.supportingDocumentService = supportingDocumentService;
+    this.teamService = teamService;
+    this.userDetailService = userDetailService;
   }
 
   @PostMapping(params = CaseEventAction.CONSULTATION_RESPONSE)
@@ -86,6 +96,8 @@ public class ConsultationResponseController {
             supportingDocumentService)
         .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
         .withConsultationResponseForm(consultationResponseForm)
+        .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
+        .withUpdatePermission(teamService.userIsMemberOfRegulatorTeam(userDetailService.getUserDetail()))
         .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);
 

@@ -93,16 +93,20 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
 
   @Test
   void renderSummary_fullSCAPDetails() throws Exception {
-
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
-    when(caseEventService.getApplicableActionsForScap(SCAP_ID)).thenReturn(Set.of(FURTHER_INFO_REQUESTED));
-
     mockMvc.perform(get(
         ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
             .with(user(testUser)))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/summary/scapSummaryOverview"))
-        .andExpect(model().attribute("applicableActions", Set.of(FURTHER_INFO_REQUESTED)));
+        .andExpect(model().attributeExists("backLinkUrl"))
+        .andExpect(model().attributeExists("updateScapUrl"))
+        .andExpect(model().attributeExists("projectReference"))
+        .andExpect(model().attributeExists("operator"))
+        .andExpect(model().attributeExists("scapSummaryView"))
+        .andExpect(model().attributeExists("caseEvents"))
+        .andExpect(model().attributeExists("applicableActions"))
+        .andExpect(model().attributeExists("updateInProgress"));
   }
 
 

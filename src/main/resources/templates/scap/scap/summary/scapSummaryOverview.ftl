@@ -4,6 +4,20 @@
 <#import '../timeline/scapTimelineEvents.ftl' as timeline>
 
 <#assign pageTitle = projectName!'' />
+<#macro buttongroup group actions>
+    <#if actions?size gt 1>
+      <@fdsActionDropdown.actionDropdown dropdownButtonText="${group}">
+        <#list actions as action>
+          <@fdsActionDropdown.actionDropdownItem actionText="${action.getButtonText()}" buttonSlideOutPanelId="${action.getActionPanelId()}"/>
+        </#list>
+      </@fdsActionDropdown.actionDropdown>
+    <#elseif actions?size == 1>
+      <#list actions as action>
+        <@fdsAction.button buttonText="${action.getButtonText()}" buttonSlideOutPanelId="${action.getActionPanelId()}"buttonClass="govuk-button govuk-button--secondary"/>
+      </#list>
+    </#if>
+
+</#macro>
 
 <#-- @ftlvariable name="backLinkUrl" type="java.lang.String" -->
 <#-- @ftlvariable name="updateScapUrl" type="java.lang.String" -->
@@ -12,7 +26,7 @@
 <#-- @ftlvariable name="operator" type="java.lang.String" -->
 <#-- @ftlvariable name="scapSummaryView" type="uk.co.nstauthority.scap.scap.summary.ScapSummaryView" -->
 <#-- @ftlvariable name="caseEvents" type="java.util.List<uk.co.nstauthority.scap.scap.casemanagement.CaseEventView>" -->
-<#-- @ftlvariable name="applicableActions" type="java.util.Set<uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject>" -->
+<#-- @ftlvariable name="applicableActions" type="java.util.Map<java.lang.String, uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject>" -->
 <#-- @ftlvariable name="updateInProgress" type="java.lang.Boolean" -->
 
 <@defaultPage
@@ -23,7 +37,25 @@ pageSize=PageSize.FULL_WIDTH
 backLinkUrl=springUrl(backLinkUrl)
 >
   <@scapSummaryCard.summaryCard/>
-  <@actions applicableActions/>
+  <#if updateInProgress>
+    <@fdsAction.buttonGroup>
+      <@fdsForm.htmlForm springUrl(updateScapUrl)>
+        <#if applicableActions?seq_contains("UPDATE_SCAP")>
+          <#if updateInProgress>
+            <@fdsAction.button buttonText="Resume SCAP update"/>
+            <@fdsAction.link linkText="Delete draft update" linkUrl=springUrl(deleteScapUrl) linkClass="govuk-button govuk-button--secondary" role=true />
+          <#else>
+            <@fdsAction.button buttonText="Update SCAP"/>
+          </#if>
+        </#if>
+      </@fdsForm.htmlForm>
+    </@fdsAction.buttonGroup>
+  </#if>
+  <@fdsAction.buttonGroup>
+    <#list applicableActions as group, actions>
+      <@buttongroup group=group actions=actions/>
+    </#list>
+  </@fdsAction.buttonGroup>
   <@fdsTabs.tabs tabsHeading="SCAP overview tabs">
     <@fdsTabs.tabList>
       <@fdsTabs.tab tabLabel="Application form" tabAnchor="summary-tab"/>
@@ -49,19 +81,3 @@ backLinkUrl=springUrl(backLinkUrl)
   <#include 'caseActions/withdrawScap.ftl'/>
 </@defaultPage>
 
-<#macro actions applicableActions>
-  <#if applicableActions?has_content>
-    <#list applicableActions as action>
-      <@fdsSlideOutPanel.slideOutPanelButton buttonText=action.getButtonText() buttonPanelId=action.getActionPanelId() buttonClass="govuk-button govuk-button--secondary"/>
-    </#list>
-  </#if>
-  <@fdsForm.htmlForm springUrl(updateScapUrl)>
-    <#if updateInProgress>
-      <@fdsAction.button buttonText="Resume SCAP update"/>
-      <@fdsAction.link linkText="Delete draft update" linkUrl=springUrl(deleteScapUrl) linkClass="govuk-button govuk-button--secondary" role=true />
-    <#else>
-      <@fdsAction.button buttonText="Update SCAP"/>
-    </#if>
-  </@fdsForm.htmlForm>
-
-</#macro>

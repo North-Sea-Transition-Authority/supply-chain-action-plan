@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequired;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
@@ -48,6 +50,10 @@ public class FurtherInfoController {
 
   private final SupportingDocumentService supportingDocumentService;
 
+  private final TeamService teamService;
+
+  private final UserDetailService userDetailService;
+
   @Autowired
   public FurtherInfoController(CaseEventService caseEventService,
                                ScapDetailService scapDetailService,
@@ -55,7 +61,8 @@ public class FurtherInfoController {
                                ScapSummaryViewService scapSummaryViewService,
                                OrganisationGroupService organisationGroupService,
                                FurtherInfoRequestFormValidator furtherInfoRequestFormValidator,
-                               SupportingDocumentService supportingDocumentService) {
+                               SupportingDocumentService supportingDocumentService, TeamService teamService,
+                               UserDetailService userDetailService) {
     this.caseEventService = caseEventService;
     this.scapDetailService = scapDetailService;
     this.controllerHelperService = controllerHelperService;
@@ -63,6 +70,8 @@ public class FurtherInfoController {
     this.organisationGroupService = organisationGroupService;
     this.furtherInfoRequestFormValidator = furtherInfoRequestFormValidator;
     this.supportingDocumentService = supportingDocumentService;
+    this.teamService = teamService;
+    this.userDetailService = userDetailService;
   }
 
   @PostMapping(params = CaseEventAction.INFO_REQUESTED)
@@ -85,6 +94,8 @@ public class FurtherInfoController {
                 supportingDocumentService)
         .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
         .withFurtherInfoRequestFrom(infoRequestForm)
+        .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
+        .withUpdatePermission(teamService.userIsMemberOfRegulatorTeam(userDetailService.getUserDetail()))
         .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);
 

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerBodyLine;
@@ -20,6 +21,7 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.notify.ScapEmailService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequired;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
@@ -51,6 +53,10 @@ public class ScapWithdrawController {
   private final SupportingDocumentService supportingDocumentService;
   private final ScapEmailService scapEmailService;
 
+  private final TeamService teamService;
+
+  private final UserDetailService userDetailService;
+
   @Autowired
   public ScapWithdrawController(CaseEventService caseEventService,
                                 ControllerHelperService controllerHelperService,
@@ -59,7 +65,8 @@ public class ScapWithdrawController {
                                 OrganisationGroupService organisationGroupService,
                                 ScapWithdrawalFormValidator scapWithdrawalFormValidator,
                                 SupportingDocumentService supportingDocumentService,
-                                ScapEmailService scapEmailService) {
+                                ScapEmailService scapEmailService, TeamService teamService,
+                                UserDetailService userDetailService) {
     this.caseEventService = caseEventService;
     this.controllerHelperService = controllerHelperService;
     this.scapDetailService = scapDetailService;
@@ -68,6 +75,8 @@ public class ScapWithdrawController {
     this.scapWithdrawalFormValidator = scapWithdrawalFormValidator;
     this.supportingDocumentService = supportingDocumentService;
     this.scapEmailService = scapEmailService;
+    this.teamService = teamService;
+    this.userDetailService = userDetailService;
   }
 
   @PostMapping(params = CaseEventAction.WITHDRAWN)
@@ -92,6 +101,7 @@ public class ScapWithdrawController {
             .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
             .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
             .withScapWithdrawalForm(scapWithdrawalForm)
+            .withUpdatePermission(teamService.userIsMemberOfRegulatorTeam(userDetailService.getUserDetail()))
             .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);
 
