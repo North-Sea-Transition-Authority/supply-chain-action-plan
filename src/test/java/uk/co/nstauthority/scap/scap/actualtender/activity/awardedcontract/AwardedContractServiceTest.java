@@ -66,12 +66,15 @@ class AwardedContractServiceTest {
   void saveAwardedContract_UpdateExisting_VerifySaves() {
     var awardedContract = new AwardedContract(27);
     var date = LocalDate.of(2000, 1, 1);
+    var otherPaymentTerm = 90;
     var form = new AwardedContractForm();
     form.setPreferredBidderId(bidParticipants.get(0).getId());
     form.setAwardValue("1.23");
     form.setAwardRationale("Test award rationale");
     form.setPreferredBidderCountryId(0);
     form.setContractAwardDate(date);
+    form.setPaymentTermsRadio(PaymentTermsRadio.OTHER);
+    form.setOtherPaymentTerm(String.valueOf(otherPaymentTerm));
     var argumentCaptor = ArgumentCaptor.forClass(AwardedContract.class);
 
     when(awardedContractRepository.findByActualTenderActivity(actualTenderActivity))
@@ -87,14 +90,16 @@ class AwardedContractServiceTest {
         AwardedContract::getAwardValue,
         AwardedContract::getAwardRationale,
         AwardedContract::getPreferredBidderCountryId,
-        AwardedContract::getContractAwardDate
+        AwardedContract::getContractAwardDate,
+        AwardedContract::getPaymentTerms
     ).containsExactly(
         awardedContract.getId(),
         bidParticipants.get(0),
         form.getAwardValue().getAsBigDecimal().get(),
         form.getAwardRationale().getInputValue(),
         form.getPreferredBidderCountryId(),
-        date
+        date,
+        otherPaymentTerm
     );
   }
 
@@ -102,11 +107,13 @@ class AwardedContractServiceTest {
   void saveAwardedContract_CreateNew_VerifySaves() {
     var form = new AwardedContractForm();
     var date = LocalDate.of(2000, 1, 1);
+    var paymentTerms = PaymentTermsRadio.DAYS_30;
     form.setPreferredBidderId(bidParticipants.get(0).getId());
     form.setAwardValue("1.23");
     form.setAwardRationale("Test award rationale");
     form.setPreferredBidderCountryId(0);
     form.setContractAwardDate(date);
+    form.setPaymentTermsRadio(paymentTerms);
     var argumentCaptor = ArgumentCaptor.forClass(AwardedContract.class);
 
     when(awardedContractRepository.findByActualTenderActivity(actualTenderActivity))
@@ -122,14 +129,16 @@ class AwardedContractServiceTest {
         AwardedContract::getAwardRationale,
         AwardedContract::getPreferredBidderCountryId,
         AwardedContract::getCreatedTimestamp,
-        AwardedContract::getContractAwardDate
+        AwardedContract::getContractAwardDate,
+        AwardedContract::getPaymentTerms
     ).containsExactly(
         bidParticipants.get(0),
         form.getAwardValue().getAsBigDecimal().get(),
         form.getAwardRationale().getInputValue(),
         form.getPreferredBidderCountryId(),
         clock.instant(),
-        date
+        date,
+        paymentTerms.getPaymentTerm()
     );
   }
 
@@ -160,6 +169,25 @@ class AwardedContractServiceTest {
     assertThatThrownBy(() -> awardedContractService.saveAwardedContract(actualTenderActivity, form, bidParticipants))
         .isInstanceOf(ClassCastException.class)
         .hasMessage(String.format("Could not cast %s to BigDecimal", form.getAwardValue().getInputValue()));
+
+    verify(awardedContractRepository, never()).save(any());
+  }
+
+  @Test
+  void saveAwardedContract_InvalidPaymentTerm_VerifyNeverSaves() {
+    var form = new AwardedContractForm();
+    form.setPreferredBidderId(bidParticipants.get(0).getId());
+    form.setPaymentTermsRadio(PaymentTermsRadio.OTHER);
+    form.setOtherPaymentTerm("NaN");
+    form.setAwardValue("1.23");
+    form.setContractAwardDate(LocalDate.of(2000, 1, 1));
+
+    when(awardedContractRepository.findByActualTenderActivity(actualTenderActivity))
+        .thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> awardedContractService.saveAwardedContract(actualTenderActivity, form, bidParticipants))
+        .isInstanceOf(ClassCastException.class)
+        .hasMessage("Could not cast payment terms [%s] to integer".formatted(form.getOtherPaymentTerm().getInputValue()));
 
     verify(awardedContractRepository, never()).save(any());
   }

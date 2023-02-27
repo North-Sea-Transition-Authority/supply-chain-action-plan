@@ -67,6 +67,11 @@
   <@fdsSummaryList.summaryListRowNoAction keyText="Contract award date">
     ${awardedContract.contractAwardDate()!""}
   </@fdsSummaryList.summaryListRowNoAction>
+  <@fdsSummaryList.summaryListRowNoAction keyText="Payment term">
+    <#if awardedContract.paymentTerms()?has_content>
+      ${awardedContract.paymentTerms()} days
+    </#if>
+  </@fdsSummaryList.summaryListRowNoAction>
 </#macro>
 
 <#macro notOnEnergyPortalTag>

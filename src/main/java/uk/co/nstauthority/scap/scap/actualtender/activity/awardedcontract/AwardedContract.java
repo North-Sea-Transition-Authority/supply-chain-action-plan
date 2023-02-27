@@ -41,6 +41,8 @@ public class AwardedContract {
 
   private LocalDate contractAwardDate;
 
+  private Integer paymentTerms;
+
   public AwardedContract() {
   }
 
@@ -105,5 +107,13 @@ public class AwardedContract {
 
   public void setContractAwardDate(LocalDate contractAwardDate) {
     this.contractAwardDate = contractAwardDate;
+  }
+
+  public Integer getPaymentTerms() {
+    return paymentTerms;
+  }
+
+  public void setPaymentTerms(Integer paymentTerms) {
+    this.paymentTerms = paymentTerms;
   }
 }

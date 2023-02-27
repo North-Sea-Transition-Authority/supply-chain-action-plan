@@ -44,6 +44,29 @@ backLinkUrl=springUrl(backLinkUrl)
       yearPath="form.contractAwardDate.yearInput.inputValue"
     />
 
+    <@fdsRadio.radioGroup
+      path="form.paymentTermsRadio"
+      labelText="What are the payment terms for this contract?"
+      hiddenContent=true
+    >
+      <#list paymentTermsRadioOptions as value, displayName>
+        <@fdsRadio.radioItem
+          path="form.paymentTermsRadio"
+          itemMap={value: displayName}
+        >
+          <#if value == "OTHER">
+            <@fdsTextInput.textInput
+              path="form.otherPaymentTerm.inputValue"
+              labelText="Provide the days for the payment terms"
+              suffix="days"
+              inputClass="govuk-input--width-3"
+              nestingPath="form.paymentTermsRadio"
+            />
+          </#if>
+        </@fdsRadio.radioItem>
+      </#list>
+    </@fdsRadio.radioGroup>
+
     <@fdsAction.button buttonText="Save and continue"/>
   </@fdsForm.htmlForm>
 </@defaultPage>

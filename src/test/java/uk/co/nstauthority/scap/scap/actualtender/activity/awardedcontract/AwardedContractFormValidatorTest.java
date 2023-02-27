@@ -36,10 +36,16 @@ class AwardedContractFormValidatorTest {
 
   private AwardedContractForm form;
   private BindingResult bindingResult;
+  private InvitationToTenderParticipant bidParticipant1;
+  private List<InvitationToTenderParticipant> bidParticipants;
 
   @BeforeEach
   void setup() {
-    form = new AwardedContractForm();
+    bidParticipant1 = new InvitationToTenderParticipant(1410);
+    var bidParticipant2 = new InvitationToTenderParticipant(1411);
+    bidParticipants = List.of(bidParticipant1, bidParticipant2);
+
+    form = getValidForm();
     bindingResult = new BeanPropertyBindingResult(form, "form");
   }
 
@@ -62,15 +68,9 @@ class AwardedContractFormValidatorTest {
 
   @Test
   void validate_ValidForm_AssertNoErrors() {
-    var bidParticipant1 = new InvitationToTenderParticipant(1410);
-    var bidParticipant2 = new InvitationToTenderParticipant(1411);
-    var bidParticipants = List.of(bidParticipant1, bidParticipant2);
     var countryId = 2141;
     form.setPreferredBidderId(bidParticipant1.getId());
-    form.setAwardValue("1.41");
-    form.setAwardRationale("test award rationale");
     form.setPreferredBidderCountryId(countryId);
-    form.setContractAwardDate(LocalDate.of(2000, 1, 1));
 
     when(countryService.doesCountryExist(countryId)).thenReturn(true);
 
@@ -81,9 +81,8 @@ class AwardedContractFormValidatorTest {
 
   @Test
   void validate_EmptyForm_AssertErrors() {
-    var bidParticipant1 = new InvitationToTenderParticipant(1410);
-    var bidParticipant2 = new InvitationToTenderParticipant(1411);
-    var bidParticipants = List.of(bidParticipant1, bidParticipant2);
+    var form = new AwardedContractForm();
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
     validator.validate(form, bindingResult, new AwardedContractFormValidatorHint(bidParticipants));
 
     var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
@@ -100,21 +99,21 @@ class AwardedContractFormValidatorTest {
         entry("%s.monthInput.inputValue".formatted(contractAwardDateField),
             Set.of("%s.monthInput.required".formatted(contractAwardDateField))),
         entry("%s.yearInput.inputValue".formatted(contractAwardDateField),
-            Set.of("%s.yearInput.required".formatted(contractAwardDateField)))
+            Set.of("%s.yearInput.required".formatted(contractAwardDateField))),
+        entry("%s".formatted(AwardedContractFormValidator.PAYMENT_TERMS_RADIO_FIELD),
+            Set.of("%s.required".formatted(AwardedContractFormValidator.PAYMENT_TERMS_RADIO_FIELD)))
     );
   }
 
   @Test
   void validate_NonExistentBidParticipantAndCountry_AssertErrors() {
-    var bidParticipant1 = new InvitationToTenderParticipant(1410);
-    var bidParticipant2 = new InvitationToTenderParticipant(1411);
-    var bidParticipants = List.of(bidParticipant1, bidParticipant2);
     var countryId = 9998;
     form.setPreferredBidderId(9999);
     form.setAwardValue("1.41");
     form.setAwardRationale("test award rationale");
     form.setPreferredBidderCountryId(countryId);
     form.setContractAwardDate(LocalDate.of(2000, 1, 1));
+    form.setPaymentTermsRadio(PaymentTermsRadio.DAYS_30);
 
     when(countryService.doesCountryExist(countryId)).thenReturn(false);
 
@@ -130,15 +129,13 @@ class AwardedContractFormValidatorTest {
 
   @Test
   void validate_AwardValueTooSmall_AssertError() {
-    var bidParticipant1 = new InvitationToTenderParticipant(1410);
-    var bidParticipant2 = new InvitationToTenderParticipant(1411);
-    var bidParticipants = List.of(bidParticipant1, bidParticipant2);
     var countryId = 0;
     form.setPreferredBidderId(bidParticipant1.getId());
     form.setAwardValue("0");
     form.setAwardRationale("test award rationale");
     form.setPreferredBidderCountryId(countryId);
     form.setContractAwardDate(LocalDate.of(2000, 1, 1));
+    form.setPaymentTermsRadio(PaymentTermsRadio.DAYS_30);
 
     when(countryService.doesCountryExist(countryId)).thenReturn(true);
 
@@ -153,15 +150,13 @@ class AwardedContractFormValidatorTest {
 
   @Test
   void validate_AwardValueTooManyDecimalPlaces_AssertError() {
-    var bidParticipant1 = new InvitationToTenderParticipant(1410);
-    var bidParticipant2 = new InvitationToTenderParticipant(1411);
-    var bidParticipants = List.of(bidParticipant1, bidParticipant2);
     var countryId = 0;
     form.setPreferredBidderId(bidParticipant1.getId());
     form.setAwardValue("0.1234");
     form.setAwardRationale("test award rationale");
     form.setPreferredBidderCountryId(countryId);
     form.setContractAwardDate(LocalDate.of(2000, 1, 1));
+    form.setPaymentTermsRadio(PaymentTermsRadio.DAYS_30);
 
     when(countryService.doesCountryExist(countryId)).thenReturn(true);
 
@@ -173,4 +168,78 @@ class AwardedContractFormValidatorTest {
         entry("awardValue.inputValue", Set.of("awardValue.maxDecimalPlacesExceeded"))
     );
   }
+
+  @Test
+  void validate_NoPaymentTermsSelected_AssertErrors() {
+    var countryId = 0;
+    form.setPreferredBidderId(bidParticipant1.getId());
+    form.setPreferredBidderCountryId(countryId);
+
+    form.setPaymentTermsRadio(null);
+
+    when(countryService.doesCountryExist(countryId)).thenReturn(true);
+
+    validator.validate(form, bindingResult, new AwardedContractFormValidatorHint(bidParticipants));
+
+    var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
+
+    assertThat(extractedErrors).containsExactly(
+        entry(AwardedContractFormValidator.PAYMENT_TERMS_RADIO_FIELD,
+            Set.of("%s.required".formatted(AwardedContractFormValidator.PAYMENT_TERMS_RADIO_FIELD)))
+    );
+  }
+
+  @Test
+  void validate_OtherPaymentTerm_NoValueProvided_AssertErrors() {
+    var countryId = 0;
+    form.setPreferredBidderId(bidParticipant1.getId());
+    form.setPreferredBidderCountryId(countryId);
+
+    form.setPaymentTermsRadio(PaymentTermsRadio.OTHER);
+    form.setOtherPaymentTerm(null);
+
+    when(countryService.doesCountryExist(countryId)).thenReturn(true);
+
+    validator.validate(form, bindingResult, new AwardedContractFormValidatorHint(bidParticipants));
+
+    var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
+
+    assertThat(extractedErrors).containsExactly(
+        entry("otherPaymentTerm.inputValue",
+            Set.of("otherPaymentTerm.required"))
+    );
+  }
+
+  @Test
+  void validate_InvalidPaymentTerm_AssertErrors() {
+    var countryId = 0;
+    form.setPreferredBidderId(bidParticipant1.getId());
+    form.setPreferredBidderCountryId(countryId);
+
+    form.setPaymentTermsRadio(PaymentTermsRadio.OTHER);
+    form.setOtherPaymentTerm("-1");
+
+    when(countryService.doesCountryExist(countryId)).thenReturn(true);
+
+    validator.validate(form, bindingResult, new AwardedContractFormValidatorHint(bidParticipants));
+
+    var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
+
+    assertThat(extractedErrors).containsExactly(
+        entry("otherPaymentTerm.inputValue",
+            Set.of("otherPaymentTerm.minValueNotMet"))
+    );
+  }
+
+  private AwardedContractForm getValidForm() {
+    var form = new AwardedContractForm();
+    form.setPreferredBidderId(1);
+    form.setAwardValue("1.41");
+    form.setAwardRationale("test award rationale");
+    form.setPreferredBidderCountryId(0);
+    form.setContractAwardDate(LocalDate.of(2000, 1, 1));
+    form.setPaymentTermsRadio(PaymentTermsRadio.DAYS_30);
+    return form;
+  }
+
 }

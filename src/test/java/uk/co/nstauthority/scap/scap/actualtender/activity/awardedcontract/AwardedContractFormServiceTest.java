@@ -11,8 +11,12 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -48,8 +52,22 @@ class AwardedContractFormServiceTest {
     assertThat(argumentCaptor.getValue().bidParticipants()).isEqualTo(bidParticipants);
   }
 
-  @Test
-  void getForm() {
+  static Stream<Arguments> paymentTermsArguments() {
+    var otherPaymentTerm = 31;
+    return Stream.of(
+        Arguments.of(null, null, null),
+        Arguments.of(otherPaymentTerm, PaymentTermsRadio.OTHER, String.valueOf(otherPaymentTerm)),
+        Arguments.of(PaymentTermsRadio.DAYS_30.getPaymentTerm(), PaymentTermsRadio.DAYS_30, null),
+        Arguments.of(PaymentTermsRadio.DAYS_60.getPaymentTerm(), PaymentTermsRadio.DAYS_60, null)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("paymentTermsArguments")
+  void getForm(
+      Integer awardedContractPaymentTerms,
+      PaymentTermsRadio expectedFormRadio,
+      String expectFormOtherPaymentTerm) {
     var awardedContract = new AwardedContract(141);
     var preferredBidderId = 1141;
     var preferredBidderLocation = 2141;
@@ -61,6 +79,7 @@ class AwardedContractFormServiceTest {
     awardedContract.setAwardRationale(awardRationale);
     awardedContract.setPreferredBidderCountryId(preferredBidderLocation);
     awardedContract.setContractAwardDate(awardDate);
+    awardedContract.setPaymentTerms(awardedContractPaymentTerms);
 
     var form = awardedContractFormService.getForm(awardedContract);
 
@@ -69,13 +88,17 @@ class AwardedContractFormServiceTest {
         actualForm -> actualForm.getAwardValue().getInputValue(),
         actualForm -> actualForm.getAwardRationale().getInputValue(),
         AwardedContractForm::getPreferredBidderCountryId,
-        actualForm -> actualForm.getContractAwardDate().getAsLocalDate()
+        actualForm -> actualForm.getContractAwardDate().getAsLocalDate(),
+        AwardedContractForm::getPaymentTermsRadio,
+        actualForm -> actualForm.getOtherPaymentTerm().getInputValue()
     ).containsExactly(
         preferredBidderId,
         String.valueOf(awardValue),
         awardRationale,
         preferredBidderLocation,
-        Optional.of(awardDate)
+        Optional.of(awardDate),
+        expectedFormRadio,
+        expectFormOtherPaymentTerm
     );
   }
 

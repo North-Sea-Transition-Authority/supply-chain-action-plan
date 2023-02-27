@@ -37,6 +37,10 @@ class AwardedContractFormService {
     form.setAwardRationale(awardedContract.getAwardRationale());
     form.setPreferredBidderCountryId(awardedContract.getPreferredBidderCountryId());
     form.setContractAwardDate(awardedContract.getContractAwardDate());
+    form.setPaymentTermsRadio(PaymentTermsRadio.from(awardedContract));
+    if (PaymentTermsRadio.OTHER.equals(form.getPaymentTermsRadio())) {
+      form.setOtherPaymentTerm(String.valueOf(awardedContract.getPaymentTerms()));
+    }
     return form;
   }
 

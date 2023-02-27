@@ -6,5 +6,6 @@ public record AwardedContractSummaryView(String preferredBidderName,
                                          BigDecimal awardValue,
                                          String awardRationale,
                                          String preferredBidderCountry,
-                                         String contractAwardDate) {
+                                         String contractAwardDate,
+                                         Integer paymentTerms) {
 }

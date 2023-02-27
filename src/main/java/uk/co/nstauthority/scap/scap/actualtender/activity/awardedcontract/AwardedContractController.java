@@ -112,6 +112,7 @@ public class AwardedContractController {
         .addObject("bidParticipantsMap", AwardedContractFormService.getSelectOptions(bidParticipants))
         .addObject("countrySearchRestUrl",
             ReverseRouter.route(on(AwardedContractRestController.class).getCountrySearchResults(null)))
-        .addObject("preselectedCountry", preselectedCountry);
+        .addObject("preselectedCountry", preselectedCountry)
+        .addObject("paymentTermsRadioOptions", PaymentTermsRadio.getRadioOptions());
   }
 }

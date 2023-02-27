@@ -47,6 +47,14 @@ public class AwardedContractService {
     awardedContract.setAwardRationale(form.getAwardRationale().getInputValue());
     awardedContract.setPreferredBidderCountryId(form.getPreferredBidderCountryId());
     awardedContract.setContractAwardDate(contractAwardDate);
+    if (PaymentTermsRadio.OTHER.equals(form.getPaymentTermsRadio())) {
+      var paymentTerms = form.getOtherPaymentTerm().getAsInteger()
+          .orElseThrow(() -> new ClassCastException("Could not cast payment terms [%s] to integer"
+              .formatted(form.getOtherPaymentTerm().getInputValue())));
+      awardedContract.setPaymentTerms(paymentTerms);
+    } else {
+      awardedContract.setPaymentTerms(form.getPaymentTermsRadio().getPaymentTerm());
+    }
 
     awardedContractRepository.save(awardedContract);
   }

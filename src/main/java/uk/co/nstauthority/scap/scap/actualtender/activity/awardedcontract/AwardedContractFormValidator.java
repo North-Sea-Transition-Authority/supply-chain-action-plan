@@ -13,6 +13,7 @@ import org.springframework.validation.SmartValidator;
 import org.springframework.validation.ValidationUtils;
 import uk.co.fivium.formlibrary.validator.date.ThreeFieldDateInputValidator;
 import uk.co.fivium.formlibrary.validator.decimal.DecimalInputValidator;
+import uk.co.fivium.formlibrary.validator.integer.IntegerInputValidator;
 import uk.co.fivium.formlibrary.validator.string.StringInputValidator;
 import uk.co.nstauthority.scap.energyportal.CountryService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
@@ -21,7 +22,8 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderPart
 class AwardedContractFormValidator implements SmartValidator {
 
   static final String BIDDER_LOCATION_FIELD = "preferredBidderCountryId";
-  private static final String PREFERRED_BIDDER_FIELD = "preferredBidderId";
+  static final String PREFERRED_BIDDER_FIELD = "preferredBidderId";
+  static final String PAYMENT_TERMS_RADIO_FIELD = "paymentTermsRadio";
 
   private final CountryService countryService;
 
@@ -93,5 +95,19 @@ class AwardedContractFormValidator implements SmartValidator {
     ThreeFieldDateInputValidator.builder()
         .mustBeBeforeOrEqualTo(LocalDate.now())
         .validate(form.getContractAwardDate(), errors);
+
+
+    ValidationUtils.rejectIfEmpty(
+        errors,
+        PAYMENT_TERMS_RADIO_FIELD,
+        "%s.required".formatted(PAYMENT_TERMS_RADIO_FIELD),
+        "Select the payment terms"
+    );
+
+    if (PaymentTermsRadio.OTHER.equals(form.getPaymentTermsRadio())) {
+      IntegerInputValidator.builder()
+          .mustBeMoreThanOrEqual(0)
+          .validate(form.getOtherPaymentTerm(), errors);
+    }
   }
 }

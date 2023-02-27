@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract;
 
 import java.time.LocalDate;
 import uk.co.fivium.formlibrary.input.DecimalInput;
+import uk.co.fivium.formlibrary.input.IntegerInput;
 import uk.co.fivium.formlibrary.input.StringInput;
 import uk.co.fivium.formlibrary.input.ThreeFieldDateInput;
 
@@ -14,11 +15,14 @@ class AwardedContractForm {
   private final StringInput awardRationale;
   private Integer preferredBidderCountryId;
   private final ThreeFieldDateInput contractAwardDate;
+  private PaymentTermsRadio paymentTermsRadio;
+  private final IntegerInput otherPaymentTerm;
 
   public AwardedContractForm() {
     this.awardValue = new DecimalInput("awardValue", "Award value");
     this.awardRationale = new StringInput("awardRationale", "Award rationale");
     this.contractAwardDate = new ThreeFieldDateInput(CONTRACT_AWARD_DATE_FIELD, "Contract award date");
+    this.otherPaymentTerm = new IntegerInput("otherPaymentTerm", "Days for payment terms");
   }
 
   public Integer getPreferredBidderId() {
@@ -59,5 +63,21 @@ class AwardedContractForm {
 
   public void setContractAwardDate(LocalDate localDate) {
     this.contractAwardDate.setDate(localDate);
+  }
+
+  public PaymentTermsRadio getPaymentTermsRadio() {
+    return paymentTermsRadio;
+  }
+
+  public void setPaymentTermsRadio(PaymentTermsRadio paymentTermsRadio) {
+    this.paymentTermsRadio = paymentTermsRadio;
+  }
+
+  public IntegerInput getOtherPaymentTerm() {
+    return otherPaymentTerm;
+  }
+
+  public void setOtherPaymentTerm(String otherPaymentTerm) {
+    this.otherPaymentTerm.setInputValue(otherPaymentTerm);
   }
 }
