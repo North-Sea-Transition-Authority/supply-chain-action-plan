@@ -11,7 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -74,8 +74,8 @@ class DeleteActualTenderActivityControllerTest extends AbstractScapSubmitterCont
         RemunerationModel.LUMP_SUM,
         null,
         ContractStage.INVITATION_TO_TENDER_IS_LIVE,
-        List.of("company name"),
-        Collections.emptyList(),
+        Map.of("company name", false),
+        Collections.emptyMap(),
         null
     );
 
@@ -104,8 +104,8 @@ class DeleteActualTenderActivityControllerTest extends AbstractScapSubmitterCont
         RemunerationModel.LUMP_SUM,
         null,
         ContractStage.INVITATION_TO_TENDER_IS_LIVE,
-        List.of("company name"),
-        Collections.emptyList(),
+        Map.of("company name", false),
+        Collections.emptyMap(),
         null
     );
 

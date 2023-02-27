@@ -2,7 +2,7 @@ package uk.co.nstauthority.scap.scap.summary.actualtender;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
-import java.util.List;
+import java.util.Map;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityController;
@@ -17,8 +17,8 @@ public record ActualTenderActivitySummaryView(ScapId scapId,
                                               RemunerationModel remunerationModel,
                                               String remunerationModelName,
                                               ContractStage contractStage,
-                                              List<String> ittParticipants,
-                                              List<String> bidParticipants,
+                                              Map<String, Boolean> ittParticipants,
+                                              Map<String, Boolean> bidParticipants,
                                               AwardedContractSummaryView awardedContractSummaryView) {
   public String getChangeLinkUrl() {
     return ReverseRouter.route(on(ActualTenderActivityController.class)

@@ -25,15 +25,20 @@
       ${actualTenderActivity.contractStage().displayName!""}
     </#if>
   </@fdsSummaryList.summaryListRowNoAction>
-  <#list actualTenderActivity.ittParticipants() as invitationToTenderParticipant>
-    <@fdsSummaryList.summaryListRowNoAction keyText="Invitation to tender recipient ${invitationToTenderParticipant_index + 1}">
+  <#assign listItemNum = 0 />
+  <#list actualTenderActivity.ittParticipants() as invitationToTenderParticipant, notOnEnergyPortal>
+    <@fdsSummaryList.summaryListRowNoAction keyText="Invitation to tender recipient ${listItemNum + 1}">
       ${invitationToTenderParticipant!""}
+      <#if notOnEnergyPortal><@notOnEnergyPortalTag/></#if>
     </@fdsSummaryList.summaryListRowNoAction>
+    <#assign listItemNum += 1 />
   </#list>
-  <#list actualTenderActivity.bidParticipants() as bidParticipant>
-    <@fdsSummaryList.summaryListRowNoAction keyText="Bid participant ${bidParticipant_index + 1}">
+  <#assign listItemNum = 0 />
+  <#list actualTenderActivity.bidParticipants() as bidParticipant, notOnEnergyPortal>
+    <@fdsSummaryList.summaryListRowNoAction keyText="Bid participant ${listItemNum + 1}">
       ${bidParticipant}
     </@fdsSummaryList.summaryListRowNoAction>
+    <#assign listItemNum += 1 />
   </#list>
   <#if actualTenderActivity.awardedContractSummaryView()?has_content>
     <@awardedContractSummaryContent awardedContract=actualTenderActivity.awardedContractSummaryView()/>
@@ -62,4 +67,8 @@
   <@fdsSummaryList.summaryListRowNoAction keyText="Contract award date">
     ${awardedContract.contractAwardDate()!""}
   </@fdsSummaryList.summaryListRowNoAction>
+</#macro>
+
+<#macro notOnEnergyPortalTag>
+  <strong class="govuk-tag">Not from portal</strong>
 </#macro>

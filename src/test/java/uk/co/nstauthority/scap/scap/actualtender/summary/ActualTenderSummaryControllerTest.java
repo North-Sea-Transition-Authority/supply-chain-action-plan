@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -98,8 +99,8 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
         "scope title", "scope description",
         RemunerationModel.OTHER, "remuneration model name",
         ContractStage.CONTRACT_AWARDED,
-        List.of("ITT participant 1", "ITT participant 2"),
-        List.of("bid participant 1", "bid participant 2"), awardedContractSummaryView);
+        Map.of("ITT participant 1", false, "ITT participant 2", false),
+        Map.of("bid participant 1", false, "bid participant 2", false), awardedContractSummaryView);
     var actualTenderActivitySummaryViews = List.of(actualTenderSummaryView);
 
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
@@ -145,8 +146,8 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
         "scope title", "scope description",
         RemunerationModel.OTHER, "remuneration model name",
         ContractStage.CONTRACT_AWARDED,
-        List.of("ITT participant 1", "ITT participant 2"),
-        List.of("bid participant 1", "bid participant 2"), awardedContractSummaryView);
+        Map.of("ITT participant 1", false, "ITT participant 2", false),
+        Map.of("bid participant 1", false, "bid participant 2", false), awardedContractSummaryView);
     var actualTenderActivitySummaryViews = List.of(actualTenderSummaryView);
     var form = new ActualTenderSummaryForm();
     var bindingResultWithErrors = new BeanPropertyBindingResult(form, "form");
@@ -187,8 +188,8 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
         "scope title", "scope description",
         RemunerationModel.OTHER, "remuneration model name",
         ContractStage.CONTRACT_AWARDED,
-        List.of("ITT participant 1", "ITT participant 2"),
-        List.of("bid participant 1", "bid participant 2"), awardedContractSummaryView);
+        Map.of("ITT participant 1", false, "ITT participant 2", false),
+        Map.of("bid participant 1", false, "bid participant 2", false), awardedContractSummaryView);
     var actualTenderActivitySummaryViews = List.of(actualTenderSummaryView);
     var form = new ActualTenderSummaryForm();
     form.setHasMoreActualTenderActivities(HasMoreActualTenderActivities.YES_LATER);
@@ -224,8 +225,8 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
         "scope title", "scope description",
         RemunerationModel.OTHER, "remuneration model name",
         ContractStage.CONTRACT_AWARDED,
-        List.of("ITT participant 1", "ITT participant 2"),
-        List.of("bid participant 1", "bid participant 2"), awardedContractSummaryView);
+        Map.of("ITT participant 1", false, "ITT participant 2", false),
+        Map.of("bid participant 1", false, "bid participant 2", false), awardedContractSummaryView);
     var actualTenderActivitySummaryViews = List.of(actualTenderSummaryView);
     var form = new ActualTenderSummaryForm();
     form.setHasMoreActualTenderActivities(HasMoreActualTenderActivities.YES_NOW);

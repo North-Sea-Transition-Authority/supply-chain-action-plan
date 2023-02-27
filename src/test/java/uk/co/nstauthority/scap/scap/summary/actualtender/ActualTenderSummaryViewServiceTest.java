@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -79,8 +80,8 @@ class ActualTenderSummaryViewServiceTest {
         actualTenderActivity.getRemunerationModel(),
         actualTenderActivity.getRemunerationModelName(),
         actualTenderActivity.getContractStage(),
-        List.of(participant.getCompanyName()),
-        Collections.emptyList(),
+        Map.of(participant.getCompanyName(), true),
+        Collections.emptyMap(),
         null
     );
   }
@@ -124,6 +125,7 @@ class ActualTenderSummaryViewServiceTest {
     var participant5 = new InvitationToTenderParticipant(214);
     participant5.setCompanyName("company name 5");
     participant5.setActualTenderActivity(actualTenderActivity3);
+    participant5.setOrganisationUnitId(55);
     var country = new Country(0, "United Kingdom", null, null);
     var awardedContract = new AwardedContract(actualTenderActivity3, Instant.now());
     awardedContract.setPreferredBidder(participant4);
@@ -167,8 +169,8 @@ class ActualTenderSummaryViewServiceTest {
             actualTenderActivity1.getRemunerationModel(),
             actualTenderActivity1.getRemunerationModelName(),
             actualTenderActivity1.getContractStage(),
-            List.of(participant1.getCompanyName()),
-            Collections.emptyList()
+            Map.of(participant1.getCompanyName(), true),
+            Collections.emptyMap()
         ),
         tuple(
             scapId,
@@ -178,8 +180,8 @@ class ActualTenderSummaryViewServiceTest {
             actualTenderActivity2.getRemunerationModel(),
             actualTenderActivity2.getRemunerationModelName(),
             actualTenderActivity2.getContractStage(),
-            List.of(participant2.getCompanyName(), participant3.getCompanyName()),
-            List.of(participant2.getCompanyName())
+            Map.of(participant2.getCompanyName(), true, participant3.getCompanyName(), true),
+            Map.of(participant2.getCompanyName(), true)
         ),
         tuple(
             scapId,
@@ -189,8 +191,8 @@ class ActualTenderSummaryViewServiceTest {
             actualTenderActivity3.getRemunerationModel(),
             actualTenderActivity3.getRemunerationModelName(),
             actualTenderActivity3.getContractStage(),
-            List.of(participant4.getCompanyName(), participant5.getCompanyName()),
-            List.of(participant4.getCompanyName())
+            Map.of(participant4.getCompanyName(), true, participant5.getCompanyName(), false),
+            Map.of(participant4.getCompanyName(), true)
         )
     );
 

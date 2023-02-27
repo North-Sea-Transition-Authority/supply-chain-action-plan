@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.scap.summary.actualtender;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -77,8 +78,8 @@ public class ActualTenderSummaryViewService {
               actualTenderActivity.getRemunerationModel(),
               actualTenderActivity.getRemunerationModelName(),
               actualTenderActivity.getContractStage(),
-              getParticipantNames(activityInvitationToTenderParticipants),
-              getParticipantNames(activityBidParticipants),
+              getParticipantsAndEpaStatus(activityInvitationToTenderParticipants),
+              getParticipantsAndEpaStatus(activityBidParticipants),
               awardedContractView
           );
         })
@@ -92,10 +93,12 @@ public class ActualTenderSummaryViewService {
         .collect(Collectors.groupingBy(participant -> participant.getActualTenderActivity().getId()));
   }
 
-  private List<String> getParticipantNames(List<InvitationToTenderParticipant> participants) {
+  private Map<String, Boolean> getParticipantsAndEpaStatus(List<InvitationToTenderParticipant> participants) {
     return participants.stream()
-        .map(InvitationToTenderParticipant::getCompanyName)
-        .toList();
+        .collect(Collectors.toMap(
+            InvitationToTenderParticipant::getCompanyName,
+            participant -> Objects.isNull(participant.getOrganisationUnitId())
+        ));
   }
 
   private List<Integer> getCountryIds(List<AwardedContract> awardedContracts) {
