@@ -16,11 +16,11 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermission;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.notify.ScapEmailService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
-import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequired;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
@@ -36,7 +36,7 @@ import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 
 @Controller
 @RequestMapping("{scapId}/")
-@PermissionsRequired(permissions = RolePermission.REVIEW_SCAP)
+@UserHasAnyPermission(permissions = RolePermission.REVIEW_SCAP)
 @ScapHasStatus(permittedStatuses = ScapDetailStatus.SUBMITTED)
 public class ScapApprovalController {
 

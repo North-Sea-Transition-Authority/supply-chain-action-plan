@@ -3,6 +3,8 @@ package uk.co.nstauthority.scap.endpointvalidation.rules;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -18,11 +21,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 
 @ExtendWith(MockitoExtension.class)
 class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
+
+  @Mock
+  ScapDetailService scapDetailService;
 
   @InjectMocks
   ScapHasStatusRule rule;
@@ -30,6 +38,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
   @Test
   @DisplayName("Test rule passes when status is DRAFT")
   void validate_scapIsDraft_IsOK() throws NoSuchMethodException {
+    doReturn(scapDetail).when(scapDetailService).getLatestScapDetailByScapOrThrow(scap);
     when(scapDetail.getStatus()).thenReturn(ScapDetailStatus.DRAFT);
 
     var annotation = getAnnotation(
@@ -41,8 +50,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
         request,
         response,
         userDetail,
-        scap,
-        scapDetail
+        scap
     );
 
     assertTrue(interceptorResult.hasRulePassed());
@@ -53,6 +61,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
   @DisplayName("Assert redirection when status is SUBMITTED")
   void validate_WhenScapSubmitted() throws NoSuchMethodException {
     when(scap.getScapId()).thenReturn(SCAP_ID);
+    doReturn(scapDetail).when(scapDetailService).getLatestScapDetailByScapOrThrow(scap);
     when(scapDetail.getStatus()).thenReturn(ScapDetailStatus.SUBMITTED);
 
     var annotation = getAnnotation(
@@ -64,8 +73,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
         request,
         response,
         userDetail,
-        scap,
-        scapDetail
+        scap
     );
     var redirectUrl = ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID));
 
@@ -76,6 +84,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
   @Test
   @DisplayName("Assert 400 when status is null")
   void validate_WhenScapStatusNull() throws NoSuchMethodException {
+    doReturn(scapDetail).when(scapDetailService).getLatestScapDetailByScapOrThrow(scap);
     when(scapDetail.getStatus()).thenReturn(null);
 
     var annotation = getAnnotation(
@@ -87,8 +96,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
         request,
         response,
         userDetail,
-        scap,
-        scapDetail
+        scap
     );
 
     assertFalse(interceptorResult.hasRulePassed());
@@ -98,6 +106,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
   @Test
   @DisplayName("Assert that annotation works at class level")
   void validate_WhenScapIsDraft() {
+    doReturn(scapDetail).when(scapDetailService).getLatestScapDetailByScapOrThrow(scap);
     when(scapDetail.getStatus()).thenReturn(ScapDetailStatus.SUBMITTED);
 
     var annotation = getAnnotation(
@@ -109,8 +118,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
         request,
         response,
         userDetail,
-        scap,
-        scapDetail
+        scap
     );
 
     assertTrue(interceptorResult.hasRulePassed());

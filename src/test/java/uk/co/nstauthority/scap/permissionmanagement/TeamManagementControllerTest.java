@@ -51,34 +51,31 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
 
   @Test
   void renderTeamList_authorised_thenOk() throws Exception {
-    var user = ServiceUserDetailTestUtil.Builder().build();
     mockMvc.perform(
             get(ReverseRouter.route(on(TeamManagementController.class).renderTeamList()))
-              .with(user(user)))
+              .with(user(testUser)))
         .andExpect(status().isOk());
   }
 
   @Test
   void renderTeamList_userInTeam_thenTeamPresent() throws Exception {
-    var user = ServiceUserDetailTestUtil.Builder().build();
     var team = TeamTestUtil
         .Builder()
         .withTeamType(TeamType.INDUSTRY)
         .build();
 
-    when(userDetailService.getUserDetail()).thenReturn(user);
-    when(teamService.getTeamsThatUserBelongsTo(user)).thenReturn(List.of(team));
+    when(userDetailService.getUserDetail()).thenReturn(testUser);
+    when(teamService.getTeamsThatUserBelongsTo(testUser)).thenReturn(List.of(team));
 
     mockMvc.perform(
         get(ReverseRouter.route(on(TeamManagementController.class).renderTeamList()))
-            .with(user(user)))
+            .with(user(testUser)))
         .andExpect(status().isOk())
         .andExpect(model().attribute("allTeams", List.of(TeamView.fromTeam(team))));
   }
 
   @Test
   void renderTeamList_userAccessManager_thenAllTeamPresent() throws Exception {
-    var user = ServiceUserDetailTestUtil.Builder().build();
     var team = TeamTestUtil
         .Builder()
         .withTeamType(TeamType.INDUSTRY)
@@ -89,49 +86,47 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
         .withTeamType(TeamType.REGULATOR)
         .build();
 
-    when(userDetailService.getUserDetail()).thenReturn(user);
-    when(teamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR)).thenReturn(List.of(regulatorTeam));
-    when(teamMemberService.getTeamMember(any(Team.class), eq(user.getWebUserAccountId()))).thenReturn(
+    when(userDetailService.getUserDetail()).thenReturn(testUser);
+    when(teamService.getTeamsOfTypeThatUserBelongsTo(testUser, TeamType.REGULATOR)).thenReturn(List.of(regulatorTeam));
+    when(teamMemberService.getTeamMember(any(Team.class), eq(testUser.getWebUserAccountId()))).thenReturn(
         TeamMemberTestUtil.Builder()
             .withRole(RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER)
             .build());
     when(teamService.getAllTeams()).thenReturn(List.of(team, regulatorTeam));
     mockMvc.perform(
             get(ReverseRouter.route(on(TeamManagementController.class).renderTeamList()))
-                .with(user(user)))
+                .with(user(testUser)))
         .andExpect(status().isOk())
         .andExpect(model().attribute("allTeams", List.of(TeamView.fromTeam(team), TeamView.fromTeam(regulatorTeam))));
   }
 
   @Test
   void renderTeamList_notUserAccessManager_thenRegulatorTeamPresent() throws Exception {
-    var user = ServiceUserDetailTestUtil.Builder().build();
     var regulatorTeam = TeamTestUtil
         .Builder()
         .withTeamType(TeamType.REGULATOR)
         .build();
 
-    when(userDetailService.getUserDetail()).thenReturn(user);
-    when(teamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR)).thenReturn(List.of(regulatorTeam));
-    when(teamMemberService.getTeamMember(any(Team.class), eq(user.getWebUserAccountId()))).thenReturn(
+    when(userDetailService.getUserDetail()).thenReturn(testUser);
+    when(teamService.getTeamsOfTypeThatUserBelongsTo(testUser, TeamType.REGULATOR)).thenReturn(List.of(regulatorTeam));
+    when(teamMemberService.getTeamMember(any(Team.class), eq(testUser.getWebUserAccountId()))).thenReturn(
         TeamMemberTestUtil.Builder()
             .withRole(RegulatorTeamRole.SCAP_VIEWER)
             .build());
-    when(teamService.getTeamsThatUserBelongsTo(user)).thenReturn(List.of(regulatorTeam));
+    when(teamService.getTeamsThatUserBelongsTo(testUser)).thenReturn(List.of(regulatorTeam));
     mockMvc.perform(
             get(ReverseRouter.route(on(TeamManagementController.class).renderTeamList()))
-                .with(user(user)))
+                .with(user(testUser)))
         .andExpect(status().isOk())
         .andExpect(model().attribute("allTeams", List.of(TeamView.fromTeam(regulatorTeam))));
   }
 
   @Test
   void renderNewTeamForm_authorisedUser_isOk() throws Exception {
-    var user = ServiceUserDetailTestUtil.Builder().build();
 
     mockMvc.perform(
         get(ReverseRouter.route(on(TeamManagementController.class).renderNewIndustryTeamForm(new NewTeamForm())))
-            .with(user(user)))
+            .with(user(testUser)))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/addTeam"))
     ;
@@ -139,7 +134,6 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
 
   @Test
   void addNewIndustryTeam_FormValidates_ReturnToTeamList() throws Exception {
-    var user = ServiceUserDetailTestUtil.Builder().withWuaId(100L).build();
 
     var orgGroup = new OrganisationGroup();
     orgGroup.setName("Royal Dutch Shell");
@@ -149,33 +143,32 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
     form.setOrganisationGroupId("10000");
 
     when(teamService.validate(any(), any())).thenReturn(emptyBindingResult());
-    when(organisationGroupService.getOrganisationGroupById(any(), any())).thenReturn(Optional.of(orgGroup));when(userDetailService.getUserDetail()).thenReturn(user);
-    when(userDetailService.getUserDetail()).thenReturn(user);
+    when(organisationGroupService.getOrganisationGroupById(any(), any())).thenReturn(Optional.of(orgGroup));when(userDetailService.getUserDetail()).thenReturn(testUser);
+    when(userDetailService.getUserDetail()).thenReturn(testUser);
 
     mockMvc.perform(
             post(ReverseRouter.route(on(TeamManagementController.class).addNewIndustryTeam(form, emptyBindingResult())))
                 .flashAttr("form", form)
                 .with(csrf())
-                .with(user(user)))
+                .with(user(testUser)))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/teamList"));
   }
 
   @Test
   void addNewIndustryTeam_FormValidatesGroupDoesntExist_ReturnToNewTeam() throws Exception {
-    var user = ServiceUserDetailTestUtil.Builder().withWuaId(100L).build();
 
     var form = new NewTeamForm();
     form.setOrganisationGroupId("10000");
 
     when(teamService.validate(any(), any())).thenReturn(emptyBindingResult());
-    when(userDetailService.getUserDetail()).thenReturn(user);
+    when(userDetailService.getUserDetail()).thenReturn(testUser);
 
     mockMvc.perform(
             post(ReverseRouter.route(on(TeamManagementController.class).addNewIndustryTeam(form, emptyBindingResult())))
                 .flashAttr("form", form)
                 .with(csrf())
-                .with(user(user)))
+                .with(user(testUser)))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/addTeam"));
   }
@@ -183,27 +176,25 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
   @Test
   void renderArchiveTeamConfirmation_userNotPermitted() throws Exception {
     var teamId = new TeamId(new UUID(1, 1));
-    var user = ServiceUserDetailTestUtil.Builder().withWuaId(100L).build();
 
-    when(teamMemberService.getAllPermissionsForUser(user)).thenReturn(List.of(RolePermission.GRANT_ROLES));
-    doReturn(user).when(userDetailService).getUserDetail();
+    when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.GRANT_ROLES));
+    doReturn(testUser).when(userDetailService).getUserDetail();
 
     mockMvc.perform(
         get(ReverseRouter.route(on(TeamManagementController.class).renderArchiveTeamConfirmation(teamId)))
             .with(csrf())
-            .with(user(user)))
+            .with(user(testUser)))
         .andExpect(status().is4xxClientError());
   }
 
   @Test
   void archiveTeamConfirmation_userPermitted() throws Exception {
     var teamId = new TeamId(new UUID(1, 1));
-    var user = ServiceUserDetailTestUtil.Builder().withWuaId(100L).build();
 
     mockMvc.perform(
         get(ReverseRouter.route(on(TeamManagementController.class).renderArchiveTeamConfirmation(teamId)))
             .with(csrf())
-            .with(user(user)))
+            .with(user(testUser)))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/removeTeam"));
   }
@@ -211,21 +202,19 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
   @Test
   void renderArchiveTeamConfirmation_userNotPermittedReroute() throws Exception {
     var teamId = new TeamId(new UUID(1, 1));
-    var user = ServiceUserDetailTestUtil.Builder().withWuaId(100L).build();
 
-    when(teamMemberService.getAllPermissionsForUser(user)).thenReturn(List.of(RolePermission.GRANT_ROLES));
-    doReturn(user).when(userDetailService).getUserDetail();
+    when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.GRANT_ROLES));
+    doReturn(testUser).when(userDetailService).getUserDetail();
 
     mockMvc.perform(
             get(ReverseRouter.route(on(TeamManagementController.class).renderArchiveTeamConfirmation(teamId)))
                 .with(csrf())
-                .with(user(user)))
+                .with(user(testUser)))
         .andExpect(status().is4xxClientError());
   }
 
   @Test
   void archiveTeam_VerifyCalls() throws Exception {
-    var user = ServiceUserDetailTestUtil.Builder().withWuaId(100L).build();
     var teamId = new TeamId(new UUID(1, 1));
     var team = TeamTestUtil
         .Builder()
@@ -236,7 +225,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
     mockMvc.perform(
             post(ReverseRouter.route(on(TeamManagementController.class).archiveTeam(teamId, null)))
                 .with(csrf())
-                .with(user(user)))
+                .with(user(testUser)))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectUrl("/permission-management/"));
 

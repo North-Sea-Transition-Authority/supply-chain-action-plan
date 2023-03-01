@@ -12,14 +12,11 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
@@ -28,21 +25,16 @@ import uk.co.nstauthority.scap.util.HandlerInterceptorUtil;
 @Component
 public class ScapHandlerInterceptor implements HandlerInterceptor {
 
-  private static final String MISSING_SCAP_ID_PATH_VAR_MESSAGE = "No path variable called scapId found in request";
-  private static final Logger LOGGER = LoggerFactory.getLogger(ScapHandlerInterceptor.class);
-
   private final ScapService scapService;
-  private final ScapDetailService scapDetailService;
+
   private final UserDetailService userDetailService;
   private final List<ScapSecurityRule> securityRules;
 
   @Autowired
   ScapHandlerInterceptor(ScapService scapService,
-                         ScapDetailService scapDetailService,
                          UserDetailService userDetailService,
                          List<ScapSecurityRule> securityRules) {
     this.scapService = scapService;
-    this.scapDetailService = scapDetailService;
     this.userDetailService = userDetailService;
     this.securityRules = securityRules;
   }
@@ -63,7 +55,6 @@ public class ScapHandlerInterceptor implements HandlerInterceptor {
     }
 
     var scap = extractScapFromRequest(request, handlerMethod);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
     var userDetail = userDetailService.getUserDetail();
 
     for (var securityRule : securityRules) {
@@ -76,8 +67,7 @@ public class ScapHandlerInterceptor implements HandlerInterceptor {
           request,
           response,
           userDetail,
-          scap,
-          scapDetail
+          scap
       );
 
       var hasRulePassed = HandlerInterceptorUtil.processRedirectsAndReturnResult(result, response);
@@ -93,8 +83,7 @@ public class ScapHandlerInterceptor implements HandlerInterceptor {
     var scapIdParameter = getPathVariableByClass(handlerMethod, ScapId.class);
 
     if (scapIdParameter.isEmpty()) {
-      LOGGER.error(MISSING_SCAP_ID_PATH_VAR_MESSAGE);
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+      return null;
     }
 
     @SuppressWarnings("unchecked")

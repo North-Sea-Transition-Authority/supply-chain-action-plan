@@ -74,7 +74,7 @@ class ScapHandlerInterceptorTest {
     uriVariables = new HashMap<>();
 
     scapHandlerInterceptor = new ScapHandlerInterceptor(
-        scapService, scapDetailService, userDetailService, Collections.singletonList(securityRule)
+        scapService, userDetailService, Collections.singletonList(securityRule)
     );
   }
 
@@ -91,11 +91,10 @@ class ScapHandlerInterceptorTest {
 
     doReturn(ExampleAnnotation.class).when(securityRule).supports();
     doReturn(scap).when(scapService).getScapById(SCAP_ID.scapId());
-    doReturn(scapDetail).when(scapDetailService).getLatestScapDetailByScapOrThrow(scap);
     doReturn(user).when(userDetailService).getUserDetail();
     doReturn(method).when(handlerMethod).getMethod();
     doReturn(new SecurityRuleResult(false, null, null))
-        .when(securityRule).check(any(), eq(request), eq(response), eq(user), eq(scap), eq(scapDetail));
+        .when(securityRule).check(any(), eq(request), eq(response), eq(user), eq(scap));
 
     var interceptorResult = scapHandlerInterceptor.preHandle(
         request,
@@ -120,11 +119,10 @@ class ScapHandlerInterceptorTest {
 
     doReturn(ExampleAnnotation.class).when(securityRule).supports();
     doReturn(scap).when(scapService).getScapById(SCAP_ID.scapId());
-    doReturn(scapDetail).when(scapDetailService).getLatestScapDetailByScapOrThrow(scap);
     doReturn(user).when(userDetailService).getUserDetail();
     doReturn(method).when(handlerMethod).getMethod();
     doReturn(new SecurityRuleResult(false, null, redirectUrl))
-        .when(securityRule).check(any(), eq(request), eq(response), eq(user), eq(scap), eq(scapDetail));
+        .when(securityRule).check(any(), eq(request), eq(response), eq(user), eq(scap));
 
     var interceptorResult = scapHandlerInterceptor.preHandle(
         request,
@@ -149,11 +147,10 @@ class ScapHandlerInterceptorTest {
 
     doReturn(ExampleAnnotation.class).when(securityRule).supports();
     doReturn(scap).when(scapService).getScapById(SCAP_ID.scapId());
-    doReturn(scapDetail).when(scapDetailService).getLatestScapDetailByScapOrThrow(scap);
     doReturn(user).when(userDetailService).getUserDetail();
     doReturn(method).when(handlerMethod).getMethod();
     doReturn(new SecurityRuleResult(true, null, null))
-        .when(securityRule).check(any(), eq(request), eq(response), eq(user), eq(scap), eq(scapDetail));
+        .when(securityRule).check(any(), eq(request), eq(response), eq(user), eq(scap));
 
     var interceptorResult = scapHandlerInterceptor.preHandle(
         request,
@@ -177,11 +174,10 @@ class ScapHandlerInterceptorTest {
 
     doReturn(ExampleAnnotation.class).when(securityRule).supports();
     doReturn(scap).when(scapService).getScapById(SCAP_ID.scapId());
-    doReturn(scapDetail).when(scapDetailService).getLatestScapDetailByScapOrThrow(scap);
     doReturn(user).when(userDetailService).getUserDetail();
     doReturn(method).when(handlerMethod).getMethod();
     doReturn(new SecurityRuleResult(true, null, null))
-        .when(securityRule).check(any(), eq(request), eq(response), eq(user), eq(scap), eq(scapDetail));
+        .when(securityRule).check(any(), eq(request), eq(response), eq(user), eq(scap));
 
     var interceptorResult = scapHandlerInterceptor.preHandle(
         request,
@@ -190,28 +186,6 @@ class ScapHandlerInterceptorTest {
     );
 
     assertTrue(interceptorResult);
-  }
-
-  @Test
-  @DisplayName("Assert preHandle throws when endpoint does not have ScapId path var param")
-  void preHandle_WhenNoScapIdPathVar() throws NoSuchMethodException {
-    var method = TestController.class.getDeclaredMethod("get", String.class);
-
-    doReturn(ExampleAnnotation.class).when(securityRule).supports();
-    doReturn(method).when(handlerMethod).getMethod();
-
-
-    assertThatThrownBy(() -> scapHandlerInterceptor.preHandle(
-        request,
-        response,
-        handlerMethod
-    ))
-        .isInstanceOf(ResponseStatusException.class)
-        .hasMessage(HttpStatus.BAD_REQUEST.toString());
-
-    verifyNoInteractions(scapService);
-    verifyNoInteractions(scapDetailService);
-    verifyNoInteractions(userDetailService);
   }
 
   @Controller

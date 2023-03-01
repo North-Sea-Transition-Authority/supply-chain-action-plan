@@ -26,10 +26,10 @@ import uk.co.nstauthority.scap.configuration.WebMvcConfiguration;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.ScapHandlerInterceptor;
 import uk.co.nstauthority.scap.endpointvalidation.rules.ScapHasStatusRule;
+import uk.co.nstauthority.scap.endpointvalidation.rules.UserHasAnyPermissionRule;
 import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
 import uk.co.nstauthority.scap.mvc.WithDefaultPageControllerAdvice;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
-import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionManagementHandlerInterceptor;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.ScapPermissionManagementHandlerInterceptor;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.TeamManagementHandlerInterceptor;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.TeamPermissionManagementHandlerInterceptor;
@@ -46,13 +46,13 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 @Import({
     AbstractControllerTest.TestConfig.class,
     WebMvcConfiguration.class,
-    PermissionManagementHandlerInterceptor.class,
     TeamPermissionManagementHandlerInterceptor.class,
     TeamManagementHandlerInterceptor.class,
     ScapPermissionManagementHandlerInterceptor.class,
     ScapHandlerInterceptor.class,
     // Interceptor rules
-    ScapHasStatusRule.class
+    ScapHasStatusRule.class,
+    UserHasAnyPermissionRule.class
 })
 @WithDefaultPageControllerAdvice
 @WebMvcTest
