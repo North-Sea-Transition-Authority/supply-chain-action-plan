@@ -22,6 +22,7 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.ContractStage;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipantService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContract;
+import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContractBuilder;
 import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContractService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 
@@ -52,15 +53,22 @@ class ActualTenderSummaryViewServiceTest {
     actualTenderActivity.setScopeTitle("test scope title 1");
     actualTenderActivity.setScopeDescription("test scope description 1");
     actualTenderActivity.setRemunerationModel(RemunerationModel.LUMP_SUM);
-    actualTenderActivity.setContractStage(ContractStage.INVITATION_TO_TENDER_IS_LIVE);
+    actualTenderActivity.setContractStage(ContractStage.CONTRACT_AWARDED);
     var participant = new InvitationToTenderParticipant(210);
     participant.setCompanyName("company name 1");
     participant.setActualTenderActivity(actualTenderActivity);
+    participant.setBidParticipant(true);
     var participants = List.of(participant);
+    var awardedContract = AwardedContractBuilder.newBuilder()
+        .withPreferredBidder(null)
+        .withActualTenderActivity(actualTenderActivity)
+        .build();
 
-    when(invitationToTenderParticipantService.getInvitationToTenderParticipantsForActivities(
-        List.of(actualTenderActivity)))
+    when(invitationToTenderParticipantService
+        .getInvitationToTenderParticipantsForActivities(List.of(actualTenderActivity)))
         .thenReturn(participants);
+    when(awardedContractService.getByActualTenderActivityIn(Collections.singletonList(actualTenderActivity)))
+        .thenReturn(Collections.singletonList(awardedContract));
 
     var view = actualTenderSummaryViewService.getSingleViewByActualTenderActivity(actualTenderActivity, scapId);
 
@@ -74,7 +82,10 @@ class ActualTenderSummaryViewServiceTest {
         ActualTenderActivitySummaryView::contractStage,
         ActualTenderActivitySummaryView::ittParticipants,
         ActualTenderActivitySummaryView::bidParticipants,
-        ActualTenderActivitySummaryView::awardedContractSummaryView
+        summaryView -> summaryView.awardedContractSummaryView().preferredBidderName(),
+        summaryView -> summaryView.awardedContractSummaryView().awardValue(),
+        summaryView -> summaryView.awardedContractSummaryView().awardRationale(),
+        summaryView -> summaryView.awardedContractSummaryView().preferredBidderCountry()
     ).containsExactly(
         scapId,
         actualTenderActivity.getId(),
@@ -84,8 +95,11 @@ class ActualTenderSummaryViewServiceTest {
         actualTenderActivity.getRemunerationModelName(),
         actualTenderActivity.getContractStage(),
         Map.of(participant.getCompanyName(), true),
-        Collections.emptyMap(),
-        null
+        Map.of(participant.getCompanyName(), true),
+        null,
+        awardedContract.getAwardValue(),
+        awardedContract.getAwardRationale(),
+        ""
     );
   }
 

@@ -247,4 +247,14 @@ class AwardedContractServiceTest {
 
     assertThat(returnedContracts).isEqualTo(awardedContracts);
   }
+
+  @Test
+  void removePreferredBidder_VerifyCalls() {
+    var awardedContract = AwardedContractBuilder.newBuilder().build();
+
+    awardedContractService.removePreferredBidder(awardedContract);
+
+    verify(awardedContractRepository).save(awardedContract);
+    assertThat(awardedContract.getPreferredBidder()).isNull();
+  }
 }

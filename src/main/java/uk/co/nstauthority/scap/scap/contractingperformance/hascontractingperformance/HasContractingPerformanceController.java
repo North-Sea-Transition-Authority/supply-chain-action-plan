@@ -19,12 +19,12 @@ import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceController;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverviewService;
-import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
 import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
+import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryViewService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @Controller
@@ -36,22 +36,22 @@ public class HasContractingPerformanceController {
   private final ScapService scapService;
   private final ScapDetailService scapDetailService;
   private final ContractingPerformanceOverviewService contractingPerformanceOverviewService;
-  private final ContractingPerformanceService contractingPerformanceService;
   private final HasContractingPerformanceFormService contractingPerformanceFormService;
   private final ControllerHelperService controllerHelperService;
+  private final ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService;
 
   @Autowired
   public HasContractingPerformanceController(ScapService scapService, ScapDetailService scapDetailService,
                                              ContractingPerformanceOverviewService contractingPerformanceOverviewService,
-                                             ContractingPerformanceService contractingPerformanceService,
                                              HasContractingPerformanceFormService contractingPerformanceFormService,
-                                             ControllerHelperService controllerHelperService) {
+                                             ControllerHelperService controllerHelperService,
+                                             ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService) {
     this.scapService = scapService;
     this.scapDetailService = scapDetailService;
     this.contractingPerformanceOverviewService = contractingPerformanceOverviewService;
-    this.contractingPerformanceService = contractingPerformanceService;
     this.contractingPerformanceFormService = contractingPerformanceFormService;
     this.controllerHelperService = controllerHelperService;
+    this.contractingPerformanceSummaryViewService = contractingPerformanceSummaryViewService;
   }
 
   @GetMapping
@@ -59,8 +59,9 @@ public class HasContractingPerformanceController {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
     var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetail(scapDetail);
+    var summaryViews = contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(scapId);
 
-    if (contractingPerformanceOverview.map(contractingPerformanceService::hasContractingPerformance).orElse(false)) {
+    if (!summaryViews.isEmpty()) {
       return ReverseRouter.redirect(on(ContractingPerformanceSummaryController.class)
           .renderContractingPerformanceSummary(scapId));
     }
@@ -79,9 +80,9 @@ public class HasContractingPerformanceController {
 
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
-    var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetail(scapDetail);
+    var summaryViews = contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(scapId);
 
-    if (contractingPerformanceOverview.map(contractingPerformanceService::hasContractingPerformance).orElse(false)) {
+    if (!summaryViews.isEmpty()) {
       return ReverseRouter.redirect(on(ContractingPerformanceSummaryController.class)
           .renderContractingPerformanceSummary(scapId));
     }

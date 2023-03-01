@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import uk.co.fivium.energyportalapi.generated.types.Country;
 import uk.co.fivium.formlibrary.validator.date.DateUtils;
@@ -68,10 +69,10 @@ public class ActualTenderSummaryViewService {
           var awardedContractOpt = getAwardedContract(awardedContractsMap, actualTenderActivity);
           var awardedContractView = awardedContractOpt.map(
               awardedContract -> new AwardedContractSummaryView(
-                  awardedContract.getPreferredBidder().getCompanyName(),
+                  getCompanyName(awardedContract.getPreferredBidder()),
                   awardedContract.getAwardValue(),
                   awardedContract.getAwardRationale(),
-                  countriesMap.getOrDefault(awardedContract.getPreferredBidderCountryId(), "MISSING COUNTRY"),
+                  countriesMap.getOrDefault(awardedContract.getPreferredBidderCountryId(), ""),
                   DateUtils.format(awardedContract.getContractAwardDate()),
                   awardedContract.getPaymentTerms(),
                   DateUtils.format(awardedContract.getForecastExecutionStartDate()),
@@ -102,6 +103,13 @@ public class ActualTenderSummaryViewService {
           );
         })
         .toList();
+  }
+
+  private String getCompanyName(@Nullable InvitationToTenderParticipant participant) {
+    if (Objects.isNull(participant)) {
+      return null;
+    }
+    return participant.getCompanyName();
   }
 
   private Map<Integer, List<InvitationToTenderParticipant>> getActivityParticipantsMap(

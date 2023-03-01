@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.energyportal.OrganisationUnitService;
 import uk.co.nstauthority.scap.fds.searchselector.ManualEntryUtil;
+import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContractService;
 
 @Service
 public class InvitationToTenderParticipantService {
@@ -18,15 +19,18 @@ public class InvitationToTenderParticipantService {
   private final InvitationToTenderParticipantRepository invitationToTenderParticipantRepository;
   private final OrganisationUnitService organisationUnitService;
   private final Clock clock;
+  private final AwardedContractService awardedContractService;
 
   static final String ORGANISATION_UNIT_REQUEST_PURPOSE = "Get selected org units for SCAP actual tender activity";
 
   @Autowired
   InvitationToTenderParticipantService(InvitationToTenderParticipantRepository invitationToTenderParticipantRepository,
-                                       OrganisationUnitService organisationUnitService, Clock clock) {
+                                       OrganisationUnitService organisationUnitService, Clock clock,
+                                       AwardedContractService awardedContractService) {
     this.invitationToTenderParticipantRepository = invitationToTenderParticipantRepository;
     this.organisationUnitService = organisationUnitService;
     this.clock = clock;
+    this.awardedContractService = awardedContractService;
   }
 
   public List<InvitationToTenderParticipant> getInvitationToTenderParticipants(ActualTenderActivity actualTenderActivity) {
@@ -110,6 +114,16 @@ public class InvitationToTenderParticipantService {
 
     var newIttParticipants = Stream.concat(addedNonEpaIttParticipants.stream(), addedIttParticipantsFromEpa.stream())
         .collect(Collectors.toSet());
+
+    // Remove the ITT participant from the awarded contract
+    var awardedContractOpt = awardedContractService.getByActualTenderActivity(actualTenderActivity);
+    awardedContractOpt.ifPresent(
+        awardedContract -> {
+          if (removedParticipants.contains(awardedContract.getPreferredBidder())) {
+            awardedContractService.removePreferredBidder(awardedContract);
+          }
+        }
+    );
 
     // Delete the removed participants and save the added participants
     invitationToTenderParticipantRepository.deleteAll(removedParticipants);

@@ -83,6 +83,19 @@ class BidParticipantsFormValidatorTest {
   }
 
   @Test
+  void validate_NullBidParticipants() {
+    var form = new BidParticipantsForm();
+    var errors = new BeanPropertyBindingResult(form, "form");
+
+    validator.validate(form, errors, new BidParticipantsFormValidatorHint(null));
+    var extractedErrors = ValidatorTestingUtil.extractErrors(errors);
+
+    assertThat(extractedErrors).containsExactly(
+        entry("selectedBidParticipantIds", Set.of("selectedBidParticipantIds.required"))
+    );
+  }
+
+  @Test
   void validate_WithoutHint_AssertThrows() {
     var form = new BidParticipantsForm();
     var errors = new BeanPropertyBindingResult(form, "form");

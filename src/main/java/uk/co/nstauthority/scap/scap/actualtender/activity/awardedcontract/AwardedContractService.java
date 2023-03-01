@@ -74,4 +74,10 @@ public class AwardedContractService {
   public List<AwardedContract> getByActualTenderActivityIn(List<ActualTenderActivity> activities) {
     return awardedContractRepository.findByActualTenderActivityIn(activities);
   }
+
+  @Transactional
+  public void removePreferredBidder(AwardedContract awardedContract) {
+    awardedContract.setPreferredBidder(null);
+    awardedContractRepository.save(awardedContract);
+  }
 }

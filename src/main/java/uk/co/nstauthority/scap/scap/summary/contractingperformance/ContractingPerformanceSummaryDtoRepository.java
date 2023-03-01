@@ -39,7 +39,7 @@ class ContractingPerformanceSummaryDtoRepository {
             "JOIN ContractingPerformance cp ON cp.contractingPerformanceOverview = cpo " +
             "JOIN ActualTenderActivity ata ON cp.actualTenderActivity = ata " +
             "JOIN AwardedContract ac ON ac.actualTenderActivity = ata " +
-            "JOIN InvitationToTenderParticipant ittp ON ac.preferredBidder = ittp " +
+            "LEFT JOIN InvitationToTenderParticipant ittp ON ac.preferredBidder = ittp " +
             "WHERE s.id = :scapId " +
             "AND :contractingPerformanceId IS NULL OR cp.id = :contractingPerformanceId", ContractingPerformanceSummaryDto.class)
         .setParameter("scapId", scapId.scapId())

@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperfor
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,9 +15,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.mvc.ReverseRouter.emptyBindingResult;
 
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -32,6 +35,8 @@ import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanc
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverviewService;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceService;
 import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPerformanceSummaryController;
+import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryView;
+import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryViewService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
 
@@ -49,6 +54,12 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
   @MockBean
   HasContractingPerformanceFormService contractingPerformanceFormService;
 
+  @MockBean
+  ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService;
+
+  @Mock
+  List<ContractingPerformanceSummaryView> summaryViews;
+
   @Test
   void renderHasContractingPerformanceForm_NoExistingContractPerformanceOverview() throws Exception {
     when(contractingPerformanceOverviewService.getByScapDetail(scapDetail)).thenReturn(Optional.empty());
@@ -62,6 +73,8 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getScapId()))))
         .andExpect(model().attribute("radioItems", YesNo.getRadioOptions()))
         .andExpect(model().attributeExists("form"));
+
+    verify(contractingPerformanceSummaryViewService).getContractingPerformanceSummaryViews(SCAP_ID);
   }
 
   @Test
@@ -82,6 +95,8 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
             ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getScapId()))))
         .andExpect(model().attribute("radioItems", YesNo.getRadioOptions()))
         .andExpect(model().attribute("form", filledForm));
+
+    verify(contractingPerformanceSummaryViewService).getContractingPerformanceSummaryViews(SCAP_ID);
   }
 
   @Test
@@ -93,8 +108,8 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
 
     when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
         .thenReturn(Optional.of(existingContractPerformanceOverview));
-    when(contractingPerformanceService.hasContractingPerformance(existingContractPerformanceOverview))
-        .thenReturn(true);
+    when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(SCAP_ID)).thenReturn(summaryViews);
+    doReturn(false).when(summaryViews).isEmpty();
     when(contractingPerformanceFormService.getForm(existingContractPerformanceOverview)).thenReturn(filledForm);
 
     mockMvc.perform(get(
@@ -112,8 +127,8 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
 
     when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
         .thenReturn(Optional.of(existingContractPerformanceOverview));
-    when(contractingPerformanceService.hasContractingPerformance(existingContractPerformanceOverview))
-        .thenReturn(true);
+    when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(SCAP_ID)).thenReturn(summaryViews);
+    doReturn(false).when(summaryViews).isEmpty();
 
     mockMvc.perform(post(
         ReverseRouter.route(on(HasContractingPerformanceController.class)
@@ -121,6 +136,8 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
         .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(ControllerTestingUtil.redirectUrl(expectedRedirectUrl));
+
+    verify(contractingPerformanceSummaryViewService).getContractingPerformanceSummaryViews(SCAP_ID);
   }
 
   @Test
@@ -147,6 +164,7 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
         .andExpect(model().attribute("form", form));
 
     verify(contractingPerformanceOverviewService, never()).saveContractingPerformance(any(), any());
+    verify(contractingPerformanceSummaryViewService).getContractingPerformanceSummaryViews(SCAP_ID);
   }
 
   @Test
@@ -169,6 +187,7 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
         .andExpect(ControllerTestingUtil.redirectUrl(expectedRedirectUrl));
 
     verify(contractingPerformanceOverviewService).saveContractingPerformance(scapDetail, form.getHasContractingPerformance());
+    verify(contractingPerformanceSummaryViewService).getContractingPerformanceSummaryViews(SCAP_ID);
   }
 
   @Test
@@ -191,5 +210,6 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
         .andExpect(ControllerTestingUtil.redirectUrl(expectedRedirectUrl));
 
     verify(contractingPerformanceOverviewService).saveContractingPerformance(scapDetail, form.getHasContractingPerformance());
+    verify(contractingPerformanceSummaryViewService).getContractingPerformanceSummaryViews(SCAP_ID);
   }
 }

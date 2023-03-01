@@ -2,6 +2,8 @@ package uk.co.nstauthority.scap.scap.actualtender.activity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -9,6 +11,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +23,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationUnit;
 import uk.co.nstauthority.scap.energyportal.OrganisationUnitService;
 import uk.co.nstauthority.scap.fds.searchselector.ManualEntryUtil;
+import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContractBuilder;
+import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContractService;
 
 @ExtendWith(MockitoExtension.class)
 class InvitationToTenderParticipantServiceTest {
@@ -32,6 +37,9 @@ class InvitationToTenderParticipantServiceTest {
 
   @Mock
   OrganisationUnitService organisationUnitService;
+
+  @Mock
+  AwardedContractService awardedContractService;
 
   @InjectMocks
   InvitationToTenderParticipantService invitationToTenderParticipantService;
@@ -171,6 +179,10 @@ class InvitationToTenderParticipantServiceTest {
         String.valueOf(addedOrganisationUnitId)
     );
     var currentInstant = Instant.now();
+    var awardedContract = AwardedContractBuilder.newBuilder()
+        .withActualTenderActivity(actualTenderActivity)
+        .withPreferredBidder(removedParticipant)
+        .build();
 
     when(clock.instant()).thenReturn(currentInstant);
     when(invitationToTenderParticipantRepository.findAllByActualTenderActivity(actualTenderActivity))
@@ -179,11 +191,14 @@ class InvitationToTenderParticipantServiceTest {
         Collections.singletonList(addedOrganisationUnitId),
         InvitationToTenderParticipantService.ORGANISATION_UNIT_REQUEST_PURPOSE))
         .thenReturn(Collections.singletonList(addedOrganisation));
+    when(awardedContractService.getByActualTenderActivity(actualTenderActivity))
+        .thenReturn(Optional.of(awardedContract));
 
     invitationToTenderParticipantService.updateInvitationToTenderParticipants(actualTenderActivity, participantsFromForm);
 
     verify(invitationToTenderParticipantRepository).saveAll(participantSetArgumentCaptor.capture());
     verify(invitationToTenderParticipantRepository).deleteAll(participantSetArgumentCaptor2.capture());
+    verify(awardedContractService).removePreferredBidder(awardedContract);
 
     assertThat(participantSetArgumentCaptor2.getValue()).containsExactlyInAnyOrder(
         removedParticipant,
@@ -197,5 +212,30 @@ class InvitationToTenderParticipantServiceTest {
         tuple(addedParticipantName, currentInstant, null),
         tuple(addedOrganisation.getName(), currentInstant, addedOrganisationUnitId)
     );
+  }
+
+  @Test
+  void updateInvitationToTenderParticipants_PreferredBidderUnchanged_VerifyNeverRemoves() {
+    var actualTenderActivity = new ActualTenderActivityBuilder().build();
+    var participant = new InvitationToTenderParticipantBuilder()
+        .withActualTenderActivity(actualTenderActivity)
+        .withCompanyName("existing company name")
+        .build();
+    var awardedContract = AwardedContractBuilder.newBuilder()
+        .withActualTenderActivity(actualTenderActivity)
+        .withPreferredBidder(participant)
+        .build();
+
+    when(invitationToTenderParticipantRepository.findAllByActualTenderActivity(actualTenderActivity))
+        .thenReturn(Collections.singletonList(participant));
+    when(awardedContractService.getByActualTenderActivity(actualTenderActivity))
+        .thenReturn(Optional.of(awardedContract));
+
+    invitationToTenderParticipantService.updateInvitationToTenderParticipants(
+        actualTenderActivity,
+        Collections.singletonList(ManualEntryUtil.addFreeTextPrefix("existing company name"))
+    );
+
+    verify(awardedContractService, never()).removePreferredBidder(any());
   }
 }
