@@ -9,6 +9,8 @@ import uk.co.fivium.formlibrary.input.ThreeFieldDateInput;
 class AwardedContractForm {
 
   static final String CONTRACT_AWARD_DATE_FIELD = "contractAwardDate";
+  static final String CONTRACT_START_DATE_FIELD = "contractStartDate";
+  static final String CONTRACT_END_DATE_FIELD = "contractEndDate";
 
   private Integer preferredBidderId;
   private final DecimalInput awardValue;
@@ -17,12 +19,16 @@ class AwardedContractForm {
   private final ThreeFieldDateInput contractAwardDate;
   private PaymentTermsRadio paymentTermsRadio;
   private final IntegerInput otherPaymentTerm;
+  private final ThreeFieldDateInput contractStartDate;
+  private final ThreeFieldDateInput contractEndDate;
 
   public AwardedContractForm() {
     this.awardValue = new DecimalInput("awardValue", "Award value");
     this.awardRationale = new StringInput("awardRationale", "Award rationale");
     this.contractAwardDate = new ThreeFieldDateInput(CONTRACT_AWARD_DATE_FIELD, "Contract award date");
     this.otherPaymentTerm = new IntegerInput("otherPaymentTerm", "Days for payment terms");
+    this.contractStartDate = new ThreeFieldDateInput(CONTRACT_START_DATE_FIELD, "Forecast execution start date");
+    this.contractEndDate = new ThreeFieldDateInput(CONTRACT_END_DATE_FIELD, "Forecast execution completion date");
   }
 
   public Integer getPreferredBidderId() {
@@ -79,5 +85,21 @@ class AwardedContractForm {
 
   public void setOtherPaymentTerm(String otherPaymentTerm) {
     this.otherPaymentTerm.setInputValue(otherPaymentTerm);
+  }
+
+  public ThreeFieldDateInput getContractStartDate() {
+    return contractStartDate;
+  }
+
+  public void setContractStartDate(LocalDate contractStartDate) {
+    this.contractStartDate.setDate(contractStartDate);
+  }
+
+  public ThreeFieldDateInput getContractEndDate() {
+    return contractEndDate;
+  }
+
+  public void setContractEndDate(LocalDate contractEndDate) {
+    this.contractEndDate.setDate(contractEndDate);
   }
 }

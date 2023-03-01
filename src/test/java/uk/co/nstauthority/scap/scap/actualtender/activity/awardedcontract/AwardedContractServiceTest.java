@@ -65,14 +65,18 @@ class AwardedContractServiceTest {
   @Test
   void saveAwardedContract_UpdateExisting_VerifySaves() {
     var awardedContract = new AwardedContract(27);
-    var date = LocalDate.of(2000, 1, 1);
+    var contractAwardDate = LocalDate.of(2000, 1, 1);
+    var contractStartDate = LocalDate.of(2000, 2, 1);
+    var contractEndDate = LocalDate.of(2000, 3, 1);
     var otherPaymentTerm = 90;
     var form = new AwardedContractForm();
     form.setPreferredBidderId(bidParticipants.get(0).getId());
     form.setAwardValue("1.23");
     form.setAwardRationale("Test award rationale");
     form.setPreferredBidderCountryId(0);
-    form.setContractAwardDate(date);
+    form.setContractAwardDate(contractAwardDate);
+    form.setContractStartDate(contractStartDate);
+    form.setContractEndDate(contractEndDate);
     form.setPaymentTermsRadio(PaymentTermsRadio.OTHER);
     form.setOtherPaymentTerm(String.valueOf(otherPaymentTerm));
     var argumentCaptor = ArgumentCaptor.forClass(AwardedContract.class);
@@ -91,29 +95,37 @@ class AwardedContractServiceTest {
         AwardedContract::getAwardRationale,
         AwardedContract::getPreferredBidderCountryId,
         AwardedContract::getContractAwardDate,
-        AwardedContract::getPaymentTerms
+        AwardedContract::getPaymentTerms,
+        AwardedContract::getForecastExecutionStartDate,
+        AwardedContract::getForecastExecutionEndDate
     ).containsExactly(
         awardedContract.getId(),
         bidParticipants.get(0),
         form.getAwardValue().getAsBigDecimal().get(),
         form.getAwardRationale().getInputValue(),
         form.getPreferredBidderCountryId(),
-        date,
-        otherPaymentTerm
+        contractAwardDate,
+        otherPaymentTerm,
+        contractStartDate,
+        contractEndDate
     );
   }
 
   @Test
   void saveAwardedContract_CreateNew_VerifySaves() {
     var form = new AwardedContractForm();
-    var date = LocalDate.of(2000, 1, 1);
+    var contractAwardDate = LocalDate.of(2000, 1, 1);
+    var contractStartDate = LocalDate.of(2000, 2, 1);
+    var contractEndDate = LocalDate.of(2000, 3, 1);
     var paymentTerms = PaymentTermsRadio.DAYS_30;
     form.setPreferredBidderId(bidParticipants.get(0).getId());
     form.setAwardValue("1.23");
     form.setAwardRationale("Test award rationale");
     form.setPreferredBidderCountryId(0);
-    form.setContractAwardDate(date);
+    form.setContractAwardDate(contractAwardDate);
     form.setPaymentTermsRadio(paymentTerms);
+    form.setContractStartDate(contractStartDate);
+    form.setContractEndDate(contractEndDate);
     var argumentCaptor = ArgumentCaptor.forClass(AwardedContract.class);
 
     when(awardedContractRepository.findByActualTenderActivity(actualTenderActivity))
@@ -130,15 +142,19 @@ class AwardedContractServiceTest {
         AwardedContract::getPreferredBidderCountryId,
         AwardedContract::getCreatedTimestamp,
         AwardedContract::getContractAwardDate,
-        AwardedContract::getPaymentTerms
+        AwardedContract::getPaymentTerms,
+        AwardedContract::getForecastExecutionStartDate,
+        AwardedContract::getForecastExecutionEndDate
     ).containsExactly(
         bidParticipants.get(0),
         form.getAwardValue().getAsBigDecimal().get(),
         form.getAwardRationale().getInputValue(),
         form.getPreferredBidderCountryId(),
         clock.instant(),
-        date,
-        paymentTerms.getPaymentTerm()
+        contractAwardDate,
+        paymentTerms.getPaymentTerm(),
+        contractStartDate,
+        contractEndDate
     );
   }
 
@@ -176,11 +192,16 @@ class AwardedContractServiceTest {
   @Test
   void saveAwardedContract_InvalidPaymentTerm_VerifyNeverSaves() {
     var form = new AwardedContractForm();
+    var contractAwardDate = LocalDate.of(2000, 1, 1);
+    var contractStartDate = LocalDate.of(2000, 2, 1);
+    var contractEndDate = LocalDate.of(2000, 3, 1);
     form.setPreferredBidderId(bidParticipants.get(0).getId());
     form.setPaymentTermsRadio(PaymentTermsRadio.OTHER);
     form.setOtherPaymentTerm("NaN");
     form.setAwardValue("1.23");
-    form.setContractAwardDate(LocalDate.of(2000, 1, 1));
+    form.setContractAwardDate(contractAwardDate);
+    form.setContractStartDate(contractStartDate);
+    form.setContractEndDate(contractEndDate);
 
     when(awardedContractRepository.findByActualTenderActivity(actualTenderActivity))
         .thenReturn(Optional.empty());

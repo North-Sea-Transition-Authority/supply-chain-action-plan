@@ -80,6 +80,8 @@ class AwardedContractFormServiceTest {
     awardedContract.setPreferredBidderCountryId(preferredBidderLocation);
     awardedContract.setContractAwardDate(awardDate);
     awardedContract.setPaymentTerms(awardedContractPaymentTerms);
+    awardedContract.setForecastExecutionStartDate(LocalDate.of(2000, 2, 1));
+    awardedContract.setForecastExecutionEndDate(LocalDate.of(2000, 3, 1));
 
     var form = awardedContractFormService.getForm(awardedContract);
 
@@ -90,7 +92,9 @@ class AwardedContractFormServiceTest {
         AwardedContractForm::getPreferredBidderCountryId,
         actualForm -> actualForm.getContractAwardDate().getAsLocalDate(),
         AwardedContractForm::getPaymentTermsRadio,
-        actualForm -> actualForm.getOtherPaymentTerm().getInputValue()
+        actualForm -> actualForm.getOtherPaymentTerm().getInputValue(),
+        actualForm -> actualForm.getContractStartDate().getAsLocalDate(),
+        actualForm -> actualForm.getContractEndDate().getAsLocalDate()
     ).containsExactly(
         preferredBidderId,
         String.valueOf(awardValue),
@@ -98,7 +102,28 @@ class AwardedContractFormServiceTest {
         preferredBidderLocation,
         Optional.of(awardDate),
         expectedFormRadio,
-        expectFormOtherPaymentTerm
+        expectFormOtherPaymentTerm,
+        Optional.of(awardedContract.getForecastExecutionStartDate()),
+        Optional.of(awardedContract.getForecastExecutionEndDate())
+    );
+  }
+
+  @Test
+  void getForm_AllFieldsNull_AssertDoesNotThrow() {
+    var awardedContract = new AwardedContract(141);
+
+    var form = awardedContractFormService.getForm(awardedContract);
+
+    assertThat(form).extracting(
+        AwardedContractForm::getPreferredBidderId,
+        actualForm -> actualForm.getContractAwardDate().getAsLocalDate(),
+        actualForm -> actualForm.getContractStartDate().getAsLocalDate(),
+        actualForm -> actualForm.getContractEndDate().getAsLocalDate()
+    ).containsExactly(
+        null,
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty()
     );
   }
 

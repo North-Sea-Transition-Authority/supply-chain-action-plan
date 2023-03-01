@@ -67,6 +67,22 @@ backLinkUrl=springUrl(backLinkUrl)
       </#list>
     </@fdsRadio.radioGroup>
 
+    <@fdsDateInput.dateInput
+      formId="forecast-start-date"
+      labelText="Forecast execution start date"
+      dayPath="form.contractStartDate.dayInput.inputValue"
+      monthPath="form.contractStartDate.monthInput.inputValue"
+      yearPath="form.contractStartDate.yearInput.inputValue"
+    />
+
+    <@fdsDateInput.dateInput
+      formId="forecast-end-date"
+      labelText="Forecast execution completion date"
+      dayPath="form.contractEndDate.dayInput.inputValue"
+      monthPath="form.contractEndDate.monthInput.inputValue"
+      yearPath="form.contractEndDate.yearInput.inputValue"
+    />
+
     <@fdsAction.button buttonText="Save and continue"/>
   </@fdsForm.htmlForm>
 </@defaultPage>

@@ -68,7 +68,9 @@ public class ActualTenderSummaryViewService {
                   awardedContract.getAwardRationale(),
                   countriesMap.getOrDefault(awardedContract.getPreferredBidderCountryId(), "MISSING COUNTRY"),
                   DateUtils.format(awardedContract.getContractAwardDate()),
-                  awardedContract.getPaymentTerms())
+                  awardedContract.getPaymentTerms(),
+                  DateUtils.format(awardedContract.getForecastExecutionStartDate()),
+                  DateUtils.format(awardedContract.getForecastExecutionEndDate()))
               ).orElse(null);
 
           return new ActualTenderActivitySummaryView(

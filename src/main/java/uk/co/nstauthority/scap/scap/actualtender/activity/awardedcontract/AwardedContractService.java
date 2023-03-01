@@ -41,6 +41,10 @@ public class AwardedContractService {
             String.format("Could not cast %s to BigDecimal", form.getAwardValue().getInputValue())));
     var contractAwardDate = form.getContractAwardDate().getAsLocalDate()
         .orElseThrow(() -> new ClassCastException("Could not cast contractAwardDate to LocalDate"));
+    var contractStartDate = form.getContractStartDate().getAsLocalDate()
+        .orElseThrow(() -> new ClassCastException("Could not cast contractStartDate to LocalDate"));
+    var contractEndDate = form.getContractEndDate().getAsLocalDate()
+        .orElseThrow(() -> new ClassCastException("Could not cast contractEndDate to LocalDate"));
 
     awardedContract.setPreferredBidder(preferredBidder);
     awardedContract.setAwardValue(awardValue);
@@ -55,6 +59,8 @@ public class AwardedContractService {
     } else {
       awardedContract.setPaymentTerms(form.getPaymentTermsRadio().getPaymentTerm());
     }
+    awardedContract.setForecastExecutionStartDate(contractStartDate);
+    awardedContract.setForecastExecutionEndDate(contractEndDate);
 
     awardedContractRepository.save(awardedContract);
   }

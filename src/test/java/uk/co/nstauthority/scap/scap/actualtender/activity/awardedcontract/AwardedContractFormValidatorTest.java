@@ -87,6 +87,8 @@ class AwardedContractFormValidatorTest {
 
     var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
     var contractAwardDateField = AwardedContractForm.CONTRACT_AWARD_DATE_FIELD;
+    var contractStartDateField = AwardedContractForm.CONTRACT_START_DATE_FIELD;
+    var contractEndDateField = AwardedContractForm.CONTRACT_END_DATE_FIELD;
 
     verify(countryService, never()).doesCountryExist(any());
     assertThat(extractedErrors).containsExactly(
@@ -101,7 +103,19 @@ class AwardedContractFormValidatorTest {
         entry("%s.yearInput.inputValue".formatted(contractAwardDateField),
             Set.of("%s.yearInput.required".formatted(contractAwardDateField))),
         entry("%s".formatted(AwardedContractFormValidator.PAYMENT_TERMS_RADIO_FIELD),
-            Set.of("%s.required".formatted(AwardedContractFormValidator.PAYMENT_TERMS_RADIO_FIELD)))
+            Set.of("%s.required".formatted(AwardedContractFormValidator.PAYMENT_TERMS_RADIO_FIELD))),
+        entry("%s.dayInput.inputValue".formatted(contractStartDateField),
+            Set.of("%s.dayInput.required".formatted(contractStartDateField))),
+        entry("%s.monthInput.inputValue".formatted(contractStartDateField),
+            Set.of("%s.monthInput.required".formatted(contractStartDateField))),
+        entry("%s.yearInput.inputValue".formatted(contractStartDateField),
+            Set.of("%s.yearInput.required".formatted(contractStartDateField))),
+        entry("%s.dayInput.inputValue".formatted(contractEndDateField),
+            Set.of("%s.dayInput.required".formatted(contractEndDateField))),
+        entry("%s.monthInput.inputValue".formatted(contractEndDateField),
+            Set.of("%s.monthInput.required".formatted(contractEndDateField))),
+        entry("%s.yearInput.inputValue".formatted(contractEndDateField),
+            Set.of("%s.yearInput.required".formatted(contractEndDateField)))
     );
   }
 
@@ -231,6 +245,62 @@ class AwardedContractFormValidatorTest {
     );
   }
 
+  @Test
+  void validate_ContractStartDateBeforeContractAwardDate_AssertError() {
+    var bidParticipant1 = new InvitationToTenderParticipant(1410);
+    var bidParticipant2 = new InvitationToTenderParticipant(1411);
+    var bidParticipants = List.of(bidParticipant1, bidParticipant2);
+    var countryId = 0;
+    var contractStartDateField = AwardedContractForm.CONTRACT_START_DATE_FIELD;
+    form.setPreferredBidderId(bidParticipant1.getId());
+    form.setPreferredBidderCountryId(countryId);
+
+    form.setContractStartDate(LocalDate.of(1990, 1, 1));
+
+    when(countryService.doesCountryExist(countryId)).thenReturn(true);
+
+    validator.validate(form, bindingResult, new AwardedContractFormValidatorHint(bidParticipants));
+
+    var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
+
+    assertThat(extractedErrors).containsExactly(
+        entry("%s.dayInput.inputValue".formatted(contractStartDateField),
+            Set.of("%s.dayInput.minDateExclusiveNotMet".formatted(contractStartDateField))),
+        entry("%s.monthInput.inputValue".formatted(contractStartDateField),
+            Set.of("%s.monthInput.minDateExclusiveNotMet".formatted(contractStartDateField))),
+        entry("%s.yearInput.inputValue".formatted(contractStartDateField),
+            Set.of("%s.yearInput.minDateExclusiveNotMet".formatted(contractStartDateField)))
+    );
+  }
+
+  @Test
+  void validate_ContractEndDateBeforeContractStartDate_AssertError() {
+    var bidParticipant1 = new InvitationToTenderParticipant(1410);
+    var bidParticipant2 = new InvitationToTenderParticipant(1411);
+    var bidParticipants = List.of(bidParticipant1, bidParticipant2);
+    var countryId = 0;
+    var contractEndDateField = AwardedContractForm.CONTRACT_END_DATE_FIELD;
+    form.setPreferredBidderId(bidParticipant1.getId());
+    form.setPreferredBidderCountryId(countryId);
+
+    form.setContractEndDate(LocalDate.of(1990, 1, 1));
+
+    when(countryService.doesCountryExist(countryId)).thenReturn(true);
+
+    validator.validate(form, bindingResult, new AwardedContractFormValidatorHint(bidParticipants));
+
+    var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
+
+    assertThat(extractedErrors).containsExactly(
+        entry("%s.dayInput.inputValue".formatted(contractEndDateField),
+            Set.of("%s.dayInput.minDateExclusiveNotMet".formatted(contractEndDateField))),
+        entry("%s.monthInput.inputValue".formatted(contractEndDateField),
+            Set.of("%s.monthInput.minDateExclusiveNotMet".formatted(contractEndDateField))),
+        entry("%s.yearInput.inputValue".formatted(contractEndDateField),
+            Set.of("%s.yearInput.minDateExclusiveNotMet".formatted(contractEndDateField)))
+    );
+  }
+
   private AwardedContractForm getValidForm() {
     var form = new AwardedContractForm();
     form.setPreferredBidderId(1);
@@ -239,6 +309,8 @@ class AwardedContractFormValidatorTest {
     form.setPreferredBidderCountryId(0);
     form.setContractAwardDate(LocalDate.of(2000, 1, 1));
     form.setPaymentTermsRadio(PaymentTermsRadio.DAYS_30);
+    form.setContractStartDate(LocalDate.of(2001, 1, 1));
+    form.setContractEndDate(LocalDate.of(2002, 1, 1));
     return form;
   }
 

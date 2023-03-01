@@ -109,5 +109,21 @@ class AwardedContractFormValidator implements SmartValidator {
           .mustBeMoreThanOrEqual(0)
           .validate(form.getOtherPaymentTerm(), errors);
     }
+
+    // Contract start date validation
+    var contractStartValidator = ThreeFieldDateInputValidator.builder();
+
+    var contractAwardDateOpt = form.getContractAwardDate().getAsLocalDate();
+    contractAwardDateOpt.ifPresent(contractStartValidator::mustBeAfterDate);
+
+    contractStartValidator.validate(form.getContractStartDate(), errors);
+
+    // Contract end date validation
+    var contractEndDateValidator = ThreeFieldDateInputValidator.builder();
+
+    var contractStartDateOpt = form.getContractStartDate().getAsLocalDate();
+    contractStartDateOpt.ifPresent(contractEndDateValidator::mustBeAfterDate);
+
+    contractEndDateValidator.validate(form.getContractEndDate(), errors);
   }
 }

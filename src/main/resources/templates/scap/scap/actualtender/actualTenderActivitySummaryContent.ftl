@@ -72,6 +72,12 @@
       ${awardedContract.paymentTerms()} days
     </#if>
   </@fdsSummaryList.summaryListRowNoAction>
+  <@fdsSummaryList.summaryListRowNoAction keyText="Forecast execution start date">
+    ${awardedContract.contractStartDate()!""}
+  </@fdsSummaryList.summaryListRowNoAction>
+  <@fdsSummaryList.summaryListRowNoAction keyText="Forecast execution completion date">
+    ${awardedContract.contractEndDate()!""}
+  </@fdsSummaryList.summaryListRowNoAction>
 </#macro>
 
 <#macro notOnEnergyPortalTag>

@@ -43,6 +43,10 @@ public class AwardedContract {
 
   private Integer paymentTerms;
 
+  private LocalDate forecastExecutionStartDate;
+
+  private LocalDate forecastExecutionEndDate;
+
   public AwardedContract() {
   }
 
@@ -115,5 +119,21 @@ public class AwardedContract {
 
   public void setPaymentTerms(Integer paymentTerms) {
     this.paymentTerms = paymentTerms;
+  }
+
+  public LocalDate getForecastExecutionStartDate() {
+    return forecastExecutionStartDate;
+  }
+
+  public void setForecastExecutionStartDate(LocalDate forecastExecutionStartDate) {
+    this.forecastExecutionStartDate = forecastExecutionStartDate;
+  }
+
+  public LocalDate getForecastExecutionEndDate() {
+    return forecastExecutionEndDate;
+  }
+
+  public void setForecastExecutionEndDate(LocalDate forecastExecutionEndDate) {
+    this.forecastExecutionEndDate = forecastExecutionEndDate;
   }
 }

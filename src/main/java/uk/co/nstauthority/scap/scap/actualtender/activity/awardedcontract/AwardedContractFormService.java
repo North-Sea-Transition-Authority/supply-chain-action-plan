@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,14 +33,24 @@ class AwardedContractFormService {
 
   AwardedContractForm getForm(AwardedContract awardedContract) {
     var form = new AwardedContractForm();
-    form.setPreferredBidderId(awardedContract.getPreferredBidder().getId());
+    if (Objects.nonNull(awardedContract.getPreferredBidder())) {
+      form.setPreferredBidderId(awardedContract.getPreferredBidder().getId());
+    }
     form.setAwardValue(String.valueOf(awardedContract.getAwardValue()));
     form.setAwardRationale(awardedContract.getAwardRationale());
     form.setPreferredBidderCountryId(awardedContract.getPreferredBidderCountryId());
-    form.setContractAwardDate(awardedContract.getContractAwardDate());
+    if (Objects.nonNull(awardedContract.getContractAwardDate())) {
+      form.setContractAwardDate(awardedContract.getContractAwardDate());
+    }
     form.setPaymentTermsRadio(PaymentTermsRadio.from(awardedContract));
     if (PaymentTermsRadio.OTHER.equals(form.getPaymentTermsRadio())) {
       form.setOtherPaymentTerm(String.valueOf(awardedContract.getPaymentTerms()));
+    }
+    if (Objects.nonNull(awardedContract.getForecastExecutionStartDate())) {
+      form.setContractStartDate(awardedContract.getForecastExecutionStartDate());
+    }
+    if (Objects.nonNull(awardedContract.getForecastExecutionEndDate())) {
+      form.setContractEndDate(awardedContract.getForecastExecutionEndDate());
     }
     return form;
   }
