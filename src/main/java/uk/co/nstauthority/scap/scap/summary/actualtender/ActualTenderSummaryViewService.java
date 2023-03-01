@@ -7,7 +7,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import uk.co.fivium.energyportalapi.generated.types.Country;
 import uk.co.fivium.formlibrary.validator.date.DateUtils;
 import uk.co.nstauthority.scap.energyportal.CountryService;
@@ -18,7 +19,7 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.Awarde
 import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContractService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 
-@Repository
+@Service
 public class ActualTenderSummaryViewService {
 
   public static final String REQUEST_PURPOSE = "Get summary of actual tender activities for SCAP";
@@ -26,12 +27,16 @@ public class ActualTenderSummaryViewService {
   private final InvitationToTenderParticipantService invitationToTenderParticipantService;
   private final AwardedContractService awardedContractService;
   private final CountryService countryService;
+  private final ActualTenderSummaryValidationService actualTenderSummaryValidationService;
 
+  @Autowired
   ActualTenderSummaryViewService(InvitationToTenderParticipantService invitationToTenderParticipantService,
-                                 AwardedContractService awardedContractService, CountryService countryService) {
+                                 AwardedContractService awardedContractService, CountryService countryService,
+                                 ActualTenderSummaryValidationService actualTenderSummaryValidationService) {
     this.invitationToTenderParticipantService = invitationToTenderParticipantService;
     this.awardedContractService = awardedContractService;
     this.countryService = countryService;
+    this.actualTenderSummaryValidationService = actualTenderSummaryValidationService;
   }
 
   public ActualTenderActivitySummaryView getSingleViewByActualTenderActivity(ActualTenderActivity actualTenderActivity,
@@ -73,6 +78,15 @@ public class ActualTenderSummaryViewService {
                   DateUtils.format(awardedContract.getForecastExecutionEndDate()))
               ).orElse(null);
 
+          var awardedContract = awardedContractOpt.orElse(null);
+          var isValid = actualTenderSummaryValidationService.isValid(
+              actualTenderActivity.getActualTender(),
+              actualTenderActivity,
+              activityInvitationToTenderParticipants,
+              activityBidParticipants,
+              awardedContract
+          );
+
           return new ActualTenderActivitySummaryView(
               scapId,
               actualTenderActivity.getId(),
@@ -83,7 +97,8 @@ public class ActualTenderSummaryViewService {
               actualTenderActivity.getContractStage(),
               getParticipantsAndEpaStatus(activityInvitationToTenderParticipants),
               getParticipantsAndEpaStatus(activityBidParticipants),
-              awardedContractView
+              awardedContractView,
+              isValid
           );
         })
         .toList();

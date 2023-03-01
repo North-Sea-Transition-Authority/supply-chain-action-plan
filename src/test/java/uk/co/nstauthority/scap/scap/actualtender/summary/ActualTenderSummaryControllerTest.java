@@ -100,7 +100,9 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
         RemunerationModel.OTHER, "remuneration model name",
         ContractStage.CONTRACT_AWARDED,
         Map.of("ITT participant 1", false, "ITT participant 2", false),
-        Map.of("bid participant 1", false, "bid participant 2", false), awardedContractSummaryView);
+        Map.of("bid participant 1", false, "bid participant 2", false), 
+        awardedContractSummaryView,
+        true);
     var actualTenderActivitySummaryViews = List.of(actualTenderSummaryView);
 
     when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
@@ -148,7 +150,9 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
         RemunerationModel.OTHER, "remuneration model name",
         ContractStage.CONTRACT_AWARDED,
         Map.of("ITT participant 1", false, "ITT participant 2", false),
-        Map.of("bid participant 1", false, "bid participant 2", false), awardedContractSummaryView);
+        Map.of("bid participant 1", false, "bid participant 2", false),
+        awardedContractSummaryView,
+        true);
     var actualTenderActivitySummaryViews = List.of(actualTenderSummaryView);
     var form = new ActualTenderSummaryForm();
     var bindingResultWithErrors = new BeanPropertyBindingResult(form, "form");
@@ -191,7 +195,9 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
         RemunerationModel.OTHER, "remuneration model name",
         ContractStage.CONTRACT_AWARDED,
         Map.of("ITT participant 1", false, "ITT participant 2", false),
-        Map.of("bid participant 1", false, "bid participant 2", false), awardedContractSummaryView);
+        Map.of("bid participant 1", false, "bid participant 2", false),
+        awardedContractSummaryView,
+        true);
     var actualTenderActivitySummaryViews = List.of(actualTenderSummaryView);
     var form = new ActualTenderSummaryForm();
     form.setHasMoreActualTenderActivities(HasMoreActualTenderActivities.YES_LATER);
@@ -229,7 +235,9 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
         RemunerationModel.OTHER, "remuneration model name",
         ContractStage.CONTRACT_AWARDED,
         Map.of("ITT participant 1", false, "ITT participant 2", false),
-        Map.of("bid participant 1", false, "bid participant 2", false), awardedContractSummaryView);
+        Map.of("bid participant 1", false, "bid participant 2", false),
+        awardedContractSummaryView,
+        true);
     var actualTenderActivitySummaryViews = List.of(actualTenderSummaryView);
     var form = new ActualTenderSummaryForm();
     form.setHasMoreActualTenderActivities(HasMoreActualTenderActivities.YES_NOW);

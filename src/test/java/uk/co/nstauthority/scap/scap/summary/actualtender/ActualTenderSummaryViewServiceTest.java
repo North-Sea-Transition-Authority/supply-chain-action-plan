@@ -37,6 +37,9 @@ class ActualTenderSummaryViewServiceTest {
   @Mock
   CountryService countryService;
 
+  @Mock
+  ActualTenderSummaryValidationService actualTenderSummaryValidationService;
+
   @InjectMocks
   ActualTenderSummaryViewService actualTenderSummaryViewService;
 

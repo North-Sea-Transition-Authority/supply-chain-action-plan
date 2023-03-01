@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTenderController;
 import uk.co.nstauthority.scap.scap.actualtender.summary.HasMoreActualTenderActivities;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
@@ -26,6 +27,7 @@ import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapFormTaskListSection;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
+import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryViewService;
 
 @ExtendWith(MockitoExtension.class)
 class ActualTenderTaskListItemTest {
@@ -38,6 +40,12 @@ class ActualTenderTaskListItemTest {
 
   @Mock
   ActualTenderService actualTenderService;
+
+  @Mock
+  ActualTenderActivityService actualTenderActivityService;
+
+  @Mock
+  ActualTenderSummaryViewService actualTenderSummaryViewService;
 
   @Mock
   Clock clock = Clock.fixed(Instant.ofEpochSecond(1667576106), ZoneId.systemDefault());

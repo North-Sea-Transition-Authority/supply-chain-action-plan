@@ -59,4 +59,8 @@ public class InvitationToTenderParticipantBuilder {
     invitationToTenderParticipant.setOrganisationUnitId(organisationUnitId);
     return invitationToTenderParticipant;
   }
+
+  public static InvitationToTenderParticipantBuilder newBuilder() {
+    return new InvitationToTenderParticipantBuilder();
+  }
 }

@@ -6,7 +6,7 @@ import uk.co.fivium.formlibrary.input.IntegerInput;
 import uk.co.fivium.formlibrary.input.StringInput;
 import uk.co.fivium.formlibrary.input.ThreeFieldDateInput;
 
-class AwardedContractForm {
+public class AwardedContractForm {
 
   static final String CONTRACT_AWARD_DATE_FIELD = "contractAwardDate";
   static final String CONTRACT_START_DATE_FIELD = "contractStartDate";

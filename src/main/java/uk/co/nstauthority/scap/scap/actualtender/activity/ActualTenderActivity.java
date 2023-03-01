@@ -112,6 +112,10 @@ public class ActualTenderActivity {
     this.createdTimestamp = createdTimestamp;
   }
 
+  public ActualTender getActualTender() {
+    return actualTender;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {

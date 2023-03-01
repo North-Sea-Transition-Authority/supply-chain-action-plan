@@ -9,7 +9,7 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderPart
 import uk.co.nstauthority.scap.util.StreamUtils;
 
 @Service
-class BidParticipantsFormService {
+public class BidParticipantsFormService {
 
   private final BidParticipantsFormValidator validator;
 
@@ -18,13 +18,13 @@ class BidParticipantsFormService {
     this.validator = validator;
   }
 
-  BindingResult validate(BidParticipantsForm form, BindingResult bindingResult,
-                         List<InvitationToTenderParticipant> invitationToTenderParticipants) {
+  public BindingResult validate(BidParticipantsForm form, BindingResult bindingResult,
+                                List<InvitationToTenderParticipant> invitationToTenderParticipants) {
     validator.validate(form, bindingResult, new BidParticipantsFormValidatorHint(invitationToTenderParticipants));
     return bindingResult;
   }
 
-  static List<Integer> getParticipantIds(List<InvitationToTenderParticipant> participants) {
+  public static List<Integer> getParticipantIds(List<InvitationToTenderParticipant> participants) {
     return participants.stream()
         .map(InvitationToTenderParticipant::getId)
         .toList();

@@ -13,7 +13,7 @@ import uk.co.nstauthority.scap.fds.searchselector.ManualEntryUtil;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 
 @Service
-class ActualTenderActivityFormService {
+public class ActualTenderActivityFormService {
 
   private final ActualTenderActivityFormValidator validator;
   private final OrganisationUnitService organisationUnitService;
@@ -32,10 +32,10 @@ class ActualTenderActivityFormService {
     return bindingResult;
   }
 
-  BindingResult validate(ActualTenderActivityForm form,
-                         BindingResult bindingResult,
-                         ActualTender actualTender,
-                         ActualTenderActivity actualTenderActivity) {
+  public BindingResult validate(ActualTenderActivityForm form,
+                                BindingResult bindingResult,
+                                ActualTender actualTender,
+                                ActualTenderActivity actualTenderActivity) {
     validator.validate(
         form,
         bindingResult,
@@ -44,7 +44,7 @@ class ActualTenderActivityFormService {
     return bindingResult;
   }
 
-  ActualTenderActivityForm getForm(ActualTenderActivity actualTenderActivity,
+  public ActualTenderActivityForm getForm(ActualTenderActivity actualTenderActivity,
                                    List<InvitationToTenderParticipant> invitationToTenderParticipants) {
     var form = new ActualTenderActivityForm();
     form.setScopeTitle(actualTenderActivity.getScopeTitle());

@@ -19,7 +19,8 @@ public record ActualTenderActivitySummaryView(ScapId scapId,
                                               ContractStage contractStage,
                                               Map<String, Boolean> ittParticipants,
                                               Map<String, Boolean> bidParticipants,
-                                              AwardedContractSummaryView awardedContractSummaryView) {
+                                              AwardedContractSummaryView awardedContractSummaryView,
+                                              boolean isValid) {
   public String getChangeLinkUrl() {
     return ReverseRouter.route(on(ActualTenderActivityController.class)
         .renderExistingActualTenderActivityForm(scapId, activityId));

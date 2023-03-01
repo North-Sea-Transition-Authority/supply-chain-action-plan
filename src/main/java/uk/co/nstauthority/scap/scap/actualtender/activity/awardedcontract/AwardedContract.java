@@ -136,4 +136,13 @@ public class AwardedContract {
   public void setForecastExecutionEndDate(LocalDate forecastExecutionEndDate) {
     this.forecastExecutionEndDate = forecastExecutionEndDate;
   }
+
+  public void setActualTenderActivity(
+      ActualTenderActivity actualTenderActivity) {
+    this.actualTenderActivity = actualTenderActivity;
+  }
+
+  public void setCreatedTimestamp(Instant createdTimestamp) {
+    this.createdTimestamp = createdTimestamp;
+  }
 }

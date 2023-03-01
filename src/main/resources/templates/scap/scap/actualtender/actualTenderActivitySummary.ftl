@@ -1,5 +1,6 @@
 <#include '../../layout/layout.ftl'>
 <#import  'actualTenderActivitySummaryContent.ftl' as summaryContent>
+<#import 'actualTenderSummaryError.ftl' as errorMsg>
 
 <#assign pageTitle = "Actual tender activity"/>
 
@@ -60,6 +61,7 @@ backLinkUrl=springUrl(backLinkUrl)
     summaryListId="actual-tender-activity-${index}"
     headingText="Actual tender activity ${index + 1}"
     cardActionsContent=cardActionsContent
+    summaryListErrorMessage=errorMsg.actualTenderSummaryErrorMessage(actualTenderActivity)
   >
     <@summaryContent.actualTenderActivitySummaryContent actualTenderActivity=actualTenderActivity/>
   </@fdsSummaryList.summaryListCard>

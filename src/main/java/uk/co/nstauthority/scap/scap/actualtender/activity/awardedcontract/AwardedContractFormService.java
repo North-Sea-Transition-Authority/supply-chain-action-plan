@@ -12,7 +12,7 @@ import uk.co.nstauthority.scap.energyportal.CountryService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
 
 @Service
-class AwardedContractFormService {
+public class AwardedContractFormService {
 
   public static final String PRESELECTED_LOCATION_REQUEST_PURPOSE = "Pre-fill actual contract award form for SCAP";
 
@@ -25,13 +25,13 @@ class AwardedContractFormService {
     this.countryService = countryService;
   }
 
-  BindingResult validate(AwardedContractForm form, BindingResult bindingResult,
-                         List<InvitationToTenderParticipant> bidParticipants) {
+  public BindingResult validate(AwardedContractForm form, BindingResult bindingResult,
+                                List<InvitationToTenderParticipant> bidParticipants) {
     validator.validate(form, bindingResult, new AwardedContractFormValidatorHint(bidParticipants));
     return bindingResult;
   }
 
-  AwardedContractForm getForm(AwardedContract awardedContract) {
+  public AwardedContractForm getForm(AwardedContract awardedContract) {
     var form = new AwardedContractForm();
     if (Objects.nonNull(awardedContract.getPreferredBidder())) {
       form.setPreferredBidderId(awardedContract.getPreferredBidder().getId());

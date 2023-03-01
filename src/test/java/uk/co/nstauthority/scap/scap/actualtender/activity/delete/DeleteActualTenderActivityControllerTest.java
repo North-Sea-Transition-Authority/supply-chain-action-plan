@@ -76,7 +76,8 @@ class DeleteActualTenderActivityControllerTest extends AbstractScapSubmitterCont
         ContractStage.INVITATION_TO_TENDER_IS_LIVE,
         Map.of("company name", false),
         Collections.emptyMap(),
-        null
+        null,
+        true
     );
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
@@ -106,7 +107,8 @@ class DeleteActualTenderActivityControllerTest extends AbstractScapSubmitterCont
         ContractStage.INVITATION_TO_TENDER_IS_LIVE,
         Map.of("company name", false),
         Collections.emptyMap(),
-        null
+        null,
+        true
     );
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);

@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
@@ -25,6 +26,16 @@ public class ValidatorTestingUtil {
             Collectors.mapping(FieldError::getCode, Collectors.toSet())
         ));
 
+  }
+
+  public static BindingResult bindingResultWithoutErrors(Object form) {
+    return new BeanPropertyBindingResult(form, "form");
+  }
+
+  public static BindingResult bindingResultWithErrors(Object form) {
+    var bindingResult = bindingResultWithoutErrors(form);
+    bindingResult.addError(new FieldError("form", "testField", "Test error message"));
+    return bindingResult;
   }
 
   public static class NonSupportedClass {

@@ -3,11 +3,11 @@ package uk.co.nstauthority.scap.scap.actualtender.activity.bidparticipants;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.apache.commons.collections.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
-import org.springframework.validation.ValidationUtils;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
 
 @Service
@@ -38,11 +38,13 @@ class BidParticipantsFormValidator implements SmartValidator {
 
     var form = (BidParticipantsForm) target;
 
-    ValidationUtils.rejectIfEmpty(
-        errors,
-        fieldName,
-        String.format("%s.required", fieldName),
-        MISSING_BID_PARTICIPANTS_MESSAGE);
+    if (CollectionUtils.isEmpty(form.getSelectedBidParticipantIds())) {
+      errors.rejectValue(
+          fieldName,
+          String.format("%s.required", fieldName),
+          MISSING_BID_PARTICIPANTS_MESSAGE
+      );
+    }
 
     if (!errors.hasFieldErrors(fieldName)) {
       var permittedParticipantIds = bidParticipantsFormValidatorHint.invitationToTenderParticipants().stream()

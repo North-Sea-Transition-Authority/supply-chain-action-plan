@@ -55,6 +55,10 @@ public class ActualTenderActivityBuilder {
     return this;
   }
 
+  public static ActualTenderActivityBuilder newBuilder() {
+    return new ActualTenderActivityBuilder();
+  }
+
   public ActualTenderActivity build() {
     var actualTenderActivity = new ActualTenderActivity(id);
     actualTenderActivity.setActualTender(actualTender);

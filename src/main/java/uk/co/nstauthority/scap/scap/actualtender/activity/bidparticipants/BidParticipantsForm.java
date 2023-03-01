@@ -2,7 +2,7 @@ package uk.co.nstauthority.scap.scap.actualtender.activity.bidparticipants;
 
 import java.util.List;
 
-class BidParticipantsForm {
+public class BidParticipantsForm {
 
   List<Integer> selectedBidParticipantIds;
 
