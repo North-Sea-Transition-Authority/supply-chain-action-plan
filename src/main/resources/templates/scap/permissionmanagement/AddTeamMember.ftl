@@ -16,7 +16,6 @@
   <@teamMember.addTeamMember
     usernameFormPath="form.username"
     registrationUrl=registrationUrl
-    postUrl=springUrl(submitUrl)
     cancelUrl=springUrl(backLinkUrl)
   />
 </@defaultPage>

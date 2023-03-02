@@ -54,11 +54,6 @@ class IndustryAddMemberController extends AddMemberController {
     var form = new AddTeamMemberForm();
     return getAddTeamMemberModelAndView(form)
         .addObject(
-            "submitUrl",
-            ReverseRouter.route(on(IndustryAddMemberController.class)
-                .addMemberToTeamSubmission(teamId, form, ReverseRouter.emptyBindingResult()))
-        )
-        .addObject(
             "backLinkUrl",
             ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId))
         );
@@ -71,6 +66,10 @@ class IndustryAddMemberController extends AddMemberController {
     return super.addMemberToTeamSubmission(teamId,
         form,
         bindingResult,
-        IndustryAddRolesController.class);
+        IndustryAddRolesController.class)
+        .addObject(
+            "backLinkUrl",
+            ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId))
+        );
   }
 }

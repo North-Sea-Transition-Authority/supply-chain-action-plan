@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
-import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 import uk.co.fivium.formlibrary.validator.string.StringInputValidator;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
@@ -13,10 +12,7 @@ import uk.co.nstauthority.scap.permissionmanagement.AddTeamMemberForm;
 @Service
 public class AddTeamMemberValidator implements Validator {
 
-  private static final String USERNAME_FORM_FIELD_NAME = "username";
-
-  private static final String NO_USERNAME_ERROR_CODE = "%s.required".formatted(USERNAME_FORM_FIELD_NAME);
-  private static final String NO_USERNAME_ERROR_MESSAGE = "Enter an Energy Portal username";
+  private static final String USERNAME_FORM_FIELD_NAME = "username.inputValue";
 
   private static final String USERNAME_NOT_FOUND_ERROR_CODE = "%s.notFound".formatted(USERNAME_FORM_FIELD_NAME);
   private static final String USERNAME_NOT_FOUND_ERROR_MESSAGE = "No Energy Portal user exists with this username";
@@ -46,13 +42,6 @@ public class AddTeamMemberValidator implements Validator {
   public void validate(@NonNull Object target, @NonNull Errors errors) {
 
     var form = (AddTeamMemberForm) target;
-
-    ValidationUtils.rejectIfEmptyOrWhitespace(
-        errors,
-        USERNAME_FORM_FIELD_NAME,
-        NO_USERNAME_ERROR_CODE,
-        NO_USERNAME_ERROR_MESSAGE
-    );
 
     StringInputValidator
         .builder()

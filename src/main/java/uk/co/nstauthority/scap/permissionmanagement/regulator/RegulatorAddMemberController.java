@@ -53,11 +53,6 @@ class RegulatorAddMemberController extends AddMemberController {
     var form = new AddTeamMemberForm();
     return getAddTeamMemberModelAndView(form)
         .addObject(
-            "submitUrl",
-            ReverseRouter.route(on(RegulatorAddMemberController.class)
-                .addMemberToTeamSubmission(teamId, form, ReverseRouter.emptyBindingResult()))
-        )
-        .addObject(
             "backLinkUrl",
             ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberList(teamId))
         );
@@ -70,6 +65,10 @@ class RegulatorAddMemberController extends AddMemberController {
     return super.addMemberToTeamSubmission(teamId,
         form,
         bindingResult,
-        RegulatorAddRolesController.class);
+        RegulatorAddRolesController.class)
+        .addObject(
+            "backLinkUrl",
+            ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberList(teamId))
+        );
   }
 }

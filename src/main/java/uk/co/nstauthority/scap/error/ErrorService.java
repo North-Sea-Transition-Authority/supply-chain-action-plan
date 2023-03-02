@@ -82,5 +82,6 @@ public class ErrorService {
 
   private void addTopNavigation(ModelAndView modelAndView) {
     modelAndView.addObject("navigationItems", topNavigationService.getTopNavigationItems());
+    modelAndView.addObject("currentEndPoint", "#");
   }
 }

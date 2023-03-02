@@ -1,7 +1,7 @@
 <#include "../layout/layout.ftl">
 
-<#macro addTeamMember usernameFormPath registrationUrl postUrl cancelUrl>
-  <@fdsForm.htmlForm actionUrl=postUrl>
+<#macro addTeamMember usernameFormPath registrationUrl cancelUrl>
+  <@fdsForm.htmlForm>
 
     <@fdsTextInput.textInput
       path="${usernameFormPath}.inputValue"
