@@ -37,6 +37,7 @@ public abstract class AbstractIndustryTeamControllerTest extends AbstractControl
   void setupTeamMocks() {
 
     when(teamService.getTeam(any())).thenReturn(team);
+    when(teamService.getRegulatorTeam()).thenReturn(getRegulatorTeam());
     when(teamMemberService.findTeamMember(any(Team.class), eq(webUserAccountId))).thenReturn(Optional.of(getTeamMember()));
     when(teamMemberService.getTeamMember(any(Team.class), eq(webUserAccountId))).thenReturn(getTeamMember());
     when(teamMemberService.isMemberOfTeam(any(TeamId.class), eq(testUser))).thenReturn(true);
@@ -56,6 +57,15 @@ public abstract class AbstractIndustryTeamControllerTest extends AbstractControl
     return TeamTestUtil
         .Builder()
         .withTeamType(TeamType.INDUSTRY)
+        .withTeamName("Test Organisation")
+        .withId(UUID.randomUUID())
+        .build();
+  }
+
+  private Team getRegulatorTeam() {
+    return TeamTestUtil
+        .Builder()
+        .withTeamType(TeamType.REGULATOR)
         .withTeamName("Test Organisation")
         .withId(UUID.randomUUID())
         .build();

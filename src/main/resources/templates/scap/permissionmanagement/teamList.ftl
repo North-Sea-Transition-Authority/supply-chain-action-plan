@@ -10,7 +10,9 @@
   errorItems=errorList
   pageSize=PageSize.FULL_WIDTH
 >
-  <@fdsAction.link linkText="Create organisation group team" linkClass="govuk-button" linkUrl=springUrl(newTeamFormUrl)/>
+    <#if hasCreateTeamPermissions>
+      <@fdsAction.link linkText="Create organisation group team" linkClass="govuk-button" linkUrl=springUrl(newTeamFormUrl)/>
+    </#if>
 
   <table class="govuk-table">
     <thead class="govuk-table__head">

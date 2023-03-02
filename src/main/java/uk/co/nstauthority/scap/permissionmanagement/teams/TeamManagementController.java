@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.permissionmanagement.teams;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,9 +68,13 @@ public class TeamManagementController {
 
   @GetMapping
   public ModelAndView renderTeamList() {
+    var teamId = new TeamId(teamService.getRegulatorTeam().getUuid());
     return new ModelAndView("scap/permissionmanagement/teamList")
         .addObject("pageTitle", "Choose team to manage")
         .addObject("allTeams", getTeamList())
+        .addObject("hasCreateTeamPermissions", teamMemberService.isMemberOfTeamWithAnyRoleOf(teamId,
+            userDetailService.getUserDetail(),
+            Set.of(RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER.name())))
         .addObject("newTeamFormUrl",
             ReverseRouter.route(on(TeamManagementController.class).renderNewIndustryTeamForm(null)));
   }

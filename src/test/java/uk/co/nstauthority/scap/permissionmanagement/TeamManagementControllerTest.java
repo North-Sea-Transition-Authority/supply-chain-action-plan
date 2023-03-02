@@ -18,6 +18,7 @@ import static uk.co.nstauthority.scap.utils.ControllerTestingUtil.redirectUrl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -71,7 +72,8 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
         get(ReverseRouter.route(on(TeamManagementController.class).renderTeamList()))
             .with(user(testUser)))
         .andExpect(status().isOk())
-        .andExpect(model().attribute("allTeams", List.of(TeamView.fromTeam(team))));
+        .andExpect(model().attribute("allTeams", List.of(TeamView.fromTeam(team))))
+        .andExpect(model().attribute("hasCreateTeamPermissions", false));
   }
 
   @Test
@@ -86,6 +88,8 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
         .withTeamType(TeamType.REGULATOR)
         .build();
 
+    var roles = Set.of(RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER.name());
+
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamService.getTeamsOfTypeThatUserBelongsTo(testUser, TeamType.REGULATOR)).thenReturn(List.of(regulatorTeam));
     when(teamMemberService.getTeamMember(any(Team.class), eq(testUser.getWebUserAccountId()))).thenReturn(
@@ -93,11 +97,14 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
             .withRole(RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER)
             .build());
     when(teamService.getAllTeams()).thenReturn(List.of(team, regulatorTeam));
+    when(teamService.getRegulatorTeam()).thenReturn(regulatorTeam);
+    when(teamMemberService.isMemberOfTeamWithAnyRoleOf(eq(TeamId.valueOf(regulatorTeam.getUuid())), eq(testUser), eq(roles))).thenReturn(true);
     mockMvc.perform(
             get(ReverseRouter.route(on(TeamManagementController.class).renderTeamList()))
                 .with(user(testUser)))
         .andExpect(status().isOk())
-        .andExpect(model().attribute("allTeams", List.of(TeamView.fromTeam(team), TeamView.fromTeam(regulatorTeam))));
+        .andExpect(model().attribute("allTeams", List.of(TeamView.fromTeam(team), TeamView.fromTeam(regulatorTeam))))
+        .andExpect(model().attribute("hasCreateTeamPermissions", true));
   }
 
   @Test
