@@ -11,6 +11,7 @@ import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -27,6 +28,9 @@ import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.util.DateUtil;
 
@@ -41,6 +45,8 @@ public class CaseEventService {
 
   private final TeamService teamService;
 
+  private final ScapDetailService scapDetailService;
+
   private static final String CONSULTATIONS = "Consultations";
 
   private static final String DECISIONS = "Decisions";
@@ -50,15 +56,20 @@ public class CaseEventService {
       SCAP_SUBMITTED,
       SCAP_APPROVED);
 
+  private static final Set<ScapDetailStatus> TERMINAL_DETAIL_STATUS = Set.of(ScapDetailStatus.CLOSED_OUT,
+      ScapDetailStatus.WITHDRAWN);
+
   @Autowired
   public CaseEventService(UserDetailService userDetailService,
                           EnergyPortalUserService energyPortalUserService,
                           CaseEventRepository caseEventRepository,
-                          TeamService teamService) {
+                          TeamService teamService,
+                          ScapDetailService scapDetailService) {
     this.userDetailService = userDetailService;
     this.energyPortalUserService = energyPortalUserService;
     this.caseEventRepository = caseEventRepository;
     this.teamService = teamService;
+    this.scapDetailService = scapDetailService;
   }
 
   @Transactional
@@ -138,11 +149,15 @@ public class CaseEventService {
 
   public Map<String, List<CaseEventSubject>> getApplicableActionsForScap(ScapId scapId) {
     var user = userDetailService.getUserDetail();
+    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
 
     var actionMap = new LinkedHashMap<String, List<CaseEventSubject>>();
     if (teamService.userIsMemberOfRegulatorTeam(user)) {
-      actionMap.putAll(getRegulatorTeamActions(scapId));
+      actionMap.putAll(getRegulatorTeamActions(scapDetail));
     } else {
+      if (TERMINAL_DETAIL_STATUS.contains(scapDetail.getStatus())) {
+        return Collections.emptyMap();
+      }
       var furtherInfo = new ArrayList<CaseEventSubject>();
       var consultations = new ArrayList<CaseEventSubject>();
       if (isFurtherInfoResponseOutstanding(scapId)) {
@@ -155,7 +170,10 @@ public class CaseEventService {
     return actionMap;
   }
 
-  private Map<String, List<CaseEventSubject>> getRegulatorTeamActions(ScapId scapId) {
+  private Map<String, List<CaseEventSubject>> getRegulatorTeamActions(ScapDetail scapDetail) {
+    if (TERMINAL_DETAIL_STATUS.contains(scapDetail.getStatus())) {
+      return Collections.emptyMap();
+    }
     var regulatorMap = new HashMap<String, List<CaseEventSubject>>();
     var qa = new ArrayList<CaseEventSubject>();
     qa.add(QA_COMMENT);
@@ -169,7 +187,7 @@ public class CaseEventService {
     descisions.add(SCAP_WITHDRAWN);
 
     var furtherInfo = new ArrayList<CaseEventSubject>();
-    if (isFurtherInfoResponseOutstanding(scapId)) {
+    if (isFurtherInfoResponseOutstanding(scapDetail.getScap().getScapId())) {
       furtherInfo.add(FURTHER_INFO_RESPONSE);
     } else {
       furtherInfo.add(FURTHER_INFO_REQUESTED);

@@ -39,6 +39,10 @@ import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailEntityTestUtil;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
+import uk.co.nstauthority.scap.scap.scap.ScapEntityTestUtil;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.util.DateUtil;
 import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
@@ -53,6 +57,9 @@ class CaseEventServiceTest {
 
   @Mock
   EnergyPortalUserService energyPortalUserService;
+
+  @Mock
+  ScapDetailService scapDetailService;
 
   @Mock
   TeamService teamService;
@@ -158,6 +165,10 @@ class CaseEventServiceTest {
     var user = ServiceUserDetailTestUtil.Builder().build();
     when(userDetailService.getUserDetail()).thenReturn(user);
     when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(true);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
+        .withStatus(ScapDetailStatus.APPROVED)
+        .withScap(ScapEntityTestUtil.scapBuilder().withScapId(SCAP_ID).build())
+        .build());
 
     var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
 
@@ -165,6 +176,21 @@ class CaseEventServiceTest {
     assertThat(actions.get("Consultations")).containsExactly(SCAP_CONSULTATION_REQUESTED, SCAP_CONSULTATION_RESPONSE);
     assertThat(actions.get("Decisions")).containsExactly(SCAP_APPROVED, SCAP_WITHDRAWN);
     assertThat(actions.get("Further Info")).containsExactly(FURTHER_INFO_REQUESTED);
+  }
+
+  @Test
+  void getApplicableActions_isWithdrawnRegulator() {
+    var user = ServiceUserDetailTestUtil.Builder().build();
+    when(userDetailService.getUserDetail()).thenReturn(user);
+    when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(true);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
+        .withStatus(ScapDetailStatus.WITHDRAWN)
+        .withScap(ScapEntityTestUtil.scapBuilder().withScapId(SCAP_ID).build())
+        .build());
+
+    var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
+
+    assertThat(actions).isEmpty();
   }
 
   @Test
@@ -179,6 +205,10 @@ class CaseEventServiceTest {
     var user = ServiceUserDetailTestUtil.Builder().build();
     when(userDetailService.getUserDetail()).thenReturn(user);
     when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(true);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
+        .withStatus(ScapDetailStatus.APPROVED)
+        .withScap(ScapEntityTestUtil.scapBuilder().withScapId(SCAP_ID).build())
+        .build());
 
     var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
 
@@ -193,11 +223,27 @@ class CaseEventServiceTest {
     var user = ServiceUserDetailTestUtil.Builder().build();
     when(userDetailService.getUserDetail()).thenReturn(user);
     when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(false);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
+        .withStatus(ScapDetailStatus.APPROVED)
+        .build());
 
     var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
 
     assertThat(actions.get("Consultations")).containsExactly(SCAP_CONSULTATION_RESPONSE);
     assertThat(actions.get("Further Info")).isEmpty();
+  }
+
+  @Test
+  void getApplicableActions_isClosedIndustry() {
+    var user = ServiceUserDetailTestUtil.Builder().build();
+    when(userDetailService.getUserDetail()).thenReturn(user);
+    when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(false);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
+        .withStatus(ScapDetailStatus.CLOSED_OUT)
+        .build());
+
+    var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
+    assertThat(actions).isEmpty();
   }
 
   @Test
@@ -212,6 +258,9 @@ class CaseEventServiceTest {
     var user = ServiceUserDetailTestUtil.Builder().build();
     when(userDetailService.getUserDetail()).thenReturn(user);
     when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(false);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
+        .withStatus(ScapDetailStatus.APPROVED)
+        .build());
 
     var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
 
