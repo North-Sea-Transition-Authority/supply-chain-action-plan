@@ -1,11 +1,14 @@
 package uk.co.nstauthority.scap.scap.projectdetails;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
+import uk.co.fivium.energyportalapi.generated.types.Facility;
+import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
@@ -88,6 +91,7 @@ public class ProjectDetailsFormService {
     var facilities = facilityService
         .findFacilitiesByIds(List.copyOf(projectFacilityIds), PRESELECTED_FACILITIES_REQUEST_PURPOSE);
     return facilities.stream()
+        .sorted(Comparator.comparing(Facility::getName))
         .map(facility -> new AddToListItem(facility.getId().toString(), facility.getName(), true))
         .toList();
   }
@@ -99,6 +103,7 @@ public class ProjectDetailsFormService {
 
     var fields = fieldService.getFieldsByIds(List.copyOf(projectFieldIds), PRESELECTED_FIELD_REQUEST_PURPOSE);
     return fields.stream()
+        .sorted(Comparator.comparing(Field::getFieldName))
         .map(field -> new AddToListItem(field.getFieldId().toString(), field.getFieldName(), true))
         .toList();
   }
