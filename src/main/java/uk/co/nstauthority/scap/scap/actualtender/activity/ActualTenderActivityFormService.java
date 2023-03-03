@@ -57,7 +57,7 @@ public class ActualTenderActivityFormService {
           if (Objects.nonNull(ittParticipant.getOrganisationUnitId())) {
             return String.valueOf(ittParticipant.getOrganisationUnitId());
           }
-          return "%s%s".formatted(ManualEntryUtil.FREE_TEXT_PREFIX, ittParticipant.getCompanyName());
+          return ManualEntryUtil.addFreeTextPrefix(ittParticipant.getCompanyName());
         })
         .toList();
     form.setInvitationToTenderParticipants(participantIds);

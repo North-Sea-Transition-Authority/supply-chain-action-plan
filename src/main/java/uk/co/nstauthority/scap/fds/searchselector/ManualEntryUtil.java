@@ -16,6 +16,10 @@ public class ManualEntryUtil {
   }
 
   public static final String FREE_TEXT_PREFIX = "FT_";
+  public static final String HTML_SPACE_REPLACEMENT = "--space--";
+  public static final String HTML_DOUBLE_QUOTE_REPLACEMENT = "--double-quote--";
+  public static final String HTML_OPEN_BRACKET_REPLACEMENT = "--open-bracket--";
+  public static final String HTML_CLOSE_BRACKET_REPLACEMENT = "--close-bracket--";
 
   /**
    * Adds a manual entry to a {@link RestSearchResult}, with ID of "{@value FREE_TEXT_PREFIX}manualEntryText" and text
@@ -26,7 +30,7 @@ public class ManualEntryUtil {
    * @return A new RestSearchResult with the input manual entry added
    */
   public static RestSearchResult addManualEntry(RestSearchResult searchResult, String manualEntry) {
-    var manualEntryItem = new RestSearchItem("FT_%s".formatted(manualEntry), manualEntry);
+    var manualEntryItem = new RestSearchItem(addFreeTextPrefix(manualEntry), manualEntry);
 
     var resultsWithManualEntry = new ArrayList<>(searchResult.getResults());
     resultsWithManualEntry.add(0, manualEntryItem);
@@ -41,7 +45,24 @@ public class ManualEntryUtil {
    * @return The string with the prefix added
    */
   public static String addFreeTextPrefix(String target) {
+    // TODO SCAP2022-244: When team-wide strategy for free text is decided, remove this
+    target = target.replace(" ", HTML_SPACE_REPLACEMENT);
+    target = target.replace("\"", HTML_DOUBLE_QUOTE_REPLACEMENT);
+    target = target.replace("(", HTML_OPEN_BRACKET_REPLACEMENT);
+    target = target.replace(")", HTML_CLOSE_BRACKET_REPLACEMENT);
+    target = target.replaceAll("[^A-Za-z\\d-. ]", "");
+
     return "%s%s".formatted(FREE_TEXT_PREFIX, target);
+  }
+
+  public static String removeFreeTextPrefix(String target) {
+    // TODO SCAP2022-244: When team-wide strategy for free text is decided, remove this
+    target = target.replaceFirst(FREE_TEXT_PREFIX, "");
+    target = target.replace(HTML_SPACE_REPLACEMENT, " ");
+    target = target.replace(HTML_DOUBLE_QUOTE_REPLACEMENT, "\"");
+    target = target.replace(HTML_OPEN_BRACKET_REPLACEMENT, "(");
+    target = target.replace(HTML_CLOSE_BRACKET_REPLACEMENT, ")");
+    return target;
   }
 
   /**
@@ -66,7 +87,7 @@ public class ManualEntryUtil {
         .toList();
     var manualEntryList = partitionedList.getOrDefault(true, Collections.emptyList())
         .stream()
-        .map(manualEntry -> manualEntry.replaceFirst(FREE_TEXT_PREFIX, ""))
+        .map(ManualEntryUtil::removeFreeTextPrefix)
         .toList();
     return new ManualEntryPartitionedList(idList, manualEntryList);
   }
