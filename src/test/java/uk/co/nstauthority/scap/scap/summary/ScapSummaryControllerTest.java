@@ -7,19 +7,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
-import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTHER_INFO_REQUESTED;
 import static uk.co.nstauthority.scap.scap.projectdetails.ProjectType.FIELD_DEVELOPMENT_PLAN;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getScapSummaryView;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -29,13 +27,14 @@ import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventView;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailEntityTestUtil;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
-import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetails;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
@@ -43,6 +42,7 @@ import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryView;
 import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderSummaryView;
+import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @ContextConfiguration(classes = ScapSummaryController.class)
 class ScapSummaryControllerTest extends AbstractControllerTest {
@@ -65,18 +65,19 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
   @MockBean
   SupportingDocumentService supportingDocumentService;
 
-  private ScapDetail scapDetail;
-
   private static final ScapId SCAP_ID = new ScapId(1000);
+
+  private ScapDetail scapDetail;
 
   @BeforeEach
   void setup() {
     var scap = new Scap(SCAP_ID);
     scap.setReference("TEST PROJECT NAME");
-    scapDetail = new ScapDetail();
-    scapDetail.setScap(scap);
-    scapDetail.setStatus(ScapDetailStatus.DRAFT);
-
+    scapDetail = ScapDetailEntityTestUtil.scapDetailBuilder()
+        .withScap(scap)
+        .withStatus(ScapDetailStatus.DRAFT)
+        .withVersionNumber(1)
+        .build();
 
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(scapService.getScapById(SCAP_ID.scapId())).thenReturn(scap);
@@ -96,6 +97,60 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
     mockMvc.perform(get(
         ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
+            .with(user(testUser)))
+        .andExpect(status().isOk())
+        .andExpect(view().name("scap/scap/summary/scapSummaryOverview"))
+        .andExpect(model().attributeExists("backLinkUrl"))
+        .andExpect(model().attributeExists("updateScapUrl"))
+        .andExpect(model().attributeExists("projectReference"))
+        .andExpect(model().attributeExists("operator"))
+        .andExpect(model().attributeExists("scapSummaryView"))
+        .andExpect(model().attributeExists("caseEvents"))
+        .andExpect(model().attributeExists("applicableActions"))
+        .andExpect(model().attributeExists("updateInProgress"));
+  }
+
+  @Test
+  void renderSummary_IsFirstDraft_UserIsSumbitter() throws Exception {
+    when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
+    when(teamMemberService.getAllPermissionsForUser(testUser))
+        .thenReturn(Collections.singletonList(RolePermission.SUBMIT_SCAP));
+
+    mockMvc.perform(get(
+        ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
+            .with(user(testUser)))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl(ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID))));
+  }
+
+  @Test
+  void renderSummary_FirstVersionNotDraft_AssertNoRedirection() throws Exception {
+    scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
+
+    when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
+    mockMvc.perform(get(
+            ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
+            .with(user(testUser)))
+        .andExpect(status().isOk())
+        .andExpect(view().name("scap/scap/summary/scapSummaryOverview"))
+        .andExpect(model().attributeExists("backLinkUrl"))
+        .andExpect(model().attributeExists("updateScapUrl"))
+        .andExpect(model().attributeExists("projectReference"))
+        .andExpect(model().attributeExists("operator"))
+        .andExpect(model().attributeExists("scapSummaryView"))
+        .andExpect(model().attributeExists("caseEvents"))
+        .andExpect(model().attributeExists("applicableActions"))
+        .andExpect(model().attributeExists("updateInProgress"));
+  }
+
+
+  @Test
+  void renderSummary_NotFirstVersionIsDraft_AssertNoRedirection() throws Exception {
+    scapDetail.setVersionNumber(2);
+
+    when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
+    mockMvc.perform(get(
+            ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
             .with(user(testUser)))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/summary/scapSummaryOverview"))

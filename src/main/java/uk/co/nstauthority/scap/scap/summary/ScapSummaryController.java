@@ -1,6 +1,8 @@
 package uk.co.nstauthority.scap.scap.summary;
 
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
 import java.util.Collections;
 import java.util.List;
 import org.springframework.stereotype.Controller;
@@ -10,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
+import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventView;
@@ -18,6 +23,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
+import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @Controller
 @RequestMapping("{scapId}")
@@ -37,13 +43,16 @@ public class ScapSummaryController {
 
   private final SupportingDocumentService supportingDocumentService;
 
+  private final TeamMemberService teamMemberService;
+
   public ScapSummaryController(ScapDetailService scapDetailService,
                                ScapSummaryViewService scapSummaryViewService,
                                CaseEventService caseEventService,
                                OrganisationGroupService organisationGroupService,
                                TeamService teamService,
                                UserDetailService userDetailService,
-                               SupportingDocumentService supportingDocumentService) {
+                               SupportingDocumentService supportingDocumentService,
+                               TeamMemberService teamMemberService) {
     this.scapDetailService = scapDetailService;
     this.scapSummaryViewService = scapSummaryViewService;
     this.caseEventService = caseEventService;
@@ -51,6 +60,7 @@ public class ScapSummaryController {
     this.teamService = teamService;
     this.userDetailService = userDetailService;
     this.supportingDocumentService = supportingDocumentService;
+    this.teamMemberService = teamMemberService;
   }
 
   //TODO:SCAP2022-232 - Smoke test all statuses against this method
@@ -62,6 +72,15 @@ public class ScapSummaryController {
       ScapDetailStatus.WITHDRAWN})
   public ModelAndView getScapSummary(@PathVariable("scapId") ScapId scapId) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
+    var user = userDetailService.getUserDetail();
+    var userPermissions = teamMemberService.getAllPermissionsForUser(user);
+
+    if (ScapDetailStatus.DRAFT.equals(scapDetail.getStatus())
+        && scapDetail.getVersionNumber() == 1
+        && userPermissions.contains(RolePermission.SUBMIT_SCAP)) {
+      return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
+    }
+
     var scapSummary = scapSummaryViewService.getScapSummaryView(scapDetail);
 
     var orgGroup = organisationGroupService
