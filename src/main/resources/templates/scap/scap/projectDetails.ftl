@@ -48,6 +48,7 @@
     />
 
     <@fdsAddToList.addToList
+      addToListId="project-details-field-selector"
       pathForList="form.fieldIds"
       pathForSelector="form.fieldSelector"
       restUrl=springUrl(fieldSearchRestUrl)
@@ -73,6 +74,7 @@
         >
           <#if value == "YES">
             <@fdsAddToList.addToList
+              addToListId="project-details-installation-selector"
               pathForList="form.installationIds"
               pathForSelector="form.installationSelector"
               alreadyAdded=preselectedFacilities
