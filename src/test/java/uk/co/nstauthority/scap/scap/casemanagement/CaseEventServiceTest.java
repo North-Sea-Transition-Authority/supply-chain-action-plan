@@ -17,6 +17,7 @@ import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTH
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.QA_COMMENT;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_APPROVED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_CONSULTATION_RESPONSE;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_REINSTATED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_WITHDRAWN;
 
 import java.time.Instant;
@@ -190,7 +191,7 @@ class CaseEventServiceTest {
 
     var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
 
-    assertThat(actions).isEmpty();
+    assertThat(actions.get("Decisions")).containsExactly(SCAP_REINSTATED);
   }
 
   @Test

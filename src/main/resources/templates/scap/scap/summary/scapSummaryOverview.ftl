@@ -79,5 +79,6 @@ backLinkUrl=springUrl(backLinkUrl)
   <#include 'caseActions/infoResponseAction.ftl'/>
   <#include 'caseActions/approveScap.ftl'/>
   <#include 'caseActions/withdrawScap.ftl'/>
+  <#include 'caseActions/reinstateScap.ftl'/>
 </@defaultPage>
 

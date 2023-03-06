@@ -13,8 +13,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.APPROVED;
+import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.CLOSED_OUT;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.DRAFT;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.SUBMITTED;
+import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.WITHDRAWN;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -87,9 +89,9 @@ class ScapDetailServiceTest {
     var scapDetail = new ScapDetail(scap, 1, true, SUBMITTED, EntityTestingUtil.dateToInstant(2000, 4, 23), getUserDetail().getWebUserAccountId().toInt());
 
     when(userDetailService.getUserDetail()).thenReturn(getUserDetail());
-    when(scapDetailRepository.findFirstByScapIdAndStatusOrderByVersionNumberDesc(SCAP_ID, APPROVED)).thenReturn(Optional.empty());
-    when(scapDetailRepository.findFirstByScapIdAndStatusOrderByVersionNumberDesc(SCAP_ID, SUBMITTED)).thenReturn(Optional.of(scapDetail));
-
+    var existingStatuses = ScapDetailStatus.getReinstateableStatuses();
+    when(scapDetailRepository.findFirstByScapIdAndStatusInOrderByVersionNumberDesc(scap.getScapId().scapId(), existingStatuses))
+        .thenReturn(Optional.of(scapDetail));
     scapDetailService.createDraftScapDetail(scap);
 
     var argumentCaptor = ArgumentCaptor.forClass(ScapDetail.class);
@@ -112,8 +114,9 @@ class ScapDetailServiceTest {
     var scapDetail = new ScapDetail(scap, 1, true, APPROVED, EntityTestingUtil.dateToInstant(2000, 4, 23), getUserDetail().getWebUserAccountId().toInt());
 
     when(userDetailService.getUserDetail()).thenReturn(getUserDetail());
-    when(scapDetailRepository.findFirstByScapIdAndStatusOrderByVersionNumberDesc(SCAP_ID, APPROVED)).thenReturn(Optional.of(scapDetail));
-
+    var existingStatuses = ScapDetailStatus.getReinstateableStatuses();
+    when(scapDetailRepository.findFirstByScapIdAndStatusInOrderByVersionNumberDesc(scap.getScapId().scapId(), existingStatuses))
+        .thenReturn(Optional.of(scapDetail));
     scapDetailService.createDraftScapDetail(scap);
 
     var argumentCaptor = ArgumentCaptor.forClass(ScapDetail.class);
@@ -176,7 +179,7 @@ class ScapDetailServiceTest {
 
     when(scapDetailRepository.findFirstByScapIdAndTipFlag(scap.getId(), true)).thenReturn(Optional.of(scapDetail));
 
-    var returnedScapDetail = scapDetailService.getLatestScapDetailByScapId(scap.getScapId());
+    var returnedScapDetail = scapDetailService.findLatestScapDetailByScapId(scap.getScapId());
 
     assertThat(returnedScapDetail).contains(scapDetail);
   }
@@ -454,6 +457,38 @@ class ScapDetailServiceTest {
         ScapDetailStatus.WITHDRAWN,
         clock.instant())
     );
+  }
+
+  @Test
+  void reinstateScap_verifyCalls() {
+    var scap = new Scap(SCAP_ID);
+    var scapDetail = new ScapDetail();
+    scapDetail.setScap(scap);
+    scapDetail.setVersionNumber(5);
+    scapDetail.setStatus(CLOSED_OUT);
+
+    var scapDraftDetail = new ScapDetail();
+    scapDraftDetail.setScap(scap);
+    scapDraftDetail.setVersionNumber(6);
+    scapDraftDetail.setStatus(DRAFT);
+
+    var existingStatuses = ScapDetailStatus.getReinstateableStatuses();
+    when(userDetailService.getUserDetail()).thenReturn(getUserDetail());
+    when(scapDetailRepository.findFirstByScapIdAndStatusInOrderByVersionNumberDesc(scap.getScapId().scapId(), existingStatuses))
+        .thenReturn(Optional.of(scapDetail));
+    when(scapDetailRepository.save(any(ScapDetail.class))).thenReturn(scapDraftDetail);
+    ArgumentCaptor<ScapDetail> argumentCaptor = ArgumentCaptor.forClass(ScapDetail.class);
+
+    scapDetailService.reinstateScap(scap);
+    verify(scapDetailRepository, times(3)).save(argumentCaptor.capture());
+    var resultDetail = argumentCaptor.getAllValues().get(1);
+    assertThat(resultDetail.getScap().getScapId().scapId()).isEqualTo(SCAP_ID);
+    assertThat(resultDetail.getVersionNumber()).isEqualTo(6);
+    assertThat(resultDetail.getStatus()).isEqualTo(DRAFT);
+
+    var resultSubmitDetail = argumentCaptor.getAllValues().get(2);
+    assertThat(resultSubmitDetail.getScap().getScapId().scapId()).isEqualTo(SCAP_ID);
+    assertThat(resultSubmitDetail.getStatus()).isEqualTo(SUBMITTED);
   }
 
   @Test

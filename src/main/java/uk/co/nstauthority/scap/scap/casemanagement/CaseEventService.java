@@ -6,6 +6,7 @@ import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.QA_CO
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_APPROVED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_CONSULTATION_REQUESTED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_CONSULTATION_RESPONSE;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_REINSTATED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_SUBMITTED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_WITHDRAWN;
 
@@ -172,7 +173,11 @@ public class CaseEventService {
 
   private Map<String, List<CaseEventSubject>> getRegulatorTeamActions(ScapDetail scapDetail) {
     if (TERMINAL_DETAIL_STATUS.contains(scapDetail.getStatus())) {
-      return Collections.emptyMap();
+      var regulatorMap = new HashMap<String, List<CaseEventSubject>>();
+      var descisions = new ArrayList<CaseEventSubject>();
+      descisions.add(SCAP_REINSTATED);
+      regulatorMap.put(DECISIONS, descisions);
+      return regulatorMap;
     }
     var regulatorMap = new HashMap<String, List<CaseEventSubject>>();
     var qa = new ArrayList<CaseEventSubject>();

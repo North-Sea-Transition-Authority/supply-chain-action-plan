@@ -27,4 +27,6 @@ public class CaseEventAction {
   public static final String CLOSED_OUT = "CLOSED_OUT";
 
   public static final String WITHDRAWN = "WITHDRAWN";
+
+  public static final String REINSTATE = "REINSTATED";
 }

@@ -9,6 +9,7 @@ import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.CONSUL
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.INFO_REQUESTED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.INFO_RESPONSE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.QA;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.REINSTATE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.SUBMIT;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.UPDATE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.WITHDRAWN;
@@ -54,7 +55,11 @@ public enum CaseEventSubject {
   SCAP_WITHDRAWN(WITHDRAWN,
       "SCAP Withdrawn",
       "Withdraw SCAP",
-      "Withdraw-scap-panel");
+      "Withdraw-scap-panel"),
+  SCAP_REINSTATED(REINSTATE,
+      "SCAP Reinstated",
+      "Reinstate SCAP",
+      "Reinstate-scap-panel");
 
   private String displayName;
 

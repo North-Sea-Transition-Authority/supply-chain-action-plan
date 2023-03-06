@@ -1,12 +1,16 @@
 package uk.co.nstauthority.scap.scap.detail;
 
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.APPROVED;
+import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.CLOSED_OUT;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.DRAFT;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.SUBMITTED;
+import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.WITHDRAWN;
 
 import java.time.Clock;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,8 @@ public class ScapDetailService {
   private final UserDetailService userDetailService;
   private final Clock clock;
 
+  private static final Set<ScapDetailStatus> canBeWithdrawn = Set.of(SUBMITTED, APPROVED);
+
   @Autowired
   public ScapDetailService(ScapDetailRepository scapDetailRepository, UserDetailService userDetailService, Clock clock) {
     this.scapDetailRepository = scapDetailRepository;
@@ -33,11 +39,9 @@ public class ScapDetailService {
   }
 
   @Transactional
-  public void createDraftScapDetail(Scap scap) {
-    var latestScapDetail = findLatestByScapIdAndStatus(scap.getScapId(), APPROVED);
-    if (latestScapDetail.isEmpty()) {
-      latestScapDetail = findLatestByScapIdAndStatus(scap.getScapId(), SUBMITTED);
-    }
+  public ScapDetail createDraftScapDetail(Scap scap) {
+    var latestScapDetail = findLatestByScapIdAndStatusIn(scap.getScapId(), ScapDetailStatus.getReinstateableStatuses());
+
     var versionNumber = latestScapDetail.map(ScapDetail::getVersionNumber).orElse(0) + 1;
 
     var isLatestScapDetail = true;
@@ -52,7 +56,7 @@ public class ScapDetailService {
       scapDetailRepository.save(detail);
     }
     var scapDetail = new ScapDetail(scap, versionNumber, isLatestScapDetail, ScapDetailStatus.DRAFT, clock.instant(), userId);
-    scapDetailRepository.save(scapDetail);
+    return scapDetailRepository.save(scapDetail);
   }
 
   public ScapDetail getById(Integer scapDetailId) {
@@ -76,12 +80,16 @@ public class ScapDetailService {
         ));
   }
 
-  public Optional<ScapDetail> getLatestScapDetailByScapId(ScapId scapId) {
+  public Optional<ScapDetail> findLatestScapDetailByScapId(ScapId scapId) {
     return scapDetailRepository.findFirstByScapIdAndTipFlag(scapId.scapId(), true);
   }
 
   public Optional<ScapDetail> findLatestByScapIdAndStatus(ScapId scapId, ScapDetailStatus status) {
     return scapDetailRepository.findFirstByScapIdAndStatusOrderByVersionNumberDesc(scapId.scapId(), status);
+  }
+
+  public Optional<ScapDetail> findLatestByScapIdAndStatusIn(ScapId scapId, List<ScapDetailStatus> statuses) {
+    return scapDetailRepository.findFirstByScapIdAndStatusInOrderByVersionNumberDesc(scapId.scapId(), statuses);
   }
 
   public ScapDetail getLatestByScapIdAndStatus(ScapId scapId, ScapDetailStatus status) {
@@ -94,7 +102,7 @@ public class ScapDetailService {
   }
 
   public ScapDetail getLatestScapDetailByScapIdOrThrow(ScapId scapId) {
-    return getLatestScapDetailByScapId(scapId).orElseThrow(
+    return findLatestScapDetailByScapId(scapId).orElseThrow(
         () -> new ScapEntityNotFoundException(
             String.format("Could not find a ScapDetail for Scap with ID [%d]", scapId.scapId())
         ));
@@ -160,7 +168,7 @@ public class ScapDetailService {
 
   @Transactional
   public void withdrawScap(ScapDetail scapDetail) {
-    if (!scapDetail.getStatus().equals(SUBMITTED)) {
+    if (!canBeWithdrawn.contains(scapDetail.getStatus())) {
       throw new ScapBadRequestException("Cannot withdraw SCAP reference: %s that has not been submitted"
           .formatted(scapDetail.getScap().getReference()));
     }
@@ -176,6 +184,14 @@ public class ScapDetailService {
     scapDetail.setApprovedTimestamp(clock.instant());
     updatedScaps.add(scapDetail);
     scapDetailRepository.saveAll(updatedScaps);
+  }
+
+  @Transactional
+  public void reinstateScap(Scap scap) {
+    var draftDetail = createDraftScapDetail(scap);
+    var reviewForm = new ReviewAndSubmitForm();
+    reviewForm.setApprovedByStakeholders(true);
+    submitScap(draftDetail, reviewForm);
   }
 
   @Transactional
