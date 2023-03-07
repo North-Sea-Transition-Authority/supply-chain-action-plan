@@ -37,10 +37,9 @@ pageSize=PageSize.FULL_WIDTH
 backLinkUrl=springUrl(backLinkUrl)
 >
   <@scapSummaryCard.summaryCard/>
-  <#if updateInProgress>
     <@fdsAction.buttonGroup>
       <@fdsForm.htmlForm springUrl(updateScapUrl)>
-        <#if applicableActions?seq_contains("UPDATE_SCAP")>
+        <#if applicableActions["UPDATE_SCAP"]??>
           <#if updateInProgress>
             <@fdsAction.button buttonText="Resume SCAP update"/>
             <@fdsAction.link linkText="Delete draft update" linkUrl=springUrl(deleteScapUrl) linkClass="govuk-button govuk-button--secondary" role=true />
@@ -50,7 +49,6 @@ backLinkUrl=springUrl(backLinkUrl)
         </#if>
       </@fdsForm.htmlForm>
     </@fdsAction.buttonGroup>
-  </#if>
   <@fdsAction.buttonGroup>
     <#list applicableActions as group, actions>
       <@buttongroup group=group actions=actions/>

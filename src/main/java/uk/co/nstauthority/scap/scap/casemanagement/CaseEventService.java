@@ -9,6 +9,7 @@ import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_REINSTATED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_SUBMITTED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_WITHDRAWN;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.UPDATE_SCAP;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class CaseEventService {
   private final ScapDetailService scapDetailService;
 
   private static final String CONSULTATIONS = "Consultations";
-
+  private static final String UPDATE_SCAP = "UPDATE_SCAP";
   private static final String DECISIONS = "Decisions";
   private static final String FURTHER_INFO = "Further Info";
   private static final String QA = "QA";
@@ -167,6 +168,7 @@ public class CaseEventService {
       consultations.add(SCAP_CONSULTATION_RESPONSE);
       actionMap.put(FURTHER_INFO, furtherInfo);
       actionMap.put(CONSULTATIONS, consultations);
+      actionMap.put(UPDATE_SCAP, List.of(CaseEventSubject.UPDATE_SCAP));
     }
     return actionMap;
   }

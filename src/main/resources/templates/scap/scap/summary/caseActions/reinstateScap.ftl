@@ -7,6 +7,6 @@
       <@fdsTextarea.textarea
       path="scapReinstateForm.reinstateComments.inputValue"
       labelText="Reasons for reinstating SCAP"/>
-      <@fdsAction.button buttonText="reinstate SCAP" buttonName="REINSTATE" buttonClass="govuk-button"/>
+      <@fdsAction.button buttonText="Reinstate SCAP" buttonName="REINSTATE" buttonClass="govuk-button"/>
   </@fdsForm.htmlForm>
 </@fdsSlideOutPanel.slideOutPanel>
