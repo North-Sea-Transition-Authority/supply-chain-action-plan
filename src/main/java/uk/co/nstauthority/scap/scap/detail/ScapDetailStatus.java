@@ -47,6 +47,6 @@ public enum ScapDetailStatus implements Displayable {
   }
 
   public static List<ScapDetailStatus> getReinstateableStatuses() {
-    return List.of(DRAFT, SUBMITTED, APPROVED, WITHDRAWN);
+    return List.of(DRAFT, SUBMITTED, APPROVED, WITHDRAWN, CLOSED_OUT);
   }
 }
