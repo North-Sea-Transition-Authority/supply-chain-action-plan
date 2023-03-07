@@ -168,7 +168,7 @@ public class CaseEventService {
       consultations.add(SCAP_CONSULTATION_RESPONSE);
       actionMap.put(FURTHER_INFO, furtherInfo);
       actionMap.put(CONSULTATIONS, consultations);
-      actionMap.put(UPDATE_SCAP, List.of(CaseEventSubject.UPDATE_SCAP));
+      actionMap.put(UPDATE_SCAP, Collections.emptyList());
     }
     return actionMap;
   }
