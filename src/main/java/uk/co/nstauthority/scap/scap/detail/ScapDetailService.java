@@ -1,10 +1,8 @@
 package uk.co.nstauthority.scap.scap.detail;
 
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.APPROVED;
-import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.CLOSED_OUT;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.DRAFT;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.SUBMITTED;
-import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.WITHDRAWN;
 
 import java.time.Clock;
 import java.util.ArrayList;
@@ -17,6 +15,7 @@ import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.error.exception.ScapBadRequestException;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.submit.ReviewAndSubmitForm;
@@ -27,14 +26,20 @@ public class ScapDetailService {
   private final ScapDetailRepository scapDetailRepository;
 
   private final UserDetailService userDetailService;
+
+  private final TeamService teamService;
   private final Clock clock;
 
   private static final Set<ScapDetailStatus> canBeWithdrawn = Set.of(SUBMITTED, APPROVED);
 
   @Autowired
-  public ScapDetailService(ScapDetailRepository scapDetailRepository, UserDetailService userDetailService, Clock clock) {
+  public ScapDetailService(ScapDetailRepository scapDetailRepository,
+                           UserDetailService userDetailService,
+                           TeamService teamService,
+                           Clock clock) {
     this.scapDetailRepository = scapDetailRepository;
     this.userDetailService = userDetailService;
+    this.teamService = teamService;
     this.clock = clock;
   }
 
@@ -130,9 +135,27 @@ public class ScapDetailService {
         ));
   }
 
+  public List<ScapDetail> findAllByScap(Scap scap) {
+    return scapDetailRepository.findAllByScap(scap);
+  }
+
   public boolean isUpdateInProgress(ScapId scapId) {
     var optionalDraftUpdate = findLatestByScapIdAndStatus(scapId, DRAFT);
     return optionalDraftUpdate.map(scapDetail -> scapDetail.getVersionNumber() > 1).orElse(false);
+  }
+
+  public List<ScapDetail> getAllVersionsForUser(Scap scap) {
+    var applicableVersions = findAllByScap(scap);
+    var filterDraft = teamService.userIsMemberOfRegulatorTeam(userDetailService.getUserDetail());
+    if (filterDraft) {
+      return applicableVersions.stream()
+          .filter(detail -> detail.getStatus() != ScapDetailStatus.DELETED)
+          .filter(detail -> detail.getStatus() != ScapDetailStatus.DRAFT)
+          .toList();
+    }
+    return applicableVersions.stream()
+        .filter(detail -> detail.getStatus() != ScapDetailStatus.DELETED)
+        .toList();
   }
 
   @Transactional

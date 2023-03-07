@@ -15,6 +15,8 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getScapSummaryView;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -145,6 +147,50 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
     verifyNoInteractions(scapEmailService);
   }
 
+  @Test
+  void approveScap_VersionSelect_Regulator_NoDrafts() throws Exception {
+    var expectedRedirect = ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID));
+    when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(true);
+    when(scapDetailService.findAllByScap(scapDetail.getScap())).thenReturn(getScapDetails());
+
+    var expectedResults = getScapDetails();
+    expectedResults.remove(0);
+    mockMvc.perform(post(ReverseRouter.route(on(ScapApprovalController.class)
+            .saveScapApprovalForm(
+                SCAP_ID,
+                CaseEventAction.CLOSED_OUT,
+                false,
+                getScapApprovalForm(),
+                null)))
+            .with(user(testUser))
+            .with(csrf())
+            .flashAttr("scapApprovalForm", getScapApprovalForm())
+            .flashAttr("scapId", SCAP_ID))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl(expectedRedirect));
+  }
+
+  @Test
+  void approveScap_VersionSelect_Industry_DraftsIncluded() throws Exception {
+    var expectedRedirect = ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID));
+    when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(false);
+    when(scapDetailService.findAllByScap(scapDetail.getScap())).thenReturn(getScapDetails());
+
+    mockMvc.perform(post(ReverseRouter.route(on(ScapApprovalController.class)
+            .saveScapApprovalForm(
+                SCAP_ID,
+                CaseEventAction.CLOSED_OUT,
+                false,
+                getScapApprovalForm(),
+                null)))
+            .with(user(testUser))
+            .with(csrf())
+            .flashAttr("scapApprovalForm", getScapApprovalForm())
+            .flashAttr("scapId", SCAP_ID))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl(expectedRedirect));
+  }
+
   private ScapApprovalForm getScapApprovalForm() {
     var form = new ScapApprovalForm();
     var input = form.getApprovalComments();
@@ -164,6 +210,32 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
     scapDetail.setScap(scap);
 
     return scapDetail;
+  }
+
+  private List<ScapDetail> getScapDetails() {
+    var list = new ArrayList<ScapDetail>();
+    var scapDetail = new ScapDetail();
+    scapDetail.setVersionNumber(3);
+    scapDetail.setStatus(ScapDetailStatus.DRAFT);
+    scapDetail.setScap(scap);
+    scapDetail.setCreatedTimestamp(Instant.now());
+    list.add(scapDetail);
+
+    var scapDetail2 = new ScapDetail();
+    scapDetail2.setVersionNumber(2);
+    scapDetail2.setStatus(ScapDetailStatus.SUBMITTED);
+    scapDetail2.setScap(scap);
+    scapDetail2.setCreatedTimestamp(Instant.now());
+    list.add(scapDetail2);
+
+    var scapDetail3 = new ScapDetail();
+    scapDetail3.setVersionNumber(1);
+    scapDetail3.setStatus(ScapDetailStatus.WITHDRAWN);
+    scapDetail.setScap(scap);
+    scapDetail3.setCreatedTimestamp(Instant.now());
+    list.add(scapDetail3);
+
+    return list;
   }
 
   private OrganisationGroup getOrgGroup() {

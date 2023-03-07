@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.casemanagement.qacomments;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -96,6 +97,7 @@ public class QaCommentController {
         .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
         .withQaCommentForm(qaCommentForm)
         .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
+        .withScapVersions(scapDetailService.getAllVersionsForUser(scapDetail.getScap()))
         .withUpdatePermission(teamService.userIsMemberOfRegulatorTeam(userDetailService.getUserDetail()))
         .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);

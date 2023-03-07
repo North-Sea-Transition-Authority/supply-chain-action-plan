@@ -4,6 +4,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_APPROVED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_CLOSED_OUT;
 
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -109,6 +110,7 @@ public class ScapApprovalController {
             .withScapApprovalForm(scapApprovalForm)
             .withScapApprovalDocuments(existingFiles)
             .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
+            .withScapVersions(scapDetailService.getAllVersionsForUser(scapDetail.getScap()))
             .withUpdatePermission(teamService.userIsMemberOfRegulatorTeam(userDetailService.getUserDetail()))
             .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);

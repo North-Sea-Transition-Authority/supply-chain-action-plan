@@ -4,6 +4,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.CONSULTATION_REPORT;
 import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.FURTHER_INFORMATION;
 
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -103,6 +104,7 @@ public class FurtherInfoResponseController {
             .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
             .withFurtherInfoResponseForm(furtherInfoResponseForm)
             .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
+            .withScapVersions(scapDetailService.getAllVersionsForUser(scapDetail.getScap()))
             .withUpdatePermission(teamService.userIsMemberOfRegulatorTeam(userDetailService.getUserDetail()))
             .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);

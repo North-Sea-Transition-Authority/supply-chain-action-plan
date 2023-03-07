@@ -7,9 +7,12 @@ import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.Su
 import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.FURTHER_INFORMATION;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.error.exception.IllegalUtilClassInstantiationException;
@@ -38,6 +41,7 @@ import uk.co.nstauthority.scap.scap.casemanagement.withdraw.ScapWithdrawalForm;
 import uk.co.nstauthority.scap.scap.delete.ScapDeletionController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
+import uk.co.nstauthority.scap.util.DateUtil;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 public class ScapSummaryModelAndViewGenerator {
@@ -62,6 +66,7 @@ public class ScapSummaryModelAndViewGenerator {
     private final SupportingDocumentService supportingDocumentService;
     private ScapSubmissionStage scapStatus = ScapSubmissionStage.DRAFT;
     private List<CaseEventView> caseEventTimeline = emptyList();
+    private List<ScapDetail> scapVersions = emptyList();
     private FurtherInfoRequestForm furtherInfoRequestForm = new FurtherInfoRequestForm();
     private List<FileUploadForm> existingFurtherInfoFiles;
     private QaCommentForm qaCommentForm = new QaCommentForm();
@@ -79,6 +84,11 @@ public class ScapSummaryModelAndViewGenerator {
       this.scapDetail = scapDetail;
       this.scapSummary = scapSummary;
       this.supportingDocumentService = supportingDocumentService;
+    }
+
+    public Generator withScapVersions(List<ScapDetail> applicableVersions) {
+      this.scapVersions = applicableVersions;
+      return this;
     }
 
     public Generator withOrgGroup(OrganisationGroup organisationGroup) {
@@ -162,7 +172,7 @@ public class ScapSummaryModelAndViewGenerator {
     }
 
     public ModelAndView generate() {
-      var modelAndView =  new ModelAndView("scap/scap/summary/scapSummaryOverview")
+      var modelAndView = new ModelAndView("scap/scap/summary/scapSummaryOverview")
           .addObject("scapSummaryView", scapSummary)
           .addObject("projectReference", scapDetail.getScap().getReference())
           .addObject("projectName", scapSummary.projectDetailsSummaryView().projectName())
@@ -179,6 +189,7 @@ public class ScapSummaryModelAndViewGenerator {
               on(ScapDeletionController.class).renderScapDeletionConfirmation(scapDetail.getScap().getScapId())));
 
 
+      addVersionSelectForm(modelAndView);
       addCaseEventTimeline(modelAndView);
       addQaCommentForm(modelAndView);
       addInfoRequestForm(modelAndView);
@@ -190,6 +201,13 @@ public class ScapSummaryModelAndViewGenerator {
       addReinstateForm(modelAndView);
 
       return modelAndView;
+    }
+
+    private void addVersionSelectForm(ModelAndView modelAndView) {
+      modelAndView.addObject("availableVersions", getScapVersionOptions());
+      modelAndView.addObject("versionSubmitUrl",
+          ReverseRouter.route(on(ScapSummaryController.class)
+              .getScapSummary(scapDetail.getScap().getScapId())));
     }
 
     private void addCaseEventTimeline(ModelAndView modelAndView) {
@@ -291,6 +309,18 @@ public class ScapSummaryModelAndViewGenerator {
               null,
               null,
               null)));
+    }
+
+    private Map<Integer, String> getScapVersionOptions() {
+      return scapVersions.stream()
+          .collect(Collectors.toMap(
+              ScapDetail::getVersionNumber,
+              detail -> "(%d) %s : %s".formatted(
+                  detail.getVersionNumber(),
+                  detail.getStatus().getDisplayName(),
+                  DateUtil.instantToString(detail.getCreatedTimestamp())
+              )
+          ));
     }
   }
 }

@@ -16,8 +16,11 @@ import static uk.co.nstauthority.scap.scap.projectdetails.ProjectType.FIELD_DEVE
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getScapSummaryView;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -66,6 +69,8 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
   SupportingDocumentService supportingDocumentService;
 
   private static final ScapId SCAP_ID = new ScapId(1000);
+
+  private static final Integer SCAP_VERSION = 5;
 
   private ScapDetail scapDetail;
 
@@ -161,7 +166,9 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
         .andExpect(model().attributeExists("scapSummaryView"))
         .andExpect(model().attributeExists("caseEvents"))
         .andExpect(model().attributeExists("applicableActions"))
-        .andExpect(model().attributeExists("updateInProgress"));
+        .andExpect(model().attributeExists("updateInProgress"))
+        .andExpect(model().attributeExists("availableVersions"))
+        .andExpect(model().attributeExists("versionSubmitUrl"));
   }
 
 
@@ -189,6 +196,41 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(false);
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
     when(caseEventService.getEventViewByScapId(SCAP_ID)).thenReturn(getTimelineView());
+
+    mockMvc.perform(get(
+            ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
+            .with(user(testUser)))
+        .andExpect(status().isOk())
+        .andExpect(view().name("scap/scap/summary/scapSummaryOverview"));
+    verify(caseEventService, never()).getEventViewByScapId(SCAP_ID);
+  }
+
+  @Test
+  void renderSummary_IndustryUser_VersionSelected() throws Exception {
+    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
+        .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
+    when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(false);
+    when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
+    when(caseEventService.getEventViewByScapId(SCAP_ID)).thenReturn(getTimelineView());
+
+    mockMvc.perform(get(
+            ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID, SCAP_VERSION)))
+            .with(user(testUser)))
+        .andExpect(status().isOk())
+        .andExpect(view().name("scap/scap/summary/scapSummaryOverview"));
+    verify(caseEventService, never()).getEventViewByScapId(SCAP_ID);
+    verify(scapDetailService).getByScapIdAndVersionNumber(SCAP_ID, SCAP_VERSION);
+  }
+
+  @Test
+  void renderSummary_RegulatorUser_VersionApplicable() throws Exception {
+    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
+        .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
+    when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(false);
+    when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
+    when(caseEventService.getEventViewByScapId(SCAP_ID)).thenReturn(getTimelineView());
+    when(scapDetailService.getAllVersionsForUser(scapDetail.getScap()))
+        .thenReturn(getScapDetails());
 
     mockMvc.perform(get(
             ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
@@ -228,5 +270,32 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
         "",
         null);
     return List.of(timelineEvent);
+  }
+
+  private List<ScapDetail> getScapDetails() {
+    var list = new ArrayList<ScapDetail>();
+    var scap = new Scap();
+    var scapDetail = new ScapDetail();
+    scapDetail.setVersionNumber(3);
+    scapDetail.setStatus(ScapDetailStatus.DRAFT);
+    scapDetail.setScap(scap);
+    scapDetail.setCreatedTimestamp(Instant.now());
+    list.add(scapDetail);
+
+    var scapDetail2 = new ScapDetail();
+    scapDetail2.setVersionNumber(2);
+    scapDetail2.setStatus(ScapDetailStatus.SUBMITTED);
+    scapDetail2.setScap(scap);
+    scapDetail2.setCreatedTimestamp(Instant.now());
+    list.add(scapDetail2);
+
+    var scapDetail3 = new ScapDetail();
+    scapDetail3.setVersionNumber(1);
+    scapDetail3.setStatus(ScapDetailStatus.WITHDRAWN);
+    scapDetail.setScap(scap);
+    scapDetail3.setCreatedTimestamp(Instant.now());
+    list.add(scapDetail3);
+
+    return list;
   }
 }

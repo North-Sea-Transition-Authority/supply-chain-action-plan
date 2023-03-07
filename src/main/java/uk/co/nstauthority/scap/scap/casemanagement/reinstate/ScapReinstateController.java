@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.scap.casemanagement.reinstate;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_REINSTATED;
 
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -29,7 +30,6 @@ import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
-import uk.co.nstauthority.scap.scap.submit.ReviewAndSubmitForm;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
@@ -103,6 +103,7 @@ public class ScapReinstateController {
             .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
             .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
             .withScapReinstateForm(scapReinstateForm)
+            .withScapVersions(scapDetailService.getAllVersionsForUser(scapDetail.getScap()))
             .withUpdatePermission(teamService.userIsMemberOfRegulatorTeam(userDetailService.getUserDetail()))
             .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);

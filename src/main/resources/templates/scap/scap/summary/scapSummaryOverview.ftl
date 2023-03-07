@@ -19,6 +19,14 @@
 
 </#macro>
 
+<#macro scapVersions availableVersions>
+    <@fdsActionDropdown.actionDropdown dropdownButtonText="Versions">
+      <#list availableVersions as value, key>
+        <@fdsActionDropdown.actionDropdownItem actionText=key linkAction=true linkActionUrl=springUrl(versionSubmitUrl + value)/>
+      </#list>
+    </@fdsActionDropdown.actionDropdown>
+</#macro>
+
 <#-- @ftlvariable name="backLinkUrl" type="java.lang.String" -->
 <#-- @ftlvariable name="updateScapUrl" type="java.lang.String" -->
 <#-- @ftlvariable name="projectReference" type="java.lang.String"-->
@@ -48,12 +56,14 @@ backLinkUrl=springUrl(backLinkUrl)
           </#if>
         </#if>
       </@fdsForm.htmlForm>
+      <@scapVersions availableVersions/>
     </@fdsAction.buttonGroup>
   <@fdsAction.buttonGroup>
     <#list applicableActions as group, actions>
       <@buttongroup group=group actions=actions/>
     </#list>
   </@fdsAction.buttonGroup>
+
   <@fdsTabs.tabs tabsHeading="SCAP overview tabs">
     <@fdsTabs.tabList>
       <@fdsTabs.tab tabLabel="Application form" tabAnchor="summary-tab"/>

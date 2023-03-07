@@ -18,6 +18,7 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventView;
+import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
@@ -71,7 +72,24 @@ public class ScapSummaryController {
       ScapDetailStatus.CLOSED_OUT,
       ScapDetailStatus.WITHDRAWN})
   public ModelAndView getScapSummary(@PathVariable("scapId") ScapId scapId) {
+    return getScapSummary(scapId, null);
+  }
+
+  @GetMapping(path = "/{versionNumber}")
+  @ScapHasStatus(permittedStatuses = {ScapDetailStatus.DRAFT,
+      ScapDetailStatus.SUBMITTED,
+      ScapDetailStatus.APPROVED,
+      ScapDetailStatus.CLOSED_OUT,
+      ScapDetailStatus.WITHDRAWN})
+  public ModelAndView getScapSummary(@PathVariable("scapId") ScapId scapId,
+                                     @PathVariable("versionNumber") Integer versionNumber) {
+
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
+    ScapDetail versionedDetail = null;
+    if (versionNumber != null) {
+      versionedDetail = scapDetailService.getByScapIdAndVersionNumber(scapId, versionNumber);
+    }
+
     var user = userDetailService.getUserDetail();
     var userPermissions = teamMemberService.getAllPermissionsForUser(user);
 
@@ -80,9 +98,7 @@ public class ScapSummaryController {
         && userPermissions.contains(RolePermission.SUBMIT_SCAP)) {
       return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
     }
-
-    var scapSummary = scapSummaryViewService.getScapSummaryView(scapDetail);
-
+    var scapSummary = scapSummaryViewService.getScapSummaryView(versionedDetail != null ? versionedDetail : scapDetail);
     var orgGroup = organisationGroupService
         .getOrganisationGroupById(scapDetail.getScap().getOrganisationGroupId(), "Get Org Group for Summary");
 
@@ -94,7 +110,8 @@ public class ScapSummaryController {
         .withCaseEventTimeline(getCaseEventView(scapId))
         .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
         .withUpdatePermission(teamService.userIsMemberOfRegulatorTeam(userDetailService.getUserDetail()))
-        .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
+        .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId))
+        .withScapVersions(scapDetailService.getAllVersionsForUser(scapDetail.getScap()));
     orgGroup.ifPresent(generator::withOrgGroup);
     return generator.generate();
   }

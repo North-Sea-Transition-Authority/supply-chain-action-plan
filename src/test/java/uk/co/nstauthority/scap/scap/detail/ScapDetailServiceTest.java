@@ -16,11 +16,11 @@ import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.APPROVED;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.CLOSED_OUT;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.DRAFT;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.SUBMITTED;
-import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.WITHDRAWN;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +36,7 @@ import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.error.exception.ScapBadRequestException;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.submit.ReviewAndSubmitForm;
@@ -49,6 +50,9 @@ class ScapDetailServiceTest {
 
   @Mock
   UserDetailService userDetailService;
+
+  @Mock
+  TeamService teamService;
 
   @Mock
   Clock clock = Clock.fixed(Instant.ofEpochSecond(1667576106), ZoneId.systemDefault());
@@ -174,6 +178,12 @@ class ScapDetailServiceTest {
   }
 
   @Test
+  void listAllByScap_verifyCalls() {
+    scapDetailService.findAllByScap(scap);
+    verify(scapDetailRepository).findAllByScap(scap);
+  }
+
+  @Test
   void getLatestScapDetailByScapId() {
     var scapDetail = new ScapDetail();
 
@@ -218,6 +228,23 @@ class ScapDetailServiceTest {
         .thenReturn(Optional.of(scapDetail));
 
     assertThat(scapDetailService.findLatestSubmittedScapDetail(scap.getScapId())).isNotEmpty();
+  }
+
+  @Test
+  void getLatestSubmittedScapDetail_NotFound_Throws() {
+    when(scapDetailRepository.findFirstByScapIdAndTipFlagAndStatus(scap.getId(), true, SUBMITTED))
+        .thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> scapDetailService.getLatestSubmittedScapDetail(scap.getScapId())).isInstanceOf(ScapEntityNotFoundException.class);
+  }
+
+  @Test
+  void getLatestSubmittedScapDetail_Found_Returns() {
+    var scapDetail = new ScapDetail();
+    when(scapDetailRepository.findFirstByScapIdAndTipFlagAndStatus(scap.getId(), true, SUBMITTED))
+        .thenReturn(Optional.of(scapDetail));
+
+    assertThat(scapDetailService.getLatestSubmittedScapDetail(scap.getScapId())).isNotNull();
   }
 
   @Test
@@ -286,6 +313,30 @@ class ScapDetailServiceTest {
     when(scapDetailRepository.findFirstByScapIdAndStatusOrderByVersionNumberDesc(scapId.scapId(), DRAFT)).thenReturn(Optional.of(scapDetail));
 
     assertTrue(scapDetailService.isUpdateInProgress(scapId));
+  }
+
+  @Test
+  void getApplicableActions_userIsRegulator() {
+    when(scapDetailRepository.findAllByScap(scap)).thenReturn(getListScapDetail());
+    when(userDetailService.getUserDetail()).thenReturn(getUserDetail());
+    when(teamService.userIsMemberOfRegulatorTeam(getUserDetail())).thenReturn(true);
+
+    var result = scapDetailService.getAllVersionsForUser(scap);
+    assertThat(result.size()).isEqualTo(1);
+    assertThat(result.get(0).getStatus()).isEqualTo(SUBMITTED);
+  }
+
+  @Test
+  void getApplicableActions_userIsIndustry() {
+    var expectedResult = getListScapDetail();
+    when(scapDetailRepository.findAllByScap(scap)).thenReturn(expectedResult);
+    when(userDetailService.getUserDetail()).thenReturn(getUserDetail());
+    when(teamService.userIsMemberOfRegulatorTeam(getUserDetail())).thenReturn(false);
+
+    expectedResult.remove(2);
+    var result = scapDetailService.getAllVersionsForUser(scap);
+    assertThat(result.size()).isEqualTo(3);
+    assertThat(result).containsExactlyElementsOf(expectedResult);
   }
 
   @Test
@@ -533,10 +584,13 @@ class ScapDetailServiceTest {
   }
 
   private List<ScapDetail> getListScapDetail() {
-    var scapDetailList = List.of(
-        new ScapDetail(scap, 1, false, ScapDetailStatus.DRAFT, EntityTestingUtil.dateToInstant(2000, 4, 23), 1),
-        new ScapDetail(scap, 2, true, ScapDetailStatus.DRAFT, EntityTestingUtil.dateToInstant(2000, 4, 23), 1)
-    );
+    var scapDetailList = new ArrayList<ScapDetail>();
+    scapDetailList.addAll(List.of(
+        new ScapDetail(scap, 1, false, ScapDetailStatus.SUBMITTED, EntityTestingUtil.dateToInstant(2000, 4, 23), 1),
+        new ScapDetail(scap, 2, true, ScapDetailStatus.DRAFT, EntityTestingUtil.dateToInstant(2000, 4, 23), 1),
+        new ScapDetail(scap, 2, true, ScapDetailStatus.DELETED, EntityTestingUtil.dateToInstant(2000, 4, 23),1),
+        new ScapDetail(scap, 3, true, ScapDetailStatus.DRAFT, EntityTestingUtil.dateToInstant(2000, 4, 23), 1)
+    ));
     return scapDetailList;
   }
 }
