@@ -1,8 +1,6 @@
 package uk.co.nstauthority.scap.scap.casemanagement.updaterequest;
 
-import java.time.Clock;
 import java.time.LocalDate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;

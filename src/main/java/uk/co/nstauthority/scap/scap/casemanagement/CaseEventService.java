@@ -1,6 +1,5 @@
 package uk.co.nstauthority.scap.scap.casemanagement;
 
-import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.QA;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventGroups.CONSULTATIONS;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventGroups.DECISIONS;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventGroups.FURTHER_INFO;

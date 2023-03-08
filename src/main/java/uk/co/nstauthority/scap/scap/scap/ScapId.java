@@ -1,8 +1,5 @@
 package uk.co.nstauthority.scap.scap.scap;
 
-import java.util.UUID;
-import uk.co.nstauthority.scap.permissionmanagement.TeamId;
-
 public record ScapId(Integer scapId) {
 
   public static ScapId valueOf(String value) {

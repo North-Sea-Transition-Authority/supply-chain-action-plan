@@ -1,6 +1,5 @@
 package uk.co.nstauthority.scap.scap.casemanagement.updaterequest;
 
-import uk.co.fivium.formlibrary.input.IntegerInput;
 import uk.co.fivium.formlibrary.input.StringInput;
 import uk.co.fivium.formlibrary.input.ThreeFieldDateInput;
 

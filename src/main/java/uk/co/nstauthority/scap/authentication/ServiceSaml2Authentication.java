@@ -1,7 +1,6 @@
 package uk.co.nstauthority.scap.authentication;
 
 import java.util.Collection;
-import java.util.Objects;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 

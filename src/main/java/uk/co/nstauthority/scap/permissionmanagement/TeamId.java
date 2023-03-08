@@ -1,7 +1,5 @@
 package uk.co.nstauthority.scap.permissionmanagement;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.UUID;
 
 public record TeamId(UUID uuid) {
