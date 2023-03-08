@@ -46,7 +46,9 @@
 <#-- @ftlvariable name="workAreaItem" type="uk.co.nstauthority.scap.workarea.WorkAreaItem" -->
   <#assign tagContentInfoRequest>
     <#if workAreaItem.updateInProgress()>
-      <@fdsResultList.resultListTag tagClass="govuk-tag--blue" tagText="Update In Progress"/>
+      <@fdsResultList.resultListTag tagClass="govuk-tag--blue" tagText="Update in progress"/>
+    <#elseif workAreaItem.requestDueBy()?has_content>
+        <@fdsResultList.resultListTag tagClass="govuk-tag--blue" tagText="Update due by " + workAreaItem.requestDueBy()/>
     <#elseif workAreaItem.outstandingInformationRequest()>
       <@fdsResultList.resultListTag tagClass="govuk-tag--blue" tagText="Further information requested"/>
     </#if>

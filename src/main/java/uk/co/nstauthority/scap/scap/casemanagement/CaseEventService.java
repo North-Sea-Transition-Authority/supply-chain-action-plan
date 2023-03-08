@@ -1,5 +1,10 @@
 package uk.co.nstauthority.scap.scap.casemanagement;
 
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.QA;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventGroups.CONSULTATIONS;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventGroups.DECISIONS;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventGroups.FURTHER_INFO;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventGroups.UPDATE_SCAP;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTHER_INFO_REQUESTED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTHER_INFO_RESPONSE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.QA_COMMENT;
@@ -8,10 +13,12 @@ import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_CONSULTATION_RESPONSE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_REINSTATED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_SUBMITTED;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_UPDATE_REQUESTED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_WITHDRAWN;
-import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.UPDATE_SCAP;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,6 +32,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.co.fivium.formlibrary.validator.date.DateUtils;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
@@ -49,11 +57,6 @@ public class CaseEventService {
 
   private final ScapDetailService scapDetailService;
 
-  private static final String CONSULTATIONS = "Consultations";
-  private static final String UPDATE_SCAP = "UPDATE_SCAP";
-  private static final String DECISIONS = "Decisions";
-  private static final String FURTHER_INFO = "Further Info";
-  private static final String QA = "QA";
   private static final Set<CaseEventSubject> RESPONSE_ACTIONS = Set.of(FURTHER_INFO_RESPONSE,
       SCAP_SUBMITTED,
       SCAP_APPROVED);
@@ -79,12 +82,21 @@ public class CaseEventService {
                                   ScapId scapId,
                                   Integer scapVersion,
                                   String comments) {
+    return recordNewEvent(subject, scapId, scapVersion, comments, null);
+  }
+
+  public CaseEvent recordNewEvent(CaseEventSubject subject,
+                                  ScapId scapId,
+                                  Integer scapVersion,
+                                  String comments,
+                                  LocalDate dueDate) {
     var caseEvent = new CaseEvent();
     caseEvent.setCaseEventSubject(subject);
     caseEvent.setEventTime(Instant.now());
     caseEvent.setScapId(scapId.scapId());
     caseEvent.setVersionNumber(scapVersion);
     caseEvent.setComments(comments);
+    caseEvent.setDueDate(dueDate);
 
     var loggedInUser = userDetailService.getUserDetail();
     caseEvent.setEventByWuaId(loggedInUser.getWebUserAccountId().id());
@@ -135,10 +147,19 @@ public class CaseEventService {
     return false;
   }
 
-  public Optional<Instant> getDateOfResponseToInfoRequest(CaseEvent infoRequest) {
-    if (infoRequest.getTimelineEventSubject() != FURTHER_INFO_REQUESTED) {
-      return Optional.empty();
+  public String getUpdateDueDate(ScapId scapId) {
+    var requestActionOptional = caseEventRepository
+        .findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(scapId.scapId(), SCAP_UPDATE_REQUESTED);
+
+    if (requestActionOptional.isPresent()) {
+      if (getDateOfResponseToInfoRequest(requestActionOptional.get()).isEmpty()) {
+        return requestActionOptional.get().getDueDate().format(DateTimeFormatter.ofPattern(DateUtils.SHORT_DATE));
+      }
     }
+    return null;
+  }
+
+  public Optional<Instant> getDateOfResponseToInfoRequest(CaseEvent infoRequest) {
     var events = caseEventRepository.findAllByScapIdAndEventTimeAfter(
         infoRequest.getScapId(),
         infoRequest.getEventTime());
@@ -166,9 +187,9 @@ public class CaseEventService {
         furtherInfo.add(FURTHER_INFO_RESPONSE);
       }
       consultations.add(SCAP_CONSULTATION_RESPONSE);
-      actionMap.put(FURTHER_INFO, furtherInfo);
-      actionMap.put(CONSULTATIONS, consultations);
-      actionMap.put(UPDATE_SCAP, Collections.emptyList());
+      actionMap.put(FURTHER_INFO.getDisplayName(), furtherInfo);
+      actionMap.put(CONSULTATIONS.getDisplayName(), consultations);
+      actionMap.put(UPDATE_SCAP.getDisplayName(), Collections.emptyList());
     }
     return actionMap;
   }
@@ -178,7 +199,7 @@ public class CaseEventService {
       var regulatorMap = new HashMap<String, List<CaseEventSubject>>();
       var descisions = new ArrayList<CaseEventSubject>();
       descisions.add(SCAP_REINSTATED);
-      regulatorMap.put(DECISIONS, descisions);
+      regulatorMap.put(DECISIONS.getDisplayName(), descisions);
       return regulatorMap;
     }
     var regulatorMap = new HashMap<String, List<CaseEventSubject>>();
@@ -198,11 +219,12 @@ public class CaseEventService {
       furtherInfo.add(FURTHER_INFO_RESPONSE);
     } else {
       furtherInfo.add(FURTHER_INFO_REQUESTED);
+      furtherInfo.add(SCAP_UPDATE_REQUESTED);
     }
-    regulatorMap.put(QA, qa);
-    regulatorMap.put(DECISIONS, descisions);
-    regulatorMap.put(CONSULTATIONS, consultations);
-    regulatorMap.put(FURTHER_INFO, furtherInfo);
+    regulatorMap.put(CaseEventGroups.QA.getDisplayName(), qa);
+    regulatorMap.put(DECISIONS.getDisplayName(), descisions);
+    regulatorMap.put(CONSULTATIONS.getDisplayName(), consultations);
+    regulatorMap.put(FURTHER_INFO.getDisplayName(), furtherInfo);
     return regulatorMap;
   }
 }

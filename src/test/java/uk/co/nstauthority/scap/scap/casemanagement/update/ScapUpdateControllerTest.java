@@ -60,7 +60,7 @@ class ScapUpdateControllerTest extends AbstractControllerTest {
     mockMvc.perform(post(ReverseRouter.route(on(ScapUpdateController.class)
         .startScapUpdate(
             SCAP_ID,
-            CaseEventAction.UPDATE)))
+            CaseEventAction.UPDATE_SUBMITTED)))
         .with(user(testUser))
         .with(csrf()))
         .andExpect(redirectUrl(ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID))));
@@ -79,7 +79,7 @@ class ScapUpdateControllerTest extends AbstractControllerTest {
     mockMvc.perform(post(ReverseRouter.route(on(ScapUpdateController.class)
             .startScapUpdate(
                 SCAP_ID,
-                CaseEventAction.UPDATE)))
+                CaseEventAction.UPDATE_SUBMITTED)))
             .with(user(testUser))
             .with(csrf()))
         .andExpect(status().is4xxClientError());
@@ -95,7 +95,7 @@ class ScapUpdateControllerTest extends AbstractControllerTest {
     mockMvc.perform(post(ReverseRouter.route(on(ScapUpdateController.class)
             .startScapUpdate(
                 SCAP_ID,
-                CaseEventAction.UPDATE)))
+                CaseEventAction.UPDATE_SUBMITTED)))
             .with(user(testUser))
             .with(csrf()))
         .andExpect(redirectUrl(ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID))));

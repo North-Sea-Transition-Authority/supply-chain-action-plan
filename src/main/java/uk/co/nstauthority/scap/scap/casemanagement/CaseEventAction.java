@@ -22,7 +22,8 @@ public class CaseEventAction {
 
   public static final String APPROVED = "APPROVED";
 
-  public static final String UPDATE = "UPDATE";
+  public static final String UPDATE_SUBMITTED = "UPDATE_SUBMITTED";
+  public static final String UPDATE_REQUESTED = "UPDATE_REQUESTED";
 
   public static final String CLOSED_OUT = "CLOSED_OUT";
 

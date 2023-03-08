@@ -1,7 +1,6 @@
 package uk.co.nstauthority.scap.scap.casemanagement;
 
 
-
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.APPROVED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.CLOSED_OUT;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.CONSULTATION_REQUESTED;
@@ -11,7 +10,8 @@ import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.INFO_R
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.QA;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.REINSTATE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.SUBMIT;
-import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.UPDATE;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.UPDATE_REQUESTED;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.UPDATE_SUBMITTED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.WITHDRAWN;
 
 public enum CaseEventSubject {
@@ -31,7 +31,7 @@ public enum CaseEventSubject {
       "Submitted SCAP",
       null,
       null),
-  UPDATE_SCAP(UPDATE,
+  UPDATE_SCAP(UPDATE_SUBMITTED,
       "SCAP UPDATE",
       null,
       "Update-Panel"),
@@ -48,6 +48,10 @@ public enum CaseEventSubject {
       "Consultation Response",
       "Consultation Response",
       "Consultation-Response-Panel"),
+  SCAP_UPDATE_REQUESTED(UPDATE_REQUESTED,
+      "Update requested",
+      "Request an update",
+      "Update-Request-Panel"),
   SCAP_APPROVED(APPROVED,
       "SCAP Approved",
       "Approve SCAP",

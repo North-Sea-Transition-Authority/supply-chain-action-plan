@@ -35,9 +35,9 @@ public class ScapUpdateController {
   }
 
 
-  @PostMapping(params = CaseEventAction.UPDATE)
+  @PostMapping(params = CaseEventAction.UPDATE_SUBMITTED)
   public ModelAndView startScapUpdate(@PathVariable("scapId") ScapId scapId,
-                                      @RequestParam(CaseEventAction.UPDATE) String caseEventAction) {
+                                      @RequestParam(CaseEventAction.UPDATE_SUBMITTED) String caseEventAction) {
     var existingDraftUpdate = scapDetailService.findLatestByScapIdAndStatus(scapId, ScapDetailStatus.DRAFT);
     if (existingDraftUpdate.isEmpty()) {
       scapDetailService.createDraftScapDetail(scapService.getScapById(scapId));

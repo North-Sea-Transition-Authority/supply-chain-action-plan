@@ -60,7 +60,8 @@ class WorkAreaControllerTest extends AbstractControllerTest {
             ScapDetailStatus.DRAFT,
             ScapSubmissionStage.CONTRACTING_STRATEGY_PENDING,
             false,
-            false
+            false,
+            null
         ));
     statusCheckboxes = ScapDetailStatus.getRadioOptions();
 

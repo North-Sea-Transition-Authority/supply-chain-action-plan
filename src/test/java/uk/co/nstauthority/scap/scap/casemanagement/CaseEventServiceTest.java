@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.casemanagement;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.LOCAL_DATE;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -18,9 +19,11 @@ import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.QA_CO
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_APPROVED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_CONSULTATION_RESPONSE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_REINSTATED;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_UPDATE_REQUESTED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_WITHDRAWN;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -104,7 +107,7 @@ class CaseEventServiceTest {
     assertThat(result.get(2).scapId()).isEqualTo(SCAP_ID.scapId());
     assertThat(result.get(2).userDisplayName()).isEqualTo("TEST SURNAME");
     assertThat(result.get(2).formattedTime()).isEqualTo(formatter.format(TIME.minus(1, ChronoUnit.DAYS)));
-    assertNull(result.get(2).dateOfResponse());
+    assertThat(result.get(2).dateOfResponse()).isEqualTo(formatter.format(TIME.minus(1, ChronoUnit.DAYS)));
     assertThat(result.get(1).dateOfResponse()).isEqualTo(DateUtil.instantToString(TIME.minus(1, ChronoUnit.DAYS)));
   }
 
@@ -162,6 +165,47 @@ class CaseEventServiceTest {
   }
 
   @Test
+  void getUpdateDueDate_requestNoResponse() {
+    when(caseEventRepository.findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(SCAP_ID.scapId(),
+        SCAP_UPDATE_REQUESTED))
+        .thenReturn(Optional.of(getUpdateRequestEvent()));
+
+    when(caseEventRepository.findAllByScapIdAndEventTimeAfter(SCAP_ID.scapId(),
+        getRequestEvent().getEventTime()))
+        .thenReturn(emptyList());
+
+    assertThat(caseEventService.getUpdateDueDate(SCAP_ID)).isEqualTo(DateUtil.instantToString(TIME));
+  }
+
+  @Test
+  void getUpdateDueDate_emptyRequestAndResponse() {
+    var request = getUpdateRequestEvent();
+    request.setDueDate(null);
+    when(caseEventRepository.findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(SCAP_ID.scapId(),
+        SCAP_UPDATE_REQUESTED))
+        .thenReturn(Optional.of(request));
+
+    when(caseEventRepository.findAllByScapIdAndEventTimeAfter(SCAP_ID.scapId(),
+        getRequestEvent().getEventTime()))
+        .thenReturn(getTimelineEvents());
+
+    assertNull(caseEventService.getUpdateDueDate(SCAP_ID));
+  }
+
+  @Test
+  void getUpdateDueDate_requestAndResponse() {
+    when(caseEventRepository.findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(SCAP_ID.scapId(),
+        SCAP_UPDATE_REQUESTED))
+        .thenReturn(Optional.of(getUpdateRequestEvent()));
+
+    when(caseEventRepository.findAllByScapIdAndEventTimeAfter(SCAP_ID.scapId(),
+        getRequestEvent().getEventTime()))
+        .thenReturn(getTimelineEvents());
+
+    assertNull(caseEventService.getUpdateDueDate(SCAP_ID));
+  }
+
+  @Test
   void getApplicableActions_isRegulator() {
     var user = ServiceUserDetailTestUtil.Builder().build();
     when(userDetailService.getUserDetail()).thenReturn(user);
@@ -173,10 +217,10 @@ class CaseEventServiceTest {
 
     var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
 
-    assertThat(actions.get("QA")).containsExactly(QA_COMMENT);
-    assertThat(actions.get("Consultations")).containsExactly(SCAP_CONSULTATION_REQUESTED, SCAP_CONSULTATION_RESPONSE);
-    assertThat(actions.get("Decisions")).containsExactly(SCAP_APPROVED, SCAP_WITHDRAWN);
-    assertThat(actions.get("Further Info")).containsExactly(FURTHER_INFO_REQUESTED);
+    assertThat(actions.get(CaseEventGroups.QA.getDisplayName())).containsExactly(QA_COMMENT);
+    assertThat(actions.get(CaseEventGroups.CONSULTATIONS.getDisplayName())).containsExactly(SCAP_CONSULTATION_REQUESTED, SCAP_CONSULTATION_RESPONSE);
+    assertThat(actions.get(CaseEventGroups.DECISIONS.getDisplayName())).containsExactly(SCAP_APPROVED, SCAP_WITHDRAWN);
+    assertThat(actions.get(CaseEventGroups.FURTHER_INFO.getDisplayName())).containsExactly(FURTHER_INFO_REQUESTED, SCAP_UPDATE_REQUESTED);
   }
 
   @Test
@@ -191,7 +235,7 @@ class CaseEventServiceTest {
 
     var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
 
-    assertThat(actions.get("Decisions")).containsExactly(SCAP_REINSTATED);
+    assertThat(actions.get(CaseEventGroups.DECISIONS.getDisplayName())).containsExactly(SCAP_REINSTATED);
   }
 
   @Test
@@ -213,10 +257,10 @@ class CaseEventServiceTest {
 
     var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
 
-    assertThat(actions.get("QA")).containsExactly(QA_COMMENT);
-    assertThat(actions.get("Consultations")).containsExactly(SCAP_CONSULTATION_REQUESTED, SCAP_CONSULTATION_RESPONSE);
-    assertThat(actions.get("Decisions")).containsExactly(SCAP_APPROVED, SCAP_WITHDRAWN);
-    assertThat(actions.get("Further Info")).containsExactly(FURTHER_INFO_RESPONSE);
+    assertThat(actions.get(CaseEventGroups.QA.getDisplayName())).containsExactly(QA_COMMENT);
+    assertThat(actions.get(CaseEventGroups.CONSULTATIONS.getDisplayName())).containsExactly(SCAP_CONSULTATION_REQUESTED, SCAP_CONSULTATION_RESPONSE);
+    assertThat(actions.get(CaseEventGroups.DECISIONS.getDisplayName())).containsExactly(SCAP_APPROVED, SCAP_WITHDRAWN);
+    assertThat(actions.get(CaseEventGroups.FURTHER_INFO.getDisplayName())).containsExactly(FURTHER_INFO_RESPONSE);
   }
 
   @Test
@@ -230,8 +274,8 @@ class CaseEventServiceTest {
 
     var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
 
-    assertThat(actions.get("Consultations")).containsExactly(SCAP_CONSULTATION_RESPONSE);
-    assertThat(actions.get("Further Info")).isEmpty();
+    assertThat(actions.get(CaseEventGroups.CONSULTATIONS.getDisplayName())).containsExactly(SCAP_CONSULTATION_RESPONSE);
+    assertThat(actions.get(CaseEventGroups.FURTHER_INFO.getDisplayName())).isEmpty();
   }
 
   @Test
@@ -265,8 +309,8 @@ class CaseEventServiceTest {
 
     var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
 
-    assertThat(actions.get("Consultations")).containsExactly(SCAP_CONSULTATION_RESPONSE);
-    assertThat(actions.get("Further Info")).containsExactly(FURTHER_INFO_RESPONSE);
+    assertThat(actions.get(CaseEventGroups.CONSULTATIONS.getDisplayName())).containsExactly(SCAP_CONSULTATION_RESPONSE);
+    assertThat(actions.get(CaseEventGroups.FURTHER_INFO.getDisplayName())).containsExactly(FURTHER_INFO_RESPONSE);
   }
 
   private List<CaseEvent> getTimelineEvents() {
@@ -297,6 +341,18 @@ class CaseEventServiceTest {
     infoRequestTimelineEvent.setVersionNumber(1);
     infoRequestTimelineEvent.setEventTime(TIME);
     infoRequestTimelineEvent.setEventByWuaId(1000L);
+
+    return infoRequestTimelineEvent;
+  }
+
+  private CaseEvent getUpdateRequestEvent() {
+    var infoRequestTimelineEvent = new CaseEvent(15);
+    infoRequestTimelineEvent.setCaseEventSubject(SCAP_UPDATE_REQUESTED);
+    infoRequestTimelineEvent.setScapId(SCAP_ID.scapId());
+    infoRequestTimelineEvent.setVersionNumber(1);
+    infoRequestTimelineEvent.setEventTime(TIME);
+    infoRequestTimelineEvent.setEventByWuaId(1000L);
+    infoRequestTimelineEvent.setDueDate(LocalDate.ofInstant(TIME, ZoneId.systemDefault()));
 
     return infoRequestTimelineEvent;
   }

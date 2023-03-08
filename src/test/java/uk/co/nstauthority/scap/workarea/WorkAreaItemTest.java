@@ -29,7 +29,8 @@ class WorkAreaItemTest {
         ScapDetailStatus.DRAFT,
         ScapSubmissionStage.CONTRACTING_STRATEGY_PENDING,
         false,
-        false
+        false,
+        null
     );
     var expectedUrl = ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(workAreaItem.scapId()));
 

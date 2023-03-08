@@ -103,7 +103,8 @@ class WorkAreaService {
             workAreaItemDto.status(),
             inferStatus(workAreaItemDto),
             caseEventService.isFurtherInfoResponseOutstanding(new ScapId(workAreaItemDto.scapId())),
-            scapDetailService.isUpdateInProgress(new ScapId(workAreaItemDto.scapId()))))
+            scapDetailService.isUpdateInProgress(new ScapId(workAreaItemDto.scapId())),
+            caseEventService.getUpdateDueDate(new ScapId(workAreaItemDto.scapId()))))
         .toList();
 
   }

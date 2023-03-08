@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.casemanagement;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
+import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -33,6 +34,8 @@ public class CaseEvent {
   @Column(name = "event_by")
   private Long eventByWuaId;
   private String comments;
+
+  private LocalDate dueDate;
 
   public CaseEvent() {
   }
@@ -88,5 +91,13 @@ public class CaseEvent {
 
   public void setComments(String comments) {
     this.comments = comments;
+  }
+
+  public LocalDate getDueDate() {
+    return dueDate;
+  }
+
+  public void setDueDate(LocalDate dueDate) {
+    this.dueDate = dueDate;
   }
 }

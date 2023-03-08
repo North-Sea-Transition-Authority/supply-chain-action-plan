@@ -6,7 +6,7 @@
 <#assign pageTitle = projectName!'' />
 <#macro buttongroup group actions>
     <#if actions?size gt 1>
-      <@fdsActionDropdown.actionDropdown dropdownButtonText="${group}">
+      <@fdsActionDropdown.actionDropdown dropdownButtonText="${group.getDisplayName()}">
         <#list actions as action>
           <@fdsActionDropdown.actionDropdownItem actionText="${action.getButtonText()}" buttonSlideOutPanelId="${action.getActionPanelId()}"/>
         </#list>
@@ -34,7 +34,7 @@
 <#-- @ftlvariable name="operator" type="java.lang.String" -->
 <#-- @ftlvariable name="scapSummaryView" type="uk.co.nstauthority.scap.scap.summary.ScapSummaryView" -->
 <#-- @ftlvariable name="caseEvents" type="java.util.List<uk.co.nstauthority.scap.scap.casemanagement.CaseEventView>" -->
-<#-- @ftlvariable name="applicableActions" type="java.util.Map<java.lang.String, uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject>" -->
+<#-- @ftlvariable name="applicableActions" type="java.util.Map<uk.co.nstauthority.scap.scap.casemanagement.CaseEventGroups, uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject>" -->
 <#-- @ftlvariable name="updateInProgress" type="java.lang.Boolean" -->
 
 <@defaultPage
@@ -85,6 +85,7 @@ backLinkUrl=springUrl(backLinkUrl)
   <#include 'caseActions/consultationRequestAction.ftl'/>
   <#include 'caseActions/consultationResponseAction.ftl'/>
   <#include 'caseActions/infoResponseAction.ftl'/>
+  <#include 'caseActions/updateRequestAction.ftl'/>
   <#include 'caseActions/approveScap.ftl'/>
   <#include 'caseActions/withdrawScap.ftl'/>
   <#include 'caseActions/reinstateScap.ftl'/>

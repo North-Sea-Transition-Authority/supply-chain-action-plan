@@ -7,11 +7,9 @@ import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.Su
 import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.FURTHER_INFORMATION;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
@@ -36,6 +34,8 @@ import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentForm;
 import uk.co.nstauthority.scap.scap.casemanagement.reinstate.ScapReinstateController;
 import uk.co.nstauthority.scap.scap.casemanagement.reinstate.ScapReinstateForm;
 import uk.co.nstauthority.scap.scap.casemanagement.update.ScapUpdateController;
+import uk.co.nstauthority.scap.scap.casemanagement.updaterequest.UpdateRequestController;
+import uk.co.nstauthority.scap.scap.casemanagement.updaterequest.UpdateRequestForm;
 import uk.co.nstauthority.scap.scap.casemanagement.withdraw.ScapWithdrawController;
 import uk.co.nstauthority.scap.scap.casemanagement.withdraw.ScapWithdrawalForm;
 import uk.co.nstauthority.scap.scap.delete.ScapDeletionController;
@@ -75,6 +75,7 @@ public class ScapSummaryModelAndViewGenerator {
     private ScapApprovalForm scapApprovalForm = new ScapApprovalForm();
     private ConsultationResponseForm consultationResponseForm = new ConsultationResponseForm();
     private ScapWithdrawalForm scapWithdrawalForm = new ScapWithdrawalForm();
+    private UpdateRequestForm updateRequestForm = new UpdateRequestForm();
     private ScapReinstateForm scapReinstateForm = new ScapReinstateForm();
     private List<FileUploadForm> existingApprovalFiles = new ArrayList<>();
 
@@ -161,6 +162,11 @@ public class ScapSummaryModelAndViewGenerator {
       return this;
     }
 
+    public Generator withUpdateRequestForm(UpdateRequestForm updateRequestForm) {
+      this.updateRequestForm = updateRequestForm;
+      return this;
+    }
+
     public Generator withScapReinstateForm(ScapReinstateForm scapReinstateForm) {
       this.scapReinstateForm = scapReinstateForm;
       return this;
@@ -181,7 +187,7 @@ public class ScapSummaryModelAndViewGenerator {
           .addObject("scapSubmissionStatus", scapStatus.getDisplayName())
           .addObject("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)))
           .addObject("updateScapUrl", ReverseRouter.route(
-              on(ScapUpdateController.class).startScapUpdate(scapDetail.getScap().getScapId(), CaseEventAction.UPDATE)))
+              on(ScapUpdateController.class).startScapUpdate(scapDetail.getScap().getScapId(), CaseEventAction.UPDATE_SUBMITTED)))
           .addObject("applicableActions", applicableActions)
           .addObject("updateInProgress", updateInProgress)
           .addObject("updatePermission", updatePermission)
@@ -196,6 +202,7 @@ public class ScapSummaryModelAndViewGenerator {
       addInfoResponseForm(modelAndView);
       addConsultationRequestForm(modelAndView);
       addConsultationResponseForm(modelAndView);
+      addUpdateRequestForm(modelAndView);
       addScapApprovalRequestForm(modelAndView);
       addWithdrawForm(modelAndView);
       addReinstateForm(modelAndView);
@@ -272,6 +279,17 @@ public class ScapSummaryModelAndViewGenerator {
                   null)));
       modelAndView.addObject("supportingDocumentsTemplate",
           supportingDocumentService.buildFileUploadTemplate(scapDetail.getScap().getScapId(), CONSULTATION_REPORT));
+    }
+
+    private void addUpdateRequestForm(ModelAndView modelAndView) {
+      modelAndView.addObject("updateRequestForm", updateRequestForm);
+      modelAndView.addObject("updateRequestSubmitUrl",
+          ReverseRouter.route(on(UpdateRequestController.class)
+              .saveInfoRequestedForm(scapDetail.getScap().getScapId(),
+                  CaseEventAction.UPDATE_REQUESTED,
+                  true,
+                  null,
+                  null)));
     }
 
     private void addScapApprovalRequestForm(ModelAndView modelAndView) {
