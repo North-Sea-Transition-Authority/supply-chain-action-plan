@@ -6,7 +6,7 @@
 <#assign pageTitle = projectName!'' />
 <#macro buttongroup group actions>
     <#if actions?size gt 1>
-      <@fdsActionDropdown.actionDropdown dropdownButtonText="${group.getDisplayName()}">
+      <@fdsActionDropdown.actionDropdown dropdownButtonText="${group}">
         <#list actions as action>
           <@fdsActionDropdown.actionDropdownItem actionText="${action.getButtonText()}" buttonSlideOutPanelId="${action.getActionPanelId()}"/>
         </#list>
