@@ -129,7 +129,7 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
 
     verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_APPROVED, SCAP_ID, 1, TEST_STRING);
     verify(scapDetailService).approveScap(scapDetail);
-    verify(scapEmailService).sendScapApprovalEmails(scapDetail, null);
+    verify(scapEmailService).sendScapApprovalEmails(scapDetail, null, false);
   }
 
   @Test

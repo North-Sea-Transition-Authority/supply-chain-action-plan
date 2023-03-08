@@ -54,12 +54,14 @@ public class ScapEmailService {
   }
 
   public void sendScapApprovalEmails(ScapDetail scapDetail,
-                                     ScapSubmissionStage scapSubmissionStage) {
+                                     ScapSubmissionStage scapSubmissionStage,
+                                     boolean projectClosedOut) {
     var scap = scapDetail.getScap();
     var emailProperties = new EmailProperties(NotifyTemplate.SCAP_APPROVED);
     var personalisations = emailProperties.getEmailPersonalisations();
     addDefaultPersonalisations(personalisations, scap);
     personalisations.put("SCAP submission stage", scapSubmissionStage.getDisplayName());
+    personalisations.put("Project closed out", projectClosedOut ? "yes" : "no");
     var recipients = getScapSubmitterRecipients(scap);
     sendEmailsWithRecipientNames(emailProperties, recipients);
   }

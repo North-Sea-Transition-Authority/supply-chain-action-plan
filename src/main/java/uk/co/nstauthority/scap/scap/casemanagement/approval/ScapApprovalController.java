@@ -124,13 +124,16 @@ public class ScapApprovalController {
               scapId,
               scapDetail.getVersionNumber(),
               scapApprovalForm.getApprovalComments().getInputValue());
-          if (scapApprovalForm.getProjectClosedOut().equals(YesNo.YES)) {
+          var projectClosedOut = scapApprovalForm.getProjectClosedOut().equals(YesNo.YES);
+          if (projectClosedOut) {
             scapDetailService.closeOutScap(scapDetail);
           } else {
             scapDetailService.approveScap(scapDetail);
           }
           scapEmailService.sendScapApprovalEmails(
-              scapDetail, scapSummaryViewService.inferSubmissionStatusFromSummary(scapSummary)
+              scapDetail,
+              scapSummaryViewService.inferSubmissionStatusFromSummary(scapSummary),
+              projectClosedOut
           );
 
           return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));

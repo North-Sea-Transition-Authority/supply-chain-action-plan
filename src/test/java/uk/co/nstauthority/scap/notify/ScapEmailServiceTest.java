@@ -12,10 +12,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -132,15 +136,16 @@ class ScapEmailServiceTest {
     when(userDetailService.getUserDetail()).thenReturn(LOGGED_IN_USER);
   }
 
-  @Test
-  void sendScapApprovalEmails() {
+  @ParameterizedTest
+  @MethodSource("projectClosedOutArguments")
+  void sendScapApprovalEmails(boolean projectClosedOutBool, String projectClosedOutString) {
     when(teamService.getByEnergyPortalOrgGroupId(SCAP_DETAIL.getScap().getOrganisationGroupId()))
         .thenReturn(industryTeam);
     when(teamMemberService.getTeamMembers(industryTeam)).thenReturn(List.of(industryTeamMember1, industryTeamMember2));
     when(energyPortalUserService.searchUsersByIds(Collections.singletonList(industryTeamMember1.wuaId())))
         .thenReturn(Collections.singletonList(recipient));
 
-    scapEmailService.sendScapApprovalEmails(SCAP_DETAIL, SCAP_SUBMISSION_STAGE);
+    scapEmailService.sendScapApprovalEmails(SCAP_DETAIL, SCAP_SUBMISSION_STAGE, projectClosedOutBool);
 
     verify(notifyEmailService).sendEmail(argumentCaptor.capture(), eq(recipient.getPrimaryEmailAddress()));
 
@@ -155,6 +160,7 @@ class ScapEmailServiceTest {
             "action-performing user", LOGGED_IN_USER.displayName(),
             "SCAP case url", SCAP_SUMMARY_URL,
             "recipient name", recipient.getForename(),
+            "Project closed out", projectClosedOutString,
             "TEST_EMAIL", "no"
         )
     );
@@ -234,6 +240,13 @@ class ScapEmailServiceTest {
     );
     verifyNoMoreInteractions(
         notifyEmailService, teamService, teamMemberService, energyPortalUserService, organisationGroupService
+    );
+  }
+
+  private static Stream<Arguments> projectClosedOutArguments() {
+    return Stream.of(
+        Arguments.of(true, "yes"),
+        Arguments.of(false, "no")
     );
   }
 }
