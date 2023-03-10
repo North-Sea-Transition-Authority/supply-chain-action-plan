@@ -1,20 +1,14 @@
 package uk.co.nstauthority.scap.scap.organisationgroup;
 
-import uk.co.fivium.formlibrary.input.DecimalInput;
-
 public class OrganisationGroupForm {
 
-  private final DecimalInput organisationGroupId;
+  private Integer organisationGroupId;
 
-  public OrganisationGroupForm() {
-    this.organisationGroupId = new DecimalInput("organisationGroupId", "Operator");
-  }
-
-  public DecimalInput getOrganisationGroupId() {
+  public Integer getOrganisationGroupId() {
     return organisationGroupId;
   }
 
-  public void setOrganisationGroupId(String organisationGroupId) {
-    this.organisationGroupId.setInputValue(organisationGroupId);
+  public void setOrganisationGroupId(Integer organisationGroupId) {
+    this.organisationGroupId = organisationGroupId;
   }
 }

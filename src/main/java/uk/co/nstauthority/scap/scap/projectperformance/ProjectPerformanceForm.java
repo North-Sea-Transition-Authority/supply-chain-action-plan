@@ -19,12 +19,12 @@ class ProjectPerformanceForm {
   private final DecimalInput outturnCost;
 
   ProjectPerformanceForm() {
-    this.startDay = new IntegerInput("startDay", "Start day");
-    this.startMonth = new IntegerInput("startMonth", "Start month");
-    this.startYear = new IntegerInput("startYear", "Start year");
-    this.completionDay = new IntegerInput("completionDay", "Completion day");
-    this.completionMonth = new IntegerInput("completionMonth", "Completion month");
-    this.completionYear = new IntegerInput("completionYear", "Completion year");
+    this.startDay = new IntegerInput("startDay", "start day");
+    this.startMonth = new IntegerInput("startMonth", "start month");
+    this.startYear = new IntegerInput("startYear", "start year");
+    this.completionDay = new IntegerInput("completionDay", "completion day");
+    this.completionMonth = new IntegerInput("completionMonth", "completion month");
+    this.completionYear = new IntegerInput("completionYear", "completion year");
     this.startDate = new ThreeFieldDateInput(
         "startDate",
         "actual execution start date",
@@ -39,7 +39,7 @@ class ProjectPerformanceForm {
         this.completionMonth,
         this.completionYear
     );
-    this.outturnCost = new DecimalInput("outturnCost", "Project outturn cost");
+    this.outturnCost = new DecimalInput("outturnCost", "the project outturn cost");
   }
 
   public YesNo getIsProjectCompleted() {

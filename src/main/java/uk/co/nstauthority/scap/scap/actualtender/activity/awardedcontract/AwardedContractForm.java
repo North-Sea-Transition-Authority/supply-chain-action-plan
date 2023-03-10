@@ -23,12 +23,12 @@ public class AwardedContractForm {
   private final ThreeFieldDateInput contractEndDate;
 
   public AwardedContractForm() {
-    this.awardValue = new DecimalInput("awardValue", "Award value");
-    this.awardRationale = new StringInput("awardRationale", "Award rationale");
-    this.contractAwardDate = new ThreeFieldDateInput(CONTRACT_AWARD_DATE_FIELD, "Contract award date");
-    this.otherPaymentTerm = new IntegerInput("otherPaymentTerm", "Days for payment terms");
-    this.contractStartDate = new ThreeFieldDateInput(CONTRACT_START_DATE_FIELD, "Forecast execution start date");
-    this.contractEndDate = new ThreeFieldDateInput(CONTRACT_END_DATE_FIELD, "Forecast execution completion date");
+    this.awardValue = new DecimalInput("awardValue", "the value of the awarded contract");
+    this.awardRationale = new StringInput("awardRationale", "the award rationale");
+    this.otherPaymentTerm = new IntegerInput("otherPaymentTerm", "the payment term in days");
+    this.contractAwardDate = new ThreeFieldDateInput(CONTRACT_AWARD_DATE_FIELD, "contract award date");
+    this.contractStartDate = new ThreeFieldDateInput(CONTRACT_START_DATE_FIELD, "forecast execution start date");
+    this.contractEndDate = new ThreeFieldDateInput(CONTRACT_END_DATE_FIELD, "forecast execution completion date");
   }
 
   public Integer getPreferredBidderId() {

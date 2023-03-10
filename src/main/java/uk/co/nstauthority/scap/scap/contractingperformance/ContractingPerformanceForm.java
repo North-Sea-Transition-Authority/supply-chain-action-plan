@@ -10,8 +10,9 @@ class ContractingPerformanceForm {
   private final StringInput outturnRationale;
 
   public ContractingPerformanceForm() {
-    this.outturnCost = new DecimalInput("outturnCost", "Outturn cost");
-    this.outturnRationale = new StringInput("outturnRationale", "Outturn rationale");
+    this.outturnCost = new DecimalInput("outturnCost", "the outturn cost");
+    this.outturnRationale =
+        new StringInput("outturnRationale", "why the outturn is greater than the award value");
   }
 
   public Integer getActualTenderActivityId() {

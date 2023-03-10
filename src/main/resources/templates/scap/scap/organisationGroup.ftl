@@ -12,7 +12,7 @@
   >
   <@fdsForm.htmlForm>
     <@fdsSelect.select
-      path="form.organisationGroupId.inputValue"
+      path="form.organisationGroupId"
       labelText=pageTitle
       pageHeading=true
       options=permittedOrganisationGroups

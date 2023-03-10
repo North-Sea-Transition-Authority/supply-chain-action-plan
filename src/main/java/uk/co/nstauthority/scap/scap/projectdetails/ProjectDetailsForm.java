@@ -32,26 +32,27 @@ class ProjectDetailsForm {
   private List<FileUploadForm> supportingDocuments = new ArrayList<>();
 
   public ProjectDetailsForm() {
-    this.projectName = new StringInput("projectName", "Project name");
-    this.projectCostEstimate = new DecimalInput("projectCostEstimate", "Project cost estimate");
-    this.estimatedValueLocalContent = new DecimalInput("estimatedValueLocalContent",
-        "Estimated value local content");
-    this.startDay = new IntegerInput("startDay", "Start day");
-    this.startMonth = new IntegerInput("startMonth", "Start month");
-    this.startYear = new IntegerInput("startYear", "Start year");
-    this.endDay = new IntegerInput("endDay", "End day");
-    this.endMonth = new IntegerInput("endMonth", "End month");
-    this.endYear = new IntegerInput("endYear", "End year");
+    this.projectName = new StringInput("projectName", "the project name");
+    this.projectCostEstimate = new DecimalInput("projectCostEstimate", "the project cost estimate");
+    this.estimatedValueLocalContent = new DecimalInput(
+        "estimatedValueLocalContent", "the estimated value of local content");
+    // TODO SCAP2022-255: Remove deprecated DFL method
+    this.startDay = new IntegerInput("startDay", "start day");
+    this.startMonth = new IntegerInput("startMonth", "start month");
+    this.startYear = new IntegerInput("startYear", "start year");
+    this.endDay = new IntegerInput("endDay", "snd day");
+    this.endMonth = new IntegerInput("endMonth", "end month");
+    this.endYear = new IntegerInput("endYear", "end year");
     this.expectedStartDate = new ThreeFieldDateInput(
         "startDate",
-        "Indicative planned execution start date",
+        "indicative planned execution start date",
         this.startDay,
         this.startMonth,
         this.startYear
     );
     this.expectedEndDate = new ThreeFieldDateInput(
         "endDate",
-        "Indicative planned execution end date",
+        "indicative planned execution end date",
         this.endDay,
         this.endMonth,
         this.endYear

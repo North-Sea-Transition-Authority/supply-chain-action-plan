@@ -19,7 +19,7 @@ class HasActualTenderFormValidator implements Validator {
         errors,
         "hasActualTender",
         "hasActualTender.required",
-        "Select whether this SCAP has actual tender activity"
+        "Select whether this SCAP has any actual tender activity"
     );
   }
 }

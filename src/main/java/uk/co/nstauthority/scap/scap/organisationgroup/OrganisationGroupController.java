@@ -73,7 +73,7 @@ public class OrganisationGroupController {
           .addObject("errorItems", validationErrorOrderingService.getErrorItemsFromBindingResult(form, bindingResult));
     }
 
-    var scap = createScap(Integer.valueOf(form.getOrganisationGroupId().getInputValue()));
+    var scap = createScap(form.getOrganisationGroupId());
     return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scap.getScapId()));
   }
 
@@ -101,8 +101,7 @@ public class OrganisationGroupController {
           .addObject("errorItems", validationErrorOrderingService.getErrorItemsFromBindingResult(form, bindingResult));
     }
 
-    scapService.updateScapOrganisationGroup(scapOverview,
-        Integer.valueOf(form.getOrganisationGroupId().getInputValue()));
+    scapService.updateScapOrganisationGroup(scapOverview, form.getOrganisationGroupId());
     return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
   }
 

@@ -27,15 +27,15 @@ public class PlannedTenderActivityForm {
   static final String INDICATIVE_CONTRACT_AWARD_DATE_FIELD = "indicativeContractAwardDate";
 
   public PlannedTenderActivityForm() {
-    this.scopeDescription = new StringInput("scopeDescription", "Scope description");
-    this.estimatedValue = new DecimalInput("estimatedValue", "Estimated value");
-    this.remunerationModelName = new StringInput("remunerationModelName", "Remuneration model");
-    this.awardRationale = new StringInput("awardRationale", "Award rationale");
+    this.scopeDescription = new StringInput("scopeDescription", "the scope description");
+    this.estimatedValue = new DecimalInput("estimatedValue", "the estimated value");
+    this.remunerationModelName = new StringInput("remunerationModelName", "the remuneration model");
+    this.awardRationale = new StringInput("awardRationale", "the award rationale");
     this.indicativeActualTenderStartDate = new ThreeFieldDateInput(
-        INDICATIVE_ACTUAL_TENDER_START_DATE_FIELD, "Indicative actual tender start date"
+        INDICATIVE_ACTUAL_TENDER_START_DATE_FIELD, "indicative actual tender start date"
     );
     this.indicativeContractAwardDate = new ThreeFieldDateInput(
-        INDICATIVE_CONTRACT_AWARD_DATE_FIELD, "Indicative contract award date"
+        INDICATIVE_CONTRACT_AWARD_DATE_FIELD, "indicative contract award date"
     );
   }
 

@@ -56,7 +56,7 @@ class OrganisationGroupFormValidatorTest {
   @Test
   void validate_validForm() {
     var form = new OrganisationGroupForm();
-    form.setOrganisationGroupId("1");
+    form.setOrganisationGroupId(1);
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     var requestPurpose = "Check organisation group exists when saving scap overview";
     var organisationGroup = new OrganisationGroup(1, null, null, null, null, null);
@@ -85,25 +85,25 @@ class OrganisationGroupFormValidatorTest {
     var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
 
     assertThat(extractedErrors).containsExactly(
-        entry("organisationGroupId.inputValue", Set.of("organisationGroupId.required")));
+        entry("organisationGroupId", Set.of("organisationGroupId.required")));
   }
 
   @Test
   void validate_nonExistentOrganisationGroup() {
     var form = new OrganisationGroupForm();
-    form.setOrganisationGroupId("999");
+    form.setOrganisationGroupId(999);
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     organisationGroupFormValidator.validate(form, bindingResult);
     var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
 
     assertThat(extractedErrors).containsExactly(
-        entry("organisationGroupId.inputValue", Set.of("organisationGroupId.doesNotExist")));
+        entry("organisationGroupId", Set.of("organisationGroupId.doesNotExist")));
   }
 
   @Test
   void validate_userNotPartOfOrganisationGroup() {
     var form = new OrganisationGroupForm();
-    form.setOrganisationGroupId("1");
+    form.setOrganisationGroupId(1);
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     var requestPurpose = "Check organisation group exists when saving scap overview";
     var organisationGroup = new OrganisationGroup(1, null, null, null, null, null);
@@ -118,6 +118,6 @@ class OrganisationGroupFormValidatorTest {
 
     var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
     assertThat(extractedErrors).containsExactly(
-        entry("organisationGroupId.inputValue", Set.of("organisationGroupId.invalidTeamAuthentication")));
+        entry("organisationGroupId", Set.of("organisationGroupId.invalidTeamAuthentication")));
   }
 }

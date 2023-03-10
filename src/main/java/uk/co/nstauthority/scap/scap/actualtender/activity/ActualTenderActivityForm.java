@@ -15,9 +15,9 @@ public class ActualTenderActivityForm {
   private Object ittParticipantsSelector;
 
   public ActualTenderActivityForm() {
-    this.scopeTitle = new StringInput("scopeTitle", "Scope title");
-    this.scopeDescription = new StringInput("scopeDescription", "Scope description");
-    this.remunerationModelName = new StringInput("remunerationModelName", "Remuneration model name");
+    this.scopeTitle = new StringInput("scopeTitle", "a scope title");
+    this.scopeDescription = new StringInput("scopeDescription", "the scope description");
+    this.remunerationModelName = new StringInput("remunerationModelName", "the remuneration model");
   }
 
   public StringInput getScopeTitle() {

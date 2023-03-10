@@ -18,6 +18,6 @@ public class HasPlannedTenderFormValidator implements Validator {
     ValidationUtils.rejectIfEmptyOrWhitespace(errors,
         "hasPlannedTender",
         "hasPlannedTender.presence",
-        "Select whether this SCAP has planned tender activities");
+        "Select whether this SCAP has any planned tender activities");
   }
 }

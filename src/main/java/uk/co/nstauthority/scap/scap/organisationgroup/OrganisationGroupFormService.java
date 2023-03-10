@@ -22,7 +22,7 @@ public class OrganisationGroupFormService {
 
   public OrganisationGroupForm getForm(Scap scap) {
     var form = new OrganisationGroupForm();
-    form.setOrganisationGroupId(String.valueOf(scap.getOrganisationGroupId()));
+    form.setOrganisationGroupId(scap.getOrganisationGroupId());
     return form;
   }
 }
