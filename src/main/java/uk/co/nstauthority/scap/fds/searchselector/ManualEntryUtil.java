@@ -30,7 +30,7 @@ public class ManualEntryUtil {
    * @return A new RestSearchResult with the input manual entry added
    */
   public static RestSearchResult addManualEntry(RestSearchResult searchResult, String manualEntry) {
-    var manualEntryItem = new RestSearchItem(addFreeTextPrefix(manualEntry), manualEntry);
+    var manualEntryItem = new RestSearchItem(addFreeTextPrefix(manualEntry), escapeDisallowedCharacters(manualEntry));
 
     var resultsWithManualEntry = new ArrayList<>(searchResult.getResults());
     resultsWithManualEntry.add(0, manualEntryItem);
@@ -50,7 +50,7 @@ public class ManualEntryUtil {
     target = target.replace("\"", HTML_DOUBLE_QUOTE_REPLACEMENT);
     target = target.replace("(", HTML_OPEN_BRACKET_REPLACEMENT);
     target = target.replace(")", HTML_CLOSE_BRACKET_REPLACEMENT);
-    target = target.replaceAll("[^A-Za-z\\d-. ]", "");
+    target = escapeDisallowedCharacters(target);
 
     return "%s%s".formatted(FREE_TEXT_PREFIX, target);
   }
@@ -90,5 +90,15 @@ public class ManualEntryUtil {
         .map(ManualEntryUtil::removeFreeTextPrefix)
         .toList();
     return new ManualEntryPartitionedList(idList, manualEntryList);
+  }
+
+  /**
+   * Removes any special characters, excluding those that are explicitly escaped.
+   *
+   * @param target The string to remove the special characters from
+   * @return The string with the special characters removed
+   */
+  private static String escapeDisallowedCharacters(String target) {
+    return target.replaceAll("[^A-Za-z\\d-.()\" ]", "");
   }
 }
