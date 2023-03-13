@@ -81,7 +81,7 @@ class ProjectDetailsControllerTest extends AbstractScapSubmitterControllerTest {
     when(supportingDocumentService.buildFileUploadTemplate(SCAP_ID, SupportingDocumentType.ADDITIONAL_DOCUMENT))
         .thenReturn(fileUploadTemplate);
 
-    var model = mockMvc.perform(
+    var modelAndView = mockMvc.perform(
         get(ReverseRouter.route(on(ProjectDetailsController.class)
             .renderProjectDetailsForm(SCAP_ID))))
         .andExpect(status().isOk())
@@ -92,9 +92,11 @@ class ProjectDetailsControllerTest extends AbstractScapSubmitterControllerTest {
             ReverseRouter.route(on(ProjectDetailsRestController.class)
                 .getFieldSearchResults(null))))
         .andExpect(model().attribute("projectTypesMap", ProjectType.getCheckboxItems()))
-        .andReturn().getModelAndView().getModel();
+        .andReturn()
+        .getModelAndView();
 
-    assertThat(model.get("form")).isInstanceOf(ProjectDetailsForm.class);
+    assertThat(modelAndView).isNotNull();
+    assertThat(modelAndView.getModel().get("form")).isInstanceOf(ProjectDetailsForm.class);
   }
 
   @Test
@@ -104,18 +106,29 @@ class ProjectDetailsControllerTest extends AbstractScapSubmitterControllerTest {
     var fieldIds = Collections.singleton(fieldId);
     var projectField = new ProjectField(projectDetails, fieldId, Instant.now());
     var projectFields = Collections.singletonList(projectField);
+    var installationId = 33;
+    var installationIds = Collections.singleton(installationId);
+    var projectFacility = new ProjectFacility(projectDetails, Instant.now(), installationId);
+    var projectFacilities = Collections.singletonList(projectFacility);
     var form = new ProjectDetailsForm();
     form.setFieldIds(Collections.singleton(fieldId));
+    form.setInstallationIds(installationIds);
     var preselectedFields = List.of(
         new AddToListItem(String.valueOf(fieldId), "Test field", true)
+    );
+    var preselectedFacilities = Collections.singletonList(
+        new AddToListItem(String.valueOf(installationId), "Test facility", true)
     );
 
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
     when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
     when(projectDetailsService.getProjectFields(projectDetails)).thenReturn(projectFields);
-    when(projectDetailsFormService.getForm(projectDetails, Collections.emptySet(), fieldIds))
+    when(projectDetailsService.getProjectFacilities(projectDetails)).thenReturn(projectFacilities);
+    when(projectDetailsFormService.getForm(projectDetails, installationIds, fieldIds))
         .thenReturn(form);
     when(projectDetailsFormService.getPreselectedFields(fieldIds)).thenReturn(preselectedFields);
+    when(projectDetailsFormService.getPreselectedFacilities(installationIds))
+        .thenReturn(preselectedFacilities);
     when(supportingDocumentService.buildFileUploadTemplate(SCAP_ID, SupportingDocumentType.ADDITIONAL_DOCUMENT))
         .thenReturn(fileUploadTemplate);
 
@@ -133,7 +146,8 @@ class ProjectDetailsControllerTest extends AbstractScapSubmitterControllerTest {
         .andExpect(model().attribute("form", form))
         .andExpect(model().attribute("preselectedFields", preselectedFields));
 
-
+    verify(projectDetailsFormService).getPreselectedFields(form.getFieldIds());
+    verify(projectDetailsFormService).getPreselectedFacilities(form.getInstallationIds());
   }
 
   @Test
@@ -172,6 +186,8 @@ class ProjectDetailsControllerTest extends AbstractScapSubmitterControllerTest {
         .andExpect(model().attribute("projectTypesMap", ProjectType.getCheckboxItems()))
         .andExpect(model().attribute("errorList", errorItems));
 
+    verify(projectDetailsFormService).getPreselectedFields(form.getFieldIds());
+    verify(projectDetailsFormService).getPreselectedFacilities(form.getInstallationIds());
     verify(projectDetailsService, never()).saveProjectDetails(any(), any());
   }
 

@@ -91,9 +91,8 @@ class ProjectDetailsController {
                                       BindingResult bindingResult) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
     projectDetailsService.getProjectDetails(scapDetail);
-    var projectFacilityIds = form.getInstallationIds();
-    var preselectedFields = projectDetailsFormService.getPreselectedFields(projectFacilityIds);
-    var preselectedFacilities = projectDetailsFormService.getPreselectedFacilities(projectFacilityIds);
+    var preselectedFields = projectDetailsFormService.getPreselectedFields(form.getFieldIds());
+    var preselectedFacilities = projectDetailsFormService.getPreselectedFacilities(form.getInstallationIds());
     var supportingDocuments = projectDetailsFormService.getSupportingDocuments(form);
 
     bindingResult = projectDetailsFormService.validate(form, bindingResult);
