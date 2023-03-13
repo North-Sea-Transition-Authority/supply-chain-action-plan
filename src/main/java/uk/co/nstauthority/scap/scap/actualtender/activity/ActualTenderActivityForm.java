@@ -10,9 +10,9 @@ public class ActualTenderActivityForm {
   private final StringInput scopeDescription;
   private RemunerationModel remunerationModel;
   private final StringInput remunerationModelName;
-  private ContractStage contractStage;
   private List<String> invitationToTenderParticipants;
   private Object ittParticipantsSelector;
+  private ContractStage contractStage;
 
   public ActualTenderActivityForm() {
     this.scopeTitle = new StringInput("scopeTitle", "a scope title");
@@ -52,14 +52,6 @@ public class ActualTenderActivityForm {
     this.remunerationModelName.setInputValue(remunerationModelName);
   }
 
-  public ContractStage getContractStage() {
-    return contractStage;
-  }
-
-  public void setContractStage(ContractStage contractStage) {
-    this.contractStage = contractStage;
-  }
-
   public List<String> getInvitationToTenderParticipants() {
     return invitationToTenderParticipants;
   }
@@ -74,5 +66,13 @@ public class ActualTenderActivityForm {
 
   public void setIttParticipantsSelector(Object ittParticipantsSelector) {
     this.ittParticipantsSelector = ittParticipantsSelector;
+  }
+
+  public ContractStage getContractStage() {
+    return contractStage;
+  }
+
+  public void setContractStage(ContractStage contractStage) {
+    this.contractStage = contractStage;
   }
 }

@@ -49,10 +49,12 @@ backLinkUrl=springUrl(backLinkUrl)
       labelText="What are the payment terms for this contract?"
       hiddenContent=true
     >
+      <#assign firstItem = true>
       <#list paymentTermsRadioOptions as value, displayName>
         <@fdsRadio.radioItem
           path="form.paymentTermsRadio"
           itemMap={value: displayName}
+          isFirstItem=firstItem
         >
           <#if value == "OTHER">
             <@fdsTextInput.textInput
@@ -64,6 +66,7 @@ backLinkUrl=springUrl(backLinkUrl)
             />
           </#if>
         </@fdsRadio.radioItem>
+        <#assign firstItem = false>
       </#list>
     </@fdsRadio.radioGroup>
 
