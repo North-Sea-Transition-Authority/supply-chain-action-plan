@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -19,10 +20,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
+import uk.co.nstauthority.scap.authentication.SamlResponseParser;
+import uk.co.nstauthority.scap.authentication.ServiceLogoutSuccessHandler;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.branding.IncludeServiceBrandingConfigurationProperties;
+import uk.co.nstauthority.scap.configuration.SamlProperties;
 import uk.co.nstauthority.scap.configuration.WebMvcConfiguration;
+import uk.co.nstauthority.scap.configuration.WebSecurityConfiguration;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.ScapHandlerInterceptor;
 import uk.co.nstauthority.scap.endpointvalidation.rules.ScapHasStatusRule;
@@ -43,16 +48,20 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 //@AutoConfigureMockMvc
 @IncludeServiceBrandingConfigurationProperties
 @IncludeTechnicalSupportConfigurationProperties
+@EnableConfigurationProperties(SamlProperties.class)
 @Import({
     AbstractControllerTest.TestConfig.class,
+    WebSecurityConfiguration.class,
     WebMvcConfiguration.class,
-    TeamPermissionManagementHandlerInterceptor.class,
-    TeamManagementHandlerInterceptor.class,
-    ScapPermissionManagementHandlerInterceptor.class,
-    ScapHandlerInterceptor.class,
+    SamlResponseParser.class,
+    ServiceLogoutSuccessHandler.class,
+
     // Interceptor rules
     ScapHasStatusRule.class,
-    UserHasAnyPermissionRule.class
+    UserHasAnyPermissionRule.class,TeamPermissionManagementHandlerInterceptor.class,
+    TeamManagementHandlerInterceptor.class,
+    ScapPermissionManagementHandlerInterceptor.class,
+    ScapHandlerInterceptor.class
 })
 @WithDefaultPageControllerAdvice
 @WebMvcTest

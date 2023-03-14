@@ -61,7 +61,7 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
   void renderMemberListRedirect_whenNotAuthenticated_thenUnauthorised() throws Exception {
     mockMvc.perform(
       get(ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberListRedirect())))
-      .andExpect(status().isUnauthorized());
+      .andExpect(status().is3xxRedirection());
   }
 
   @Test
@@ -70,7 +70,7 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
       get(ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberList(teamId))))
-      .andExpect(status().isUnauthorized());
+      .andExpect(status().is3xxRedirection());
   }
 
   @Test

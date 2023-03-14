@@ -21,6 +21,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
   private static final String ASSET_EXCLUSION_PATH = "/assets/**";
 
+  private static final String LOGOUT_EXCLUSION_PATH = "/api/v1/logout/*";
+
   private final TeamPermissionManagementHandlerInterceptor teamPermissionManagementHandlerInterceptor;
   private final TeamManagementHandlerInterceptor teamManagementHandlerInterceptor;
 
@@ -55,7 +57,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     registry.addInterceptor(scapPermissionManagementHandlerInterceptor)
         .excludePathPatterns(ASSET_EXCLUSION_PATH);
     registry.addInterceptor(teamPermissionManagementHandlerInterceptor)
-        .addPathPatterns("/permission-management/**");
+        .addPathPatterns("/permission-management/**")
+        .excludePathPatterns(LOGOUT_EXCLUSION_PATH);
     registry.addInterceptor(scapHandlerInterceptor)
         .excludePathPatterns(ASSET_EXCLUSION_PATH);
     registry.addInterceptor(teamManagementHandlerInterceptor)

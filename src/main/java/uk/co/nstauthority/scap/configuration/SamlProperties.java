@@ -29,6 +29,9 @@ public class SamlProperties {
   private String logoutUrl;
 
   @NotNull
+  private String logoutKey;
+
+  @NotNull
   private String consumerServiceLocation;
 
   public String getRegistrationId() {
@@ -77,6 +80,14 @@ public class SamlProperties {
 
   public void setLogoutUrl(String logoutUrl) {
     this.logoutUrl = logoutUrl;
+  }
+
+  public String getLogoutKey() {
+    return logoutKey;
+  }
+
+  public void setLogoutKey(String logoutKey) {
+    this.logoutKey = logoutKey;
   }
 
   public String getConsumerServiceLocation() {

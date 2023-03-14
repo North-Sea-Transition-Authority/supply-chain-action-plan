@@ -33,7 +33,7 @@ class TestAuthenticationControllerTest extends AbstractControllerTest {
   void whenNoUser_thenVerifyAuthenticationRequired() throws Exception {
     mockMvc.perform(
         get(ReverseRouter.route(on(TestAuthenticationController.class).requiresUserEndpoint())))
-        .andExpect(status().isUnauthorized());
+        .andExpect(status().is3xxRedirection());
   }
 
   @Test

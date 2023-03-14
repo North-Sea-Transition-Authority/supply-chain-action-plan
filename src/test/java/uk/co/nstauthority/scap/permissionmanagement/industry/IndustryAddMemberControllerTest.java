@@ -2,7 +2,6 @@ package uk.co.nstauthority.scap.permissionmanagement.industry;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,7 +16,6 @@ import static uk.co.nstauthority.scap.utils.ControllerTestingUtil.redirectUrl;
 
 import java.util.Collections;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
@@ -26,15 +24,12 @@ import uk.co.fivium.digital.energyportalteamaccesslibrary.team.EnergyPortalAcces
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.InstigatingWebUserAccountId;
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.ResourceType;
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.TargetWebUserAccountId;
-import uk.co.nstauthority.scap.authentication.UserDetailService;
-import uk.co.nstauthority.scap.configuration.SamlProperties;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.AddTeamMemberForm;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.teams.AddTeamMemberValidator;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
 
 @ContextConfiguration(classes = IndustryAddMemberController.class)
@@ -49,9 +44,6 @@ class IndustryAddMemberControllerTest extends AbstractIndustryTeamControllerTest
   @MockBean
   EnergyPortalAccessService energyPortalAccessService;
 
-  @MockBean
-  SamlProperties samlProperties;
-
   private static final EnergyPortalUserDto energyPortalDto = EnergyPortalUserDtoTestUtil.Builder().build();
 
   private AddTeamMemberForm form;
@@ -61,7 +53,6 @@ class IndustryAddMemberControllerTest extends AbstractIndustryTeamControllerTest
   private void setupMocks() {
     form = new AddTeamMemberForm();
     bindingResult = new BeanPropertyBindingResult(form, "form");
-    when(samlProperties.getRegistrationUrl()).thenReturn("test-test.com");
     when(energyPortalUserService.findUsersByUsername(any())).thenReturn(List.of(energyPortalDto));
   }
 

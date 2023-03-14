@@ -43,7 +43,7 @@ class RegulatorAddRolesControllerTest extends AbstractRegulatorTeamControllerTes
         get(ReverseRouter.route(on(RegulatorAddRolesController.class).renderAddTeamMemberRoles(
             new TeamId(team.getUuid()),
             user.wuaId()))))
-        .andExpect(status().isUnauthorized());
+        .andExpect(status().is3xxRedirection());
   }
 
   @Test

@@ -38,7 +38,7 @@ class IndustryTeamManagementControllerTest extends AbstractIndustryTeamControlle
   void renderMemberList_whenNotAuthenticated_thenUnauthorised() throws Exception {
     mockMvc.perform(
       get(ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId))))
-      .andExpect(status().isUnauthorized());
+      .andExpect(status().is3xxRedirection());
   }
 
   @Test

@@ -16,9 +16,6 @@ import static uk.co.nstauthority.scap.utils.ControllerTestingUtil.redirectUrl;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
@@ -27,18 +24,11 @@ import uk.co.fivium.digital.energyportalteamaccesslibrary.team.EnergyPortalAcces
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.InstigatingWebUserAccountId;
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.ResourceType;
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.TargetWebUserAccountId;
-import uk.co.nstauthority.scap.AbstractControllerTest;
-import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
-import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
-import uk.co.nstauthority.scap.configuration.SamlProperties;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.AddTeamMemberForm;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
-import uk.co.nstauthority.scap.permissionmanagement.TeamId;
-import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
-import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.teams.AddTeamMemberValidator;
 import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
 
@@ -54,9 +44,6 @@ class RegulatorAddMemberControllerTest extends AbstractRegulatorTeamControllerTe
   @MockBean
   EnergyPortalAccessService energyPortalAccessService;
 
-  @MockBean
-  SamlProperties samlProperties;
-
   private static final EnergyPortalUserDto energyPortalDto = EnergyPortalUserDtoTestUtil.Builder().build();
 
   private AddTeamMemberForm form;
@@ -66,7 +53,6 @@ class RegulatorAddMemberControllerTest extends AbstractRegulatorTeamControllerTe
   private void setupMocks() {
     form = new AddTeamMemberForm();
     bindingResult = new BeanPropertyBindingResult(form, "form");
-    when(samlProperties.getRegistrationUrl()).thenReturn("test-test.com");
     when(energyPortalUserService.findUsersByUsername(any())).thenReturn(List.of(energyPortalDto));
   }
 

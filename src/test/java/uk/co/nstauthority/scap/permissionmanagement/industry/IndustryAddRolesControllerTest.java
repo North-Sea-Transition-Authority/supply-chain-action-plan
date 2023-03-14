@@ -35,7 +35,7 @@ class IndustryAddRolesControllerTest extends AbstractIndustryTeamControllerTest 
         get(ReverseRouter.route(on(IndustryAddRolesController.class).renderAddTeamMemberRoles(
             teamId,
             webUserAccountId))))
-        .andExpect(status().isUnauthorized());
+        .andExpect(status().is3xxRedirection());
   }
 
   @Test

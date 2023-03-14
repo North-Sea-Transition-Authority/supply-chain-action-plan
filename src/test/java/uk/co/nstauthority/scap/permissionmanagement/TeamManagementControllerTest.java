@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
-import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.industry.AbstractIndustryTeamControllerTest;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
@@ -47,7 +46,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
   void renderTeamList_notAuthorised_thenUnAuthorised() throws Exception {
     mockMvc.perform(
         get(ReverseRouter.route(on(TeamManagementController.class).renderTeamList())))
-        .andExpect(status().isUnauthorized());
+        .andExpect(status().is3xxRedirection());
   }
 
   @Test

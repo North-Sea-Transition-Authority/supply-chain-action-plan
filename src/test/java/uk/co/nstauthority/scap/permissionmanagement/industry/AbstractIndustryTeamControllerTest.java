@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.AbstractControllerTestWithSecurity;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
@@ -20,7 +20,7 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 
-public abstract class AbstractIndustryTeamControllerTest extends AbstractControllerTest {
+public abstract class AbstractIndustryTeamControllerTest extends AbstractControllerTestWithSecurity {
 
   protected final TeamId teamId = new TeamId(UUID.randomUUID());
 
