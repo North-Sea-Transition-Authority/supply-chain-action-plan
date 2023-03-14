@@ -7,6 +7,7 @@
 <#-- @ftlvariable name="serviceHomeUrl" type="String" -->
 <#-- @ftlvariable name="notificationBannerView" type="uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerView" -->
 <#-- @ftlvariable name="loggedInUser" type="uk.co.nstauthority.scap.authentication.ServiceUserDetail" -->
+<#-- @ftlvariable name="accessibilityStatementUrl" type="String" -->
 
 <#if notificationBannerView??>
   <#assign notificationBannerContent>
@@ -25,9 +26,11 @@
   errorItems=[]
   pageSize=PageSize.TWO_THIRDS_COLUMN
   backLinkUrl=""
+  backLink=false
   caption=""
   singleErrorMessage=""
   wrapperWidth=false
+  topNavigation=false
 >
   <#local serviceName = serviceBranding.name() />
   <#local customerMnemonic = customerBranding.mnemonic() />
@@ -75,6 +78,16 @@
       </@fdsHeader.header>
   </#assign>
 
+  <#assign footerMetaContent>
+    <@fdsFooter.footerMeta footerMetaHiddenHeading="Support links">
+      <@fdsFooter.footerMetaLink linkText="Accessibility statement" linkUrl=springUrl(accessibilityStatementUrl)/>
+    </@fdsFooter.footerMeta>
+  </#assign>
+
+  <#assign footerContent>
+    <@fdsFooter.footer metaLinks=true footerMetaContent=footerMetaContent wrapperWidth=wrapperWidth/>
+  </#assign>
+
   <@fdsDefaultPageTemplate
     htmlTitle=htmlTitle
     serviceName=serviceName
@@ -82,7 +95,7 @@
     pageHeading=pageHeading
     headerLogo="GOV_CREST"
     logoProductText=customerMnemonic
-    topNavigation=true
+    topNavigation=topNavigation
     phaseBanner=phaseBanner
     serviceUrl=serviceHomeUrl
     homePageUrl=serviceHomeUrl
@@ -92,7 +105,7 @@
     twoThirdsColumn=twoThirdsColumn
     twoThirdsOneThirdColumn=twoThirdsOneThirdColumn
     oneQuarterColumn=oneQuarterColumn
-    backLink=backLinkUrl?has_content
+    backLink=backLinkUrl?has_content || backLink
     backLinkUrl=backLinkUrl
     caption=caption
     errorItems=errorItems
@@ -100,6 +113,7 @@
     headerContent=headerContent
     singleErrorMessage=singleErrorMessage
     wrapperWidth=wrapperWidth
+    footerContent=footerContent
   >
     <#nested />
   </@fdsDefaultPageTemplate>

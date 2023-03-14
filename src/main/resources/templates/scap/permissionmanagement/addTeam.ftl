@@ -11,6 +11,7 @@ htmlTitle=pageTitle
 pageHeading=pageTitle
 errorItems=errorList
 pageSize=PageSize.FULL_WIDTH
+topNavigation=true
 >
     <@fdsForm.htmlForm actionUrl=springUrl(submitFormUrl)>
       <@fdsSearchSelector.searchSelectorRest path="form.organisationGroupId.inputValue"

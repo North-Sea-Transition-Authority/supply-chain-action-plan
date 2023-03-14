@@ -12,6 +12,7 @@
   errorItems=errorList
   pageSize=PageSize.TWO_THIRDS_COLUMN
   backLinkUrl=springUrl(backLinkUrl)
+  topNavigation=true
 >
   <@teamMember.addTeamMember
     usernameFormPath="form.username"

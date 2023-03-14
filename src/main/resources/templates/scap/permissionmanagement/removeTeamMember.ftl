@@ -14,6 +14,7 @@
     errorItems=[]
     pageSize=PageSize.TWO_THIRDS_COLUMN
     backLinkUrl=springUrl(backLinkUrl)
+    topNavigation=true
 >
 
     <#if !canRemoveTeamMember>

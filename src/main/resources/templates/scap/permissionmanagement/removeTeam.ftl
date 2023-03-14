@@ -10,6 +10,7 @@
     pageHeading=pageTitle
     pageSize=PageSize.TWO_THIRDS_COLUMN
     backLinkUrl=springUrl(backLinkUrl)
+    topNavigation=true
 >
     <@fdsSummaryList.summaryListWrapper headingText="${team.getDisplayName()}" summaryListId="summary-list-one">
       <@fdsSummaryList.summaryList>

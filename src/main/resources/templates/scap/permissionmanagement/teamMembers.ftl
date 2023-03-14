@@ -19,6 +19,7 @@
   pageHeading=pageTitle
   errorItems=errorList
   pageSize=PageSize.FULL_WIDTH
+  topNavigation=true
 >
 
   <@roleDescriptions.roleDescriptions roles=teamRoles/>

@@ -9,6 +9,7 @@
   pageHeading=pageTitle
   errorItems=errorList
   pageSize=PageSize.FULL_WIDTH
+  topNavigation=true
 >
     <#if hasCreateTeamPermissions>
       <@fdsAction.link linkText="Create organisation group team" linkClass="govuk-button" linkUrl=springUrl(newTeamFormUrl)/>

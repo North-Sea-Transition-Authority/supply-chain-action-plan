@@ -10,6 +10,7 @@
   pageHeading=pageTitle
   pageSize=PageSize.FULL_WIDTH
   wrapperWidth=true
+  topNavigation=true
 >
   <#if canStartScap>
     <@fdsAction.link linkText="Start new SCAP" linkClass="govuk-button" linkUrl=springUrl(startScapUrl)/>
