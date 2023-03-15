@@ -42,6 +42,7 @@ import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.Supportin
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
 
 @ExtendWith(MockitoExtension.class)
 @WithMockUser
@@ -58,6 +59,9 @@ class FurtherInfoControllerTest extends AbstractControllerTest {
   private ScapSummaryViewService scapSummaryViewService;
 
   @MockBean
+  private UpdateRequestService updateRequestService;
+
+  @MockBean
   private OrganisationGroupService organisationGroupService;
 
   @MockBean
@@ -68,13 +72,14 @@ class FurtherInfoControllerTest extends AbstractControllerTest {
 
   private static final ScapId SCAP_ID = new ScapId(1111);
 
+  private static final ScapDetail SCAP_DETAIL = getScapDetail();
+
   private static final Integer ORG_GROUP_ID = 1000;
 
   private static final String TEST_STRING = "This is a test comment";
 
   @BeforeEach
   void setup() {
-    var scapDetail = getScapDetail();
     when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.APPROVAL_DOCUMENT)))
@@ -84,10 +89,10 @@ class FurtherInfoControllerTest extends AbstractControllerTest {
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
     when(scapService.getScapById(anyInt())).thenReturn(new Scap());
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(any(Scap.class))).thenReturn(scapDetail);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(SCAP_DETAIL);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(any(Scap.class))).thenReturn(SCAP_DETAIL);
     when(organisationGroupService.getOrganisationGroupById(eq(ORG_GROUP_ID), any())).thenReturn(Optional.of(getOrgGroup()));
-    when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
+    when(scapSummaryViewService.getScapSummaryView(SCAP_DETAIL)).thenReturn(getScapSummaryView());
   }
 
   @Test
@@ -103,7 +108,7 @@ class FurtherInfoControllerTest extends AbstractControllerTest {
             .with(csrf())
             .flashAttr("infoRequestForm", getInfoRequestedForm()))
         .andExpect(status().is3xxRedirection());
-    verify(caseEventService).recordNewEvent(CaseEventSubject.FURTHER_INFO_REQUESTED, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.FURTHER_INFO_REQUESTED, SCAP_DETAIL, 1, TEST_STRING);
   }
 
   @Test
@@ -126,7 +131,7 @@ class FurtherInfoControllerTest extends AbstractControllerTest {
             .flashAttr("infoRequestForm", getInfoRequestedForm()))
         .andExpect(status().isOk());
 
-    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.FURTHER_INFO_REQUESTED, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.FURTHER_INFO_REQUESTED, SCAP_DETAIL, 1, TEST_STRING);
   }
 
   private FurtherInfoRequestForm getInfoRequestedForm() {
@@ -138,7 +143,7 @@ class FurtherInfoControllerTest extends AbstractControllerTest {
     return form;
   }
 
-  private ScapDetail getScapDetail() {
+  private static ScapDetail getScapDetail() {
     var scapDetail = new ScapDetail(1234);
     scapDetail.setVersionNumber(1);
     scapDetail.setStatus(ScapDetailStatus.SUBMITTED);

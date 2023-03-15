@@ -108,7 +108,7 @@ class ScapSubmissionController {
         () -> {
           scapDetailService.submitScap(scapDetail, form);
           scapEmailService.sendScapSubmissionEmails(scapDetail);
-          caseEventService.recordNewEvent(SCAP_SUBMITTED, scapId, scapDetail.getVersionNumber(), null);
+          caseEventService.recordNewEvent(SCAP_SUBMITTED, scapDetail, scapDetail.getVersionNumber(), null);
 
           return ReverseRouter.redirect(on(ScapSubmissionController.class).renderScapSubmissionSuccess(scapId));
         }

@@ -115,7 +115,7 @@ public class ScapReinstateController {
           scapDetailService.reinstateScap(scapService.getScapById(scapId));
           caseEventService.recordNewEvent(
               SCAP_REINSTATED,
-              scapId,
+              scapDetail,
               scapDetail.getVersionNumber(),
               scapReinstateForm.getReinstateComments().getInputValue());
           var modelAndView =  ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));

@@ -115,7 +115,7 @@ public class ScapWithdrawController {
           scapEmailService.sendScapWithdrawalEmails(scapDetail);
           caseEventService.recordNewEvent(
               SCAP_WITHDRAWN,
-              scapId,
+              scapDetail,
               scapDetail.getVersionNumber(),
               scapWithdrawalForm.getWithdrawComments().getInputValue());
           var modelAndView =  ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));

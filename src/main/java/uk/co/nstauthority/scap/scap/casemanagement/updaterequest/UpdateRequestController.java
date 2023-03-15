@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.casemanagement.updaterequest;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -29,6 +30,8 @@ import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestType;
 
 @Controller
 @RequestMapping("{scapId}/")
@@ -54,6 +57,8 @@ public class UpdateRequestController {
 
   private final UserDetailService userDetailService;
 
+  private final UpdateRequestService updateRequestService;
+
   @Autowired
   public UpdateRequestController(CaseEventService caseEventService,
                                  ScapDetailService scapDetailService,
@@ -63,7 +68,8 @@ public class UpdateRequestController {
                                  UpdateRequestFormValidator updateRequestFormValidator,
                                  SupportingDocumentService supportingDocumentService,
                                  TeamService teamService,
-                                 UserDetailService userDetailService) {
+                                 UserDetailService userDetailService,
+                                 UpdateRequestService updateRequestService) {
     this.caseEventService = caseEventService;
     this.scapDetailService = scapDetailService;
     this.controllerHelperService = controllerHelperService;
@@ -73,6 +79,7 @@ public class UpdateRequestController {
     this.supportingDocumentService = supportingDocumentService;
     this.teamService = teamService;
     this.userDetailService = userDetailService;
+    this.updateRequestService = updateRequestService;
   }
 
   @PostMapping(params = CaseEventAction.UPDATE_REQUESTED)
@@ -104,8 +111,9 @@ public class UpdateRequestController {
         generator.generate(),
         updateRequestForm,
         () -> {
+          updateRequestService.createUpdateRequest(scapDetail, UpdateRequestType.UPDATE, LocalDate.now());
           caseEventService.recordNewEvent(CaseEventSubject.SCAP_UPDATE_REQUESTED,
-              scapId,
+              scapDetail,
               scapDetail.getVersionNumber(),
               updateRequestForm.getInfoRequest().getInputValue(),
               updateRequestForm.getDueDate().getAsLocalDate().get());

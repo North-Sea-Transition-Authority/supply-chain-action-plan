@@ -118,7 +118,7 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
             .flashAttr("scapId", SCAP_ID))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl(expectedRedirect));
-    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_CLOSED_OUT, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_CLOSED_OUT, scapDetail, 1, TEST_STRING);
     verify(scapDetailService).closeOutScap(scapDetail);
     verify(scapEmailService).sendScapApprovalEmails(scapDetail, null, true);
   }
@@ -143,7 +143,7 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
             .flashAttr("scapId", SCAP_ID))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/summary/scapSummaryOverview"));
-    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.SCAP_CLOSED_OUT, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.SCAP_CLOSED_OUT, scapDetail, 1, TEST_STRING);
     verifyNoInteractions(scapEmailService);
   }
 

@@ -32,6 +32,7 @@ import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
@@ -40,7 +41,6 @@ import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.Supportin
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
-import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 
 @ExtendWith(MockitoExtension.class)
@@ -68,6 +68,8 @@ class QaCommentControllerTest extends AbstractControllerTest {
 
   private static final ScapId SCAP_ID = new ScapId(1111);
 
+  private static final ScapDetail SCAP_DETAIL = getScapDetail();
+
   private static final Integer ORG_GROUP_ID = 1000;
 
   private static final String TEST_STRING = "This is a test comment";
@@ -83,8 +85,8 @@ class QaCommentControllerTest extends AbstractControllerTest {
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
     when(scapService.getScapById(anyInt())).thenReturn(new Scap());
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(getScapDetail());
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(any(Scap.class))).thenReturn(getScapDetail());
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(SCAP_DETAIL);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(any(Scap.class))).thenReturn(SCAP_DETAIL);
     when(organisationGroupService.getOrganisationGroupById(eq(ORG_GROUP_ID), any())).thenReturn(Optional.of(getOrgGroup()));
     when(scapSummaryViewService.getScapSummaryView(any())).thenReturn(getScapSummaryView());
   }
@@ -102,7 +104,7 @@ class QaCommentControllerTest extends AbstractControllerTest {
         .with(csrf()))
         .andExpect(status().is3xxRedirection());
 
-    verify(caseEventService).recordNewEvent(CaseEventSubject.QA_COMMENT, SCAP_ID, 1, null);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.QA_COMMENT, SCAP_DETAIL, 1, null);
   }
 
   @Test
@@ -119,7 +121,7 @@ class QaCommentControllerTest extends AbstractControllerTest {
             .flashAttr("qaForm", getQaCommentForm()))
         .andExpect(status().is3xxRedirection());
 
-    verify(caseEventService).recordNewEvent(CaseEventSubject.QA_COMMENT, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.QA_COMMENT, SCAP_DETAIL, 1, TEST_STRING);
   }
 
   @Test
@@ -142,7 +144,7 @@ class QaCommentControllerTest extends AbstractControllerTest {
             .flashAttr("qaForm", getQaCommentForm()))
         .andExpect(status().isOk());
 
-    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.FURTHER_INFO_REQUESTED, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.FURTHER_INFO_REQUESTED, SCAP_DETAIL, 1, TEST_STRING);
   }
 
   private QaCommentForm getQaCommentForm() {
@@ -154,7 +156,7 @@ class QaCommentControllerTest extends AbstractControllerTest {
     return form;
   }
 
-  private ScapDetail getScapDetail() {
+  private static ScapDetail getScapDetail() {
     var scapDetail = new ScapDetail();
     scapDetail.setVersionNumber(1);
     scapDetail.setStatus(ScapDetailStatus.SUBMITTED);

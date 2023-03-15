@@ -1,22 +1,16 @@
 package uk.co.nstauthority.scap.scap.casemanagement;
 
-import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.LOCAL_DATE;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_CONSULTATION_REQUESTED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTHER_INFO_REQUESTED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTHER_INFO_RESPONSE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.QA_COMMENT;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_APPROVED;
+import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_CONSULTATION_REQUESTED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_CONSULTATION_RESPONSE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_REINSTATED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_UPDATE_REQUESTED;
@@ -43,13 +37,17 @@ import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailEntityTestUtil;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
+import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapEntityTestUtil;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.util.DateUtil;
 import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestType;
 
 @ExtendWith(MockitoExtension.class)
 class CaseEventServiceTest {
@@ -68,6 +66,9 @@ class CaseEventServiceTest {
   @Mock
   TeamService teamService;
 
+  @Mock
+  UpdateRequestService updateRequestService;
+
   @Captor
   private ArgumentCaptor<CaseEvent> timelineEventArgumentCaptor;
 
@@ -75,6 +76,8 @@ class CaseEventServiceTest {
   CaseEventService caseEventService;
 
   private static final ScapId SCAP_ID = new ScapId(11111);
+
+  private static final ScapDetail SCAP_DETAIL = new ScapDetail(SCAP_ID);
 
   private static final Instant TIME = Instant.now();
 
@@ -113,11 +116,12 @@ class CaseEventServiceTest {
 
   @Test
   void recordNewEvent_createsNewTimelineEvent() {
+    SCAP_DETAIL.setScap(new Scap(SCAP_ID));
     var user = ServiceUserDetailTestUtil.Builder().build();
     when(userDetailService.getUserDetail()).thenReturn(user);
 
     caseEventService.recordNewEvent(CaseEventSubject.SCAP_SUBMITTED,
-        SCAP_ID,
+        SCAP_DETAIL,
         1,
         null);
 
@@ -129,81 +133,7 @@ class CaseEventServiceTest {
     assertThat(timelineEvent.getScapId()).isEqualTo(SCAP_ID.scapId());
   }
 
-  @Test
-  void isFurtherResponseOutstanding_noRequest() {
-    when(caseEventRepository.findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(SCAP_ID.scapId(),
-        FURTHER_INFO_REQUESTED))
-        .thenReturn(Optional.empty());
 
-    assertFalse(caseEventService.isFurtherInfoResponseOutstanding(SCAP_ID));
-  }
-
-  @Test
-  void isFurtherResponseOutstanding_requestNoResponse() {
-    when(caseEventRepository.findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(SCAP_ID.scapId(),
-        FURTHER_INFO_REQUESTED))
-        .thenReturn(Optional.of(getRequestEvent()));
-
-    when(caseEventRepository.findAllByScapIdAndEventTimeAfter(SCAP_ID.scapId(),
-        getRequestEvent().getEventTime()))
-        .thenReturn(emptyList());
-
-    assertTrue(caseEventService.isFurtherInfoResponseOutstanding(SCAP_ID));
-  }
-
-  @Test
-  void isFurtherResponseOutstanding_requestAndResponse() {
-    when(caseEventRepository.findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(SCAP_ID.scapId(),
-        FURTHER_INFO_REQUESTED))
-        .thenReturn(Optional.of(getRequestEvent()));
-
-    when(caseEventRepository.findAllByScapIdAndEventTimeAfter(SCAP_ID.scapId(),
-        getRequestEvent().getEventTime()))
-        .thenReturn(getTimelineEvents());
-
-    assertFalse(caseEventService.isFurtherInfoResponseOutstanding(SCAP_ID));
-  }
-
-  @Test
-  void getUpdateDueDate_requestNoResponse() {
-    when(caseEventRepository.findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(SCAP_ID.scapId(),
-        SCAP_UPDATE_REQUESTED))
-        .thenReturn(Optional.of(getUpdateRequestEvent()));
-
-    when(caseEventRepository.findAllByScapIdAndEventTimeAfter(SCAP_ID.scapId(),
-        getRequestEvent().getEventTime()))
-        .thenReturn(emptyList());
-
-    assertThat(caseEventService.getUpdateDueDate(SCAP_ID)).isEqualTo(DateUtil.instantToString(TIME));
-  }
-
-  @Test
-  void getUpdateDueDate_emptyRequestAndResponse() {
-    var request = getUpdateRequestEvent();
-    request.setDueDate(null);
-    when(caseEventRepository.findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(SCAP_ID.scapId(),
-        SCAP_UPDATE_REQUESTED))
-        .thenReturn(Optional.of(request));
-
-    when(caseEventRepository.findAllByScapIdAndEventTimeAfter(SCAP_ID.scapId(),
-        getRequestEvent().getEventTime()))
-        .thenReturn(getTimelineEvents());
-
-    assertNull(caseEventService.getUpdateDueDate(SCAP_ID));
-  }
-
-  @Test
-  void getUpdateDueDate_requestAndResponse() {
-    when(caseEventRepository.findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(SCAP_ID.scapId(),
-        SCAP_UPDATE_REQUESTED))
-        .thenReturn(Optional.of(getUpdateRequestEvent()));
-
-    when(caseEventRepository.findAllByScapIdAndEventTimeAfter(SCAP_ID.scapId(),
-        getRequestEvent().getEventTime()))
-        .thenReturn(getTimelineEvents());
-
-    assertNull(caseEventService.getUpdateDueDate(SCAP_ID));
-  }
 
   @Test
   void getApplicableActions_isRegulator() {
@@ -240,12 +170,8 @@ class CaseEventServiceTest {
 
   @Test
   void getApplicableActions_isRegulatorOutstandingResponse() {
-    when(caseEventRepository.findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(SCAP_ID.scapId(),
-        FURTHER_INFO_REQUESTED))
-        .thenReturn(Optional.of(getRequestEvent()));
-    when(caseEventRepository.findAllByScapIdAndEventTimeAfter(SCAP_ID.scapId(),
-        getRequestEvent().getEventTime()))
-        .thenReturn(emptyList());
+    when(updateRequestService.getUpdateDueDate(SCAP_ID, UpdateRequestType.FURTHER_INFORMATION)).thenReturn(
+        Optional.of(LocalDate.now()));
 
     var user = ServiceUserDetailTestUtil.Builder().build();
     when(userDetailService.getUserDetail()).thenReturn(user);
@@ -293,12 +219,8 @@ class CaseEventServiceTest {
 
   @Test
   void getApplicableActions_isIndustryRequestOutstanding() {
-    when(caseEventRepository.findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(SCAP_ID.scapId(),
-        FURTHER_INFO_REQUESTED))
-        .thenReturn(Optional.of(getRequestEvent()));
-    when(caseEventRepository.findAllByScapIdAndEventTimeAfter(SCAP_ID.scapId(),
-        getRequestEvent().getEventTime()))
-        .thenReturn(emptyList());
+    when(updateRequestService.getUpdateDueDate(SCAP_ID, UpdateRequestType.FURTHER_INFORMATION))
+        .thenReturn(Optional.of(LocalDate.now()));
 
     var user = ServiceUserDetailTestUtil.Builder().build();
     when(userDetailService.getUserDetail()).thenReturn(user);

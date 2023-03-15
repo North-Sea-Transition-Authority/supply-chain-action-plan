@@ -7,6 +7,7 @@ import static uk.co.nstauthority.scap.generated.jooq.Tables.PROJECT_DETAILS;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.PROJECT_PERFORMANCES;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAPS;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAP_DETAILS;
+import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAP_UPDATE_REQUESTS;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,10 +45,12 @@ class WorkAreaItemDtoRepository {
   List<WorkAreaItemDto> performQuery(List<Condition> conditions) {
     //Generates sub query to return SCAP Detail ID's that are applicable for work area, based on conditions.
     //Only allows one SCAP Detail ID per SCAP
+
     var detailsSubQuery = context.select(SCAP_DETAILS.ID)
         .distinctOn(SCAPS.SCAP_ID)
         .from(SCAPS)
         .join(SCAP_DETAILS).onKey(SCAP_DETAILS.SCAP_ID)
+        .leftJoin(SCAP_UPDATE_REQUESTS).onKey(SCAP_UPDATE_REQUESTS.SCAP_DETAIL_ID)
         .where(conditions)
         .orderBy(SCAPS.SCAP_ID, SCAP_DETAILS.VERSION_NUMBER.desc());
 

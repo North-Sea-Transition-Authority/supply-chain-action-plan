@@ -34,9 +34,6 @@ import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
-import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestController;
-import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestForm;
-import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestFormValidator;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
@@ -71,6 +68,8 @@ class ConsultationResponseControllerTest extends AbstractControllerTest {
 
   private static final ScapId SCAP_ID = new ScapId(1111);
 
+  private static final ScapDetail SCAP_DETAIL = getScapDetail();
+
   private static final Integer ORG_GROUP_ID = 1000;
 
   private static final String TEST_STRING = "This is a test comment";
@@ -79,7 +78,6 @@ class ConsultationResponseControllerTest extends AbstractControllerTest {
 
   @BeforeEach
   void setup() {
-    var scapDetail = getScapDetail();
     when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.APPROVAL_DOCUMENT)))
@@ -89,10 +87,10 @@ class ConsultationResponseControllerTest extends AbstractControllerTest {
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
     when(scapService.getScapById(anyInt())).thenReturn(new Scap());
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(any(Scap.class))).thenReturn(scapDetail);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(SCAP_DETAIL);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(any(Scap.class))).thenReturn(SCAP_DETAIL);
     when(organisationGroupService.getOrganisationGroupById(ORG_GROUP_ID, PURPOSE)).thenReturn(Optional.of(getOrgGroup()));
-    when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
+    when(scapSummaryViewService.getScapSummaryView(SCAP_DETAIL)).thenReturn(getScapSummaryView());
   }
 
   @Test
@@ -108,7 +106,7 @@ class ConsultationResponseControllerTest extends AbstractControllerTest {
             .with(csrf())
             .flashAttr("form", getConsultationResponseForm()))
         .andExpect(status().is3xxRedirection());
-    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_CONSULTATION_RESPONSE, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_CONSULTATION_RESPONSE, SCAP_DETAIL, 1, TEST_STRING);
   }
 
   @Test
@@ -130,7 +128,7 @@ class ConsultationResponseControllerTest extends AbstractControllerTest {
             .with(csrf())
             .flashAttr("consultationRequestForm", getConsultationResponseForm()))
         .andExpect(status().isOk());
-    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.SCAP_CONSULTATION_REQUESTED, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.SCAP_CONSULTATION_REQUESTED, SCAP_DETAIL, 1, TEST_STRING);
   }
 
   private ConsultationResponseForm getConsultationResponseForm() {
@@ -142,7 +140,7 @@ class ConsultationResponseControllerTest extends AbstractControllerTest {
     return form;
   }
 
-  private ScapDetail getScapDetail() {
+  private static ScapDetail getScapDetail() {
     var scapDetail = new ScapDetail();
     scapDetail.setVersionNumber(1);
     scapDetail.setStatus(ScapDetailStatus.SUBMITTED);

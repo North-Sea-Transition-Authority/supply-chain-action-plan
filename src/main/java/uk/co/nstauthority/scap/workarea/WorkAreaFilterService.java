@@ -8,18 +8,31 @@ import static uk.co.nstauthority.scap.generated.jooq.Tables.PROJECT_DETAIL_TYPES
 import static uk.co.nstauthority.scap.generated.jooq.Tables.PROJECT_FIELDS;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAPS;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAP_DETAILS;
+import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAP_UPDATE_REQUESTS;
+import static uk.co.nstauthority.scap.workarea.UpdateRequestStatusRadioOptions.UPDATE_OVERDUE;
+import static uk.co.nstauthority.scap.workarea.UpdateRequestStatusRadioOptions.UPDATE_REQUESTED;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.Condition;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectType;
 
 @Service
 class WorkAreaFilterService {
+
+  private final Clock clock;
+
+  @Autowired
+  WorkAreaFilterService(Clock clock) {
+    this.clock = clock;
+  }
 
   ArrayList<Condition> getConditions(WorkAreaFilter filter) {
     var conditions = new ArrayList<Condition>();
@@ -42,6 +55,16 @@ class WorkAreaFilterService {
 
     if (Objects.nonNull(filter.getProjectTypes())) {
       conditions.add(getProjectTypesCondition(filter.getProjectTypes()));
+    }
+
+    if (Objects.nonNull(filter.getUpdateRequestStatusRadioOptions())) {
+      var updateRequestFilterOption = filter.getUpdateRequestStatusRadioOptions();
+      if (UPDATE_OVERDUE.equals(updateRequestFilterOption)) {
+        conditions.add(SCAP_UPDATE_REQUESTS.DUE_DATE.le(LocalDateTime.now(clock)));
+        conditions.add(SCAP_UPDATE_REQUESTS.RESOLUTION_DATE.isNull());
+      } else if (UPDATE_REQUESTED.equals(updateRequestFilterOption)) {
+        conditions.add(SCAP_UPDATE_REQUESTS.RESOLUTION_DATE.isNull());
+      }
     }
 
     return conditions;

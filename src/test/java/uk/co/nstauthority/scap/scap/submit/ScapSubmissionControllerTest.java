@@ -136,7 +136,7 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
 
     verify(scapDetailService).submitScap(eq(scapDetail), any());
     verify(caseEventService).recordNewEvent(eq(CaseEventSubject.SCAP_SUBMITTED),
-        eq(SCAP_ID),
+        eq(scapDetail),
         eq(scapDetail.getVersionNumber()),
         eq(null));
     verify(scapEmailService).sendScapSubmissionEmails(scapDetail);

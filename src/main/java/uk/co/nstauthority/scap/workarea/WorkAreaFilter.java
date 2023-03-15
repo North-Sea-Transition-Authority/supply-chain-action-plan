@@ -15,12 +15,15 @@ class WorkAreaFilter implements Serializable {
   private Integer fieldId;
   private List<ProjectType> projectTypes;
 
+  private UpdateRequestStatusRadioOptions updateRequestStatusRadioOptions;
+
   void update(WorkAreaForm form) {
     scapStatuses = form.getScapStatuses();
     referenceSearchTerm = form.getReferenceSearchTerm();
     operatorId = form.getOperatorId();
     fieldId = form.getFieldId();
     projectTypes = form.getProjectTypes();
+    updateRequestStatusRadioOptions = form.getUpdateRequestStatusRadioOptions();
   }
 
   void clearFilter() {
@@ -29,6 +32,7 @@ class WorkAreaFilter implements Serializable {
     operatorId = null;
     fieldId = null;
     projectTypes = null;
+    updateRequestStatusRadioOptions = null;
   }
 
   List<ScapDetailStatus> getScapStatuses() {
@@ -53,5 +57,9 @@ class WorkAreaFilter implements Serializable {
 
   List<ProjectType> getProjectTypes() {
     return projectTypes;
+  }
+
+  public UpdateRequestStatusRadioOptions getUpdateRequestStatusRadioOptions() {
+    return updateRequestStatusRadioOptions;
   }
 }

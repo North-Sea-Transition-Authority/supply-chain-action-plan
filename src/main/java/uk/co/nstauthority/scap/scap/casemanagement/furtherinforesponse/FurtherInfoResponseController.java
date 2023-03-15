@@ -114,7 +114,7 @@ public class FurtherInfoResponseController {
         furtherInfoResponseForm,
         () -> {
           caseEventService.recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE,
-              scapId,
+              scapDetail,
               scapDetail.getVersionNumber(),
               furtherInfoResponseForm.getInfoResponse().getInputValue());
           return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));

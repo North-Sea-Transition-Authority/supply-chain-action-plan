@@ -2,9 +2,12 @@ package uk.co.nstauthority.scap.workarea;
 
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAPS;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAP_DETAILS;
+import static uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestType.FURTHER_INFORMATION;
+import static uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestType.UPDATE;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,13 +19,14 @@ import org.jooq.Condition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
+import uk.co.fivium.formlibrary.validator.date.DateUtils;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
-import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSubmissionStage;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
 
 @Service
 class WorkAreaService {
@@ -32,19 +36,20 @@ class WorkAreaService {
   private final WorkAreaItemDtoRepository workAreaItemDtoRepository;
   private final OrganisationGroupService organisationGroupService;
   private final WorkAreaFilterService workAreaFilterService;
-  private final CaseEventService caseEventService;
+
+  private final UpdateRequestService updateRequestService;
   private final ScapDetailService scapDetailService;
 
   @Autowired
   WorkAreaService(WorkAreaItemDtoRepository workAreaItemDtoRepository,
                   OrganisationGroupService organisationGroupService,
-                  CaseEventService caseEventService,
                   WorkAreaFilterService workAreaFilterService,
+                  UpdateRequestService updateRequestService,
                   ScapDetailService scapDetailService) {
     this.workAreaItemDtoRepository = workAreaItemDtoRepository;
     this.organisationGroupService = organisationGroupService;
-    this.caseEventService = caseEventService;
     this.workAreaFilterService = workAreaFilterService;
+    this.updateRequestService = updateRequestService;
     this.scapDetailService = scapDetailService;
   }
 
@@ -102,9 +107,9 @@ class WorkAreaService {
             workAreaItemDto.projectName(),
             workAreaItemDto.status(),
             inferStatus(workAreaItemDto),
-            caseEventService.isFurtherInfoResponseOutstanding(new ScapId(workAreaItemDto.scapId())),
+            updateRequestService.getUpdateDueDate(new ScapId(workAreaItemDto.scapId()), FURTHER_INFORMATION).isPresent(),
             scapDetailService.isUpdateInProgress(new ScapId(workAreaItemDto.scapId())),
-            caseEventService.getUpdateDueDate(new ScapId(workAreaItemDto.scapId()))))
+            getUpdateDueDate(new ScapId(workAreaItemDto.scapId()))))
         .toList();
 
   }
@@ -131,5 +136,11 @@ class WorkAreaService {
       case SUBMITTED -> dto.submittedTimestamp();
       default -> dto.createdTimestamp();
     };
+  }
+
+  private String getUpdateDueDate(ScapId scapId) {
+    var updateDate = updateRequestService.getUpdateDueDate(scapId, UPDATE);
+    return updateDate.map(localDate -> localDate.format(DateTimeFormatter.ofPattern(DateUtils.SHORT_DATE)))
+        .orElse(null);
   }
 }

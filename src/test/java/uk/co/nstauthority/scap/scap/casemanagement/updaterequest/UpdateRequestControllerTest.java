@@ -35,9 +35,6 @@ import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
-import uk.co.nstauthority.scap.scap.casemanagement.furtherinfo.FurtherInfoController;
-import uk.co.nstauthority.scap.scap.casemanagement.furtherinfo.FurtherInfoRequestForm;
-import uk.co.nstauthority.scap.scap.casemanagement.furtherinfo.FurtherInfoRequestFormValidator;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
@@ -46,6 +43,7 @@ import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.Supportin
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
 
 @ExtendWith(MockitoExtension.class)
 @WithMockUser
@@ -62,6 +60,9 @@ class UpdateRequestControllerTest extends AbstractControllerTest {
   private ScapSummaryViewService scapSummaryViewService;
 
   @MockBean
+  private UpdateRequestService updateRequestService;
+
+  @MockBean
   private OrganisationGroupService organisationGroupService;
 
   @MockBean
@@ -72,6 +73,8 @@ class UpdateRequestControllerTest extends AbstractControllerTest {
 
   private static final ScapId SCAP_ID = new ScapId(1111);
 
+  private static final ScapDetail SCAP_DETAIL = getScapDetail();
+
   private static final Integer ORG_GROUP_ID = 1000;
 
   private static final OrganisationGroup ORG_GROUP = new OrganisationGroup();
@@ -80,7 +83,6 @@ class UpdateRequestControllerTest extends AbstractControllerTest {
 
   @BeforeEach
   void setup() {
-    var scapDetail = getScapDetail();
     when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.APPROVAL_DOCUMENT)))
@@ -90,10 +92,10 @@ class UpdateRequestControllerTest extends AbstractControllerTest {
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
     when(scapService.getScapById(anyInt())).thenReturn(new Scap());
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(any(Scap.class))).thenReturn(scapDetail);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(SCAP_DETAIL);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(any(Scap.class))).thenReturn(SCAP_DETAIL);
     when(organisationGroupService.getOrganisationGroupById(eq(ORG_GROUP_ID), any())).thenReturn(Optional.of(ORG_GROUP));
-    when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
+    when(scapSummaryViewService.getScapSummaryView(SCAP_DETAIL)).thenReturn(getScapSummaryView());
   }
 
   @Test
@@ -109,7 +111,7 @@ class UpdateRequestControllerTest extends AbstractControllerTest {
             .with(csrf())
             .flashAttr("updateRequestForm", getInfoRequestedForm()))
         .andExpect(status().is3xxRedirection());
-    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_UPDATE_REQUESTED, SCAP_ID, 1, TEST_STRING, LocalDate.now().plusDays(5L));
+    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_UPDATE_REQUESTED, SCAP_DETAIL, 1, TEST_STRING, LocalDate.now().plusDays(5L));
   }
 
   @Test
@@ -132,7 +134,7 @@ class UpdateRequestControllerTest extends AbstractControllerTest {
             .flashAttr("infoRequestForm", getInfoRequestedForm()))
         .andExpect(status().isOk());
 
-    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.SCAP_UPDATE_REQUESTED, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.SCAP_UPDATE_REQUESTED, SCAP_DETAIL, 1, TEST_STRING);
   }
 
   private UpdateRequestForm getInfoRequestedForm() {
@@ -147,7 +149,7 @@ class UpdateRequestControllerTest extends AbstractControllerTest {
     return form;
   }
 
-  private ScapDetail getScapDetail() {
+  private static ScapDetail getScapDetail() {
     var scapDetail = new ScapDetail(1234);
     scapDetail.setVersionNumber(1);
     scapDetail.setStatus(ScapDetailStatus.SUBMITTED);

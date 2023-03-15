@@ -71,15 +71,14 @@ class ScapWithdrawControllerTest extends AbstractControllerTest {
   private ScapEmailService scapEmailService;
 
   private static final ScapId SCAP_ID = new ScapId(1111);
+
+  private static final ScapDetail SCAP_DETAIL = getScapDetail();
   private static final Integer ORG_GROUP_ID = 1000;
   private static final String TEST_STRING = "This is a test comment";
-
-  private ScapDetail scapDetail;
 
   @BeforeEach
   void setup() {
     var scap = new Scap();
-    scapDetail = getScapDetail();
 
     when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
@@ -90,9 +89,9 @@ class ScapWithdrawControllerTest extends AbstractControllerTest {
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
     when(scapService.getScapById(anyInt())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
-    when(scapDetailService.getLatestSubmittedScapDetail(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(SCAP_DETAIL);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(SCAP_DETAIL);
+    when(scapDetailService.getLatestSubmittedScapDetail(SCAP_ID)).thenReturn(SCAP_DETAIL);
     when(organisationGroupService.getOrganisationGroupById(eq(ORG_GROUP_ID), any()))
         .thenReturn(Optional.of(OrganisationGroup.newBuilder().build()));
     when(scapSummaryViewService.getScapSummaryView(any())).thenReturn(getScapSummaryView());
@@ -113,8 +112,8 @@ class ScapWithdrawControllerTest extends AbstractControllerTest {
             .flashAttr("scapWithdrawForm", getWithdrawalForm()))
         .andExpect(status().is3xxRedirection());
 
-    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_WITHDRAWN, SCAP_ID, 1, TEST_STRING);
-    verify(scapEmailService).sendScapWithdrawalEmails(scapDetail);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_WITHDRAWN, SCAP_DETAIL, 1, TEST_STRING);
+    verify(scapEmailService).sendScapWithdrawalEmails(SCAP_DETAIL);
   }
 
   @Test
@@ -137,7 +136,7 @@ class ScapWithdrawControllerTest extends AbstractControllerTest {
             .with(csrf()))
         .andExpect(status().isOk());
 
-    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_DETAIL, 1, TEST_STRING);
   }
 
   private ScapWithdrawalForm getWithdrawalForm() {
@@ -149,7 +148,7 @@ class ScapWithdrawControllerTest extends AbstractControllerTest {
     return form;
   }
 
-  private ScapDetail getScapDetail() {
+  private static ScapDetail getScapDetail() {
     var scapDetail = new ScapDetail();
     scapDetail.setVersionNumber(1);
     scapDetail.setStatus(SUBMITTED);

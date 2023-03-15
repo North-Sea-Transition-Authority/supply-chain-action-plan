@@ -107,7 +107,7 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
         .andExpect(status().is3xxRedirection());
 
     verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_APPROVED,
-        SCAP_ID,
+        scapDetail,
         1,
         getScapApprovalForm().getApprovalComments().getInputValue());
     verify(scapDetailService).approveScap(scapDetail);
@@ -127,7 +127,7 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
             .flashAttr("scapApprovalForm", getScapApprovalForm()))
         .andExpect(status().is3xxRedirection());
 
-    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_APPROVED, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_APPROVED, scapDetail, 1, TEST_STRING);
     verify(scapDetailService).approveScap(scapDetail);
     verify(scapEmailService).sendScapApprovalEmails(scapDetail, null, false);
   }
@@ -151,7 +151,7 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
             .with(csrf()))
         .andExpect(status().isOk());
 
-    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.SCAP_APPROVED, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.SCAP_APPROVED, scapDetail, 1, TEST_STRING);
     verifyNoInteractions(scapEmailService);
   }
 

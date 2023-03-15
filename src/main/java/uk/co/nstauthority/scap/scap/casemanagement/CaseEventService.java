@@ -17,7 +17,6 @@ import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,7 +30,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.co.fivium.formlibrary.validator.date.DateUtils;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
@@ -42,6 +40,8 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.util.DateUtil;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestType;
 
 @Service
 public class CaseEventService {
@@ -56,6 +56,8 @@ public class CaseEventService {
 
   private final ScapDetailService scapDetailService;
 
+  private final UpdateRequestService updateRequestService;
+
   private static final Set<CaseEventSubject> RESPONSE_ACTIONS = Set.of(FURTHER_INFO_RESPONSE,
       SCAP_SUBMITTED,
       SCAP_APPROVED);
@@ -68,38 +70,41 @@ public class CaseEventService {
                           EnergyPortalUserService energyPortalUserService,
                           CaseEventRepository caseEventRepository,
                           TeamService teamService,
-                          ScapDetailService scapDetailService) {
+                          ScapDetailService scapDetailService,
+                          UpdateRequestService updateRequestService) {
     this.userDetailService = userDetailService;
     this.energyPortalUserService = energyPortalUserService;
     this.caseEventRepository = caseEventRepository;
     this.teamService = teamService;
     this.scapDetailService = scapDetailService;
+    this.updateRequestService = updateRequestService;
   }
 
   @Transactional
   public CaseEvent recordNewEvent(CaseEventSubject subject,
-                                  ScapId scapId,
+                                  ScapDetail scapDetail,
                                   Integer scapVersion,
                                   String comments) {
-    return recordNewEvent(subject, scapId, scapVersion, comments, null);
+    return recordNewEvent(subject, scapDetail, scapVersion, comments, null);
   }
 
   public CaseEvent recordNewEvent(CaseEventSubject subject,
-                                  ScapId scapId,
+                                  ScapDetail scapDetail,
                                   Integer scapVersion,
                                   String comments,
                                   LocalDate dueDate) {
+    updateRequestService.resolveUpdateRequest(scapDetail, subject);
+
     var caseEvent = new CaseEvent();
     caseEvent.setCaseEventSubject(subject);
     caseEvent.setEventTime(Instant.now());
-    caseEvent.setScapId(scapId.scapId());
+    caseEvent.setScapId(scapDetail.getScap().getScapId().scapId());
     caseEvent.setVersionNumber(scapVersion);
     caseEvent.setComments(comments);
     caseEvent.setDueDate(dueDate);
 
     var loggedInUser = userDetailService.getUserDetail();
     caseEvent.setEventByWuaId(loggedInUser.getWebUserAccountId().id());
-
     return caseEventRepository.save(caseEvent);
   }
 
@@ -136,28 +141,6 @@ public class CaseEventService {
         .toList();
   }
 
-  public boolean isFurtherInfoResponseOutstanding(ScapId scapId) {
-    var requestActionOptional = caseEventRepository
-        .findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(scapId.scapId(), FURTHER_INFO_REQUESTED);
-
-    if (requestActionOptional.isPresent()) {
-      return getDateOfResponseToInfoRequest(requestActionOptional.get()).isEmpty();
-    }
-    return false;
-  }
-
-  public String getUpdateDueDate(ScapId scapId) {
-    var requestActionOptional = caseEventRepository
-        .findFirstByScapIdAndCaseEventSubjectOrderByEventTimeDesc(scapId.scapId(), SCAP_UPDATE_REQUESTED);
-
-    if (requestActionOptional.isPresent()) {
-      if (getDateOfResponseToInfoRequest(requestActionOptional.get()).isEmpty()) {
-        return requestActionOptional.get().getDueDate().format(DateTimeFormatter.ofPattern(DateUtils.SHORT_DATE));
-      }
-    }
-    return null;
-  }
-
   public Optional<Instant> getDateOfResponseToInfoRequest(CaseEvent infoRequest) {
     var events = caseEventRepository.findAllByScapIdAndEventTimeAfter(
         infoRequest.getScapId(),
@@ -182,7 +165,7 @@ public class CaseEventService {
       }
       var furtherInfo = new ArrayList<CaseEventSubject>();
       var consultations = new ArrayList<CaseEventSubject>();
-      if (isFurtherInfoResponseOutstanding(scapId)) {
+      if (updateRequestService.getUpdateDueDate(scapId, UpdateRequestType.FURTHER_INFORMATION).isPresent()) {
         furtherInfo.add(FURTHER_INFO_RESPONSE);
       }
       consultations.add(SCAP_CONSULTATION_RESPONSE);
@@ -214,7 +197,8 @@ public class CaseEventService {
     descisions.add(SCAP_WITHDRAWN);
 
     var furtherInfo = new ArrayList<CaseEventSubject>();
-    if (isFurtherInfoResponseOutstanding(scapDetail.getScap().getScapId())) {
+    if (updateRequestService.getUpdateDueDate(scapDetail.getScap().getScapId(),
+        UpdateRequestType.FURTHER_INFORMATION).isPresent()) {
       furtherInfo.add(FURTHER_INFO_RESPONSE);
     } else {
       furtherInfo.add(FURTHER_INFO_REQUESTED);

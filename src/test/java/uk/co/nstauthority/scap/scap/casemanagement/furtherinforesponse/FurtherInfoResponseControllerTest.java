@@ -28,16 +28,12 @@ import org.springframework.validation.BindingResult;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
-import uk.co.nstauthority.scap.file.FileUploadService;
 import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
-import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentController;
-import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentForm;
-import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentFormValidator;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
@@ -72,6 +68,8 @@ class FurtherInfoResponseControllerTest extends AbstractControllerTest {
 
   private static final ScapId SCAP_ID = new ScapId(1111);
 
+  private static final ScapDetail SCAP_DETAIL = getScapDetail();
+
   private static final Integer ORG_GROUP_ID = 1000;
 
   private static final String TEST_STRING = "This is a test comment";
@@ -87,8 +85,8 @@ class FurtherInfoResponseControllerTest extends AbstractControllerTest {
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
     when(scapService.getScapById(anyInt())).thenReturn(new Scap());
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(getScapDetail());
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(any(Scap.class))).thenReturn(getScapDetail());
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(SCAP_DETAIL);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(any(Scap.class))).thenReturn(SCAP_DETAIL);
     when(organisationGroupService.getOrganisationGroupById(eq(ORG_GROUP_ID), any())).thenReturn(Optional.of(getOrgGroup()));
     when(scapSummaryViewService.getScapSummaryView(any())).thenReturn(getScapSummaryView());
   }
@@ -106,7 +104,7 @@ class FurtherInfoResponseControllerTest extends AbstractControllerTest {
         .with(csrf()))
         .andExpect(status().is3xxRedirection());
 
-    verify(caseEventService).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_ID, 1, null);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_DETAIL, 1, null);
   }
 
   @Test
@@ -123,7 +121,7 @@ class FurtherInfoResponseControllerTest extends AbstractControllerTest {
             .flashAttr("infoResponseForm", getFurtherInfoResponseForm()))
         .andExpect(status().is3xxRedirection());
 
-    verify(caseEventService).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_DETAIL, 1, TEST_STRING);
   }
 
   @Test
@@ -146,7 +144,7 @@ class FurtherInfoResponseControllerTest extends AbstractControllerTest {
             .flashAttr("qaForm", getFurtherInfoResponseForm()))
         .andExpect(status().isOk());
 
-    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_DETAIL, 1, TEST_STRING);
   }
 
   private FurtherInfoResponseForm getFurtherInfoResponseForm() {
@@ -158,7 +156,7 @@ class FurtherInfoResponseControllerTest extends AbstractControllerTest {
     return form;
   }
 
-  private ScapDetail getScapDetail() {
+  private static ScapDetail getScapDetail() {
     var scapDetail = new ScapDetail();
     scapDetail.setVersionNumber(1);
     scapDetail.setStatus(ScapDetailStatus.SUBMITTED);

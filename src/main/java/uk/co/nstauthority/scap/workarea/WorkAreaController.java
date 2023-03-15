@@ -65,6 +65,7 @@ public class WorkAreaController {
 
     var form = WorkAreaForm.from(filter);
     var statusCheckboxes = ScapDetailStatus.getRadioOptions();
+    var updateRequestRadios = UpdateRequestStatusRadioOptions.getRadioOptions();
     var prefilledOperator = workAreaFormService.getPreselectedOrganisation(form.getOperatorId());
     var prefilledField = workAreaFormService.getPreselectedField(form.getFieldId());
 
@@ -77,6 +78,7 @@ public class WorkAreaController {
             ReverseRouter.route(on(WorkAreaController.class).clearWorkAreaFilter(null, null)))
         .addObject("form", form)
         .addObject("statusCheckboxes", statusCheckboxes)
+        .addObject("updateRequestRadios", updateRequestRadios)
         .addObject("isRegulator", isRegulator)
         .addObject("organisationGroupSearchUrl",
             ReverseRouter.route(on(OrganisationGroupRestController.class).getOrganisationGroupSearchResults(null)))

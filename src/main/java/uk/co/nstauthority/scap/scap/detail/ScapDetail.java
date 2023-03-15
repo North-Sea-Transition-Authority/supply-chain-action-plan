@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import org.hibernate.envers.Audited;
 import uk.co.nstauthority.scap.scap.scap.Scap;
+import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @Entity
 @Table(name = "scap_details")
@@ -53,6 +54,11 @@ public class ScapDetail {
   @VisibleForTesting
   public ScapDetail(Integer id) {
     this.id = id;
+  }
+
+  @VisibleForTesting
+  public ScapDetail(ScapId id) {
+    this.id = id.scapId();
   }
 
   public ScapDetail(Scap scap, Integer versionNumber, Boolean tipFlag, ScapDetailStatus status,

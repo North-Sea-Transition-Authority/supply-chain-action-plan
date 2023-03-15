@@ -12,6 +12,8 @@ public class WorkAreaForm {
   private Integer fieldId;
   private List<ProjectType> projectTypes;
 
+  private UpdateRequestStatusRadioOptions updateRequestStatusRadioOptions;
+
   public List<ScapDetailStatus> getScapStatuses() {
     return scapStatuses;
   }
@@ -52,6 +54,15 @@ public class WorkAreaForm {
     this.projectTypes = projectTypes;
   }
 
+  public UpdateRequestStatusRadioOptions getUpdateRequestStatusRadioOptions() {
+    return updateRequestStatusRadioOptions;
+  }
+
+  public void setUpdateRequestStatusRadioOptions(
+      UpdateRequestStatusRadioOptions updateRequestStatusRadioOptions) {
+    this.updateRequestStatusRadioOptions = updateRequestStatusRadioOptions;
+  }
+
   public static WorkAreaForm from(WorkAreaFilter filter) {
     var form = new WorkAreaForm();
     form.setScapStatuses(filter.getScapStatuses());
@@ -59,6 +70,7 @@ public class WorkAreaForm {
     form.setOperatorId(filter.getOperatorId());
     form.setFieldId(filter.getFieldId());
     form.setProjectTypes(filter.getProjectTypes());
+    form.setUpdateRequestStatusRadioOptions(filter.getUpdateRequestStatusRadioOptions());
     return form;
   }
 }

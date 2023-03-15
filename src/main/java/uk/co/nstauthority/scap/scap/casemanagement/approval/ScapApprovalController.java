@@ -121,7 +121,7 @@ public class ScapApprovalController {
         () -> {
           caseEventService.recordNewEvent(
               scapApprovalForm.getProjectClosedOut().equals(YesNo.YES) ? SCAP_CLOSED_OUT : SCAP_APPROVED,
-              scapId,
+              scapDetail,
               scapDetail.getVersionNumber(),
               scapApprovalForm.getApprovalComments().getInputValue());
           var projectClosedOut = scapApprovalForm.getProjectClosedOut().equals(YesNo.YES);

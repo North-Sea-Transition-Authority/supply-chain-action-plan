@@ -29,6 +29,7 @@
         </#if>
         <@fieldFilter form=form preselectedField=prefilledField />
         <@statusFilter form=form statusCheckboxes=statusCheckboxes />
+        <@updateStatusFilter form=form updateRequestRadios=updateRequestRadios />
         <@projectTypeFilter form=form projectTypeCheckboxes=projectTypeCheckboxes />
       </@fdsSearch.searchFilterList>
     </@fdsSearch.searchFilter>
@@ -73,6 +74,16 @@
     <@fdsSearch.searchCheckboxes
       path="form.scapStatuses"
       checkboxes=statusCheckboxes
+    />
+  </@fdsSearch.searchFilterItem>
+</#macro>
+
+<#macro updateStatusFilter form updateRequestRadios>
+  <@fdsSearch.searchFilterItem itemName="Update status" expanded=form.getUpdateRequestStatusRadioOptions()?has_content>
+    <@fdsRadio.radio
+    labelText="Update status"
+    path="form.updateRequestStatusRadioOptions"
+    radioItems=updateRequestRadios
     />
   </@fdsSearch.searchFilterItem>
 </#macro>

@@ -107,7 +107,7 @@ public class QaCommentController {
         qaCommentForm,
         () -> {
           caseEventService.recordNewEvent(CaseEventSubject.QA_COMMENT,
-              scapId,
+              scapDetail,
               scapDetail.getVersionNumber(),
               qaCommentForm.getQaComments().getInputValue());
           return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));

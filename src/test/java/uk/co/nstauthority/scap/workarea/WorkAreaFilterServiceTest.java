@@ -9,7 +9,12 @@ import static uk.co.nstauthority.scap.generated.jooq.Tables.PROJECT_DETAIL_TYPES
 import static uk.co.nstauthority.scap.generated.jooq.Tables.PROJECT_FIELDS;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAPS;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAP_DETAILS;
+import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAP_UPDATE_REQUESTS;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,8 +27,10 @@ import uk.co.nstauthority.scap.scap.projectdetails.ProjectType;
 @ExtendWith(MockitoExtension.class)
 class WorkAreaFilterServiceTest {
 
+  private Clock clock =  Clock.fixed(Instant.ofEpochSecond(1667576106), ZoneId.systemDefault());
+
   @InjectMocks
-  WorkAreaFilterService workAreaFilterService;
+  WorkAreaFilterService workAreaFilterService = new WorkAreaFilterService(clock);
 
   private WorkAreaFilter filter;
   private WorkAreaForm form;
@@ -37,7 +44,6 @@ class WorkAreaFilterServiceTest {
   @Test
   void getConditions_EmptyFilter_AssertEmpty() {
     var conditions = workAreaFilterService.getConditions(filter);
-
     assertThat(conditions).isEmpty();
   }
 
@@ -117,5 +123,43 @@ class WorkAreaFilterServiceTest {
                 .and(PROJECT_DETAILS.ID.eq(PROJECT_DETAIL_TYPES.PROJECT_DETAIL_ID))
         )
     );
+  }
+
+  @Test
+  void getConditions_UpdateRequestStatus_NullScapConditions() {
+    filter.update(form);
+
+    var conditions = workAreaFilterService.getConditions(filter);
+    assertThat(conditions).isEmpty();
+  }
+
+  @Test
+  void getConditions_UpdateRequestStatus_AllScapConditions() {
+    form.setUpdateRequestStatusRadioOptions(UpdateRequestStatusRadioOptions.ALL);
+    filter.update(form);
+
+    var conditions = workAreaFilterService.getConditions(filter);
+    assertThat(conditions).isEmpty();
+  }
+
+  @Test
+  void getConditions_UpdateRequestStatus_AnyUpdatesConditions() {
+    form.setUpdateRequestStatusRadioOptions(UpdateRequestStatusRadioOptions.UPDATE_REQUESTED);
+    filter.update(form);
+
+    var conditions = workAreaFilterService.getConditions(filter);
+    assertThat(conditions)
+        .containsExactly(SCAP_UPDATE_REQUESTS.RESOLUTION_DATE.isNull());
+  }
+
+  @Test
+  void getConditions_UpdateRequestStatus_OverdueUpdatesConditions() {
+    form.setUpdateRequestStatusRadioOptions(UpdateRequestStatusRadioOptions.UPDATE_OVERDUE);
+    filter.update(form);
+
+    var conditions = workAreaFilterService.getConditions(filter);
+    assertThat(conditions).containsExactly(
+        SCAP_UPDATE_REQUESTS.DUE_DATE.le(LocalDateTime.now(clock)),
+        SCAP_UPDATE_REQUESTS.RESOLUTION_DATE.isNull());
   }
 }

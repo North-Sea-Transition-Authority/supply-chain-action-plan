@@ -108,7 +108,7 @@ public class ConsultationResponseController {
         consultationResponseForm,
         () -> {
           caseEventService.recordNewEvent(CaseEventSubject.SCAP_CONSULTATION_RESPONSE,
-              scapId,
+              scapDetail,
               scapDetail.getVersionNumber(),
               consultationResponseForm.getResponseComments().getInputValue());
           return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));

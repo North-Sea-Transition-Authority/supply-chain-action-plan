@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.jooq.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,8 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSubmissionStage;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestType;
 
 @ExtendWith(MockitoExtension.class)
 class WorkAreaServiceTest {
@@ -48,6 +51,9 @@ class WorkAreaServiceTest {
 
   @Mock
   CaseEventService caseEventService;
+
+  @Mock
+  UpdateRequestService updateRequestService;
 
   @Mock
   TeamService teamService;
@@ -91,7 +97,8 @@ class WorkAreaServiceTest {
         Instant.now()
     );
 
-    when(caseEventService.isFurtherInfoResponseOutstanding(new ScapId(1))).thenReturn(false);
+    when(updateRequestService.getUpdateDueDate(new ScapId(1), UpdateRequestType.FURTHER_INFORMATION))
+        .thenReturn(Optional.empty());
     when(workAreaItemDtoRepository.performQuery(any())).thenReturn(List.of(workAreaItemDto));
     when(organisationGroupService.getOrganisationGroupsByIds(
         List.of(workAreaItemDto.organisationGroupId()), WorkAreaService.ORGANISATION_GROUPS_REQUEST_PURPOSE))
@@ -148,7 +155,8 @@ class WorkAreaServiceTest {
         Instant.now()
     );
 
-    when(caseEventService.isFurtherInfoResponseOutstanding(new ScapId(1))).thenReturn(false);
+    when(updateRequestService.getUpdateDueDate(new ScapId(1), UpdateRequestType.FURTHER_INFORMATION))
+        .thenReturn(Optional.empty());
     when(workAreaItemDtoRepository.performQuery(any()))
         .thenReturn(List.of(workAreaItemDto));
     when(organisationGroupService.getOrganisationGroupsByIds(
@@ -215,7 +223,8 @@ class WorkAreaServiceTest {
         oldDraftScapDto, newDraftScapDto, oldSubmittedScapDto, newSubmittedScapDto
     );
 
-    when(caseEventService.isFurtherInfoResponseOutstanding(new ScapId(4))).thenReturn(false);
+    when(updateRequestService.getUpdateDueDate(new ScapId(4), UpdateRequestType.FURTHER_INFORMATION))
+        .thenReturn(Optional.empty());
     when(workAreaItemDtoRepository.performQuery(any())).thenReturn(workAreaItemDtoList);
     when(organisationGroupService.getOrganisationGroupsByIds(
         List.of(orgGrpId, orgGrpId, orgGrpId, orgGrpId),

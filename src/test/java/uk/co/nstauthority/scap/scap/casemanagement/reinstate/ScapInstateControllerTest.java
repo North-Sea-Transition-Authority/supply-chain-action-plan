@@ -12,8 +12,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
-import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.APPROVED;
-import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.SUBMITTED;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.WITHDRAWN;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getScapSummaryView;
 
@@ -73,15 +71,14 @@ class ScapInstateControllerTest extends AbstractControllerTest {
   private ScapEmailService scapEmailService;
 
   private static final ScapId SCAP_ID = new ScapId(1111);
+
+  private static final ScapDetail SCAP_DETAIL = getScapDetail();
   private static final Integer ORG_GROUP_ID = 1000;
   private static final String TEST_STRING = "This is a test comment";
-
-  private ScapDetail scapDetail;
 
   @BeforeEach
   void setup() {
     var scap = new Scap();
-    scapDetail = getScapDetail();
 
     when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
@@ -92,9 +89,9 @@ class ScapInstateControllerTest extends AbstractControllerTest {
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
     when(scapService.getScapById(anyInt())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
-    when(scapDetailService.getLatestSubmittedScapDetail(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(SCAP_DETAIL);
+    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(SCAP_DETAIL);
+    when(scapDetailService.getLatestSubmittedScapDetail(SCAP_ID)).thenReturn(SCAP_DETAIL);
     when(organisationGroupService.getOrganisationGroupById(eq(ORG_GROUP_ID), any()))
         .thenReturn(Optional.of(OrganisationGroup.newBuilder().build()));
     when(scapSummaryViewService.getScapSummaryView(any())).thenReturn(getScapSummaryView());
@@ -115,7 +112,7 @@ class ScapInstateControllerTest extends AbstractControllerTest {
             .flashAttr("scapReinstateForm", getReinstateForm()))
         .andExpect(status().is3xxRedirection());
 
-    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_REINSTATED, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_REINSTATED, SCAP_DETAIL, 1, TEST_STRING);
   }
 
   @Test
@@ -138,7 +135,7 @@ class ScapInstateControllerTest extends AbstractControllerTest {
             .with(csrf()))
         .andExpect(status().isOk());
 
-    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_ID, 1, TEST_STRING);
+    verify(caseEventService, never()).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_DETAIL, 1, TEST_STRING);
   }
 
   private ScapReinstateForm getReinstateForm() {
@@ -150,7 +147,7 @@ class ScapInstateControllerTest extends AbstractControllerTest {
     return form;
   }
 
-  private ScapDetail getScapDetail() {
+  private static ScapDetail getScapDetail() {
     var scapDetail = new ScapDetail();
     scapDetail.setVersionNumber(1);
     scapDetail.setStatus(WITHDRAWN);
