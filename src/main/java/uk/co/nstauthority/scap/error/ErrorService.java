@@ -17,14 +17,18 @@ import uk.co.nstauthority.scap.workarea.WorkAreaController;
 public class ErrorService {
 
   private final ErrorConfiguration errorConfiguration;
+  private final FooterService footerService;
   private static final Logger LOGGER = LoggerFactory.getLogger(ErrorService.class);
   private static final String SAFE_CHARACTERS = "BCDFGHJKMPQRTVWXY346789";
 
   private final TopNavigationService topNavigationService;
 
   @Autowired
-  public ErrorService(ErrorConfiguration errorConfiguration, TopNavigationService topNavigationService) {
+  public ErrorService(ErrorConfiguration errorConfiguration,
+                      FooterService footerService,
+                      TopNavigationService topNavigationService) {
     this.errorConfiguration = errorConfiguration;
+    this.footerService = footerService;
     this.topNavigationService = topNavigationService;
   }
 
@@ -41,6 +45,7 @@ public class ErrorService {
     addBrandingConfigs(modelAndView);
     addTechnicalSupportConfigs(modelAndView);
     addTopNavigation(modelAndView);
+    footerService.addFooterItems(modelAndView.getModel());
     return modelAndView;
   }
 

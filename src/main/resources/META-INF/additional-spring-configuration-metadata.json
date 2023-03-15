@@ -29,6 +29,21 @@
       "name": "schema.password",
       "type": "java.lang.String",
       "description": "The password for the database schema the service will connect to."
+    },
+    {
+      "name": "business-support.contact.name",
+      "type": "java.lang.String",
+      "description": "The name of the business support contact."
+    },
+    {
+      "name": "business-support.contact.phoneNumber",
+      "type": "java.lang.String",
+      "description": "The phone number of business support."
+    },
+    {
+      "name": "business-support.contact.emailAddress",
+      "type": "java.lang.String",
+      "description": "The email address of business support."
     }
   ]
 }

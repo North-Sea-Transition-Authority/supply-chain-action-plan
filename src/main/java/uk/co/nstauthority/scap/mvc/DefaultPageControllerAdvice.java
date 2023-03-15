@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.branding.ServiceBrandingConfigurationProperties;
+import uk.co.nstauthority.scap.error.FooterService;
 import uk.co.nstauthority.scap.error.exception.InvalidAuthenticationException;
 import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
-import uk.co.nstauthority.scap.legal.AccessibilityStatementController;
 import uk.co.nstauthority.scap.technicalsupport.TechnicalSupportConfiguration;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
@@ -29,16 +29,19 @@ class DefaultPageControllerAdvice {
   private final TechnicalSupportConfiguration technicalSupportConfiguration;
   private final TopNavigationService topNavigationService;
   private final UserDetailService userDetailService;
+  private final FooterService footerService;
 
   @Autowired
   DefaultPageControllerAdvice(ServiceBrandingConfigurationProperties serviceBrandingConfigurationProperties,
                               TechnicalSupportConfiguration technicalSupportConfiguration,
                               TopNavigationService topNavigationService,
-                              UserDetailService userDetailService) {
+                              UserDetailService userDetailService,
+                              FooterService footerService) {
     this.serviceBrandingConfigurationProperties = serviceBrandingConfigurationProperties;
     this.technicalSupportConfiguration = technicalSupportConfiguration;
     this.topNavigationService = topNavigationService;
     this.userDetailService = userDetailService;
+    this.footerService = footerService;
   }
 
   @ModelAttribute
@@ -48,7 +51,7 @@ class DefaultPageControllerAdvice {
     addBrandingAttributes(model);
     addCommonUrls(model);
     addTechnicalSupportContactInfo(model);
-    addFooterLinks(model);
+    footerService.addFooterItems(model.asMap());
   }
 
   @InitBinder
@@ -81,10 +84,5 @@ class DefaultPageControllerAdvice {
   private void addTopNavigationItems(Model model, HttpServletRequest request) {
     model.addAttribute("navigationItems", topNavigationService.getTopNavigationItems());
     model.addAttribute("currentEndPoint", request.getRequestURI());
-  }
-
-  private void addFooterLinks(Model model) {
-    model.addAttribute("accessibilityStatementUrl",
-        ReverseRouter.route(on(AccessibilityStatementController.class).renderAccessibilityStatement()));
   }
 }

@@ -14,6 +14,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -24,6 +25,7 @@ import uk.co.nstauthority.scap.authentication.SamlResponseParser;
 import uk.co.nstauthority.scap.authentication.ServiceLogoutSuccessHandler;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
+import uk.co.nstauthority.scap.branding.IncludeBusinessSupportConfiguration;
 import uk.co.nstauthority.scap.branding.IncludeServiceBrandingConfigurationProperties;
 import uk.co.nstauthority.scap.configuration.SamlProperties;
 import uk.co.nstauthority.scap.configuration.WebMvcConfiguration;
@@ -32,6 +34,7 @@ import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.ScapHandlerInterceptor;
 import uk.co.nstauthority.scap.endpointvalidation.rules.ScapHasStatusRule;
 import uk.co.nstauthority.scap.endpointvalidation.rules.UserHasAnyPermissionRule;
+import uk.co.nstauthority.scap.error.FooterService;
 import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
 import uk.co.nstauthority.scap.mvc.WithDefaultPageControllerAdvice;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
@@ -48,6 +51,7 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 //@AutoConfigureMockMvc
 @IncludeServiceBrandingConfigurationProperties
 @IncludeTechnicalSupportConfigurationProperties
+@IncludeBusinessSupportConfiguration
 @EnableConfigurationProperties(SamlProperties.class)
 @Import({
     AbstractControllerTest.TestConfig.class,
@@ -79,7 +83,7 @@ public abstract class AbstractControllerTest {
   protected TeamMemberService teamMemberService;
 
   @MockBean
-  TopNavigationService topNavigationService;
+  protected TopNavigationService topNavigationService;
 
   @MockBean
   protected TeamService teamService;
@@ -89,6 +93,9 @@ public abstract class AbstractControllerTest {
 
   @MockBean
   protected ScapDetailService scapDetailService;
+
+  @SpyBean
+  protected FooterService footerService;
 
   @BeforeEach
   void setup() {

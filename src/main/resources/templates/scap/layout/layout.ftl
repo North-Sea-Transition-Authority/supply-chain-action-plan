@@ -8,6 +8,7 @@
 <#-- @ftlvariable name="notificationBannerView" type="uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerView" -->
 <#-- @ftlvariable name="loggedInUser" type="uk.co.nstauthority.scap.authentication.ServiceUserDetail" -->
 <#-- @ftlvariable name="accessibilityStatementUrl" type="String" -->
+<#-- @ftlvariable name="contactUrl" type="String" -->
 
 <#if notificationBannerView??>
   <#assign notificationBannerContent>
@@ -81,6 +82,7 @@
   <#assign footerMetaContent>
     <@fdsFooter.footerMeta footerMetaHiddenHeading="Support links">
       <@fdsFooter.footerMetaLink linkText="Accessibility statement" linkUrl=springUrl(accessibilityStatementUrl)/>
+      <@fdsFooter.footerMetaLink linkText="Contact" linkUrl=springUrl(contactUrl)/>
     </@fdsFooter.footerMeta>
   </#assign>
 

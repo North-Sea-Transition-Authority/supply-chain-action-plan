@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.mvc.error;
+package uk.co.nstauthority.scap.error;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -15,9 +15,6 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
 import uk.co.nstauthority.scap.branding.ServiceBrandingConfigurationProperties;
 import uk.co.nstauthority.scap.branding.ServiceConfigurationProperties;
-import uk.co.nstauthority.scap.error.ErrorConfiguration;
-import uk.co.nstauthority.scap.error.ErrorConfigurationProperties;
-import uk.co.nstauthority.scap.error.ErrorService;
 import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
 import uk.co.nstauthority.scap.technicalsupport.TechnicalSupportConfigurationProperties;
 
@@ -50,11 +47,14 @@ class ErrorServiceTest {
   @MockBean
   private TopNavigationService topNavigationService;
 
+  @MockBean
+  private FooterService footerService;
+
   private ErrorService errorService;
 
   @BeforeEach
   public void setup() {
-    errorService = new ErrorService(errorConfiguration, topNavigationService);
+    errorService = new ErrorService(errorConfiguration, footerService, topNavigationService);
   }
 
   @Test

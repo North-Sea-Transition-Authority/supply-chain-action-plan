@@ -40,7 +40,7 @@
     different format like accessible PDF, large print, easy read, audio recording or braille or if you find any problems
     that are not listed on this page or think we are not meeting the requirements of the accessibility regulations, contact:
 
-      <@serviceContact.serviceContact technicalSupport=technicalSupport />
+      <@serviceContact.serviceContact serviceContactInfo=technicalSupport />
   </p>
   <p class="govuk-body">
     We will consider your request and get back to you in 5 working days.
