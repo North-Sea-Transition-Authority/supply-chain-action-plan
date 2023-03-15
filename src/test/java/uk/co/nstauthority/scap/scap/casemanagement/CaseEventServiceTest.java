@@ -274,7 +274,6 @@ class CaseEventServiceTest {
     infoRequestTimelineEvent.setVersionNumber(1);
     infoRequestTimelineEvent.setEventTime(TIME);
     infoRequestTimelineEvent.setEventByWuaId(1000L);
-    infoRequestTimelineEvent.setDueDate(LocalDate.ofInstant(TIME, ZoneId.systemDefault()));
 
     return infoRequestTimelineEvent;
   }

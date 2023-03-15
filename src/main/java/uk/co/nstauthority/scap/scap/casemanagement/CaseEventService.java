@@ -101,7 +101,6 @@ public class CaseEventService {
     caseEvent.setScapId(scapDetail.getScap().getScapId().scapId());
     caseEvent.setVersionNumber(scapVersion);
     caseEvent.setComments(comments);
-    caseEvent.setDueDate(dueDate);
 
     var loggedInUser = userDetailService.getUserDetail();
     caseEvent.setEventByWuaId(loggedInUser.getWebUserAccountId().id());
