@@ -60,6 +60,8 @@ dependencies {
 
   implementation "org.hibernate:hibernate-envers"
 
+  implementation 'io.micrometer:micrometer-registry-statsd:1.7.8'
+
 	runtimeOnly 'org.postgresql:postgresql:42.5.1'
   jooqGenerator 'org.postgresql:postgresql'
 

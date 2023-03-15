@@ -48,20 +48,25 @@ Note that this template uses a Postgres database, so make sure that the database
 - In your IntelliJ run configuration for the Spring app, include `production` in your active profiles
 - The following environment variables are required when using this profile:
 
-| Environment Variable           | Description                                                                                     |
-|--------------------------------|-------------------------------------------------------------------------------------------------|
-| SCAP_DATABASE_URL              | The URL to the database the service connect to                                                  |
-| SCAP_DATABASE_PASSWORD         | Database schema password for the `XYZT` user                                                    |
-| S3_ACCESS_KEY                  | S3 username for document uploads / downloads                                                    |
-| S3_SECRET_KEY                  | S3 secret for document uploads / downloads                                                      |
-| CLAMAV_HOST                    | Virus scanner host location                                                                     |
-| FILE_UPLOAD_MAX_ALLOWED_SIZE   | Maximum file upload size in bytes                                                               |
-| FILE_UPLOAD_ALLOWED_EXTENSIONS | Allowed file extensions for document uploads                                                    |
-| SCAP_EMAIL_MODE                | Can be test or production. Test mode will redirect all outbound emails to the test recipient(s) |
-| NOTIFY_TEST_EMAIL_RECIPIENT    | If email is test mode, who to send emails to. Value can be a CSV list                           |
-| NOTIFY_API_KEY                 | The GOV.UK Notify key                                                                           |
-| NOTIFY_CALLBACK_TOKEN          | The GOV.UK Notify callback token                                                                |
-
+| Environment Variable           | Description                                                                                                                  |
+|--------------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| SCAP_DATABASE_URL              | The URL to the database the service connect to                                                                               |
+| SCAP_DATABASE_PASSWORD         | Database schema password for the `scap_app` user                                                                             |
+| S3_ACCESS_KEY                  | S3 username for document uploads / downloads                                                                                 |
+| S3_SECRET_KEY                  | S3 secret for document uploads / downloads                                                                                   |
+| CLAMAV_HOST                    | Virus scanner host location                                                                                                  |
+| FILE_UPLOAD_MAX_ALLOWED_SIZE   | Maximum file upload size in bytes                                                                                            |
+| FILE_UPLOAD_ALLOWED_EXTENSIONS | Allowed file extensions for document uploads                                                                                 |
+| SCAP_EMAIL_MODE                | Can be test or production. Test mode will redirect all outbound emails to the test recipient(s)                              |
+| NOTIFY_TEST_EMAIL_RECIPIENT    | If email is test mode, who to send emails to. Value can be a CSV list                                                        |
+| NOTIFY_API_KEY                 | The GOV.UK Notify key                                                                                                        |
+| NOTIFY_CALLBACK_TOKEN          | The GOV.UK Notify callback token                                                                                             |
+| ENABLE_STATSD                  | Whether or not to export stats to Grafana, generally set to false on local and true anywhere else                            |
+| STATSD_HOST                    | The hostname for the endpoint that takes StatsD metrics                                                                      |
+| STATSD_PORT                    | The port for the endpoint that takes StatsD metrics                                                                          |
+| METRICS_EXPORT_TYPE            | The 'flavour' of metrics, one of STATSD or DATADOG. Use DATADOG as it has better out-of-the-box metrics tagging capabilities |
+| METRICS_INSTANCE_TAG           | Tag to help with filtering stats, set to the name of this instance, e.g. dev, st, uat, prod                                  |
+| METRICS_SOURCE_TYPE_TAG        | Tag to help with filtering stats, set to the name of this project, i.e. scap                                                 |
 
 ### 3. Initialise the Fivium Design System
 - `git submodule update --init --recursive`
