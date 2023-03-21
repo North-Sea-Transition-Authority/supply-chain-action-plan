@@ -2,7 +2,6 @@ package uk.co.nstauthority.scap.scap.casemanagement.updaterequest;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
-import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -16,6 +15,7 @@ import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermission;
+import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
@@ -111,7 +111,10 @@ public class UpdateRequestController {
         generator.generate(),
         updateRequestForm,
         () -> {
-          updateRequestService.createUpdateRequest(scapDetail, UpdateRequestType.UPDATE, LocalDate.now());
+          var dueDate = updateRequestForm.getDueDate().getAsLocalDate().orElseThrow(
+              () -> new ScapEntityNotFoundException("Could not find Due Date")
+          );
+          updateRequestService.createUpdateRequest(scapDetail, UpdateRequestType.UPDATE, dueDate);
           caseEventService.recordNewEvent(CaseEventSubject.SCAP_UPDATE_REQUESTED,
               scapDetail,
               scapDetail.getVersionNumber(),
