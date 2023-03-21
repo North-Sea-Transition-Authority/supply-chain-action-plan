@@ -63,6 +63,7 @@ class WorkAreaFilterService {
         conditions.add(SCAP_UPDATE_REQUESTS.DUE_DATE.le(LocalDateTime.now(clock)));
         conditions.add(SCAP_UPDATE_REQUESTS.RESOLUTION_DATE.isNull());
       } else if (UPDATE_REQUESTED.equals(updateRequestFilterOption)) {
+        conditions.add(SCAP_UPDATE_REQUESTS.DUE_DATE.isNotNull());
         conditions.add(SCAP_UPDATE_REQUESTS.RESOLUTION_DATE.isNull());
       }
     }

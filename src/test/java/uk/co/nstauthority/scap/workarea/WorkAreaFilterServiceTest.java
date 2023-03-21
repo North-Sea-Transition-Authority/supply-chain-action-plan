@@ -149,7 +149,7 @@ class WorkAreaFilterServiceTest {
 
     var conditions = workAreaFilterService.getConditions(filter);
     assertThat(conditions)
-        .containsExactly(SCAP_UPDATE_REQUESTS.RESOLUTION_DATE.isNull());
+        .containsExactly(SCAP_UPDATE_REQUESTS.DUE_DATE.isNotNull(), SCAP_UPDATE_REQUESTS.RESOLUTION_DATE.isNull());
   }
 
   @Test
