@@ -93,6 +93,7 @@ public class ScapSummaryViewService {
 
       return new ProjectDetailsSummaryView(
           projectDetails.getProjectName(),
+          projectDetails.getProjectSummary(),
           projectTypes,
           projectDetails.getProjectCostEstimate(),
           projectDetails.getEstimatedValueLocalContent(),
@@ -104,7 +105,7 @@ public class ScapSummaryViewService {
           supportingDocuments
       );
     }).orElse(new ProjectDetailsSummaryView(
-        null, Collections.emptyList(), null, null, null,
+        null, null, Collections.emptyList(), null, null, null,
         null, Collections.emptyList(), null, null, Collections.emptyList()
     ));
   }

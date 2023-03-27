@@ -20,7 +20,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -242,6 +241,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
 
   private ScapSummaryView getSummaryView() {
     var projectDetailsSummaryView = new ProjectDetailsSummaryView("Project Name",
+        "This is a project summary",
         List.of(FIELD_DEVELOPMENT_PLAN),
         new BigDecimal("5000.50"),
         new BigDecimal("5000.50"),

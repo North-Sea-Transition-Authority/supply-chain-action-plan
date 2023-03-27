@@ -7,6 +7,7 @@ import uk.co.nstauthority.scap.scap.projectdetails.ProjectType;
 import uk.co.nstauthority.scap.scap.summary.files.FileUploadSummaryView;
 
 public record ProjectDetailsSummaryView(String projectName,
+                                        String projectSummary,
                                         List<ProjectType> projectTypes,
                                         BigDecimal projectCostEstimate,
                                         BigDecimal estimatedValueLocalContent,

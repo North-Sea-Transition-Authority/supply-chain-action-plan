@@ -206,6 +206,7 @@ public class ProjectDetailsService {
 
   private void updateProjectDetails(ProjectDetails projectDetails, ProjectDetailsForm form) {
     projectDetails.setProjectName(form.getProjectName().getInputValue());
+    projectDetails.setProjectSummary(form.getProjectSummary().getInputValue());
     projectDetails.setProjectCostEstimate(form.getProjectCostEstimate().getAsBigDecimal().orElse(null));
     projectDetails.setEstimatedValueLocalContent(form.getEstimatedValueLocalContent().getAsBigDecimal().orElse(null));
     var startDate = form.getExpectedStartDate()

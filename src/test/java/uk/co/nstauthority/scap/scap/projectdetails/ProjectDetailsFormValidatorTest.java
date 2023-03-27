@@ -71,6 +71,7 @@ class ProjectDetailsFormValidatorTest {
 
     assertThat(extractedErrors).containsExactly(
         entry("projectName.inputValue", Set.of("projectName.required")),
+        entry("projectSummary.inputValue", Set.of("projectSummary.required")),
         entry("projectTypes", Set.of("projectTypes.required")),
         entry("projectCostEstimate.inputValue", Set.of("projectCostEstimate.required")),
         entry("estimatedValueLocalContent.inputValue", Set.of("estimatedValueLocalContent.required")),
@@ -100,6 +101,19 @@ class ProjectDetailsFormValidatorTest {
     assertThat(extractedErrors).containsExactly(
         entry("projectCostEstimate.inputValue", Set.of("projectCostEstimate.maxDecimalPlacesExceeded")),
         entry("estimatedValueLocalContent.inputValue", Set.of("estimatedValueLocalContent.maxDecimalPlacesExceeded"))
+    );
+  }
+
+  @Test
+  void validate_ProjectSummaryMaxCount() {
+    form.setProjectSummary("T".repeat(5000));
+    when(fieldService.getFieldsByIds(VALID_FIELD_IDS, ProjectDetailsFormValidator.FIELDS_REQUEST_PURPOSE))
+        .thenReturn(FIELDS);
+    validator.validate(form, bindingResult);
+
+    var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
+    assertThat(extractedErrors).containsExactly(
+        entry("projectSummary.inputValue", Set.of("projectSummary.maxCharExceeded"))
     );
   }
 
@@ -233,9 +247,12 @@ class ProjectDetailsFormValidatorTest {
     assertFalse(bindingResult.hasErrors());
   }
 
+
+
   private ProjectDetailsForm getValidProjectDetailsForm() {
     var form = new ProjectDetailsForm();
     form.setProjectName("Test project name");
+    form.setProjectSummary("This is a test project");
     form.setProjectTypes(Set.of(ProjectType.CARBON_STORAGE_PERMIT));
     form.setProjectCostEstimate("2.2");
     form.setEstimatedValueLocalContent("1.1");

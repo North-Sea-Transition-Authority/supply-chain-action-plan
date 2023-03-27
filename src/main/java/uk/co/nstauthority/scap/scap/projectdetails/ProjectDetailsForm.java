@@ -13,6 +13,7 @@ import uk.co.nstauthority.scap.file.FileUploadForm;
 class ProjectDetailsForm {
 
   private final StringInput projectName;
+  private final StringInput projectSummary;
   private Set<ProjectType> projectTypes;
   private final DecimalInput projectCostEstimate;
   private final DecimalInput estimatedValueLocalContent;
@@ -33,6 +34,7 @@ class ProjectDetailsForm {
 
   public ProjectDetailsForm() {
     this.projectName = new StringInput("projectName", "the project name");
+    this.projectSummary = new StringInput("projectSummary", "the project summary");
     this.projectCostEstimate = new DecimalInput("projectCostEstimate", "the project cost estimate");
     this.estimatedValueLocalContent = new DecimalInput(
         "estimatedValueLocalContent", "the estimated value of local content");
@@ -65,6 +67,14 @@ class ProjectDetailsForm {
 
   public void setProjectName(String projectName) {
     this.projectName.setInputValue(projectName);
+  }
+
+  public StringInput getProjectSummary() {
+    return projectSummary;
+  }
+
+  public void setProjectSummary(String projectSummary) {
+    this.projectSummary.setInputValue(projectSummary);
   }
 
   public Set<ProjectType> getProjectTypes() {

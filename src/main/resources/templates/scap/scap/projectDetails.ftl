@@ -17,6 +17,12 @@
       labelText="Project name"
       inputClass="govuk-!-width-two-thirds"
     />
+    <@fdsTextarea.textarea
+      path="form.projectSummary.inputValue"
+      labelText="Project summary"
+      hintText=" Please provide a brief summary description of the project in question –
+      this should capture any key project information not captured in the questions below."
+    />
     <@fdsCheckbox.checkboxes
       fieldsetHeadingText="Project type"
       path="form.projectTypes"

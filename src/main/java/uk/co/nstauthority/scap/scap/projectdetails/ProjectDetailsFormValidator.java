@@ -15,6 +15,7 @@ import uk.co.fivium.formlibrary.validator.string.StringInputValidator;
 import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
 import uk.co.nstauthority.scap.enumutil.YesNo;
+import uk.co.nstauthority.scap.util.ValidationUtil;
 
 @Service
 class ProjectDetailsFormValidator implements Validator {
@@ -42,6 +43,11 @@ class ProjectDetailsFormValidator implements Validator {
     var form = (ProjectDetailsForm) target;
 
     StringInputValidator.builder().validate(form.getProjectName(), errors);
+
+    StringInputValidator
+        .builder()
+        .mustHaveCharacterCountAtMost(ValidationUtil.TEXT_AREA_STANDARD_LIMIT)
+        .validate(form.getProjectSummary(), errors);
 
     ValidationUtils.rejectIfEmpty(errors,
         "projectTypes",

@@ -596,6 +596,7 @@ class ScapSummaryViewServiceTest {
 
   private ProjectDetailsSummaryView getMockedProjectDetailsView() {
     return new ProjectDetailsSummaryView("Test Project",
+        "This is a test summary",
         List.of(ProjectType.DECOMMISSIONING_PROGRAMME),
         new BigDecimal("50000"),
         new BigDecimal("50000"),

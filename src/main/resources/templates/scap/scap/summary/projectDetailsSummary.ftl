@@ -9,6 +9,9 @@
     <@fdsSummaryList.summaryListRowNoAction keyText="Project name">
       ${projectDetailsView.projectName()!""}
     </@fdsSummaryList.summaryListRowNoAction>
+    <@fdsSummaryList.summaryListRowNoAction keyText="Project summary">
+        ${projectDetailsView.projectSummary()!""}
+    </@fdsSummaryList.summaryListRowNoAction>
     <@fdsSummaryList.summaryListRowNoAction keyText="Project types">
       <ul class="govuk-list">
         <#list projectDetailsView.projectTypes() as projectType>

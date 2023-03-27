@@ -51,6 +51,7 @@ public class ProjectDetailsFormService {
     var form = new ProjectDetailsForm();
 
     form.setProjectName(projectDetails.getProjectName());
+    form.setProjectSummary(projectDetails.getProjectSummary());
     var projectTypes = projectDetailsService.getProjectTypesByProjectDetails(projectDetails);
 
     form.setProjectTypes(projectTypes);

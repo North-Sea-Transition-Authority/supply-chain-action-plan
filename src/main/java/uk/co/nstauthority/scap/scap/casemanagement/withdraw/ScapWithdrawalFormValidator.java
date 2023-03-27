@@ -1,5 +1,7 @@
 package uk.co.nstauthority.scap.scap.casemanagement.withdraw;
 
+import static uk.co.nstauthority.scap.util.ValidationUtil.TEXT_AREA_STANDARD_LIMIT;
+
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -18,7 +20,7 @@ public class ScapWithdrawalFormValidator implements Validator {
     var form = (ScapWithdrawalForm) target;
 
     StringInputValidator.builder()
-        .mustHaveCharacterCountAtMost(4000)
+        .mustHaveCharacterCountAtMost(TEXT_AREA_STANDARD_LIMIT)
         .validate(form.getWithdrawComments(), errors);
   }
 }

@@ -27,6 +27,8 @@ public class ProjectDetails {
 
   private String projectName;
 
+  private String projectSummary;
+
   private BigDecimal projectCostEstimate;
 
   private BigDecimal estimatedValueLocalContent;
@@ -58,6 +60,14 @@ public class ProjectDetails {
 
   public void setProjectName(String projectName) {
     this.projectName = projectName;
+  }
+
+  public String getProjectSummary() {
+    return projectSummary;
+  }
+
+  public void setProjectSummary(String projectSummary) {
+    this.projectSummary = projectSummary;
   }
 
   public BigDecimal getProjectCostEstimate() {
