@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.permissionmanagement.teams;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.inOrder;
@@ -12,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,6 +23,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
+import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRepository;
@@ -36,8 +40,17 @@ class TeamServiceTest {
   @Mock
   private TeamMemberRoleService teamMemberRoleService;
 
+  @Mock
+  private TeamMemberService teamMemberService;
+
   @InjectMocks
   private TeamService teamService;
+
+  @Test
+  void getAllTeams_VerifyCalls() {
+    teamService.getAllTeams();
+    verify(teamRepository).findAll();
+  }
 
   @Test
   void getTeam_whenMatch_thenReturnTeam() {
@@ -61,6 +74,44 @@ class TeamServiceTest {
 
     assertThat(result).isEmpty();
     verify(teamRepository).findByUuid(team.getUuid());
+  }
+
+  @Test
+  void findTeamsByUser_accessManager_getsAllTeams() {
+    var user = ServiceUserDetailTestUtil.Builder().build();
+    var regulatorTeam = TeamTestUtil
+        .Builder()
+        .withTeamType(TeamType.REGULATOR)
+        .build();
+
+    when(teamRepository.getTeamByTeamType(TeamType.REGULATOR)).thenReturn(regulatorTeam);
+    when(teamMemberService.isMemberOfTeamWithAnyRoleOf(
+        new TeamId(regulatorTeam.getUuid()),
+        user,
+        Set.of(RolePermission.MANAGE_ORGANISATIONS.name())))
+        .thenReturn(true);
+
+    teamService.findTeamsByUser(user);
+    verify(teamRepository).findAll();
+  }
+
+  @Test
+  void findTeamsByUser_notAccessManager_getsTeamsUserBelongsTo() {
+    var user = ServiceUserDetailTestUtil.Builder().build();
+    var regulatorTeam = TeamTestUtil
+        .Builder()
+        .withTeamType(TeamType.REGULATOR)
+        .build();
+
+    when(teamRepository.getTeamByTeamType(TeamType.REGULATOR)).thenReturn(regulatorTeam);
+    when(teamMemberService.isMemberOfTeamWithAnyRoleOf(
+        new TeamId(regulatorTeam.getUuid()),
+        user,
+        Set.of(RolePermission.MANAGE_ORGANISATIONS.name())))
+        .thenReturn(false);
+
+    teamService.findTeamsByUser(user);
+    verify(teamRepository).findAllTeamsThatUserIsMemberOf(user.wuaId());
   }
 
   @ParameterizedTest
@@ -143,6 +194,29 @@ class TeamServiceTest {
     var result = teamService.findByEnergyPortalOrgGroupId(team.getEnergyPortalOrgGroupId());
 
     assertThat(result).contains(team);
+    verify(teamRepository).findByEnergyPortalOrgGroupId(team.getEnergyPortalOrgGroupId());
+  }
+
+  @Test
+  void getTeamByOrgGroupId_NoMatch_Throws() {
+    var team = TeamTestUtil
+        .Builder()
+        .withTeamType(TeamType.INDUSTRY)
+        .build();
+    assertThrowsExactly(ScapEntityNotFoundException.class, () -> teamService.getByEnergyPortalOrgGroupId(team.getEnergyPortalOrgGroupId()));
+  }
+
+  @Test
+  void getTeamByOrgGroupId_Match_TeamReturend() {
+    var team = TeamTestUtil
+        .Builder()
+        .withTeamType(TeamType.INDUSTRY)
+        .build();
+
+    when(teamRepository.findByEnergyPortalOrgGroupId(team.getEnergyPortalOrgGroupId())).thenReturn(Optional.of(team));
+    var result = teamService.getByEnergyPortalOrgGroupId(team.getEnergyPortalOrgGroupId());
+
+    assertThat(result).isEqualTo(team);
     verify(teamRepository).findByEnergyPortalOrgGroupId(team.getEnergyPortalOrgGroupId());
   }
 

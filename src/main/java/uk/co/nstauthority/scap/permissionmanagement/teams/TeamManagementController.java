@@ -2,8 +2,8 @@ package uk.co.nstauthority.scap.permissionmanagement.teams;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +26,7 @@ import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamManagementController;
+import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamManagementController;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupRestController;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
@@ -69,14 +70,25 @@ public class TeamManagementController {
   @GetMapping
   public ModelAndView renderTeamList() {
     var teamId = new TeamId(teamService.getRegulatorTeam().getUuid());
-    return new ModelAndView("scap/permissionmanagement/teamList")
-        .addObject("pageTitle", "Choose team to manage")
-        .addObject("allTeams", getTeamList())
-        .addObject("hasCreateTeamPermissions", teamMemberService.isMemberOfTeamWithAnyRoleOf(teamId,
-            userDetailService.getUserDetail(),
-            Set.of(RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER.name())))
-        .addObject("newTeamFormUrl",
-            ReverseRouter.route(on(TeamManagementController.class).renderNewIndustryTeamForm(null)));
+    var hasCreateTeamPermission = teamMemberService.isMemberOfTeamWithAnyRoleOf(teamId,
+        userDetailService.getUserDetail(),
+        Collections.singleton(RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER.name()));
+
+    var teams = teamService.findTeamsByUser(userDetailService.getUserDetail());
+    if (hasCreateTeamPermission || teams.size() != 1) {
+      return new ModelAndView("scap/permissionmanagement/teamList")
+          .addObject("pageTitle", "Choose team to manage")
+          .addObject("allTeams", teams)
+          .addObject("hasCreateTeamPermissions", hasCreateTeamPermission)
+          .addObject("newTeamFormUrl",
+              ReverseRouter.route(on(TeamManagementController.class).renderNewIndustryTeamForm(null)));
+    }
+    var team = teams.get(0);
+    if (team.teamType().equals(TeamType.REGULATOR)) {
+      return ReverseRouter.redirect(on(RegulatorTeamManagementController.class).renderMemberList(team.teamId()));
+    } else {
+      return ReverseRouter.redirect(on(IndustryTeamManagementController.class).renderMemberList(team.teamId()));
+    }
   }
 
   @GetMapping("/delete/{teamId}")

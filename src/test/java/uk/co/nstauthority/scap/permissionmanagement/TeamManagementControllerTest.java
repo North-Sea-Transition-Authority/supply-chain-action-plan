@@ -9,6 +9,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -59,20 +60,32 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
 
   @Test
   void renderTeamList_userInTeam_thenTeamPresent() throws Exception {
-    var team = TeamTestUtil
-        .Builder()
-        .withTeamType(TeamType.INDUSTRY)
-        .build();
+    var team1 = new TeamView(new TeamId(UUID.randomUUID()), TeamType.INDUSTRY, "CENTRICA");
+    var team2 = new TeamView(new TeamId(UUID.randomUUID()), TeamType.INDUSTRY, "SHELL");
 
     when(userDetailService.getUserDetail()).thenReturn(testUser);
-    when(teamService.getTeamsThatUserBelongsTo(testUser)).thenReturn(List.of(team));
+    when(teamService.findTeamsByUser(testUser)).thenReturn(List.of(team1, team2));
 
     mockMvc.perform(
         get(ReverseRouter.route(on(TeamManagementController.class).renderTeamList()))
             .with(user(testUser)))
         .andExpect(status().isOk())
-        .andExpect(model().attribute("allTeams", List.of(TeamView.fromTeam(team))))
+        .andExpect(model().attribute("allTeams", List.of(team1, team2)))
         .andExpect(model().attribute("hasCreateTeamPermissions", false));
+  }
+
+  @Test
+  void renderTeamList_userIn1Team_thenRedirect() throws Exception {
+    var team1 = new TeamView(new TeamId(UUID.randomUUID()), TeamType.INDUSTRY, "CENTRICA");
+
+    when(userDetailService.getUserDetail()).thenReturn(testUser);
+    when(teamService.findTeamsByUser(testUser)).thenReturn(List.of(team1));
+
+    mockMvc.perform(
+        get(ReverseRouter.route(on(TeamManagementController.class).renderTeamList()))
+            .with(user(testUser)))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/permission-management/industry/%s".formatted(team1.teamId().uuid())));
   }
 
   @Test
@@ -95,7 +108,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
         TeamMemberTestUtil.Builder()
             .withRole(RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER)
             .build());
-    when(teamService.getAllTeams()).thenReturn(List.of(team, regulatorTeam));
+    when(teamService.findTeamsByUser(testUser)).thenReturn(List.of(TeamView.fromTeam(team), TeamView.fromTeam(regulatorTeam)));
     when(teamService.getRegulatorTeam()).thenReturn(regulatorTeam);
     when(teamMemberService.isMemberOfTeamWithAnyRoleOf(eq(TeamId.valueOf(regulatorTeam.getUuid())), eq(testUser), eq(roles))).thenReturn(true);
     mockMvc.perform(
@@ -107,7 +120,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
   }
 
   @Test
-  void renderTeamList_notUserAccessManager_thenRegulatorTeamPresent() throws Exception {
+  void renderTeamList_notUserAccessManager_thenRedirect() throws Exception {
     var regulatorTeam = TeamTestUtil
         .Builder()
         .withTeamType(TeamType.REGULATOR)
@@ -115,6 +128,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
 
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamService.getTeamsOfTypeThatUserBelongsTo(testUser, TeamType.REGULATOR)).thenReturn(List.of(regulatorTeam));
+    when(teamService.findTeamsByUser(testUser)).thenReturn(List.of(TeamView.fromTeam(regulatorTeam)));
     when(teamMemberService.getTeamMember(any(Team.class), eq(testUser.getWebUserAccountId()))).thenReturn(
         TeamMemberTestUtil.Builder()
             .withRole(RegulatorTeamRole.SCAP_VIEWER)
@@ -123,8 +137,8 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
     mockMvc.perform(
             get(ReverseRouter.route(on(TeamManagementController.class).renderTeamList()))
                 .with(user(testUser)))
-        .andExpect(status().isOk())
-        .andExpect(model().attribute("allTeams", List.of(TeamView.fromTeam(regulatorTeam))));
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/permission-management/regulator/%s".formatted(regulatorTeam.getUuid())));
   }
 
   @Test
