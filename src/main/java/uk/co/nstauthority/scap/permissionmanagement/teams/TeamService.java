@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.permissionmanagement.teams;
 
 import static uk.co.nstauthority.scap.permissionmanagement.TeamType.REGULATOR;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -16,12 +17,12 @@ import org.springframework.validation.BindingResult;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
-import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRepository;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
+import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 
 @Service
 public class TeamService {
@@ -65,7 +66,7 @@ public class TeamService {
     var isOrgAccessManager = teamMemberService.isMemberOfTeamWithAnyRoleOf(
         new TeamId(getRegulatorTeam().getUuid()),
         user,
-        Set.of(RolePermission.MANAGE_ORGANISATIONS.name()));
+        Collections.singleton(RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER.name()));
 
     if (isOrgAccessManager) {
       teams = StreamSupport.stream(getAllTeams().spliterator(), false)

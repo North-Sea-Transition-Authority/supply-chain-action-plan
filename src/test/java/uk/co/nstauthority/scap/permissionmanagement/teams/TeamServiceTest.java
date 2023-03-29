@@ -11,9 +11,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,12 +24,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
-import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRepository;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
+import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 
 @ExtendWith(MockitoExtension.class)
 class TeamServiceTest {
@@ -88,7 +88,7 @@ class TeamServiceTest {
     when(teamMemberService.isMemberOfTeamWithAnyRoleOf(
         new TeamId(regulatorTeam.getUuid()),
         user,
-        Set.of(RolePermission.MANAGE_ORGANISATIONS.name())))
+        Collections.singleton(RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER.name())))
         .thenReturn(true);
 
     teamService.findTeamsByUser(user);
@@ -107,7 +107,7 @@ class TeamServiceTest {
     when(teamMemberService.isMemberOfTeamWithAnyRoleOf(
         new TeamId(regulatorTeam.getUuid()),
         user,
-        Set.of(RolePermission.MANAGE_ORGANISATIONS.name())))
+        Collections.singleton(RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER.name())))
         .thenReturn(false);
 
     teamService.findTeamsByUser(user);
