@@ -11,6 +11,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.APPROVED;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.CLOSED_OUT;
@@ -37,7 +38,9 @@ import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.error.exception.ScapBadRequestException;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupForm;
 import uk.co.nstauthority.scap.scap.scap.Scap;
+import uk.co.nstauthority.scap.scap.scap.ScapEntityTestUtil;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.submit.ReviewAndSubmitForm;
 import uk.co.nstauthority.scap.utils.EntityTestingUtil;
@@ -322,7 +325,7 @@ class ScapDetailServiceTest {
     when(teamService.userIsMemberOfRegulatorTeam(getUserDetail())).thenReturn(true);
 
     var result = scapDetailService.getAllVersionsForUser(scap);
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(result).hasSize(1);
     assertThat(result.get(0).getStatus()).isEqualTo(SUBMITTED);
   }
 
@@ -335,8 +338,9 @@ class ScapDetailServiceTest {
 
     expectedResult.remove(2);
     var result = scapDetailService.getAllVersionsForUser(scap);
-    assertThat(result.size()).isEqualTo(3);
-    assertThat(result).containsExactlyElementsOf(expectedResult);
+    assertThat(result)
+        .hasSize(3)
+        .containsExactlyElementsOf(expectedResult);
   }
 
   @Test
@@ -577,6 +581,21 @@ class ScapDetailServiceTest {
     verify(latestScapDetail).setStatus(ScapDetailStatus.DELETED);
     verify(scapDetailRepository, never()).findByScapIdAndVersionNumber(any(), any());
     verify(scapDetailRepository).save(latestScapDetail);
+  }
+
+  @Test
+  void setTierOneContractor() {
+    var scapDetail = mock(ScapDetail.class);
+    var parentScap = ScapEntityTestUtil.scapBuilder().build();
+    var form = new OrganisationGroupForm();
+    form.setIsTierOneContractor(true);
+
+    scapDetailService.setTierOneContractor(scapDetail, parentScap, form);
+
+    verify(scapDetail).setTierOneContractor(form.getIsTierOneContractor());
+    verify(scapDetail).setParentScap(parentScap);
+    verifyNoMoreInteractions(scapDetail);
+    verify(scapDetailRepository).save(scapDetail);
   }
 
   private ServiceUserDetail getUserDetail() {

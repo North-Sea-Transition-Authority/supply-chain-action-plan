@@ -16,6 +16,7 @@ import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.error.exception.ScapBadRequestException;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupForm;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.submit.ReviewAndSubmitForm;
@@ -237,6 +238,14 @@ public class ScapDetailService {
     scapDetail.setTipFlag(false);
     scapDetail.setStatus(ScapDetailStatus.DELETED);
 
+    scapDetailRepository.save(scapDetail);
+  }
+
+  public void setTierOneContractor(ScapDetail scapDetail,
+                                   Scap parentScap,
+                                   OrganisationGroupForm form) {
+    scapDetail.setTierOneContractor(form.getIsTierOneContractor());
+    scapDetail.setParentScap(parentScap);
     scapDetailRepository.save(scapDetail);
   }
 }

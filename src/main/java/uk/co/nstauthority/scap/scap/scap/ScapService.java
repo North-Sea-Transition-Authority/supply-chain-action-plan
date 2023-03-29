@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.scap;
 
 import java.time.Clock;
 import java.time.ZonedDateTime;
+import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,14 @@ public class ScapService {
     return scapRepository.findById(id)
         .orElseThrow(() ->
             new ScapEntityNotFoundException(String.format("Could not find SCAP with id [%d]", id)));
+  }
+
+  public boolean existsById(ScapId scapId) {
+    return scapRepository.existsById(scapId.scapId());
+  }
+
+  public List<Scap> searchByReference(String reference) {
+    return scapRepository.searchAllByReferenceContainingIgnoreCase(reference);
   }
 
   @Transactional

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapFormTaskListSection;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
@@ -18,12 +19,15 @@ public class OperatorTaskListItem implements ScapTaskListItem {
 
   private static final String DISPLAY_NAME = "SCAP operator";
   private final ScapService scapService;
+  private final ScapDetailService scapDetailService;
   private final OrganisationGroupFormService organisationGroupFormService;
 
   @Autowired
   public OperatorTaskListItem(ScapService scapService,
+                              ScapDetailService scapDetailService,
                               OrganisationGroupFormService organisationGroupFormService) {
     this.scapService = scapService;
+    this.scapDetailService = scapDetailService;
     this.organisationGroupFormService = organisationGroupFormService;
   }
 
@@ -45,7 +49,8 @@ public class OperatorTaskListItem implements ScapTaskListItem {
   @Override
   public boolean isValid(Integer target) {
     var scap = scapService.getScapById(target);
-    var form = organisationGroupFormService.getForm(scap);
+    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var form = organisationGroupFormService.getForm(scapDetail);
     var bindingResult = organisationGroupFormService.validate(form, new BeanPropertyBindingResult(form, "form"));
     return !bindingResult.hasErrors();
   }

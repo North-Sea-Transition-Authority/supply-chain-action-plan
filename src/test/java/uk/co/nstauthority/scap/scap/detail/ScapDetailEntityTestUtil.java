@@ -19,6 +19,8 @@ public class ScapDetailEntityTestUtil {
     private Integer createdByUserId;
     private Instant submittedTimestamp;
     private Instant approvedTimestamp;
+    private Boolean tierOneContractor;
+    private Scap parentScap;
 
     public Builder withScapDetailId(Integer scapDetailId) {
       this.scapDetailId = scapDetailId;
@@ -65,6 +67,16 @@ public class ScapDetailEntityTestUtil {
       return this;
     }
 
+    public Builder withTierOneContractor(Boolean tierOneContractor) {
+      this.tierOneContractor = tierOneContractor;
+      return this;
+    }
+
+    public Builder withParentScap(Scap parentScap) {
+      this.parentScap = parentScap;
+      return this;
+    }
+
     public ScapDetail build() {
       var scapDetail = new ScapDetail(scapDetailId);
       scapDetail.setScap(scap);
@@ -75,6 +87,8 @@ public class ScapDetailEntityTestUtil {
       scapDetail.setCreatedByUserId(createdByUserId);
       scapDetail.setSubmittedTimestamp(submittedTimestamp);
       scapDetail.setApprovedTimestamp(approvedTimestamp);
+      scapDetail.setTierOneContractor(tierOneContractor);
+      scapDetail.setParentScap(parentScap);
       return scapDetail;
     }
   }

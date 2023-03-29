@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import org.hibernate.envers.Audited;
 import uk.co.nstauthority.scap.scap.scap.Scap;
@@ -46,6 +47,12 @@ public class ScapDetail {
   private Instant approvedTimestamp;
 
   private Boolean approvedByStakeholders;
+
+  private Boolean tierOneContractor;
+
+  @OneToOne
+  @JoinColumn(name = "parent_scap_id")
+  private Scap parentScap;
 
   public ScapDetail() {
 
@@ -146,5 +153,21 @@ public class ScapDetail {
 
   public void setApprovedByStakeholders(Boolean approvedByStakeholders) {
     this.approvedByStakeholders = approvedByStakeholders;
+  }
+
+  public Boolean isTierOneContractor() {
+    return tierOneContractor;
+  }
+
+  public void setTierOneContractor(Boolean tierOneContractor) {
+    this.tierOneContractor = tierOneContractor;
+  }
+
+  public Scap getParentScap() {
+    return parentScap;
+  }
+
+  public void setParentScap(Scap parentScap) {
+    this.parentScap = parentScap;
   }
 }
