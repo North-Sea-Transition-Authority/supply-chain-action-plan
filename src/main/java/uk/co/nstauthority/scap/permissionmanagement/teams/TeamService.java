@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.permissionmanagement.teams;
 import static uk.co.nstauthority.scap.permissionmanagement.TeamType.REGULATOR;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -113,7 +114,7 @@ public class TeamService {
   public boolean userIsMemberOfOrganisationGroupTeam(Integer organisationGroupId, ServiceUserDetail user) {
     return getTeamsThatUserBelongsTo(user)
         .stream()
-        .anyMatch(team -> team.getEnergyPortalOrgGroupId().equals(organisationGroupId));
+        .anyMatch(team -> Objects.equals(team.getEnergyPortalOrgGroupId(), organisationGroupId));
   }
 
   public boolean userIsMemberOfRegulatorTeam(ServiceUserDetail user) {

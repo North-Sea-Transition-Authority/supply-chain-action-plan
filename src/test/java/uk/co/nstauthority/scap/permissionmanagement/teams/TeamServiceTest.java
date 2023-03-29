@@ -257,6 +257,15 @@ class TeamServiceTest {
   }
 
   @Test
+  void userIsMemberofOrganisationGroupTeam_RegulatorAndOrgGroup() {
+    var user = ServiceUserDetailTestUtil.Builder().build();
+    var regulatorTeam = TeamTestUtil.Builder().withTeamType(TeamType.REGULATOR).withOrgGroupId(null).build();
+    var industryTeam = TeamTestUtil.Builder().withTeamType(TeamType.INDUSTRY).withOrgGroupId(116).build();
+    when(teamRepository.findAllTeamsThatUserIsMemberOf(user.wuaId())).thenReturn(List.of(regulatorTeam, industryTeam));
+    assertTrue(teamService.userIsMemberOfOrganisationGroupTeam(industryTeam.getEnergyPortalOrgGroupId(), user));
+  }
+
+  @Test
   void userIsMemberOfRegulatorTeam_IsMember() {
     var user = ServiceUserDetailTestUtil.Builder().build();
     var team = TeamTestUtil.Builder().withTeamType(TeamType.REGULATOR).build();
