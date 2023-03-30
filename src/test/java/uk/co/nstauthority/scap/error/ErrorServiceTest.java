@@ -19,10 +19,12 @@ import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
 import uk.co.nstauthority.scap.technicalsupport.TechnicalSupportConfigurationProperties;
 
 @ExtendWith(SpringExtension.class)
-@EnableConfigurationProperties(value = {ErrorConfigurationProperties.class,
+@EnableConfigurationProperties(value = {
+    ErrorConfigurationProperties.class,
     ServiceConfigurationProperties.class,
     CustomerConfigurationProperties.class,
-    TechnicalSupportConfigurationProperties.class})
+    TechnicalSupportConfigurationProperties.class
+})
 @ContextConfiguration(classes = {ErrorConfiguration.class, ServiceBrandingConfigurationProperties.class})
 @TestPropertySource("classpath:application-test.properties")
 class ErrorServiceTest {

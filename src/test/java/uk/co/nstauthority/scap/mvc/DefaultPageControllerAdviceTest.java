@@ -54,15 +54,15 @@ class DefaultPageControllerAdviceTest extends AbstractControllerTest {
         "currentEndPoint",
         "org.springframework.validation.BindingResult.loggedInUser",
         "accessibilityStatementUrl",
-        "contactUrl"
+        "contactUrl",
+        "privacyStatementUrl"
     );
 
     assertThat((CustomerConfigurationProperties) modelMap.get("customerBranding")).hasNoNullFieldsOrProperties();
     assertThat((ServiceConfigurationProperties) modelMap.get("serviceBranding")).hasNoNullFieldsOrProperties();
     assertThat((TechnicalSupportConfigurationProperties) modelMap.get("technicalSupport")).hasNoNullFieldsOrProperties();
-    assertThat(modelMap.get("serviceHomeUrl")).isEqualTo(
-        ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null))
-    );
+    assertThat(modelMap)
+        .containsEntry("serviceHomeUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)));
   }
 
   // Dummy application to stop the @WebMvcTest loading more than it needs

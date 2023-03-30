@@ -34,7 +34,8 @@ class EnergyPortalUserServiceTest {
   private static final CustomerConfigurationProperties customerConfigurationProperties = new CustomerConfigurationProperties(
       "name",
       "mnemonic",
-      "guidanceDocumentURL"
+      "guidanceDocumentURL",
+      "privacyStatementUrl"
   );
 
   @Mock
