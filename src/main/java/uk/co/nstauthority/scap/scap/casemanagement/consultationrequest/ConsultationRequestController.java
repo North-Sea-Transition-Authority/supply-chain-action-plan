@@ -83,8 +83,7 @@ public class ConsultationRequestController {
                                                     ConsultationRequestForm consultationRequestForm,
                                                   BindingResult bindingResult) {
     consultationRequestFormValidator.validate(consultationRequestForm, bindingResult);
-
-    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
+    var scapDetail = scapDetailService.getActionableScapDetail(scapId, userDetailService.getUserDetail());
     var scapSummary = scapSummaryViewService.getScapSummaryView(scapDetail);
     var orgGroup = organisationGroupService
         .getOrganisationGroupById(scapDetail.getScap().getOrganisationGroupId(),

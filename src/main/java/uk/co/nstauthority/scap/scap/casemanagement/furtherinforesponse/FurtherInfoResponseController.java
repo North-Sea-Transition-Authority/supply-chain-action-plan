@@ -63,7 +63,8 @@ public class FurtherInfoResponseController {
                                        ScapSummaryViewService scapSummaryViewService,
                                        OrganisationGroupService organisationGroupService,
                                        FurtherInfoResponseFormValidator furtherInfoResponseFormValidator,
-                                       SupportingDocumentService supportingDocumentService, TeamService teamService,
+                                       SupportingDocumentService supportingDocumentService,
+                                       TeamService teamService,
                                        UserDetailService userDetailService) {
     this.caseEventService = caseEventService;
     this.controllerHelperService = controllerHelperService;
@@ -85,7 +86,7 @@ public class FurtherInfoResponseController {
 
     furtherInfoResponseFormValidator.validate(furtherInfoResponseForm, bindingResult);
 
-    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
+    var scapDetail = scapDetailService.getActionableScapDetail(scapId, userDetailService.getUserDetail());
     var scapSummary = scapSummaryViewService.getScapSummaryView(scapDetail);
     var orgGroup = organisationGroupService
         .getOrganisationGroupById(scapDetail.getScap().getOrganisationGroupId(),

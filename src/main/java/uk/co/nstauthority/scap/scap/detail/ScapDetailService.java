@@ -6,15 +6,19 @@ import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.SUBMITTED;
 
 import java.time.Clock;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.error.exception.ScapBadRequestException;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.permissionmanagement.TeamId;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupForm;
 import uk.co.nstauthority.scap.scap.scap.Scap;
@@ -29,6 +33,8 @@ public class ScapDetailService {
   private final UserDetailService userDetailService;
 
   private final TeamService teamService;
+
+  private final TeamMemberService teamMemberService;
   private final Clock clock;
 
   private static final Set<ScapDetailStatus> canBeWithdrawn = Set.of(SUBMITTED, APPROVED);
@@ -37,10 +43,12 @@ public class ScapDetailService {
   public ScapDetailService(ScapDetailRepository scapDetailRepository,
                            UserDetailService userDetailService,
                            TeamService teamService,
+                           TeamMemberService teamMemberService,
                            Clock clock) {
     this.scapDetailRepository = scapDetailRepository;
     this.userDetailService = userDetailService;
     this.teamService = teamService;
+    this.teamMemberService = teamMemberService;
     this.clock = clock;
   }
 
@@ -92,6 +100,18 @@ public class ScapDetailService {
 
   public Optional<ScapDetail> findLatestByScapIdAndStatus(ScapId scapId, ScapDetailStatus status) {
     return scapDetailRepository.findFirstByScapIdAndStatusOrderByVersionNumberDesc(scapId.scapId(), status);
+  }
+
+  public Optional<ScapDetail> findLatestByScapIdAndStatusNotIn(ScapId scapId, List<ScapDetailStatus> statuses) {
+    return scapDetailRepository.findFirstByScapIdAndStatusNotInOrderByVersionNumberDesc(scapId.scapId(), statuses);
+  }
+
+  public ScapDetail getLatestByScapIdAndStatusNotIn(ScapId scapId, List<ScapDetailStatus> statuses) {
+    return findLatestByScapIdAndStatusNotIn(scapId, statuses)
+        .orElseThrow(
+            () -> new ScapEntityNotFoundException(
+                String.format("Could not find a ScapDetail with ID [%d]", scapId.scapId())
+            ));
   }
 
   public Optional<ScapDetail> findLatestByScapIdAndStatusIn(ScapId scapId, List<ScapDetailStatus> statuses) {
@@ -239,6 +259,25 @@ public class ScapDetailService {
     scapDetail.setStatus(ScapDetailStatus.DELETED);
 
     scapDetailRepository.save(scapDetail);
+  }
+
+  /**
+   * Get the latest applicable scap that a specified user can work on.
+   * This is latest Scap for an Industry User
+   * and latest non DRAFT scap for a regulator user.
+   * @param scapId the ID of the SCAP to look for.
+   * @param user the user to check against.
+   * @return the scap detail applicable to that user.
+   */
+  public ScapDetail getActionableScapDetail(ScapId scapId, ServiceUserDetail user) {
+    var isRegulator = teamMemberService.isMemberOfTeam(
+        new TeamId(teamService.getRegulatorTeam().getUuid()),
+        user);
+    if (isRegulator) {
+      return getLatestByScapIdAndStatusNotIn(scapId, Collections.singletonList(DRAFT));
+    } else {
+      return getLatestScapDetailByScapIdOrThrow(scapId);
+    }
   }
 
   public void setTierOneContractor(ScapDetail scapDetail,

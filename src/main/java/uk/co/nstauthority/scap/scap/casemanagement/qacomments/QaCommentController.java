@@ -61,7 +61,8 @@ public class QaCommentController {
                              ScapSummaryViewService scapSummaryViewService,
                              OrganisationGroupService organisationGroupService,
                              QaCommentFormValidator qaCommentFormValidator,
-                             SupportingDocumentService supportingDocumentService, TeamService teamService,
+                             SupportingDocumentService supportingDocumentService,
+                             TeamService teamService,
                              UserDetailService userDetailService) {
     this.caseEventService = caseEventService;
     this.controllerHelperService = controllerHelperService;
@@ -82,8 +83,7 @@ public class QaCommentController {
                                         BindingResult bindingResult) {
 
     qaCommentFormValidator.validate(qaCommentForm, bindingResult);
-
-    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
+    var scapDetail = scapDetailService.getActionableScapDetail(scapId, userDetailService.getUserDetail());
     var scapSummary = scapSummaryViewService.getScapSummaryView(scapDetail);
     var orgGroup = organisationGroupService
         .getOrganisationGroupById(scapDetail.getScap().getOrganisationGroupId(),

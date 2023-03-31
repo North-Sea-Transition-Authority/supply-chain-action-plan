@@ -89,8 +89,7 @@ public class FurtherInfoController {
                                             @ModelAttribute("infoRequestForm") FurtherInfoRequestForm infoRequestForm,
                                             BindingResult bindingResult) {
     furtherInfoRequestFormValidator.validate(infoRequestForm, bindingResult);
-
-    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
+    var scapDetail = scapDetailService.getActionableScapDetail(scapId, userDetailService.getUserDetail());
     var scapSummary = scapSummaryViewService.getScapSummaryView(scapDetail);
     var orgGroup = organisationGroupService
         .getOrganisationGroupById(scapDetail.getScap().getOrganisationGroupId(),

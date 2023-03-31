@@ -40,28 +40,27 @@ public class ScapSummaryController {
 
   private final TeamService teamService;
 
+  private final TeamMemberService teamMemberService;
+
   private final UserDetailService userDetailService;
 
   private final SupportingDocumentService supportingDocumentService;
-
-  private final TeamMemberService teamMemberService;
 
   public ScapSummaryController(ScapDetailService scapDetailService,
                                ScapSummaryViewService scapSummaryViewService,
                                CaseEventService caseEventService,
                                OrganisationGroupService organisationGroupService,
                                TeamService teamService,
-                               UserDetailService userDetailService,
-                               SupportingDocumentService supportingDocumentService,
-                               TeamMemberService teamMemberService) {
+                               TeamMemberService teamMemberService, UserDetailService userDetailService,
+                               SupportingDocumentService supportingDocumentService) {
     this.scapDetailService = scapDetailService;
     this.scapSummaryViewService = scapSummaryViewService;
     this.caseEventService = caseEventService;
     this.organisationGroupService = organisationGroupService;
     this.teamService = teamService;
+    this.teamMemberService = teamMemberService;
     this.userDetailService = userDetailService;
     this.supportingDocumentService = supportingDocumentService;
-    this.teamMemberService = teamMemberService;
   }
 
   //TODO:SCAP2022-232 - Smoke test all statuses against this method
@@ -83,8 +82,7 @@ public class ScapSummaryController {
       ScapDetailStatus.WITHDRAWN})
   public ModelAndView getScapSummary(@PathVariable("scapId") ScapId scapId,
                                      @PathVariable("versionNumber") Integer versionNumber) {
-
-    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
+    var scapDetail = scapDetailService.getActionableScapDetail(scapId, userDetailService.getUserDetail());
     ScapDetail versionedDetail = null;
     if (versionNumber != null) {
       versionedDetail = scapDetailService.getByScapIdAndVersionNumber(scapId, versionNumber);
@@ -92,7 +90,6 @@ public class ScapSummaryController {
 
     var user = userDetailService.getUserDetail();
     var userPermissions = teamMemberService.getAllPermissionsForUser(user);
-
     if (ScapDetailStatus.DRAFT.equals(scapDetail.getStatus())
         && scapDetail.getVersionNumber() == 1
         && userPermissions.contains(RolePermission.SUBMIT_SCAP)) {

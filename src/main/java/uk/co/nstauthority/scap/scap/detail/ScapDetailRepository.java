@@ -17,6 +17,8 @@ public interface ScapDetailRepository extends CrudRepository<ScapDetail, Integer
 
   Optional<ScapDetail> findFirstByScapIdAndStatusOrderByVersionNumberDesc(Integer scapId, ScapDetailStatus status);
 
+  Optional<ScapDetail> findFirstByScapIdAndStatusNotInOrderByVersionNumberDesc(Integer scapId, List<ScapDetailStatus> status);
+
   Optional<ScapDetail> findFirstByScapIdAndStatusInOrderByVersionNumberDesc(Integer scapId, List<ScapDetailStatus> status);
 
   Optional<ScapDetail> findFirstByScapIdAndTipFlagAndStatus(Integer scapId, boolean tipFlag, ScapDetailStatus status);

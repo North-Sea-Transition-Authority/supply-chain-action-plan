@@ -95,7 +95,7 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(scapService.getScapById(SCAP_ID.scapId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getActionableScapDetail(SCAP_ID,testUser)).thenReturn(scapDetail);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(organisationGroupService.getOrganisationGroupById(ORG_GROUP_ID, PURPOSE)).thenReturn(Optional.of(getOrgGroup()));
     when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
@@ -151,7 +151,7 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
   void approveScap_VersionSelect_Regulator_NoDrafts() throws Exception {
     var expectedRedirect = ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID));
     when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(true);
-    when(scapDetailService.findAllByScap(scapDetail.getScap())).thenReturn(getScapDetails());
+    when(scapDetailService.getActionableScapDetail(scapDetail.getScap().getScapId(), testUser)).thenReturn(scapDetail);
 
     var expectedResults = getScapDetails();
     expectedResults.remove(0);
@@ -221,12 +221,7 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
     scapDetail.setCreatedTimestamp(Instant.now());
     list.add(scapDetail);
 
-    var scapDetail2 = new ScapDetail();
-    scapDetail2.setVersionNumber(2);
-    scapDetail2.setStatus(ScapDetailStatus.SUBMITTED);
-    scapDetail2.setScap(scap);
-    scapDetail2.setCreatedTimestamp(Instant.now());
-    list.add(scapDetail2);
+    list.add(getScapDetail());
 
     var scapDetail3 = new ScapDetail();
     scapDetail3.setVersionNumber(1);

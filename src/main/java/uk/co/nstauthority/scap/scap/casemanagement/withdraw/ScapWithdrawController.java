@@ -54,7 +54,6 @@ public class ScapWithdrawController {
   private final ScapEmailService scapEmailService;
 
   private final TeamService teamService;
-
   private final UserDetailService userDetailService;
 
   @Autowired
@@ -65,7 +64,8 @@ public class ScapWithdrawController {
                                 OrganisationGroupService organisationGroupService,
                                 ScapWithdrawalFormValidator scapWithdrawalFormValidator,
                                 SupportingDocumentService supportingDocumentService,
-                                ScapEmailService scapEmailService, TeamService teamService,
+                                ScapEmailService scapEmailService,
+                                TeamService teamService,
                                 UserDetailService userDetailService) {
     this.caseEventService = caseEventService;
     this.controllerHelperService = controllerHelperService;
@@ -88,7 +88,7 @@ public class ScapWithdrawController {
                                    RedirectAttributes redirectAttributes) {
     scapWithdrawalFormValidator.validate(scapWithdrawalForm, bindingResult);
 
-    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
+    var scapDetail = scapDetailService.getActionableScapDetail(scapId, userDetailService.getUserDetail());
     var scapSummary = scapSummaryViewService.getScapSummaryView(scapDetail);
     var orgGroup = organisationGroupService
         .getOrganisationGroupById(scapDetail.getScap().getOrganisationGroupId(),
