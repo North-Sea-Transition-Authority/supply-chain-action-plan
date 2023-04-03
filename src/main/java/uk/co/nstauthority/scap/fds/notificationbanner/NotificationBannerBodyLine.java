@@ -1,4 +1,6 @@
 package uk.co.nstauthority.scap.fds.notificationbanner;
 
-public record NotificationBannerBodyLine(String lineText, String lineClass) {
+import java.io.Serializable;
+
+public record NotificationBannerBodyLine(String lineText, String lineClass) implements Serializable {
 }
