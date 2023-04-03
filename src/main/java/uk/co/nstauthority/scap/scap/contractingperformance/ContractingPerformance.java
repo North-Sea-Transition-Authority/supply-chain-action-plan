@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 
 @Entity
@@ -33,6 +34,7 @@ public class ContractingPerformance {
 
   private String outturnRationale;
 
+  @CreationTimestamp
   private Instant createdTimestamp;
 
   public ContractingPerformance() {
@@ -51,6 +53,15 @@ public class ContractingPerformance {
 
   public Integer getId() {
     return id;
+  }
+
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  public void setContractingPerformanceOverview(
+      ContractingPerformanceOverview contractingPerformanceOverview) {
+    this.contractingPerformanceOverview = contractingPerformanceOverview;
   }
 
   @VisibleForTesting

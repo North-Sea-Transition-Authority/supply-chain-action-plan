@@ -11,11 +11,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
+import uk.co.nstauthority.scap.scap.copy.ScapDetailChild;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Entity
 @Table(name = "project_performances")
-public class ProjectPerformance {
+public class ProjectPerformance implements ScapDetailChild {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +35,7 @@ public class ProjectPerformance {
 
   private BigDecimal outturnCost;
 
+  @CreationTimestamp
   private Instant createdTimestamp;
 
   public ProjectPerformance() {
@@ -46,6 +49,16 @@ public class ProjectPerformance {
   public ProjectPerformance(ScapDetail scapDetail, Instant createdTimestamp) {
     this.scapDetail = scapDetail;
     this.createdTimestamp = createdTimestamp;
+  }
+
+  @Override
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  @Override
+  public void setScapDetail(ScapDetail scapDetail) {
+    this.scapDetail = scapDetail;
   }
 
   public Integer getId() {

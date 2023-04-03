@@ -54,18 +54,22 @@ public class ProjectDetailsService {
     this.fileUploadService = fileUploadService;
   }
 
+  public List<ProjectDetailType> getProjectTypeEntitiesByProjectDetails(ProjectDetails projectDetails) {
+    return projectDetailTypeRepository.findAllByProjectDetails(projectDetails).stream().toList();
+  }
+
   public Set<ProjectType> getProjectTypesByProjectDetails(ProjectDetails projectDetails) {
     return projectDetailTypeRepository.findAllByProjectDetails(projectDetails).stream()
         .map(ProjectDetailType::getProjectType)
         .collect(Collectors.toSet());
   }
 
-  public Optional<ProjectDetails> getProjectDetails(ScapDetail scapDetail) {
+  public Optional<ProjectDetails> findByScapDetail(ScapDetail scapDetail) {
     return projectDetailsRepository.findByScapDetail(scapDetail);
   }
 
-  public ProjectDetails getProjectDetailsOrThrow(ScapDetail scapDetail) {
-    return getProjectDetails(scapDetail).orElseThrow(
+  public ProjectDetails getByScapDetail(ScapDetail scapDetail) {
+    return findByScapDetail(scapDetail).orElseThrow(
         () -> new ScapEntityNotFoundException(
             "Could not find ProjectDetails for ScapDetail with ID [%d]".formatted(scapDetail.getId())));
   }

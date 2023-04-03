@@ -15,7 +15,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Entity
 @Table(name = "supporting_documents")
-class SupportingDocument {
+public class SupportingDocument {
 
   @Id
   @GeneratedValue(generator = "uuid")

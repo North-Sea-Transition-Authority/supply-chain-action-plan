@@ -13,12 +13,14 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
+import uk.co.nstauthority.scap.scap.copy.PlannedTenderChild;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTender;
 
 @Entity
 @Table(name = "planned_tender_activities")
-public class PlannedTenderActivity {
+public class PlannedTenderActivity implements PlannedTenderChild {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
@@ -38,6 +40,7 @@ public class PlannedTenderActivity {
 
   private String awardRationale;
 
+  @CreationTimestamp
   private Instant createdTimestamp;
 
   private LocalDate expectedActualTenderStartDate;
@@ -57,12 +60,24 @@ public class PlannedTenderActivity {
     this.createdTimestamp = createdTimestamp;
   }
 
+  @Override
   public Integer getId() {
     return id;
   }
 
+  @Override
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  @Override
   public PlannedTender getPlannedTender() {
     return plannedTender;
+  }
+
+  @Override
+  public void setPlannedTender(PlannedTender plannedTender) {
+    this.plannedTender = plannedTender;
   }
 
   public String getScopeDescription() {

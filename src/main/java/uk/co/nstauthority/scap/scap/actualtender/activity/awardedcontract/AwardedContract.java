@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
 
@@ -37,6 +38,7 @@ public class AwardedContract {
 
   private Integer preferredBidderCountryId;
 
+  @CreationTimestamp
   private Instant createdTimestamp;
 
   private LocalDate contractAwardDate;
@@ -62,6 +64,10 @@ public class AwardedContract {
 
   public Integer getId() {
     return id;
+  }
+
+  public void setId(Integer id) {
+    this.id = id;
   }
 
   public ActualTenderActivity getActualTenderActivity() {

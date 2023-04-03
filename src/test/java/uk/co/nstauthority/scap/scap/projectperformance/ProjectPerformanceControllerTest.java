@@ -111,7 +111,7 @@ class ProjectPerformanceControllerTest extends AbstractScapSubmitterControllerTe
         .andExpect(model().attributeExists("errorList"));
 
     verify(projectPerformanceService, never()).createProjectPerformance(any(), any());
-    verify(projectPerformanceService, never()).saveProjectPerformance(any(), any());
+    verify(projectPerformanceService, never()).updateProjectPerformance(any(), any());
   }
 
   @Test
@@ -158,6 +158,6 @@ class ProjectPerformanceControllerTest extends AbstractScapSubmitterControllerTe
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl(expectedRedirectUrl));
 
-    verify(projectPerformanceService).saveProjectPerformance(projectPerformance, form);
+    verify(projectPerformanceService).updateProjectPerformance(projectPerformance, form);
   }
 }

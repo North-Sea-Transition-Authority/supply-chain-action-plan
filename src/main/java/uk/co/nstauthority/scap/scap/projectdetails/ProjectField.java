@@ -3,15 +3,19 @@ package uk.co.nstauthority.scap.scap.projectdetails;
 import java.time.Instant;
 import java.util.UUID;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
+import uk.co.nstauthority.scap.scap.copy.ProjectDetailsChild;
 
 @Entity
 @Table(name = "project_fields")
-class ProjectField {
+public class ProjectField implements ProjectDetailsChild {
 
   @Id
+  @GeneratedValue(generator = "uuid")
   private UUID id;
 
   @ManyToOne
@@ -19,23 +23,26 @@ class ProjectField {
 
   private Integer fieldId;
 
+  @CreationTimestamp
   private Instant createdTimestamp;
 
   public ProjectField() {
   }
 
-  ProjectField(ProjectDetails projectDetails, Integer fieldId, Instant createdTimestamp) {
+  public ProjectField(ProjectDetails projectDetails, Integer fieldId, Instant createdTimestamp) {
     this.id = UUID.randomUUID();
     this.projectDetails = projectDetails;
     this.fieldId = fieldId;
     this.createdTimestamp = createdTimestamp;
   }
 
-  UUID getId() {
+  @Override
+  public UUID getId() {
     return id;
   }
 
-  ProjectDetails getProjectDetails() {
+  @Override
+  public ProjectDetails getProjectDetails() {
     return projectDetails;
   }
 
@@ -45,5 +52,15 @@ class ProjectField {
 
   Instant getCreatedTimestamp() {
     return createdTimestamp;
+  }
+
+  @Override
+  public void setId(UUID id) {
+    this.id = id;
+  }
+
+  @Override
+  public void setProjectDetails(ProjectDetails projectDetails) {
+    this.projectDetails = projectDetails;
   }
 }

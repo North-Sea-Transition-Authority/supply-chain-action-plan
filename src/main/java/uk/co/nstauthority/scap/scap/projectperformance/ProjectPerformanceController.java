@@ -72,7 +72,7 @@ public class ProjectPerformanceController {
         () -> {
           projectPerformance.ifPresentOrElse(
               existingProjectPerformance -> projectPerformanceService
-                  .saveProjectPerformance(existingProjectPerformance, form),
+                  .updateProjectPerformance(existingProjectPerformance, form),
               () -> projectPerformanceService.createProjectPerformance(scapDetail, form));
           return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
         }

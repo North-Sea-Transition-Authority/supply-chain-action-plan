@@ -77,7 +77,7 @@ class ProjectDetailsControllerTest extends AbstractScapSubmitterControllerTest {
   @Test
   void renderProjectDetailsForm_noProjectDetails_assertCorrectResponse() throws Exception {
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
-    when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.empty());
+    when(projectDetailsService.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
     when(supportingDocumentService.buildFileUploadTemplate(SCAP_ID, SupportingDocumentType.ADDITIONAL_DOCUMENT))
         .thenReturn(fileUploadTemplate);
 
@@ -121,7 +121,7 @@ class ProjectDetailsControllerTest extends AbstractScapSubmitterControllerTest {
     );
 
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
-    when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
+    when(projectDetailsService.findByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
     when(projectDetailsService.getProjectFields(projectDetails)).thenReturn(projectFields);
     when(projectDetailsService.getProjectFacilities(projectDetails)).thenReturn(projectFacilities);
     when(projectDetailsFormService.getForm(projectDetails, installationIds, fieldIds))

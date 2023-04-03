@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "invitation_to_tender_participants")
@@ -24,6 +25,7 @@ public class InvitationToTenderParticipant {
 
   private String companyName;
 
+  @CreationTimestamp
   private Instant createdTimestamp;
 
   private Boolean isBidParticipant;
@@ -50,11 +52,14 @@ public class InvitationToTenderParticipant {
     return id;
   }
 
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
   public ActualTenderActivity getActualTenderActivity() {
     return actualTenderActivity;
   }
 
-  @VisibleForTesting
   public void setActualTenderActivity(
       ActualTenderActivity actualTenderActivity) {
     this.actualTenderActivity = actualTenderActivity;

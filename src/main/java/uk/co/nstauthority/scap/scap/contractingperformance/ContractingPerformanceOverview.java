@@ -11,12 +11,14 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
 import uk.co.nstauthority.scap.scap.contractingperformance.summary.HasMoreContractingPerformance;
+import uk.co.nstauthority.scap.scap.copy.ScapDetailChild;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Entity
 @Table(name = "contracting_performance_overviews")
-public class ContractingPerformanceOverview {
+public class ContractingPerformanceOverview implements ScapDetailChild {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +33,7 @@ public class ContractingPerformanceOverview {
   @Enumerated(EnumType.STRING)
   private HasMoreContractingPerformance hasMoreContractingPerformance;
 
+  @CreationTimestamp
   private Instant createdTimestamp;
 
   public ContractingPerformanceOverview() {
@@ -46,13 +49,24 @@ public class ContractingPerformanceOverview {
     this.createdTimestamp = createdTimestamp;
   }
 
-  Integer getId() {
+  @Override
+  public Integer getId() {
     return id;
   }
 
-  @VisibleForTesting
-  ScapDetail getScapDetail() {
+  @Override
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  @Override
+  public ScapDetail getScapDetail() {
     return scapDetail;
+  }
+
+  @Override
+  public void setScapDetail(ScapDetail scapDetail) {
+    this.scapDetail = scapDetail;
   }
 
   @VisibleForTesting

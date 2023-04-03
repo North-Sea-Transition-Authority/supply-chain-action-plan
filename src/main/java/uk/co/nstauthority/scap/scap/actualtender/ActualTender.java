@@ -11,12 +11,14 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
 import uk.co.nstauthority.scap.scap.actualtender.summary.HasMoreActualTenderActivities;
+import uk.co.nstauthority.scap.scap.copy.ScapDetailChild;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Entity
 @Table(name = "actual_tenders")
-public class ActualTender {
+public class ActualTender implements ScapDetailChild {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +33,7 @@ public class ActualTender {
   @Enumerated(EnumType.STRING)
   private HasMoreActualTenderActivities hasMoreActualTenders;
 
+  @CreationTimestamp
   private Instant createdTimestamp;
 
   public ActualTender() {
@@ -46,8 +49,24 @@ public class ActualTender {
     this.createdTimestamp = createdTimestamp;
   }
 
+  @Override
+  public Integer getId() {
+    return id;
+  }
+
+  @Override
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  @Override
   public ScapDetail getScapDetail() {
     return scapDetail;
+  }
+
+  @Override
+  public void setScapDetail(ScapDetail scapDetail) {
+    this.scapDetail = scapDetail;
   }
 
   public Instant getCreatedTimestamp() {

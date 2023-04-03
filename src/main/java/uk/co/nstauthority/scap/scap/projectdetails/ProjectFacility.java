@@ -2,21 +2,21 @@ package uk.co.nstauthority.scap.scap.projectdetails;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
+import java.util.UUID;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
+import uk.co.nstauthority.scap.scap.copy.ProjectDetailsChild;
 
 @Entity
 @Table(name = "project_facilities")
-public class ProjectFacility {
+public class ProjectFacility implements ProjectDetailsChild {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
+  private UUID id;
 
   @ManyToOne
   @JoinColumn(name = "project_details_id")
@@ -24,28 +24,41 @@ public class ProjectFacility {
 
   private Integer facilityId;
 
+  @CreationTimestamp
   private Instant createdTimestamp;
 
   public ProjectFacility() {
   }
 
   @VisibleForTesting
-  ProjectFacility(Integer id) {
+  ProjectFacility(UUID id) {
     this.id = id;
   }
 
-  ProjectFacility(ProjectDetails projectDetails, Instant createdTimestamp, Integer facilityId) {
+  public ProjectFacility(ProjectDetails projectDetails, Instant createdTimestamp, Integer facilityId) {
     this.projectDetails = projectDetails;
     this.createdTimestamp = createdTimestamp;
     this.facilityId = facilityId;
   }
 
-  Integer getId() {
+  @Override
+  public UUID getId() {
     return id;
   }
 
-  ProjectDetails getProjectDetails() {
+  @Override
+  public ProjectDetails getProjectDetails() {
     return projectDetails;
+  }
+
+  @Override
+  public void setId(UUID id) {
+    this.id = id;
+  }
+
+  @Override
+  public void setProjectDetails(ProjectDetails projectDetails) {
+    this.projectDetails = projectDetails;
   }
 
   public Integer getFacilityId() {

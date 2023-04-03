@@ -7,6 +7,7 @@ import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.SUBMITTED;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -20,6 +21,7 @@ import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.scap.copy.CopyService;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupForm;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
@@ -37,11 +39,14 @@ public class ScapDetailService {
   private final TeamMemberService teamMemberService;
   private final Clock clock;
 
+  private final List<CopyService> copyServices;
+
   private static final Set<ScapDetailStatus> canBeWithdrawn = Set.of(SUBMITTED, APPROVED);
 
   @Autowired
   public ScapDetailService(ScapDetailRepository scapDetailRepository,
                            UserDetailService userDetailService,
+                           List<CopyService> copyServices,
                            TeamService teamService,
                            TeamMemberService teamMemberService,
                            Clock clock) {
@@ -50,10 +55,15 @@ public class ScapDetailService {
     this.teamService = teamService;
     this.teamMemberService = teamMemberService;
     this.clock = clock;
+    this.copyServices = copyServices;
   }
 
   @Transactional
   public ScapDetail createDraftScapDetail(Scap scap) {
+    return createDraftScapDetail(scap, NewScapType.DRAFT_UPDATE);
+  }
+
+  public ScapDetail createDraftScapDetail(Scap scap, NewScapType isReinstatement) {
     var latestScapDetail = findLatestByScapIdAndStatusIn(scap.getScapId(), ScapDetailStatus.getReinstateableStatuses());
 
     var versionNumber = latestScapDetail.map(ScapDetail::getVersionNumber).orElse(0) + 1;
@@ -64,13 +74,28 @@ public class ScapDetailService {
         .wuaId()
         .intValue();
 
+    var newScapDetail =  scapDetailRepository.save(
+        new ScapDetail(scap,
+            versionNumber,
+            isLatestScapDetail,
+            ScapDetailStatus.DRAFT,
+            clock.instant(),
+            userId));
+
     if (latestScapDetail.isPresent()) {
-      var detail = latestScapDetail.get();
-      detail.setTipFlag(false);
-      scapDetailRepository.save(detail);
+      var oldScapDetail = latestScapDetail.get();
+      oldScapDetail.setTipFlag(false);
+      scapDetailRepository.save(oldScapDetail);
+      updateDraftInfo(oldScapDetail, newScapDetail, isReinstatement);
     }
-    var scapDetail = new ScapDetail(scap, versionNumber, isLatestScapDetail, ScapDetailStatus.DRAFT, clock.instant(), userId);
-    return scapDetailRepository.save(scapDetail);
+    return newScapDetail;
+  }
+
+  private void updateDraftInfo(ScapDetail oldScapDetail, ScapDetail newScapDetail, NewScapType isReinstatement) {
+    copyServices
+        .stream()
+        .sorted(Comparator.comparing(CopyService::runOrder))
+        .forEach(copyService -> copyService.copyEntity(oldScapDetail, newScapDetail, isReinstatement));
   }
 
   public ScapDetail getById(Integer scapDetailId) {
@@ -232,7 +257,7 @@ public class ScapDetailService {
 
   @Transactional
   public void reinstateScap(Scap scap) {
-    var draftDetail = createDraftScapDetail(scap);
+    var draftDetail = createDraftScapDetail(scap, NewScapType.REINSTATEMENT);
     var reviewForm = new ReviewAndSubmitForm();
     reviewForm.setApprovedByStakeholders(true);
     submitScap(draftDetail, reviewForm);

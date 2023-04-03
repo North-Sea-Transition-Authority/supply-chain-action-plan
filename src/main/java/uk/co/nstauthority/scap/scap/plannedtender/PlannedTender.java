@@ -10,11 +10,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
+import uk.co.nstauthority.scap.scap.copy.ScapDetailChild;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Entity
 @Table(name = "planned_tenders")
-public class PlannedTender {
+public class PlannedTender implements ScapDetailChild {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +28,7 @@ public class PlannedTender {
 
   private Boolean hasPlannedTenders;
 
+  @CreationTimestamp
   private Instant createdTimestamp;
 
   @Enumerated(EnumType.STRING)
@@ -45,6 +48,11 @@ public class PlannedTender {
 
   public ScapDetail getScapDetail() {
     return scapDetail;
+  }
+
+  @Override
+  public void setId(Integer id) {
+    this.id = id;
   }
 
   public void setScapDetail(ScapDetail scapDetail) {

@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -108,7 +109,7 @@ class ProjectDetailsServiceTest {
 
     when(projectDetailsRepository.findByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
 
-    var returnedProjectDetails = projectDetailsService.getProjectDetails(scapDetail);
+    var returnedProjectDetails = projectDetailsService.findByScapDetail(scapDetail);
 
     assertThat(returnedProjectDetails).contains(projectDetails);
   }
@@ -119,7 +120,7 @@ class ProjectDetailsServiceTest {
 
     when(projectDetailsRepository.findByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
 
-    var returnedProjectDetails = projectDetailsService.getProjectDetailsOrThrow(scapDetail);
+    var returnedProjectDetails = projectDetailsService.getByScapDetail(scapDetail);
 
     assertThat(returnedProjectDetails).isEqualTo(projectDetails);
   }
@@ -128,7 +129,7 @@ class ProjectDetailsServiceTest {
   void getProjectDetailsOrThrow_WhenNotPresent_AssertThrows() {
     when(projectDetailsRepository.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> projectDetailsService.getProjectDetailsOrThrow(scapDetail))
+    assertThatThrownBy(() -> projectDetailsService.getByScapDetail(scapDetail))
         .isInstanceOf(ScapEntityNotFoundException.class);
   }
 
@@ -322,9 +323,9 @@ class ProjectDetailsServiceTest {
 
   @Test
   void saveProjectDetails_HasPlatforms_VerifyRepositoryCalls() {
-    var keptExistingFacility = new ProjectFacility(1);
+    var keptExistingFacility = new ProjectFacility(UUID.randomUUID());
     keptExistingFacility.setFacilityId(11);
-    var removedExistingFacility = new ProjectFacility(2);
+    var removedExistingFacility = new ProjectFacility(UUID.randomUUID());
     removedExistingFacility.setFacilityId(22);
     var existingProjectFacilities = List.of(keptExistingFacility, removedExistingFacility);
 
@@ -334,7 +335,7 @@ class ProjectDetailsServiceTest {
     form.setInstallationIds(Set.of(addedFacilityId, keptExistingFacility.getFacilityId()));
     var projectDetails = new ProjectDetails();
 
-    when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
+    when(projectDetailsService.findByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
     when(projectFacilityRepository.findAllByProjectDetails(projectDetails)).thenReturn(existingProjectFacilities);
 
     projectDetailsService.saveProjectDetails(scapDetail, form);
@@ -365,7 +366,7 @@ class ProjectDetailsServiceTest {
     var createdInstant = Instant.now();
     form.setFieldIds(Set.of(addedFieldId, keptExistingField.getFieldId()));
 
-    when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
+    when(projectDetailsService.findByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
     when(projectFieldRepository.findAllByProjectDetails(projectDetails)).thenReturn(existingProjectFields);
     when(clock.instant()).thenReturn(createdInstant);
 

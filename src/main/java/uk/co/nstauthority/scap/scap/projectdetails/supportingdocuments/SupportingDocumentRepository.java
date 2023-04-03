@@ -6,7 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import uk.co.nstauthority.scap.file.UploadedFile;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
-interface SupportingDocumentRepository extends CrudRepository<SupportingDocument, UUID> {
+public interface SupportingDocumentRepository extends CrudRepository<SupportingDocument, UUID> {
 
   List<SupportingDocument> findAllByScapDetailAndSupportingDocumentType(
       ScapDetail scapDetail, SupportingDocumentType supportingDocumentType);

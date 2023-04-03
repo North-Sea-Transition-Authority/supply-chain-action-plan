@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.scap.detail;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
@@ -22,7 +23,6 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.groups.Tuple;
@@ -41,6 +41,7 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.scap.copy.CopyService;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupForm;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapEntityTestUtil;
@@ -60,6 +61,9 @@ class ScapDetailServiceTest {
   @Mock
   TeamService teamService;
 
+  @Mock
+  List<CopyService> copyServices = emptyList();
+  
   @Mock
   TeamMemberService teamMemberService;
 
@@ -120,8 +124,8 @@ class ScapDetailServiceTest {
             ScapDetail::getVersionNumber,
             ScapDetail::getCreatedByUserId)
         .containsExactly(
-            tuple(false, scap, SUBMITTED, 1, getUserDetail().getWebUserAccountId().toInt()),
-            tuple(true, scap, DRAFT, 2, getUserDetail().getWebUserAccountId().toInt()));
+            tuple(true, scap, DRAFT, 2, getUserDetail().getWebUserAccountId().toInt()),
+            tuple(false, scap, SUBMITTED, 1, getUserDetail().getWebUserAccountId().toInt()));
   }
 
   @Test
@@ -145,8 +149,8 @@ class ScapDetailServiceTest {
             ScapDetail::getVersionNumber,
             ScapDetail::getCreatedByUserId)
         .containsExactly(
-            tuple(false, scap, APPROVED, 1, getUserDetail().getWebUserAccountId().toInt()),
-            tuple(true, scap, DRAFT, 2, getUserDetail().getWebUserAccountId().toInt()));
+            tuple(true, scap, DRAFT, 2, getUserDetail().getWebUserAccountId().toInt()),
+            tuple(false, scap, APPROVED, 1, getUserDetail().getWebUserAccountId().toInt()));
   }
 
   @Test
@@ -182,7 +186,7 @@ class ScapDetailServiceTest {
 
   @Test
   void getLatestScapDetailByScapOrThrow_assertThrows() {
-    when(scapDetailRepository.findAllByScap(scap)).thenReturn(Collections.emptyList());
+    when(scapDetailRepository.findAllByScap(scap)).thenReturn(emptyList());
 
     assertThatThrownBy(() -> scapDetailService.getLatestScapDetailByScapOrThrow(scap))
         .isInstanceOf(ScapEntityNotFoundException.class);
@@ -572,7 +576,7 @@ class ScapDetailServiceTest {
 
     scapDetailService.reinstateScap(scap);
     verify(scapDetailRepository, times(3)).save(argumentCaptor.capture());
-    var resultDetail = argumentCaptor.getAllValues().get(1);
+    var resultDetail = argumentCaptor.getAllValues().get(0);
     assertThat(resultDetail.getScap().getScapId().scapId()).isEqualTo(SCAP_ID);
     assertThat(resultDetail.getVersionNumber()).isEqualTo(6);
     assertThat(resultDetail.getStatus()).isEqualTo(DRAFT);

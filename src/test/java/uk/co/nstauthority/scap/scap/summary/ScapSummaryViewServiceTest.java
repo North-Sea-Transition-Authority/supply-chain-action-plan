@@ -152,7 +152,7 @@ class ScapSummaryViewServiceTest {
     var facilities = List.of("Test facility");
     var fields = Collections.singletonList("Test field");
 
-    when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.of(projectDetails));
+    when(projectDetailsService.findByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
     when(projectDetailsService.getProjectTypesByProjectDetails(projectDetails)).thenReturn(projectTypes);
     when(projectDetailsService.getProjectFacilityNames(projectDetails)).thenReturn(facilities);
     when(projectDetailsService.getProjectFieldNames(projectDetails)).thenReturn(fields);
@@ -188,7 +188,7 @@ class ScapSummaryViewServiceTest {
 
   @Test
   void getProjectDetailsSubmissionView_NoProjectDetails() {
-    when(projectDetailsService.getProjectDetails(scapDetail)).thenReturn(Optional.empty());
+    when(projectDetailsService.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
     var projectDetailsView = scapSummaryViewService.getProjectDetailsSummaryView(scapDetail);
 

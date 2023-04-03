@@ -81,7 +81,7 @@ public class ScapSummaryViewService {
 
   @VisibleForTesting
   public ProjectDetailsSummaryView getProjectDetailsSummaryView(ScapDetail scapDetail) {
-    var projectDetailsOpt = projectDetailsService.getProjectDetails(scapDetail);
+    var projectDetailsOpt = projectDetailsService.findByScapDetail(scapDetail);
     return projectDetailsOpt.map(projectDetails -> {
       var projectTypes = projectDetailsService.getProjectTypesByProjectDetails(projectDetails)
           .stream().toList();

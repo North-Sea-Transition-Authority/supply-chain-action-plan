@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.envers.Audited;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
@@ -37,6 +38,7 @@ public class ScapDetail {
   private ScapDetailStatus status;
 
   @Audited
+  @CreationTimestamp
   private Instant createdTimestamp;
 
   private Integer createdByUserId;

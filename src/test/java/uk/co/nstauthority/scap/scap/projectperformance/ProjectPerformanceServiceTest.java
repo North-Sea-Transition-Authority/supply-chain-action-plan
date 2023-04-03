@@ -62,7 +62,7 @@ class ProjectPerformanceServiceTest {
     form.setCompletionYear("2000");
     form.setOutturnCost("3.14");
 
-    projectPerformanceService.saveProjectPerformance(projectPerformance, form);
+    projectPerformanceService.updateProjectPerformance(projectPerformance, form);
 
     verify(projectPerformanceRepository).save(argumentCaptor.capture());
 
@@ -95,7 +95,7 @@ class ProjectPerformanceServiceTest {
     form.setCompletionYear("2000");
     form.setOutturnCost("3.14");
 
-    projectPerformanceService.saveProjectPerformance(projectPerformance, form);
+    projectPerformanceService.updateProjectPerformance(projectPerformance, form);
 
     verify(projectPerformanceRepository).save(argumentCaptor.capture());
 
@@ -120,7 +120,7 @@ class ProjectPerformanceServiceTest {
     form.setStartYear("1999");
     form.setOutturnCost("3.14");
 
-    assertThatThrownBy(() -> projectPerformanceService.saveProjectPerformance(projectPerformance, form))
+    assertThatThrownBy(() -> projectPerformanceService.updateProjectPerformance(projectPerformance, form))
         .isInstanceOf(ClassCastException.class);
 
     verify(projectPerformanceRepository, never()).save(any());
@@ -139,7 +139,7 @@ class ProjectPerformanceServiceTest {
     form.setCompletionYear("2000");
     form.setOutturnCost("3.14");
 
-    assertThatThrownBy(() -> projectPerformanceService.saveProjectPerformance(projectPerformance, form))
+    assertThatThrownBy(() -> projectPerformanceService.updateProjectPerformance(projectPerformance, form))
         .isInstanceOf(ClassCastException.class);
 
     verify(projectPerformanceRepository, never()).save(any());
@@ -158,7 +158,7 @@ class ProjectPerformanceServiceTest {
     form.setCompletionYear("2000");
     form.setOutturnCost("NaN");
 
-    assertThatThrownBy(() -> projectPerformanceService.saveProjectPerformance(projectPerformance, form))
+    assertThatThrownBy(() -> projectPerformanceService.updateProjectPerformance(projectPerformance, form))
         .isInstanceOf(ClassCastException.class);
 
     verify(projectPerformanceRepository, never()).save(any());

@@ -11,11 +11,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
+import uk.co.nstauthority.scap.scap.copy.ScapDetailChild;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Entity
 @Table(name = "project_details")
-public class ProjectDetails {
+public class ProjectDetails implements ScapDetailChild {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +40,8 @@ public class ProjectDetails {
   private LocalDate plannedCompletionDate;
 
   private Boolean hasFacilities;
+
+  @CreationTimestamp
   private Instant createdTimestamp;
 
   public ProjectDetails() {
@@ -50,8 +54,24 @@ public class ProjectDetails {
     this.createdTimestamp = createdTimestamp;
   }
 
+  @Override
+  public Integer getId() {
+    return id;
+  }
+
+  @Override
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  @Override
   public ScapDetail getScapDetail() {
     return scapDetail;
+  }
+
+  @Override
+  public void setScapDetail(ScapDetail scapDetail) {
+    this.scapDetail = scapDetail;
   }
 
   public String getProjectName() {

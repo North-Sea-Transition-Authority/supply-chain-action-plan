@@ -27,11 +27,16 @@ public class ProjectPerformanceService {
   @Transactional
   void createProjectPerformance(ScapDetail scapDetail, ProjectPerformanceForm form) {
     var projectPerformance = new ProjectPerformance(scapDetail, clock.instant());
-    saveProjectPerformance(projectPerformance, form);
+    updateProjectPerformance(projectPerformance, form);
   }
 
   @Transactional
-  void saveProjectPerformance(ProjectPerformance projectPerformance, ProjectPerformanceForm form) {
+  void saveProjectPerformance(ProjectPerformance projectPerformance) {
+    projectPerformanceRepository.save(projectPerformance);
+  }
+
+  @Transactional
+  void updateProjectPerformance(ProjectPerformance projectPerformance, ProjectPerformanceForm form) {
     projectPerformance.setProjectCompleted(YesNo.YES.equals(form.getIsProjectCompleted()));
     if (Boolean.TRUE.equals(projectPerformance.getProjectCompleted())) {
       var startDate = form.getStartDate().getAsLocalDate()

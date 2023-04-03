@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 
@@ -39,6 +40,7 @@ public class ActualTenderActivity {
   @Enumerated(EnumType.STRING)
   private ContractStage contractStage;
 
+  @CreationTimestamp
   private Instant createdTimestamp;
 
   public ActualTenderActivity() {
@@ -58,7 +60,10 @@ public class ActualTenderActivity {
     return id;
   }
 
-  @VisibleForTesting
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
   void setActualTender(ActualTender actualTender) {
     this.actualTender = actualTender;
   }
