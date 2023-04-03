@@ -59,10 +59,15 @@ backLinkUrl=springUrl(backLinkUrl)
       <@scapVersions availableVersions/>
     </@fdsAction.buttonGroup>
   <@fdsAction.buttonGroup>
+    <@fdsAction.link linkText="Print" linkUrl="javascript:window.print()" linkClass="govuk-button govuk-button--secondary"/>
     <#list applicableActions as group, actions>
       <@buttongroup group=group actions=actions/>
     </#list>
   </@fdsAction.buttonGroup>
+  <@fdsDetails.summaryDetails detailsClass="print-details" summaryTitle="How can I save a PDF copy of the application?">
+    <p class="govuk-body">
+      Click the link to print your application. In the print dialog displayed change your printer to ‘Print to PDF’. This will allow you to save the application as a PDF.</p>
+  </@fdsDetails.summaryDetails>
 
   <@fdsTabs.tabs tabsHeading="SCAP overview tabs">
     <@fdsTabs.tabList>
