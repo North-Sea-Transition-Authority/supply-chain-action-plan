@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
 import java.util.UUID;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -16,6 +17,7 @@ import uk.co.nstauthority.scap.scap.copy.ProjectDetailsChild;
 public class ProjectFacility implements ProjectDetailsChild {
 
   @Id
+  @GeneratedValue(generator = "uuid")
   private UUID id;
 
   @ManyToOne
