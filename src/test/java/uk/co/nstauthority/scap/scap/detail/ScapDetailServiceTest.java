@@ -63,7 +63,7 @@ class ScapDetailServiceTest {
 
   @Mock
   List<CopyService> copyServices = emptyList();
-  
+
   @Mock
   TeamMemberService teamMemberService;
 
@@ -124,8 +124,8 @@ class ScapDetailServiceTest {
             ScapDetail::getVersionNumber,
             ScapDetail::getCreatedByUserId)
         .containsExactly(
-            tuple(true, scap, DRAFT, 2, getUserDetail().getWebUserAccountId().toInt()),
-            tuple(false, scap, SUBMITTED, 1, getUserDetail().getWebUserAccountId().toInt()));
+            tuple(false, scap, SUBMITTED, 1, getUserDetail().getWebUserAccountId().toInt()),
+            tuple(true, scap, DRAFT, 2, getUserDetail().getWebUserAccountId().toInt()));
   }
 
   @Test
@@ -149,8 +149,8 @@ class ScapDetailServiceTest {
             ScapDetail::getVersionNumber,
             ScapDetail::getCreatedByUserId)
         .containsExactly(
-            tuple(true, scap, DRAFT, 2, getUserDetail().getWebUserAccountId().toInt()),
-            tuple(false, scap, APPROVED, 1, getUserDetail().getWebUserAccountId().toInt()));
+            tuple(false, scap, APPROVED, 1, getUserDetail().getWebUserAccountId().toInt()),
+            tuple(true, scap, DRAFT, 2, getUserDetail().getWebUserAccountId().toInt()));
   }
 
   @Test
@@ -576,14 +576,11 @@ class ScapDetailServiceTest {
 
     scapDetailService.reinstateScap(scap);
     verify(scapDetailRepository, times(3)).save(argumentCaptor.capture());
-    var resultDetail = argumentCaptor.getAllValues().get(0);
-    assertThat(resultDetail.getScap().getScapId().scapId()).isEqualTo(SCAP_ID);
-    assertThat(resultDetail.getVersionNumber()).isEqualTo(6);
-    assertThat(resultDetail.getStatus()).isEqualTo(DRAFT);
 
     var resultSubmitDetail = argumentCaptor.getAllValues().get(2);
     assertThat(resultSubmitDetail.getScap().getScapId().scapId()).isEqualTo(SCAP_ID);
     assertThat(resultSubmitDetail.getStatus()).isEqualTo(SUBMITTED);
+    assertThat(resultSubmitDetail.getVersionNumber()).isEqualTo(6);
   }
 
   @Test

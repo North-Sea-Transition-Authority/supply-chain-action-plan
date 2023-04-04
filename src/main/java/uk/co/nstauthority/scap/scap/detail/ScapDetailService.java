@@ -74,24 +74,29 @@ public class ScapDetailService {
         .wuaId()
         .intValue();
 
-    var newScapDetail =  scapDetailRepository.save(
-        new ScapDetail(scap,
-            versionNumber,
-            isLatestScapDetail,
-            ScapDetailStatus.DRAFT,
-            clock.instant(),
-            userId));
+    var newScapDetail = new ScapDetail(scap,
+        versionNumber,
+        isLatestScapDetail,
+        ScapDetailStatus.DRAFT,
+        clock.instant(),
+        userId);
 
     if (latestScapDetail.isPresent()) {
       var oldScapDetail = latestScapDetail.get();
       oldScapDetail.setTipFlag(false);
       scapDetailRepository.save(oldScapDetail);
       updateDraftInfo(oldScapDetail, newScapDetail, isReinstatement);
+    } else {
+      scapDetailRepository.save(newScapDetail);
     }
     return newScapDetail;
   }
 
   private void updateDraftInfo(ScapDetail oldScapDetail, ScapDetail newScapDetail, NewScapType isReinstatement) {
+    newScapDetail.setTierOneContractor(oldScapDetail.isTierOneContractor());
+    newScapDetail.setParentScap(oldScapDetail.getParentScap());
+    scapDetailRepository.save(newScapDetail);
+
     copyServices
         .stream()
         .sorted(Comparator.comparing(CopyService::runOrder))

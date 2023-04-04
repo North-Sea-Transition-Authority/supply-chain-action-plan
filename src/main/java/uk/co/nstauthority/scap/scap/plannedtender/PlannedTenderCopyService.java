@@ -41,7 +41,6 @@ public class PlannedTenderCopyService implements CopyService {
     var newPlannedTender = (PlannedTender) entityCopyService.copyChild(newScapDetail, oldPlannedTender);
 
     if (DRAFT_UPDATE.equals(newScapType)) {
-      newPlannedTender.setHasPlannedTenders(null);
       newPlannedTender.setHasMorePlannedTenderActivities(null);
       plannedTenderRepository.save(newPlannedTender);
     }
