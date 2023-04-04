@@ -14,14 +14,18 @@ public class ProjectPerformanceCopyService implements CopyService {
 
   private final ProjectPerformanceService projectPerformanceService;
 
+  private final ProjectPerformanceRepository projectPerformanceRepository;
   private final EntityCopyService entityCopyService;
 
   private final EntityManager entityManager;
 
   @Autowired
   public ProjectPerformanceCopyService(ProjectPerformanceService projectPerformanceService,
-                                       EntityCopyService entityCopyService, EntityManager entityManager) {
+                                       ProjectPerformanceRepository projectPerformanceRepository,
+                                       EntityCopyService entityCopyService,
+                                       EntityManager entityManager) {
     this.projectPerformanceService = projectPerformanceService;
+    this.projectPerformanceRepository = projectPerformanceRepository;
     this.entityCopyService = entityCopyService;
     this.entityManager = entityManager;
   }
@@ -39,7 +43,7 @@ public class ProjectPerformanceCopyService implements CopyService {
     var newProjectPerformance = (ProjectPerformance) entityCopyService.copyChild(newScapDetail, oldProjectPerformance);
     if (newScapType.equals(NewScapType.DRAFT_UPDATE) && !newProjectPerformance.getProjectCompleted()) {
       newProjectPerformance.setProjectCompleted(null);
-      entityManager.persist(newProjectPerformance);
+      projectPerformanceRepository.save(newProjectPerformance);
     }
   }
 }

@@ -31,11 +31,14 @@ class ProjectPerformanceCopyServiceTest {
 
   EntityCopyService entityCopyService = new EntityCopyService(entityManager);
 
+  ProjectPerformanceRepository projectPerformanceRepository = mock(ProjectPerformanceRepository.class);
+
   ProjectPerformanceService projectPerformanceService = mock(ProjectPerformanceService.class);
 
   ProjectPerformanceCopyService projectPerformanceCopyService =
       new ProjectPerformanceCopyService(
           projectPerformanceService,
+          projectPerformanceRepository,
           entityCopyService,
           entityManager);
 
@@ -43,7 +46,7 @@ class ProjectPerformanceCopyServiceTest {
   ArgumentCaptor<ProjectPerformance> performanceCaptor;
 
   @Test
-  void copyService_copyChild_ContractingPerformance() {
+  void copyService_copyChild_ProjectPerformance() {
     var oldScapDetail = new ScapDetail();
     var newScapDetail = new ScapDetail();
 
@@ -72,6 +75,25 @@ class ProjectPerformanceCopyServiceTest {
     when(projectPerformanceService.findByScapDetail(oldScapDetail)).thenReturn(Optional.empty());
     assertThatThrownBy(() -> projectPerformanceCopyService.copyEntity(oldScapDetail, null, NewScapType.DRAFT_UPDATE))
         .isInstanceOf(ScapEntityNotFoundException.class);
+  }
+
+  @Test
+  void copyService_copyChild_ProjectPerformance_Draft() {
+    var oldScapDetail = new ScapDetail();
+    var newScapDetail = new ScapDetail();
+
+    var oldProjectPerformance = new ProjectPerformance();
+    oldProjectPerformance.setProjectCompleted(false);
+
+    when(projectPerformanceService.findByScapDetail(oldScapDetail)).thenReturn(Optional.of(oldProjectPerformance));
+
+    projectPerformanceCopyService.copyEntity(oldScapDetail, newScapDetail, NewScapType.DRAFT_UPDATE);
+    verify(entityManager).persist(performanceCaptor.capture());
+    var result = performanceCaptor.getValue();
+    assertValuesEqual(result, oldProjectPerformance, List.of("id", "scapDetail", "isProjectCompleted", "createdTimestamp"));
+    assertThat(result.getScapDetail()).isEqualTo(newScapDetail);
+    assertThat(result.getProjectCompleted()).isNull();
+    assertThat(result.getId()).isNull();
   }
 
 }
