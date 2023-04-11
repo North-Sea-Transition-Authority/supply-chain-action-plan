@@ -43,10 +43,18 @@
       inputClass="govuk-input--width-5"
     />
     <#assign localContentText>
-      Local content is defined as a UK registered corporate entity employing a UK workforce, paying UK taxes.
-
-      This includes companies who may have an overseas headquarters or Parent Company but are performing the contracted
-      scope through a UK registered corporate entity with UK workforce, paying UK taxes.
+      <p>For the purposes of tracking the stated NSTD commitments, <br/>
+        the NSTA will generally use the following definition of ‘UK local content’: </p>
+      <ul>
+        <li>
+          in respect of services, those services provided by a company carrying on business in the UK; and,
+        </li>
+        <li>
+          in respect of goods, those goods which are being made, changed or improved in the UK
+          (using the same definition as goods eligible for a UK country of origin certificate).
+        </li>
+      </ul>
+      <p>For more information visit: local-content-doc-accessible.docx (live.com)</p>
     </#assign>
     <@fdsDetails.details
       detailsTitle="How is 'local content' defined?"

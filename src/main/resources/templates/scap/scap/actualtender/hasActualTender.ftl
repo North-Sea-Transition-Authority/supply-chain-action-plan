@@ -15,7 +15,7 @@
     <@fdsRadio.radioGroup
       path="form.hasActualTender"
       labelText=pageTitle
-      hintText="Including any stage between request for information and the contract being awarded"
+      hintText="Including any stage between the invitation to tender being made live and the contract being awarded"
       fieldsetHeadingClass="govuk-fieldset__legend--xl"
       fieldsetHeadingSize="h1"
     >
