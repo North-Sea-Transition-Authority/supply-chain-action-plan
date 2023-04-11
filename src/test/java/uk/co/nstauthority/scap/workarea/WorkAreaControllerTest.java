@@ -91,13 +91,15 @@ class WorkAreaControllerTest extends AbstractControllerTest {
         WorkAreaFilter::getOperatorId,
         WorkAreaFilter::getScapStatuses,
         WorkAreaFilter::getProjectTypes,
-        WorkAreaFilter::getReferenceSearchTerm
+        WorkAreaFilter::getReferenceSearchTerm,
+        WorkAreaFilter::getUpdateRequestStatusRadioOptions
     ).containsExactly(
         null,
         null,
         ScapDetailStatus.getDefaultStatuses(),
         null,
-        null
+        null,
+        UpdateRequestStatusRadioOptions.ALL
     );
 
   }

@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.workarea;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -8,6 +9,9 @@ import uk.co.nstauthority.scap.scap.projectdetails.ProjectType;
 
 @SessionAttributes({"workAreaFilter"})
 class WorkAreaFilter implements Serializable {
+
+  @Serial
+  private static final long serialVersionUID = 8791625085927579692L;
 
   private List<ScapDetailStatus> scapStatuses;
   private String referenceSearchTerm;
@@ -61,5 +65,9 @@ class WorkAreaFilter implements Serializable {
 
   public UpdateRequestStatusRadioOptions getUpdateRequestStatusRadioOptions() {
     return updateRequestStatusRadioOptions;
+  }
+
+  public void setUpdateRequestStatusRadioOptions(UpdateRequestStatusRadioOptions updateRequestStatusRadioOptions) {
+    this.updateRequestStatusRadioOptions = updateRequestStatusRadioOptions;
   }
 }

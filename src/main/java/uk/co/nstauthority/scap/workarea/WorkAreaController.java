@@ -107,6 +107,7 @@ public class WorkAreaController {
   private WorkAreaFilter getDefaultFilter() {
     var defaultFilter = new WorkAreaFilter();
     defaultFilter.setScapStatuses(ScapDetailStatus.getDefaultStatuses());
+    defaultFilter.setUpdateRequestStatusRadioOptions(UpdateRequestStatusRadioOptions.ALL);
     return defaultFilter;
   }
 }
