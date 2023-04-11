@@ -106,7 +106,7 @@ public abstract class AbstractControllerTest {
   }
 
   public static RequestPostProcessor authenticatedScapUser() {
-    return user(testUser, Collections.singleton(new SimpleGrantedAuthority("SCAP_ACCESS_TEAM")));
+    return user(testUser, Collections.singleton(new SimpleGrantedAuthority("SCAP_ACCESS_PRIVILEGE")));
   }
 
   public static RequestPostProcessor authenticatedEnergyPortalUser() {
