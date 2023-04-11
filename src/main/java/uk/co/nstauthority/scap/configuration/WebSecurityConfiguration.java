@@ -30,7 +30,7 @@ public class WebSecurityConfiguration {
 
   private final ServiceLogoutSuccessHandler serviceLogoutSuccessHandler;
 
-  private static final String SCAP_ACCESS_PERMISSION = "SCAP_ACCESS_TEAM";
+  private static final String SCAP_ACCESS_PERMISSION = "SCAP_ACCESS_PRIVILEGE";
 
   @Autowired
   public WebSecurityConfiguration(SamlProperties samlProperties,
@@ -53,6 +53,8 @@ public class WebSecurityConfiguration {
         .authorizeHttpRequests()
           .mvcMatchers("/assets/**", "/notify/callback", "/api/v1/logout/*")
             .permitAll()
+          .mvcMatchers("/*")
+            .hasAuthority(SCAP_ACCESS_PERMISSION)
           .anyRequest()
             .authenticated()
         .and()
