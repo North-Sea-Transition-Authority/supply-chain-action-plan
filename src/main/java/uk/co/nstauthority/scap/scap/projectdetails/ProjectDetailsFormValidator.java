@@ -14,7 +14,6 @@ import uk.co.fivium.formlibrary.validator.decimal.DecimalInputValidator;
 import uk.co.fivium.formlibrary.validator.string.StringInputValidator;
 import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
-import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.util.ValidationUtil;
 
 @Service
@@ -94,7 +93,7 @@ class ProjectDetailsFormValidator implements Validator {
         "Select whether there are any installations or subsea infrastructure related to this project"
     );
 
-    if (YesNo.YES.equals(form.getHasPlatforms())) {
+    if (Boolean.TRUE.equals(form.getHasPlatforms())) {
 
       if (form.getInstallationIds().isEmpty()) {
         errors.rejectValue(

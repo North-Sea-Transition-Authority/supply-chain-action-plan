@@ -7,7 +7,6 @@ import uk.co.fivium.formlibrary.input.DecimalInput;
 import uk.co.fivium.formlibrary.input.IntegerInput;
 import uk.co.fivium.formlibrary.input.StringInput;
 import uk.co.fivium.formlibrary.input.ThreeFieldDateInput;
-import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.file.FileUploadForm;
 
 class ProjectDetailsForm {
@@ -19,7 +18,7 @@ class ProjectDetailsForm {
   private final DecimalInput estimatedValueLocalContent;
   private Integer fieldSelector;
   private Set<Integer> fieldIds;
-  private YesNo hasPlatforms;
+  private Boolean hasPlatforms;
   private Set<Integer> installationIds;
   private Integer installationSelector;
   private final IntegerInput startDay;
@@ -117,11 +116,11 @@ class ProjectDetailsForm {
     this.fieldSelector = fieldSelector;
   }
 
-  public YesNo getHasPlatforms() {
+  public Boolean getHasPlatforms() {
     return hasPlatforms;
   }
 
-  public void setHasPlatforms(YesNo hasPlatforms) {
+  public void setHasPlatforms(Boolean hasPlatforms) {
     this.hasPlatforms = hasPlatforms;
   }
 

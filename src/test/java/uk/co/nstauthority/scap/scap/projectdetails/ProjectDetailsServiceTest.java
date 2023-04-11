@@ -30,7 +30,6 @@ import uk.co.fivium.energyportalapi.generated.types.Facility;
 import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
-import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.file.FileUploadService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
@@ -331,7 +330,7 @@ class ProjectDetailsServiceTest {
 
     var addedFacilityId = 33;
     var form = getFilledProjectDetailsForm();
-    form.setHasPlatforms(YesNo.YES);
+    form.setHasPlatforms(true);
     form.setInstallationIds(Set.of(addedFacilityId, keptExistingFacility.getFacilityId()));
     var projectDetails = new ProjectDetails();
 
@@ -395,7 +394,7 @@ class ProjectDetailsServiceTest {
     form.setProjectCostEstimate("2.2");
     form.setEstimatedValueLocalContent("1.1");
     form.setFieldIds(Collections.singleton(7235));
-    form.setHasPlatforms(YesNo.NO);
+    form.setHasPlatforms(false);
     form.setStartDay("22");
     form.setStartMonth("1");
     form.setStartYear("2022");

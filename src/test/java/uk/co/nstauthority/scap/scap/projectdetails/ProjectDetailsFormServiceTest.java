@@ -23,7 +23,6 @@ import uk.co.fivium.energyportalapi.generated.types.Facility;
 import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
-import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.fds.addtolist.AddToListItem;
 import uk.co.nstauthority.scap.file.FileUploadForm;
 import uk.co.nstauthority.scap.file.UploadedFileView;
@@ -122,7 +121,7 @@ class ProjectDetailsFormServiceTest {
 
     var form = projectDetailsFormService.getForm(projectDetails, null, null);
 
-    assertThat(form.getHasPlatforms()).isEqualTo(YesNo.NO);
+    assertThat(form.getHasPlatforms()).isFalse();
   }
 
   @Test
@@ -137,7 +136,7 @@ class ProjectDetailsFormServiceTest {
 
     var form = projectDetailsFormService.getForm(projectDetails, projectFacilityIds, null);
 
-    assertThat(form.getHasPlatforms()).isEqualTo(YesNo.YES);
+    assertThat(form.getHasPlatforms()).isTrue();
     assertThat(form.getInstallationIds()).isEqualTo(projectFacilityIds);
   }
 

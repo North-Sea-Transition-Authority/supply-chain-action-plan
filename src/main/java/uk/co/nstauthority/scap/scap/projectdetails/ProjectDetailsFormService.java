@@ -11,7 +11,6 @@ import uk.co.fivium.energyportalapi.generated.types.Facility;
 import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
-import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.fds.addtolist.AddToListItem;
 import uk.co.nstauthority.scap.file.FileUploadUtils;
 import uk.co.nstauthority.scap.file.UploadedFileView;
@@ -59,12 +58,7 @@ public class ProjectDetailsFormService {
     form.setEstimatedValueLocalContent(projectDetails.getEstimatedValueLocalContent().toString());
     form.setFieldIds(projectFieldIds);
 
-    if (Boolean.TRUE.equals(projectDetails.getHasFacilities())) {
-      form.setHasPlatforms(YesNo.YES);
-    } else if (Boolean.FALSE.equals(projectDetails.getHasFacilities())) {
-      form.setHasPlatforms(YesNo.NO);
-    }
-
+    form.setHasPlatforms(projectDetails.getHasFacilities());
     form.setInstallationIds(projectFacilityIds);
 
     var startDate = projectDetails.getPlannedExecutionStartDate();

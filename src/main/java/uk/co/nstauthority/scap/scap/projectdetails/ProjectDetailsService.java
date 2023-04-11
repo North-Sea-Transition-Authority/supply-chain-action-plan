@@ -14,7 +14,6 @@ import uk.co.fivium.energyportalapi.generated.types.Facility;
 import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
-import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.file.FileUploadService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
@@ -85,7 +84,7 @@ public class ProjectDetailsService {
     fileUploadService.updateFileUploadDescriptions(form.getSupportingDocuments());
 
     saveProjectFields(projectDetails, form.getFieldIds(), createdTimestamp);
-    if (YesNo.YES.equals(form.getHasPlatforms())) {
+    if (Boolean.TRUE.equals(form.getHasPlatforms())) {
       saveProjectFacilities(projectDetails, form.getInstallationIds(), createdTimestamp);
     } else {
       saveProjectFacilities(projectDetails, Collections.emptySet(), createdTimestamp);
@@ -217,7 +216,7 @@ public class ProjectDetailsService {
         .getAsLocalDate().orElse(null);
     var endDate = form.getExpectedEndDate()
         .getAsLocalDate().orElse(null);
-    projectDetails.setHasFacilities(YesNo.YES.equals(form.getHasPlatforms()));
+    projectDetails.setHasFacilities(form.getHasPlatforms());
     projectDetails.setPlannedExecutionStartDate(startDate);
     projectDetails.setPlannedCompletionDate(endDate);
     projectDetailsRepository.save(projectDetails);

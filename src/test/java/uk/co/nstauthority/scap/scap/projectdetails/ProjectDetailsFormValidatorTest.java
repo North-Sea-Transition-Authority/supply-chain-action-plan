@@ -23,7 +23,6 @@ import uk.co.fivium.energyportalapi.generated.types.Facility;
 import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
-import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.utils.ValidatorTestingUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -190,7 +189,7 @@ class ProjectDetailsFormValidatorTest {
 
   @Test
   void validate_HasPlatforms_NoneSelected_AssertError() {
-    form.setHasPlatforms(YesNo.YES);
+    form.setHasPlatforms(true);
     form.setInstallationIds(Collections.emptySet());
 
     when(fieldService.getFieldsByIds(VALID_FIELD_IDS, ProjectDetailsFormValidator.FIELDS_REQUEST_PURPOSE))
@@ -210,7 +209,7 @@ class ProjectDetailsFormValidatorTest {
   void validate_HasPlatforms_InvalidSelectedPlatforms() {
     var facilityIds = Collections.singleton(1209);
 
-    form.setHasPlatforms(YesNo.YES);
+    form.setHasPlatforms(true);
     form.setInstallationIds(facilityIds);
 
     when(fieldService.getFieldsByIds(VALID_FIELD_IDS, ProjectDetailsFormValidator.FIELDS_REQUEST_PURPOSE))
@@ -234,7 +233,7 @@ class ProjectDetailsFormValidatorTest {
     var facilityIds = Collections.singleton(facilityId);
     var facilities = List.of(new Facility(facilityId, "Test facility", null, null, null));
 
-    form.setHasPlatforms(YesNo.YES);
+    form.setHasPlatforms(true);
     form.setInstallationIds(facilityIds);
 
     when(fieldService.getFieldsByIds(VALID_FIELD_IDS, ProjectDetailsFormValidator.FIELDS_REQUEST_PURPOSE))
@@ -257,7 +256,7 @@ class ProjectDetailsFormValidatorTest {
     form.setProjectCostEstimate("2.2");
     form.setEstimatedValueLocalContent("1.1");
     form.setFieldIds(new HashSet<>(VALID_FIELD_IDS));
-    form.setHasPlatforms(YesNo.NO);
+    form.setHasPlatforms(false);
     form.setStartDay("22");
     form.setStartMonth("1");
     form.setStartYear("2022");

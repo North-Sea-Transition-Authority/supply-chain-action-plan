@@ -1,6 +1,5 @@
 package uk.co.nstauthority.scap.scap.projectdetails;
 
-import com.google.common.annotations.VisibleForTesting;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -48,7 +47,6 @@ public class ProjectDetails implements ScapDetailChild {
 
   }
 
-  @VisibleForTesting
   public ProjectDetails(ScapDetail scapDetail, Instant createdTimestamp) {
     this.scapDetail = scapDetail;
     this.createdTimestamp = createdTimestamp;
