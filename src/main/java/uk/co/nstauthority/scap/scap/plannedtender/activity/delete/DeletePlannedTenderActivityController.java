@@ -24,7 +24,7 @@ import uk.co.nstauthority.scap.scap.plannedtender.hasplannedtender.HasPlannedTen
 import uk.co.nstauthority.scap.scap.plannedtender.list.PlannedTenderActivityListItem;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
-import uk.co.nstauthority.scap.util.DeletionSuccessBannerUtil;
+import uk.co.nstauthority.scap.util.SuccessBannerUtil;
 
 @Controller
 @RequestMapping("{scapId}/planned-tender/{plannedTenderDetailId}/delete")
@@ -65,7 +65,7 @@ public class DeletePlannedTenderActivityController {
     var plannedTenderDetail = plannedTenderActivityService.getPlannedTenderDetailById(plannedTenderDetailId);
     plannedTenderActivityService.deletePlannedTenderDetail(plannedTenderDetail);
 
-    DeletionSuccessBannerUtil.addRedirectionNotification(redirectAttributes, "Planned tender activity deleted successfully");
+    SuccessBannerUtil.add(redirectAttributes, "Planned tender activity deleted successfully");
 
     if (plannedTenderActivityService.hasExistingTenderDetails(plannedTender)) {
       return ReverseRouter.redirect(on(PlannedTenderController.class).renderPlannedTenderActivities(scapId));

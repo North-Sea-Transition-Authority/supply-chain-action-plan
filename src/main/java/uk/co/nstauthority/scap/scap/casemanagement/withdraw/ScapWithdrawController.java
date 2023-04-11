@@ -17,7 +17,6 @@ import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermission;
-import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerBodyLine;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.notify.ScapEmailService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
@@ -32,7 +31,7 @@ import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
-import uk.co.nstauthority.scap.util.NotificationBannerUtils;
+import uk.co.nstauthority.scap.util.SuccessBannerUtil;
 
 @Controller
 @RequestMapping("{scapId}/")
@@ -118,12 +117,10 @@ public class ScapWithdrawController {
               scapDetail,
               scapDetail.getVersionNumber(),
               scapWithdrawalForm.getWithdrawComments().getInputValue());
-
-          NotificationBannerUtils.successBannerRedirect(
-              "Success",
-              new NotificationBannerBodyLine(
-                  "%s has been withdrawn".formatted(scapDetail.getScap().getReference()), "govuk-!-font-weight-bold"
-              ), redirectAttributes);
+          SuccessBannerUtil.add(
+              redirectAttributes,
+              "%s has been withdrawn".formatted(scapDetail.getScap().getReference())
+          );
           return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
         });
   }

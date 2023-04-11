@@ -30,8 +30,8 @@ import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamManag
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupRestController;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
-import uk.co.nstauthority.scap.util.DeletionSuccessBannerUtil;
 import uk.co.nstauthority.scap.util.NotificationBannerUtils;
+import uk.co.nstauthority.scap.util.SuccessBannerUtil;
 
 @Controller
 @RequestMapping("/permission-management")
@@ -109,7 +109,7 @@ public class TeamManagementController {
     teamService.archiveTeam(team);
 
     var successMessage = "%s has been successfully deleted".formatted(team.getDisplayName());
-    DeletionSuccessBannerUtil.addRedirectionNotification(redirectAttributes, successMessage);
+    SuccessBannerUtil.add(redirectAttributes, successMessage);
 
     return ReverseRouter.redirect(on(TeamManagementController.class).renderTeamList());
   }

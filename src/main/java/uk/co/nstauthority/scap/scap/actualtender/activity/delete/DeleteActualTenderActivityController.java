@@ -25,6 +25,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryViewService;
+import uk.co.nstauthority.scap.util.SuccessBannerUtil;
 
 @Controller
 @RequestMapping("{scapId}/actual-tender/activity/{activityId}/delete")
@@ -89,8 +90,10 @@ public class DeleteActualTenderActivityController {
     var actualTenderActivity = actualTenderActivityService.getById(activityId);
     deleteActualTenderActivityService.deleteActualTenderActivity(actualTenderActivity);
 
-    deleteActualTenderActivityService.addActualTenderDeletionSuccessBanner(
-        redirectAttributes, actualTenderActivity.getScopeTitle());
+    SuccessBannerUtil.add(
+        redirectAttributes,
+        "%s has been removed from this SCAP".formatted(actualTenderActivity.getScopeTitle())
+    );
 
     var hasRemainingActualTenderActivities = actualTenderActivityService.hasActualTenderActivity(actualTender);
 

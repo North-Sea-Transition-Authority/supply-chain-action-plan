@@ -20,7 +20,7 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamManagementController;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamManagementController;
-import uk.co.nstauthority.scap.util.DeletionSuccessBannerUtil;
+import uk.co.nstauthority.scap.util.SuccessBannerUtil;
 
 public abstract class RemoveMemberController {
 
@@ -107,7 +107,7 @@ public abstract class RemoveMemberController {
     }
     var userView = teamMemberViewService.getTeamMemberViewOrThrow(teamMember);
 
-    DeletionSuccessBannerUtil.addRedirectionNotification(redirectAttributes,
+    SuccessBannerUtil.add(redirectAttributes,
         "%s has been removed from the team".formatted(userView.getDisplayName()));
     return successUrl;
   }

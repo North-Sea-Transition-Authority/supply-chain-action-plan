@@ -21,7 +21,7 @@ import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
-import uk.co.nstauthority.scap.util.DeletionSuccessBannerUtil;
+import uk.co.nstauthority.scap.util.SuccessBannerUtil;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @Controller
@@ -63,7 +63,7 @@ public class ScapDeletionController {
     scapDetailService.deleteScapDetail(scapDetail);
 
     var successMessage = "%s deleted successfully".formatted(reference);
-    DeletionSuccessBannerUtil.addRedirectionNotification(redirectAttributes, successMessage);
+    SuccessBannerUtil.add(redirectAttributes, successMessage);
     if (scapDetail.getVersionNumber() > 1) {
       return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
     }

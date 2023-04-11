@@ -24,7 +24,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryViewService;
-import uk.co.nstauthority.scap.util.DeletionSuccessBannerUtil;
+import uk.co.nstauthority.scap.util.SuccessBannerUtil;
 
 @Controller
 @RequestMapping("{scapId}/contracting-performance/{contractingPerformanceId}/delete")
@@ -79,7 +79,7 @@ public class DeleteContractingPerformanceController {
 
     var contractingPerformance = contractingPerformanceService.getById(contractingPerformanceId);
     contractingPerformanceService.deleteContractingPerformance(contractingPerformance);
-    DeletionSuccessBannerUtil.addRedirectionNotification(redirectAttributes,
+    SuccessBannerUtil.add(redirectAttributes,
         "Deleted contracting performance for \"%s\" successfully"
             .formatted(contractingPerformance.getActualTenderActivity().getScopeTitle()));
 
