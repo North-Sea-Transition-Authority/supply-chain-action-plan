@@ -10,7 +10,7 @@ public interface UpdateRequestRepository extends CrudRepository<UpdateRequest, I
       ScapDetail scapDetail,
       List<UpdateRequestType> updateRequestTypes);
 
-  Optional<UpdateRequest> findFirstByScapDetailAndUpdateRequestTypeOrderByCreatedTimestampDesc(
+  Optional<UpdateRequest> findFirstByScapDetailAndResolutionDateNullAndUpdateRequestTypeOrderByCreatedTimestampDesc(
       ScapDetail scapDetail,
       UpdateRequestType updateRequestType);
 }

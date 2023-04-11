@@ -64,7 +64,7 @@ public class UpdateRequestService {
     }
 
     var requestActionOptional = updateRequestRepository
-        .findFirstByScapDetailAndUpdateRequestTypeOrderByCreatedTimestampDesc(scapDetail.get(), requestType);
+        .findFirstByScapDetailAndResolutionDateNullAndUpdateRequestTypeOrderByCreatedTimestampDesc(scapDetail.get(), requestType);
 
     return requestActionOptional.map(t -> Optional.of(t.getDueDate())).orElse(Optional.empty());
   }

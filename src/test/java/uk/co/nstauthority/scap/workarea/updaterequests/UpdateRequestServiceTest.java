@@ -150,7 +150,7 @@ class UpdateRequestServiceTest {
 
     when(scapDetailService.findLatestSubmittedScapDetail(SCAP_ID)).thenReturn(Optional.ofNullable(scapDetail));
     when(updateRequestRepository
-        .findFirstByScapDetailAndUpdateRequestTypeOrderByCreatedTimestampDesc(scapDetail, UpdateRequestType.FURTHER_INFORMATION))
+        .findFirstByScapDetailAndResolutionDateNullAndUpdateRequestTypeOrderByCreatedTimestampDesc(scapDetail, UpdateRequestType.FURTHER_INFORMATION))
         .thenReturn(Optional.of(updateRequest));
     assertThat(updateRequestService.getUpdateDueDate(SCAP_ID, UpdateRequestType.FURTHER_INFORMATION)).contains(dueDate);
   }
