@@ -53,8 +53,6 @@ public class WebSecurityConfiguration {
         .authorizeHttpRequests()
           .mvcMatchers("/assets/**", "/notify/callback", "/api/v1/logout/*")
             .permitAll()
-          .mvcMatchers("/*")
-            .hasAuthority(SCAP_ACCESS_PERMISSION)
           .anyRequest()
             .authenticated()
         .and()
