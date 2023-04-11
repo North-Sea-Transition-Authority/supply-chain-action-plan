@@ -21,7 +21,8 @@ class AccessibilityStatementControllerTest extends AbstractControllerTest {
   @Test
   void renderAccessibilityStatement() throws Exception {
     mockMvc.perform(get(
-        ReverseRouter.route(on(AccessibilityStatementController.class).renderAccessibilityStatement())))
+        ReverseRouter.route(on(AccessibilityStatementController.class).renderAccessibilityStatement()))
+            .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/legal/accessibilityStatement"));
   }

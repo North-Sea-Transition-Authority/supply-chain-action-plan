@@ -12,7 +12,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getScapSummaryView;
 
 import java.util.List;
@@ -101,7 +100,7 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
                 false,
                 getScapApprovalForm(),
                 null)))
-            .with(user(testUser))
+            .with(authenticatedScapUser())
             .with(csrf())
             .flashAttr("scapApprovalForm", getScapApprovalForm()))
         .andExpect(status().is3xxRedirection());
@@ -122,7 +121,7 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
                 false,
                 getScapApprovalForm(),
                 null)))
-            .with(user(testUser))
+            .with(authenticatedScapUser())
             .with(csrf())
             .flashAttr("scapApprovalForm", getScapApprovalForm()))
         .andExpect(status().is3xxRedirection());
@@ -147,7 +146,7 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
                 false,
                 getScapApprovalForm(),
                 null)))
-            .with(user(testUser))
+            .with(authenticatedScapUser())
             .with(csrf()))
         .andExpect(status().isOk());
 

@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 import static uk.co.nstauthority.scap.scap.projectdetails.ProjectType.FIELD_DEVELOPMENT_PLAN;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getScapSummaryView;
 
@@ -101,7 +100,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
     mockMvc.perform(get(
         ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
-            .with(user(testUser)))
+            .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/summary/scapSummaryOverview"))
         .andExpect(model().attributeExists("backLinkUrl"))
@@ -122,7 +121,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(get(
         ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
-            .with(user(testUser)))
+            .with(authenticatedScapUser()))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl(ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID))));
   }
@@ -134,7 +133,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
     mockMvc.perform(get(
             ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
-            .with(user(testUser)))
+            .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/summary/scapSummaryOverview"))
         .andExpect(model().attributeExists("backLinkUrl"))
@@ -155,7 +154,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
     mockMvc.perform(get(
             ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
-            .with(user(testUser)))
+            .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/summary/scapSummaryOverview"))
         .andExpect(model().attributeExists("backLinkUrl"))
@@ -182,7 +181,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(get(
         ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
-            .with(user(testUser)))
+            .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/summary/scapSummaryOverview"));
     verify(caseEventService).getEventViewByScapId(SCAP_ID);
@@ -198,7 +197,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(get(
             ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
-            .with(user(testUser)))
+            .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/summary/scapSummaryOverview"));
     verify(caseEventService, never()).getEventViewByScapId(SCAP_ID);
@@ -214,7 +213,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(get(
             ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID, SCAP_VERSION)))
-            .with(user(testUser)))
+            .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/summary/scapSummaryOverview"));
     verify(caseEventService, never()).getEventViewByScapId(SCAP_ID);
@@ -233,7 +232,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(get(
             ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
-            .with(user(testUser)))
+            .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/summary/scapSummaryOverview"));
     verify(caseEventService, never()).getEventViewByScapId(SCAP_ID);

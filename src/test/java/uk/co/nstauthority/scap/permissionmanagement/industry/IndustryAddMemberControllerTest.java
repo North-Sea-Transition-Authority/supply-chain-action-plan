@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 import static uk.co.nstauthority.scap.utils.ControllerTestingUtil.redirectUrl;
 
 import java.util.Collections;
@@ -61,7 +60,7 @@ class IndustryAddMemberControllerTest extends AbstractIndustryTeamControllerTest
     setupMocks();
     mockMvc.perform(get(ReverseRouter.route(on(IndustryAddMemberController.class)
         .renderAddTeamMember(teamId)))
-        .with(user(testUser)))
+        .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/AddTeamMember"));
   }
@@ -71,7 +70,7 @@ class IndustryAddMemberControllerTest extends AbstractIndustryTeamControllerTest
     setupMocks();
     mockMvc.perform(post(ReverseRouter.route(on(IndustryAddMemberController.class)
             .addMemberToTeamSubmission(teamId, form, bindingResult)))
-            .with(user(testUser))
+            .with(authenticatedScapUser())
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectUrl("/permission-management/industry/%s/add-member/%s/roles"
@@ -85,7 +84,7 @@ class IndustryAddMemberControllerTest extends AbstractIndustryTeamControllerTest
 
     mockMvc.perform(post(ReverseRouter.route(on(IndustryAddMemberController.class)
             .addMemberToTeamSubmission(teamId, form, bindingResult)))
-            .with(user(testUser))
+            .with(authenticatedScapUser())
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectUrl("/permission-management/industry/%s/add-member/%s/roles"
@@ -103,7 +102,7 @@ class IndustryAddMemberControllerTest extends AbstractIndustryTeamControllerTest
 
     mockMvc.perform(post(ReverseRouter.route(on(IndustryAddMemberController.class)
             .addMemberToTeamSubmission(teamId, form, bindingResult)))
-            .with(user(testUser))
+            .with(authenticatedScapUser())
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectUrl("/permission-management/industry/%s/add-member/%s/roles"

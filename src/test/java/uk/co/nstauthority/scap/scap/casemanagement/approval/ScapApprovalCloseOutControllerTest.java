@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getScapSummaryView;
 
 import java.time.Instant;
@@ -112,7 +111,7 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
                 false,
                 getScapApprovalForm(),
                 null)))
-            .with(user(testUser))
+            .with(authenticatedScapUser())
             .with(csrf())
             .flashAttr("scapApprovalForm", getScapApprovalForm())
             .flashAttr("scapId", SCAP_ID))
@@ -138,7 +137,7 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
                 false,
                 getScapApprovalForm(),
                 null)))
-            .with(user(testUser))
+            .with(authenticatedScapUser())
             .with(csrf())
             .flashAttr("scapId", SCAP_ID))
         .andExpect(status().isOk())
@@ -162,7 +161,7 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
                 false,
                 getScapApprovalForm(),
                 null)))
-            .with(user(testUser))
+            .with(authenticatedScapUser())
             .with(csrf())
             .flashAttr("scapApprovalForm", getScapApprovalForm())
             .flashAttr("scapId", SCAP_ID))
@@ -183,7 +182,7 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
                 false,
                 getScapApprovalForm(),
                 null)))
-            .with(user(testUser))
+            .with(authenticatedScapUser())
             .with(csrf())
             .flashAttr("scapApprovalForm", getScapApprovalForm())
             .flashAttr("scapId", SCAP_ID))

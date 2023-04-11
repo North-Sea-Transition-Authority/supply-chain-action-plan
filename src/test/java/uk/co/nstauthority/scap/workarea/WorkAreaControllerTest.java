@@ -73,7 +73,8 @@ class WorkAreaControllerTest extends AbstractControllerTest {
   @Test
   void getWorkArea() throws Exception {
     var modelAndView = mockMvc.perform(
-        get(ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null))))
+        get(ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)))
+            .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/workarea/workArea"))
         .andExpect(model().attribute("startScapUrl",
@@ -107,7 +108,8 @@ class WorkAreaControllerTest extends AbstractControllerTest {
         .thenReturn(List.of(RolePermission.VIEW_SCAP));
 
     mockMvc.perform(
-        get(ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null))))
+        get(ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)))
+            .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/workarea/workArea"))
         .andExpect(model().attribute("startScapUrl",
@@ -123,7 +125,8 @@ class WorkAreaControllerTest extends AbstractControllerTest {
         .thenReturn(List.of(RolePermission.SUBMIT_SCAP));
 
     mockMvc.perform(
-        get(ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null))))
+        get(ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)))
+            .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/workarea/workArea"))
         .andExpect(model().attribute("startScapUrl",
@@ -144,6 +147,7 @@ class WorkAreaControllerTest extends AbstractControllerTest {
     mockMvc.perform(
         post(ReverseRouter.route(on(WorkAreaController.class).filterWorkArea(null, null)))
             .with(csrf())
+            .with(authenticatedScapUser())
             .flashAttr("form", form)
             .flashAttr("workAreaFilter", filter))
         .andExpect(status().is3xxRedirection())

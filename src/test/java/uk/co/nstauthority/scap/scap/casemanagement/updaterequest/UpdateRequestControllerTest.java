@@ -11,7 +11,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getScapSummaryView;
 
 import java.time.LocalDate;
@@ -107,7 +106,7 @@ class UpdateRequestControllerTest extends AbstractControllerTest {
                 false,
                 getInfoRequestedForm(),
                 null)))
-            .with(user(testUser))
+            .with(authenticatedScapUser())
             .with(csrf())
             .flashAttr("updateRequestForm", getInfoRequestedForm()))
         .andExpect(status().is3xxRedirection());
@@ -129,7 +128,7 @@ class UpdateRequestControllerTest extends AbstractControllerTest {
                 false,
                 getInfoRequestedForm(),
                 null)))
-            .with(user(testUser))
+            .with(authenticatedScapUser())
             .with(csrf())
             .flashAttr("infoRequestForm", getInfoRequestedForm()))
         .andExpect(status().isOk());

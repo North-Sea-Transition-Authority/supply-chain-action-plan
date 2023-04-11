@@ -20,7 +20,8 @@ class ContactInformationControllerTest extends AbstractControllerTest {
 
   @Test
   void renderContactInformation() throws Exception {
-    mockMvc.perform(get(ReverseRouter.route(on(ContactInformationController.class).renderContactInformation())))
+    mockMvc.perform(get(ReverseRouter.route(on(ContactInformationController.class).renderContactInformation()))
+            .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/legal/contactInformation"));
   }

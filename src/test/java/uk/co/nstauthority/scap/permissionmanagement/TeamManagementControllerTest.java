@@ -13,7 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 import static uk.co.nstauthority.scap.mvc.ReverseRouter.emptyBindingResult;
 import static uk.co.nstauthority.scap.utils.ControllerTestingUtil.redirectUrl;
 
@@ -54,7 +53,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
   void renderTeamList_authorised_thenOk() throws Exception {
     mockMvc.perform(
             get(ReverseRouter.route(on(TeamManagementController.class).renderTeamList()))
-              .with(user(testUser)))
+              .with(authenticatedScapUser()))
         .andExpect(status().isOk());
   }
 
@@ -68,7 +67,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
 
     mockMvc.perform(
         get(ReverseRouter.route(on(TeamManagementController.class).renderTeamList()))
-            .with(user(testUser)))
+            .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(model().attribute("allTeams", List.of(team1, team2)))
         .andExpect(model().attribute("hasCreateTeamPermissions", false));
@@ -83,7 +82,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
 
     mockMvc.perform(
         get(ReverseRouter.route(on(TeamManagementController.class).renderTeamList()))
-            .with(user(testUser)))
+            .with(authenticatedScapUser()))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl("/permission-management/industry/%s".formatted(team1.teamId().uuid())));
   }
@@ -113,7 +112,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
     when(teamMemberService.isMemberOfTeamWithAnyRoleOf(eq(TeamId.valueOf(regulatorTeam.getUuid())), eq(testUser), eq(roles))).thenReturn(true);
     mockMvc.perform(
             get(ReverseRouter.route(on(TeamManagementController.class).renderTeamList()))
-                .with(user(testUser)))
+                .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(model().attribute("allTeams", List.of(TeamView.fromTeam(team), TeamView.fromTeam(regulatorTeam))))
         .andExpect(model().attribute("hasCreateTeamPermissions", true));
@@ -136,7 +135,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
     when(teamService.getTeamsThatUserBelongsTo(testUser)).thenReturn(List.of(regulatorTeam));
     mockMvc.perform(
             get(ReverseRouter.route(on(TeamManagementController.class).renderTeamList()))
-                .with(user(testUser)))
+                .with(authenticatedScapUser()))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl("/permission-management/regulator/%s".formatted(regulatorTeam.getUuid())));
   }
@@ -146,7 +145,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
 
     mockMvc.perform(
         get(ReverseRouter.route(on(TeamManagementController.class).renderNewIndustryTeamForm(new NewTeamForm())))
-            .with(user(testUser)))
+            .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/addTeam"))
     ;
@@ -170,7 +169,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
             post(ReverseRouter.route(on(TeamManagementController.class).addNewIndustryTeam(form, emptyBindingResult())))
                 .flashAttr("form", form)
                 .with(csrf())
-                .with(user(testUser)))
+                .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/teamList"));
   }
@@ -188,7 +187,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
             post(ReverseRouter.route(on(TeamManagementController.class).addNewIndustryTeam(form, emptyBindingResult())))
                 .flashAttr("form", form)
                 .with(csrf())
-                .with(user(testUser)))
+                .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/addTeam"));
   }
@@ -203,7 +202,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
     mockMvc.perform(
         get(ReverseRouter.route(on(TeamManagementController.class).renderArchiveTeamConfirmation(teamId)))
             .with(csrf())
-            .with(user(testUser)))
+            .with(authenticatedScapUser()))
         .andExpect(status().is4xxClientError());
   }
 
@@ -214,7 +213,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
     mockMvc.perform(
         get(ReverseRouter.route(on(TeamManagementController.class).renderArchiveTeamConfirmation(teamId)))
             .with(csrf())
-            .with(user(testUser)))
+            .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/removeTeam"));
   }
@@ -229,7 +228,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
     mockMvc.perform(
             get(ReverseRouter.route(on(TeamManagementController.class).renderArchiveTeamConfirmation(teamId)))
                 .with(csrf())
-                .with(user(testUser)))
+                .with(authenticatedScapUser()))
         .andExpect(status().is4xxClientError());
   }
 
@@ -245,7 +244,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
     mockMvc.perform(
             post(ReverseRouter.route(on(TeamManagementController.class).archiveTeam(teamId, null)))
                 .with(csrf())
-                .with(user(testUser)))
+                .with(authenticatedScapUser()))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectUrl("/permission-management/"));
 

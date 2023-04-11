@@ -33,7 +33,7 @@ class DefaultPageControllerAdviceTest extends AbstractControllerTest {
 
     var modelAndView = mockMvc.perform(
         get(ReverseRouter.route(on(TestController.class).testEndpoint()))
-    )
+            .with(authenticatedScapUser()))
         .andReturn()
         .getModelAndView();
 

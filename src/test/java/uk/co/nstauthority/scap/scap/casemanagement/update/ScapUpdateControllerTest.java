@@ -8,7 +8,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 import static uk.co.nstauthority.scap.utils.ControllerTestingUtil.redirectUrl;
 
 import java.util.List;
@@ -61,7 +60,7 @@ class ScapUpdateControllerTest extends AbstractControllerTest {
         .startScapUpdate(
             SCAP_ID,
             CaseEventAction.UPDATE_SUBMITTED)))
-        .with(user(testUser))
+        .with(authenticatedScapUser())
         .with(csrf()))
         .andExpect(redirectUrl(ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID))));
     verify(scapDetailService).createDraftScapDetail(scapService.getScapById(SCAP_ID));
@@ -80,7 +79,7 @@ class ScapUpdateControllerTest extends AbstractControllerTest {
             .startScapUpdate(
                 SCAP_ID,
                 CaseEventAction.UPDATE_SUBMITTED)))
-            .with(user(testUser))
+            .with(authenticatedScapUser())
             .with(csrf()))
         .andExpect(status().is4xxClientError());
     verify(scapDetailService, never()).createDraftScapDetail(scapService.getScapById(SCAP_ID));
@@ -96,7 +95,7 @@ class ScapUpdateControllerTest extends AbstractControllerTest {
             .startScapUpdate(
                 SCAP_ID,
                 CaseEventAction.UPDATE_SUBMITTED)))
-            .with(user(testUser))
+            .with(authenticatedScapUser())
             .with(csrf()))
         .andExpect(redirectUrl(ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID))));
     verify(scapDetailService, never()).createDraftScapDetail(scapService.getScapById(SCAP_ID));

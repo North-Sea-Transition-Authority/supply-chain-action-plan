@@ -11,7 +11,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.WITHDRAWN;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getScapSummaryView;
 
@@ -107,7 +106,7 @@ class ScapInstateControllerTest extends AbstractControllerTest {
                 getReinstateForm(),
                 null,
                 null)))
-            .with(user(testUser))
+            .with(authenticatedScapUser())
             .with(csrf())
             .flashAttr("scapReinstateForm", getReinstateForm()))
         .andExpect(status().is3xxRedirection());
@@ -131,7 +130,7 @@ class ScapInstateControllerTest extends AbstractControllerTest {
                 getReinstateForm(),
                 null,
                 null)))
-            .with(user(testUser))
+            .with(authenticatedScapUser())
             .with(csrf()))
         .andExpect(status().isOk());
 

@@ -11,7 +11,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getScapSummaryView;
 
 import java.util.List;
@@ -100,7 +99,7 @@ class FurtherInfoResponseControllerTest extends AbstractControllerTest {
             false,
             null,
             null)))
-        .with(user(testUser))
+        .with(authenticatedScapUser())
         .with(csrf()))
         .andExpect(status().is3xxRedirection());
 
@@ -116,7 +115,7 @@ class FurtherInfoResponseControllerTest extends AbstractControllerTest {
                 false,
                 getFurtherInfoResponseForm(),
                 null)))
-            .with(user(testUser))
+            .with(authenticatedScapUser())
             .with(csrf())
             .flashAttr("infoResponseForm", getFurtherInfoResponseForm()))
         .andExpect(status().is3xxRedirection());
@@ -139,7 +138,7 @@ class FurtherInfoResponseControllerTest extends AbstractControllerTest {
                 false,
                 getFurtherInfoResponseForm(),
                 null)))
-            .with(user(testUser))
+            .with(authenticatedScapUser())
             .with(csrf())
             .flashAttr("qaForm", getFurtherInfoResponseForm()))
         .andExpect(status().isOk());

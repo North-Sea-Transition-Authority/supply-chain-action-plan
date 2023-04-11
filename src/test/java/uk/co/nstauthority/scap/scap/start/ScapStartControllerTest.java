@@ -31,7 +31,8 @@ class ScapStartControllerTest extends AbstractControllerTest {
     when(teamMemberService.getAllPermissionsForUser(any(ServiceUserDetail.class))).thenReturn(List.of(RolePermission.SUBMIT_SCAP));
 
     mockMvc.perform(get(
-            ReverseRouter.route(on(ScapStartController.class).renderStartNewScap())))
+            ReverseRouter.route(on(ScapStartController.class).renderStartNewScap()))
+            .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/start"))
         .andExpect(model().attribute("startScapRedirectUrl",
@@ -45,7 +46,8 @@ class ScapStartControllerTest extends AbstractControllerTest {
   void renderStartNewScap_NoPermission_WorkAreaRedirect() throws Exception {
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.VIEW_SCAP));
     mockMvc.perform(get(
-        ReverseRouter.route(on(ScapStartController.class).renderStartNewScap())))
+        ReverseRouter.route(on(ScapStartController.class).renderStartNewScap()))
+            .with(authenticatedScapUser()))
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name("redirect:/work-area/"));
   }

@@ -1,13 +1,11 @@
 package uk.co.nstauthority.scap.permissionmanagement.industry;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -30,7 +28,7 @@ class IndustryEditMemberControllerTest extends AbstractIndustryTeamControllerTes
   void renderEditMember() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(on(IndustryEditMemberController.class)
         .renderEditMember(teamId, webUserAccountId)))
-        .with(user(testUser)))
+        .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/AddTeamMemberRoles"));
   }
@@ -43,7 +41,7 @@ class IndustryEditMemberControllerTest extends AbstractIndustryTeamControllerTes
 
     mockMvc.perform(post(ReverseRouter.route(on(IndustryEditMemberController.class)
         .editMember(teamId, webUserAccountId, form, bindingResult)))
-        .with(user(testUser))
+        .with(authenticatedScapUser())
         .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name("redirect:/permission-management/industry/%s"

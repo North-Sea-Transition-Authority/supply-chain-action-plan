@@ -7,6 +7,7 @@ import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import uk.co.nstauthority.scap.authentication.SamlResponseParser;
@@ -103,7 +105,11 @@ public abstract class AbstractControllerTest {
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
   }
 
-  public static RequestPostProcessor testUser() {
+  public static RequestPostProcessor authenticatedScapUser() {
+    return user(testUser, Collections.singleton(new SimpleGrantedAuthority("SCAP_ACCESS_TEAM")));
+  }
+
+  public static RequestPostProcessor authenticatedEnergyPortalUser() {
     return user(testUser);
   }
 

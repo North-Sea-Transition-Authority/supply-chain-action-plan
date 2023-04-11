@@ -30,6 +30,8 @@ public class WebSecurityConfiguration {
 
   private final ServiceLogoutSuccessHandler serviceLogoutSuccessHandler;
 
+  private static final String SCAP_ACCESS_PERMISSION = "SCAP_ACCESS_TEAM";
+
   @Autowired
   public WebSecurityConfiguration(SamlProperties samlProperties,
                                   SamlResponseParser samlResponseParser,
@@ -49,14 +51,12 @@ public class WebSecurityConfiguration {
           .ignoringAntMatchers("/notify/callback", "/api/v1/logout/*")
         .and()
         .authorizeHttpRequests()
-          .mvcMatchers(
-              "/assets/**",
-              "/notify/callback",
-              "/api/v1/logout/*"
-          )
-        .permitAll()
+          .mvcMatchers("/assets/**", "/notify/callback", "/api/v1/logout/*")
+            .permitAll()
+          .mvcMatchers("/*")
+            .hasAuthority(SCAP_ACCESS_PERMISSION)
           .anyRequest()
-          .authenticated()
+            .authenticated()
         .and()
         .saml2Login(saml2 -> saml2.authenticationManager(new ProviderManager(authenticationProvider)))
           .logout()
