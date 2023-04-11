@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.WITHDRAWN;
@@ -109,7 +110,8 @@ class ScapInstateControllerTest extends AbstractControllerTest {
             .with(authenticatedScapUser())
             .with(csrf())
             .flashAttr("scapReinstateForm", getReinstateForm()))
-        .andExpect(status().is3xxRedirection());
+        .andExpect(status().is3xxRedirection())
+        .andExpect(flash().attributeExists("notificationBannerView"));
 
     verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_REINSTATED, SCAP_DETAIL, 1, TEST_STRING);
   }

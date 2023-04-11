@@ -118,14 +118,13 @@ public class ScapWithdrawController {
               scapDetail,
               scapDetail.getVersionNumber(),
               scapWithdrawalForm.getWithdrawComments().getInputValue());
-          var modelAndView =  ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
 
           NotificationBannerUtils.successBannerRedirect(
               "Success",
               new NotificationBannerBodyLine(
                   "%s has been withdrawn".formatted(scapDetail.getScap().getReference()), "govuk-!-font-weight-bold"
               ), redirectAttributes);
-          return modelAndView;
+          return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
         });
   }
 }

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -110,13 +111,15 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
                 CaseEventAction.CLOSED_OUT,
                 false,
                 getScapApprovalForm(),
+                null,
                 null)))
             .with(authenticatedScapUser())
             .with(csrf())
             .flashAttr("scapApprovalForm", getScapApprovalForm())
             .flashAttr("scapId", SCAP_ID))
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl(expectedRedirect));
+        .andExpect(redirectedUrl(expectedRedirect))
+        .andExpect(flash().attributeExists("notificationBannerView"));
     verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_CLOSED_OUT, scapDetail, 1, TEST_STRING);
     verify(scapDetailService).closeOutScap(scapDetail);
     verify(scapEmailService).sendScapApprovalEmails(scapDetail, null, true);
@@ -136,6 +139,7 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
                 CaseEventAction.CONSULTATION_REQUESTED,
                 false,
                 getScapApprovalForm(),
+                null,
                 null)))
             .with(authenticatedScapUser())
             .with(csrf())
@@ -160,6 +164,7 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
                 CaseEventAction.CLOSED_OUT,
                 false,
                 getScapApprovalForm(),
+                null,
                 null)))
             .with(authenticatedScapUser())
             .with(csrf())
@@ -181,6 +186,7 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
                 CaseEventAction.CLOSED_OUT,
                 false,
                 getScapApprovalForm(),
+                null,
                 null)))
             .with(authenticatedScapUser())
             .with(csrf())

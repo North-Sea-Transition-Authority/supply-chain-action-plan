@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getScapSummaryView;
@@ -98,6 +99,7 @@ class FurtherInfoResponseControllerTest extends AbstractControllerTest {
             CaseEventAction.INFO_RESPONSE,
             false,
             null,
+            null,
             null)))
         .with(authenticatedScapUser())
         .with(csrf()))
@@ -114,11 +116,13 @@ class FurtherInfoResponseControllerTest extends AbstractControllerTest {
                 CaseEventAction.INFO_RESPONSE,
                 false,
                 getFurtherInfoResponseForm(),
+                null,
                 null)))
             .with(authenticatedScapUser())
             .with(csrf())
             .flashAttr("infoResponseForm", getFurtherInfoResponseForm()))
-        .andExpect(status().is3xxRedirection());
+        .andExpect(status().is3xxRedirection())
+        .andExpect(flash().attributeExists("notificationBannerView"));
 
     verify(caseEventService).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_DETAIL, 1, TEST_STRING);
   }
@@ -137,6 +141,7 @@ class FurtherInfoResponseControllerTest extends AbstractControllerTest {
                 CaseEventAction.INFO_RESPONSE,
                 false,
                 getFurtherInfoResponseForm(),
+                null,
                 null)))
             .with(authenticatedScapUser())
             .with(csrf())

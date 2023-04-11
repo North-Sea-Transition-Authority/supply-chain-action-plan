@@ -13,11 +13,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermission;
 import uk.co.nstauthority.scap.enumutil.YesNo;
+import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerBodyLine;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.notify.ScapEmailService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
@@ -33,6 +35,7 @@ import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
+import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 
 @Controller
 @RequestMapping("{scapId}/")
@@ -88,7 +91,8 @@ public class ScapApprovalController {
                                            @RequestParam(CaseEventAction.APPROVED) String caseEventAction,
                                            @RequestParam("Approve-scap-Panel") Boolean slideOutPanelOpen,
                                            @ModelAttribute("scapApprovalForm") ScapApprovalForm scapApprovalForm,
-                                           BindingResult bindingResult) {
+                                           BindingResult bindingResult,
+                                           RedirectAttributes redirectAttributes) {
     scapApprovalFormValidator.validate(scapApprovalForm, bindingResult);
     var scapDetail = scapDetailService.getActionableScapDetail(scapId, userDetailService.getUserDetail());
     var scapSummary = scapSummaryViewService.getScapSummaryView(scapDetail);
@@ -134,7 +138,11 @@ public class ScapApprovalController {
               scapSummaryViewService.inferSubmissionStatusFromSummary(scapSummary),
               projectClosedOut
           );
-
+          NotificationBannerUtils.successBannerRedirect(
+              "Success",
+              new NotificationBannerBodyLine(
+                  "Approved %s".formatted(scapDetail.getScap().getReference()), "govuk-!-font-weight-bold"
+              ), redirectAttributes);
           return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
         });
   }

@@ -118,14 +118,12 @@ public class ScapReinstateController {
               scapDetail,
               scapDetail.getVersionNumber(),
               scapReinstateForm.getReinstateComments().getInputValue());
-          var modelAndView =  ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
-
           NotificationBannerUtils.successBannerRedirect(
               "Success",
               new NotificationBannerBodyLine(
                   "%s has been reinstated".formatted(scapDetail.getScap().getReference()), "govuk-!-font-weight-bold"
               ), redirectAttributes);
-          return modelAndView;
+          return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
         });
   }
 }

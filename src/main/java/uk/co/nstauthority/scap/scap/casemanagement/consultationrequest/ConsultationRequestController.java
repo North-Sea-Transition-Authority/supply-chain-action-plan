@@ -11,10 +11,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermission;
+import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerBodyLine;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
@@ -29,6 +31,7 @@ import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
+import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 
 @Controller
 @RequestMapping("{scapId}/")
@@ -76,12 +79,13 @@ public class ConsultationRequestController {
   }
 
   @PostMapping(params = CaseEventAction.CONSULTATION_REQUESTED)
-  public ModelAndView saveConsultationRequestForm(@PathVariable("scapId") ScapId scapId,
-                                                  @RequestParam(CaseEventAction.CONSULTATION_REQUESTED) String caseEventAction,
-                                                  @RequestParam("Consultation-Request-Panel") Boolean slideOutPanelOpen,
-                                                  @ModelAttribute("consultationRequestForm")
-                                                    ConsultationRequestForm consultationRequestForm,
-                                                  BindingResult bindingResult) {
+  public ModelAndView saveConsultationRequestForm(
+      @PathVariable("scapId") ScapId scapId,
+      @RequestParam(CaseEventAction.CONSULTATION_REQUESTED) String caseEventAction,
+      @RequestParam("Consultation-Request-Panel") Boolean slideOutPanelOpen,
+      @ModelAttribute("consultationRequestForm") ConsultationRequestForm consultationRequestForm,
+      BindingResult bindingResult,
+      RedirectAttributes redirectAttributes) {
     consultationRequestFormValidator.validate(consultationRequestForm, bindingResult);
     var scapDetail = scapDetailService.getActionableScapDetail(scapId, userDetailService.getUserDetail());
     var scapSummary = scapSummaryViewService.getScapSummaryView(scapDetail);
@@ -110,6 +114,11 @@ public class ConsultationRequestController {
               scapDetail,
               scapDetail.getVersionNumber(),
               consultationRequestForm.getRequestComments().getInputValue());
+          NotificationBannerUtils.successBannerRedirect(
+              "Success",
+              new NotificationBannerBodyLine(
+                  "Consultation requested on %s".formatted(scapDetail.getScap().getReference()), "govuk-!-font-weight-bold"
+              ), redirectAttributes);
           return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
         });
   }

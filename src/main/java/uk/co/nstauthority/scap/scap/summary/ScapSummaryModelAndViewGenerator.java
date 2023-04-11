@@ -229,6 +229,7 @@ public class ScapSummaryModelAndViewGenerator {
                   CaseEventAction.QA,
                   true,
                   null,
+                  null,
                   null)));
     }
 
@@ -239,6 +240,7 @@ public class ScapSummaryModelAndViewGenerator {
               .saveInfoRequestedForm(scapDetail.getScap().getScapId(),
                   CaseEventAction.INFO_REQUESTED,
                   true,
+                  null,
                   null,
                   null)));
     }
@@ -251,6 +253,7 @@ public class ScapSummaryModelAndViewGenerator {
               .saveInfoResponseForm(scapDetail.getScap().getScapId(),
                   CaseEventAction.INFO_RESPONSE,
                   true,
+                  null,
                   null,
                   null)));
       modelAndView.addObject("furtherInfoDocumentTemplate",
@@ -265,6 +268,7 @@ public class ScapSummaryModelAndViewGenerator {
                   CaseEventAction.CONSULTATION_REQUESTED,
                   true,
                   null,
+                  null,
                   null)));
     }
 
@@ -275,6 +279,7 @@ public class ScapSummaryModelAndViewGenerator {
               .saveConsultationResponseForm(scapDetail.getScap().getScapId(),
                   CaseEventAction.CONSULTATION_RESPONSE,
                   true,
+                  null,
                   null,
                   null)));
       modelAndView.addObject("supportingDocumentsTemplate",
@@ -289,6 +294,7 @@ public class ScapSummaryModelAndViewGenerator {
                   CaseEventAction.UPDATE_REQUESTED,
                   true,
                   null,
+                  null,
                   null)));
     }
 
@@ -301,6 +307,7 @@ public class ScapSummaryModelAndViewGenerator {
               .saveScapApprovalForm(scapDetail.getScap().getScapId(),
                   CaseEventAction.APPROVED,
                   true,
+                  null,
                   null,
                   null)));
       modelAndView.addObject("approvalDocumentsTemplate",

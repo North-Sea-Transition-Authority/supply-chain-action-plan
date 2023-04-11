@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getScapSummaryView;
@@ -99,6 +100,7 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
                 CaseEventAction.QA,
                 false,
                 getScapApprovalForm(),
+                null,
                 null)))
             .with(authenticatedScapUser())
             .with(csrf())
@@ -120,11 +122,13 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
                 CaseEventAction.APPROVED,
                 false,
                 getScapApprovalForm(),
+                null,
                 null)))
             .with(authenticatedScapUser())
             .with(csrf())
             .flashAttr("scapApprovalForm", getScapApprovalForm()))
-        .andExpect(status().is3xxRedirection());
+        .andExpect(status().is3xxRedirection())
+        .andExpect(flash().attributeExists("notificationBannerView"));
 
     verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_APPROVED, scapDetail, 1, TEST_STRING);
     verify(scapDetailService).approveScap(scapDetail);
@@ -145,6 +149,7 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
                 CaseEventAction.INFO_REQUESTED,
                 false,
                 getScapApprovalForm(),
+                null,
                 null)))
             .with(authenticatedScapUser())
             .with(csrf()))
