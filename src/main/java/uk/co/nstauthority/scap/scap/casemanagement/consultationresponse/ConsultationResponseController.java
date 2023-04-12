@@ -116,7 +116,7 @@ public class ConsultationResponseController {
           NotificationBannerUtils.successBannerRedirect(
               "Success",
               new NotificationBannerBodyLine(
-                  "Set date of next update on %s".formatted(scapDetail.getScap().getReference()), "govuk-!-font-weight-bold"
+                  "Recorded consultation response on: %s".formatted(scapDetail.getScap().getReference()), "govuk-!-font-weight-bold"
               ), redirectAttributes);
           return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
         });
