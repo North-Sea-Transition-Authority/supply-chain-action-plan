@@ -34,7 +34,7 @@ import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 @RequestMapping("{scapId}/project-details")
 @PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
 @ScapHasStatus(permittedStatuses = ScapDetailStatus.DRAFT)
-class ProjectDetailsController {
+public class ProjectDetailsController {
 
   private final ProjectDetailsFormService projectDetailsFormService;
   private final ControllerHelperService controllerHelperService;
@@ -55,7 +55,7 @@ class ProjectDetailsController {
   }
 
   @GetMapping
-  ModelAndView renderProjectDetailsForm(@PathVariable("scapId") ScapId scapId) {
+  public ModelAndView renderProjectDetailsForm(@PathVariable("scapId") ScapId scapId) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
     var projectDetails = projectDetailsService.findByScapDetail(scapDetail);
     var projectFacilities = projectDetails

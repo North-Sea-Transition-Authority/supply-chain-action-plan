@@ -46,7 +46,7 @@ public class ProjectField implements ProjectDetailsChild {
     return projectDetails;
   }
 
-  Integer getFieldId() {
+  public Integer getFieldId() {
     return fieldId;
   }
 

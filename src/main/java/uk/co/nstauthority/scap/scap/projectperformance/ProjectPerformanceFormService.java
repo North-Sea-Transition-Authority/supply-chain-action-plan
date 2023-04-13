@@ -5,7 +5,7 @@ import org.springframework.validation.BindingResult;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 
 @Service
-class ProjectPerformanceFormService {
+public class ProjectPerformanceFormService {
 
   private final ProjectPerformanceFormValidator projectPerformanceFormValidator;
 
@@ -13,12 +13,12 @@ class ProjectPerformanceFormService {
     this.projectPerformanceFormValidator = projectPerformanceFormValidator;
   }
 
-  BindingResult validate(ProjectPerformanceForm form, BindingResult bindingResult) {
+  public BindingResult validate(ProjectPerformanceForm form, BindingResult bindingResult) {
     projectPerformanceFormValidator.validate(form, bindingResult);
     return bindingResult;
   }
 
-  ProjectPerformanceForm getForm(ProjectPerformance projectPerformance) {
+  public ProjectPerformanceForm getForm(ProjectPerformance projectPerformance) {
     var form = new ProjectPerformanceForm();
     if (Boolean.TRUE.equals(projectPerformance.getProjectCompleted())) {
       form.setIsProjectCompleted(YesNo.YES);

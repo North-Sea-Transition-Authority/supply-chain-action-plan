@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -229,6 +230,22 @@ class ContractingPerformanceServiceTest {
     assertThat(activitiesWithoutContractingPerformance).containsExactly(
         activitiesWithContractAwarded.get(1),
         activitiesWithContractAwarded.get(2)
+    );
+  }
+
+  @Test
+  void getAllByContractingPerformanceOverview() {
+    var contractingPerformanceOverview = new ContractingPerformanceOverview();
+    var contractingPerformance = new ContractingPerformance();
+
+    when(contractingPerformanceRepository.getAllByContractingPerformanceOverview(contractingPerformanceOverview))
+        .thenReturn(Collections.singletonList(contractingPerformance));
+
+    var contractingPerformanceRecords = contractingPerformanceService
+        .getAllByContractingPerformanceOverview(contractingPerformanceOverview);
+
+    assertThat(contractingPerformanceRecords).containsExactly(
+        contractingPerformance
     );
   }
 }

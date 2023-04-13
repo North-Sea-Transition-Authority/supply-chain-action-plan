@@ -35,7 +35,7 @@ class ContractingPerformanceFormService {
         ));
   }
 
-  ContractingPerformanceForm getForm(ContractingPerformance contractingPerformance) {
+  public ContractingPerformanceForm getForm(ContractingPerformance contractingPerformance) {
     var form = new ContractingPerformanceForm();
     form.setActualTenderActivityId(contractingPerformance.getActualTenderActivity().getId());
     form.setOutturnCost(contractingPerformance.getOutturnCost().toPlainString());

@@ -32,7 +32,7 @@ public class HasPlannedTenderFormService {
         .orElse(new HasPlannedTenderForm());
   }
 
-  private HasPlannedTenderForm scapPlannedTenderToForm(PlannedTender plannedTender) {
+  public HasPlannedTenderForm scapPlannedTenderToForm(PlannedTender plannedTender) {
     var form = new HasPlannedTenderForm();
     if (Boolean.TRUE.equals(plannedTender.getHasPlannedTenders())) {
       form.setHasPlannedTender(YesNo.YES);

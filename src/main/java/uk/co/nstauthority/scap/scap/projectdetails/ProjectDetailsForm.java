@@ -9,7 +9,7 @@ import uk.co.fivium.formlibrary.input.StringInput;
 import uk.co.fivium.formlibrary.input.ThreeFieldDateInput;
 import uk.co.nstauthority.scap.file.FileUploadForm;
 
-class ProjectDetailsForm {
+public class ProjectDetailsForm {
 
   private final StringInput projectName;
   private final StringInput projectSummary;

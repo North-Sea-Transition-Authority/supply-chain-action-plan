@@ -3,7 +3,6 @@ package uk.co.nstauthority.scap.scap.submit;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_SUBMITTED;
 
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -28,7 +27,6 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
-import uk.co.nstauthority.scap.scap.tasklist.ScapTaskListItem;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
@@ -46,28 +44,28 @@ class ScapSubmissionController {
   private final ScapDetailService scapDetailService;
   private final ScapSummaryViewService scapSummaryViewService;
   private final CaseEventService caseEventService;
-  private final List<ScapTaskListItem> scapTaskListItems;
   private final ReviewAndSubmitFormService reviewAndSubmitFormService;
   private final ControllerHelperService controllerHelperService;
   private final ScapEmailService scapEmailService;
+  private final ScapSubmissionService scapSubmissionService;
 
   @Autowired
   ScapSubmissionController(ScapService scapService,
                            ScapDetailService scapDetailService,
                            ScapSummaryViewService scapSummaryViewService,
                            CaseEventService caseEventService,
-                           List<ScapTaskListItem> scapTaskListItems,
                            ReviewAndSubmitFormService reviewAndSubmitFormService,
                            ControllerHelperService controllerHelperService,
-                           ScapEmailService scapEmailService) {
+                           ScapEmailService scapEmailService,
+                           ScapSubmissionService scapSubmissionService) {
     this.scapService = scapService;
     this.scapDetailService = scapDetailService;
     this.scapSummaryViewService = scapSummaryViewService;
     this.caseEventService = caseEventService;
-    this.scapTaskListItems = scapTaskListItems;
     this.reviewAndSubmitFormService = reviewAndSubmitFormService;
     this.controllerHelperService = controllerHelperService;
     this.scapEmailService = scapEmailService;
+    this.scapSubmissionService = scapSubmissionService;
   }
 
   @GetMapping
@@ -95,7 +93,7 @@ class ScapSubmissionController {
                           BindingResult bindingResult) {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
 
-    if (!isScapValid(scapId)) {
+    if (!scapSubmissionService.isScapValid(scapDetail)) {
       throw new ScapBadRequestException(
           "Could not submit SCAP with ID [%d] as it is not complete".formatted(scapId.scapId()));
     }
@@ -116,24 +114,13 @@ class ScapSubmissionController {
   }
 
   private ModelAndView scapSubmissionConfirmationModelAndView(ScapId scapId, ScapDetail scapDetail) {
-    var isValid = isScapValid(scapId);
+    var isValid = scapSubmissionService.isScapValid(scapDetail);
     return new ModelAndView("scap/scap/submit/reviewAndSubmit")
         .addObject("backLinkUrl", ReverseRouter.route(on(TaskListController.class)
             .renderTaskList(scapId)))
         .addObject("isValid", isValid)
-        .addObject("incompleteErrorMessage", getIncompleteErrorMessage(isValid))
+        .addObject("incompleteErrorMessage", isValid ? null : INVALID_SCAP_ERROR_MESSAGE)
         .addObject("radioItems", YesNo.getRadioOptions())
         .addObject("scapSummaryView", scapSummaryViewService.getScapSummaryView(scapDetail));
-  }
-
-  private String getIncompleteErrorMessage(boolean isValid) {
-    return isValid ? null : INVALID_SCAP_ERROR_MESSAGE;
-  }
-
-  private boolean isScapValid(ScapId scapId) {
-    var scapIdInt = scapId.scapId();
-    return scapTaskListItems.stream()
-        .filter(taskListItem -> !ReviewAndSubmitTaskListSection.class.equals(taskListItem.getTaskListSection()))
-        .allMatch(taskListItem -> taskListItem.isValid(scapIdInt));
   }
 }

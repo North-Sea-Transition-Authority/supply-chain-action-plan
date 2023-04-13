@@ -2,8 +2,6 @@ package uk.co.nstauthority.scap.scap.submit;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -21,8 +19,6 @@ import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil
 import static uk.co.nstauthority.scap.utils.ControllerTestingUtil.bindingResultWithErrors;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,9 +35,7 @@ import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
-import uk.co.nstauthority.scap.scap.scap.ScapFormTaskListSection;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
-import uk.co.nstauthority.scap.scap.tasklist.ScapTaskListItem;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
@@ -57,13 +51,13 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
   CaseEventService caseEventService;
 
   @MockBean
-  List<ScapTaskListItem> scapTaskListItems;
-
-  @MockBean
   ReviewAndSubmitFormService reviewAndSubmitFormService;
 
   @MockBean
   ScapEmailService scapEmailService;
+
+  @MockBean
+  ScapSubmissionService scapSubmissionService;
 
   @BeforeEach
   void setup() {
@@ -74,16 +68,10 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
   @Test
   @DisplayName("Render SCAP submission confirmation when all sections complete")
   void renderScapSubmissionConfirmation_AllSectionsComplete_IsSubmittable() throws Exception {
-    var taskListItem = mock(ScapTaskListItem.class);
-    var submitTaskListItem = mock(ScapTaskListItem.class);
-
-    doReturn(Stream.of(taskListItem, submitTaskListItem)).when(scapTaskListItems).stream();
-    doReturn(ScapFormTaskListSection.class).when(taskListItem).getTaskListSection();
-    doReturn(ReviewAndSubmitTaskListSection.class).when(submitTaskListItem).getTaskListSection();
-    doReturn(true).when(taskListItem).isValid(SCAP_ID.scapId());
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
     when(reviewAndSubmitFormService.getForm(scapDetail)).thenReturn(new ReviewAndSubmitForm());
     when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
+    when(scapSubmissionService.isScapValid(scapDetail)).thenReturn(true);
 
     mockMvc.perform(get(
         ReverseRouter.route(on(ScapSubmissionController.class).renderScapSubmissionConfirmation(SCAP_ID))))
@@ -94,18 +82,11 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
         .andExpect(model().attribute("scapSummaryView", getScapSummaryView()))
         .andExpect(model().attribute("isValid", true))
         .andExpect(model().attributeExists("form"));
-
-    verify(submitTaskListItem, never()).isValid(any());
   }
 
   @Test
   @DisplayName("Render SCAP submission confirmation when not complete")
   void renderScapSubmissionConfirmation_NotComplete() throws Exception {
-    var taskListItem = mock(ScapTaskListItem.class);
-
-    doReturn(Stream.of(taskListItem)).when(scapTaskListItems).stream();
-    doReturn(ScapFormTaskListSection.class).when(taskListItem).getTaskListSection();
-    doReturn(false).when(taskListItem).isValid(SCAP_ID.scapId());
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
     when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
 
@@ -127,6 +108,7 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
 
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
     when(reviewAndSubmitFormService.validate(any(), any())).thenReturn(emptyBindingResult());
+    when(scapSubmissionService.isScapValid(scapDetail)).thenReturn(true);
 
     mockMvc.perform(post(
         ReverseRouter.route(on(ScapSubmissionController.class).submitScap(SCAP_ID, null, emptyBindingResult())))
@@ -135,10 +117,12 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
         .andExpect(redirectedUrl(expectedRedirectUrl));
 
     verify(scapDetailService).submitScap(eq(scapDetail), any());
-    verify(caseEventService).recordNewEvent(eq(CaseEventSubject.SCAP_SUBMITTED),
-        eq(scapDetail),
-        eq(scapDetail.getVersionNumber()),
-        eq(null));
+    verify(caseEventService).recordNewEvent(
+        CaseEventSubject.SCAP_SUBMITTED,
+        scapDetail,
+        scapDetail.getVersionNumber(),
+        null
+    );
     verify(scapEmailService).sendScapSubmissionEmails(scapDetail);
   }
 
@@ -151,6 +135,7 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
     when(reviewAndSubmitFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResultWithErrors(form));
     when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
+    when(scapSubmissionService.isScapValid(scapDetail)).thenReturn(true);
 
     mockMvc.perform(post(
         ReverseRouter.route(on(ScapSubmissionController.class).submitScap(SCAP_ID, null, emptyBindingResult())))
@@ -165,11 +150,6 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
   @Test
   @DisplayName("Assert that submitting a SCAP which is not complete throws a 400")
   void submitScap_NotValid_AssertThrows() throws Exception {
-    var taskListItem = mock(ScapTaskListItem.class);
-
-    doReturn(Stream.of(taskListItem)).when(scapTaskListItems).stream();
-    doReturn(ScapFormTaskListSection.class).when(taskListItem).getTaskListSection();
-    doReturn(false).when(taskListItem).isValid(SCAP_ID.scapId());
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
 
     mockMvc.perform(post(

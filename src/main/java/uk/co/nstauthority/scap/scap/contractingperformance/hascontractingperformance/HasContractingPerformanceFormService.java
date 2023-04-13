@@ -7,7 +7,7 @@ import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverview;
 
 @Service
-class HasContractingPerformanceFormService {
+public class HasContractingPerformanceFormService {
 
   private final HasContractingPerformanceFormValidator validator;
 

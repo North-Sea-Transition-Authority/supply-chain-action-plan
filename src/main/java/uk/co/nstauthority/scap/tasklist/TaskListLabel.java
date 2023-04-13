@@ -1,9 +1,17 @@
 package uk.co.nstauthority.scap.tasklist;
 
-/**
- * Record use to represent a label shown on a task list implementation.
- * @param labelText the text of the label
- * @param labelType the type of task list label (used to determine colour)
- */
-public record TaskListLabel(String labelText, TaskListLabelType labelType) {
+public enum TaskListLabel {
+
+  NOT_STARTED,
+  IN_PROGRESS,
+  COMPLETED,
+  NOT_COMPLETED,
+  BLOCKED;
+
+  public static TaskListLabel from(boolean isValid) {
+    if (isValid) {
+      return COMPLETED;
+    }
+    return NOT_COMPLETED;
+  }
 }

@@ -39,12 +39,12 @@ public class ProjectDetailsFormService {
     this.supportingDocumentService = supportingDocumentService;
   }
 
-  BindingResult validate(ProjectDetailsForm form, BindingResult bindingResult) {
+  public BindingResult validate(ProjectDetailsForm form, BindingResult bindingResult) {
     validator.validate(form, bindingResult);
     return bindingResult;
   }
 
-  ProjectDetailsForm getForm(ProjectDetails projectDetails,
+  public ProjectDetailsForm getForm(ProjectDetails projectDetails,
                              Set<Integer> projectFacilityIds,
                              Set<Integer> projectFieldIds) {
     var form = new ProjectDetailsForm();

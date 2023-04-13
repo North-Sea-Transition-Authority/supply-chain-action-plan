@@ -75,6 +75,11 @@ public class ContractingPerformanceService {
     contractingPerformanceRepository.deleteByActualTenderActivity(actualTenderActivity);
   }
 
+  public List<ContractingPerformance> getAllByContractingPerformanceOverview(
+      ContractingPerformanceOverview contractingPerformanceOverview) {
+    return contractingPerformanceRepository.getAllByContractingPerformanceOverview(contractingPerformanceOverview);
+  }
+
   List<ActualTenderActivity> getActivitiesWithoutContractingPerformance(
       List<ActualTenderActivity> contractedActivities) {
     var activityIdsWithContractingPerformance = getActivityIdsWithContractingPerformances(contractedActivities);

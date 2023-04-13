@@ -129,5 +129,4 @@ public class InvitationToTenderParticipantService {
     invitationToTenderParticipantRepository.deleteAll(removedParticipants);
     invitationToTenderParticipantRepository.saveAll(newIttParticipants);
   }
-
 }

@@ -1,6 +1,10 @@
 <#include '../layout/layout.ftl'>
-<#-- @ftlvariable name="taskListSections" type="java.util.List<uk.co.nstauthority.scap.tasklist.TaskListSectionView>" -->
+<#import  '../macros/genericTaskList.ftl' as taskList>
+
+<#-- @ftlvariable name="taskListSections" type="java.util.List<uk.co.nstauthority.scap.tasklist.TaskListSection>" -->
+
 <#assign pageTitle = "Submit a SCAP" />
+
 <@defaultPage
 htmlTitle=pageTitle
 pageHeading=pageTitle
@@ -19,25 +23,5 @@ backLinkUrl=springUrl(backLinkUrl)
 
 
 <#macro standardTaskList taskListSections>
-  <@fdsTaskList.taskList>
-    <#list taskListSections as section>
-      <@fdsTaskList.taskListSection
-      sectionNumber="${section?index + 1}"
-      sectionHeadingText=section.sectionName()
-      warningText=section.sectionWarningText()
-      >
-        <#list section.taskListItemViews() as item>
-          <@fdsTaskList.taskListItem
-          itemText=item.displayName
-          itemUrl=springUrl(item.actionUrl)
-          showTag=item.showTaskListLabels()
-          completed=item.isItemValid()
-          tagClass=(item.customTaskListLabel.labelType().cssClassName)!""
-          tagText=(item.customTaskListLabel.labelText())!""
-          useNotCompletedLabels=item.showNotCompletedLabel()
-          />
-        </#list>
-      </@fdsTaskList.taskListSection>
-    </#list>
-  </@fdsTaskList.taskList>
+  <@taskList.taskList sections=taskListSections />
 </#macro>

@@ -5,7 +5,7 @@ import uk.co.fivium.formlibrary.input.IntegerInput;
 import uk.co.fivium.formlibrary.input.ThreeFieldDateInput;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 
-class ProjectPerformanceForm {
+public class ProjectPerformanceForm {
 
   private YesNo isProjectCompleted;
   private final IntegerInput startDay;
@@ -18,7 +18,7 @@ class ProjectPerformanceForm {
   private final ThreeFieldDateInput completionDate;
   private final DecimalInput outturnCost;
 
-  ProjectPerformanceForm() {
+  public ProjectPerformanceForm() {
     this.startDay = new IntegerInput("startDay", "start day");
     this.startMonth = new IntegerInput("startMonth", "start month");
     this.startYear = new IntegerInput("startYear", "start year");

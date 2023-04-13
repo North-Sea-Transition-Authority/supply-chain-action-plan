@@ -8,7 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.Collections;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -25,10 +24,7 @@ import uk.co.nstauthority.scap.scap.delete.ScapDeletionController;
 class TaskListControllerTest extends AbstractScapSubmitterControllerTest {
 
   @MockBean
-  private List<ScapTaskListSection> scapTaskListSections;
-
-  @MockBean
-  private List<ScapTaskListItem> scapTaskListItems;
+  private TaskListService taskListService;
 
   @Test
   void renderTaskList() throws Exception {

@@ -13,4 +13,7 @@ interface ContractingPerformanceRepository extends CrudRepository<ContractingPer
   void deleteByActualTenderActivity(ActualTenderActivity actualTenderActivity);
 
   List<ContractingPerformance> getAllByActualTenderActivityIn(List<ActualTenderActivity> activities);
+
+  List<ContractingPerformance> getAllByContractingPerformanceOverview(
+      ContractingPerformanceOverview contractingPerformanceOverview);
 }

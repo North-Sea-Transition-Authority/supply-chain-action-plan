@@ -17,7 +17,7 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.bidparticipants.BidPar
 import uk.co.nstauthority.scap.scap.actualtender.activity.bidparticipants.BidParticipantsFormService;
 
 @Service
-class ActualTenderSummaryValidationService {
+public class ActualTenderSummaryValidationService {
 
   private final ActualTenderActivityFormService actualTenderActivityFormService;
   private final BidParticipantsFormService bidParticipantsFormService;

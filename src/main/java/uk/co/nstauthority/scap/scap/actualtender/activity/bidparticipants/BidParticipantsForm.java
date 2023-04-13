@@ -6,8 +6,6 @@ public class BidParticipantsForm {
 
   List<Integer> selectedBidParticipantIds;
 
-
-
   public List<Integer> getSelectedBidParticipantIds() {
     return selectedBidParticipantIds;
   }
