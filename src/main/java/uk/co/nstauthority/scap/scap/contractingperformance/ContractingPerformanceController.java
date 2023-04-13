@@ -69,7 +69,7 @@ public class ContractingPerformanceController {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
     var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail);
-    var actualTender = actualTenderService.getByScapDetail(scapDetail);
+    var actualTender = actualTenderService.findByScapDetail(scapDetail);
     var contractedActivities = actualTender
         .map(actualTenderActivityService::getActivitiesWithContractAwarded)
         .orElse(Collections.emptyList());
@@ -87,7 +87,7 @@ public class ContractingPerformanceController {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
     var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail);
-    var actualTender = actualTenderService.getByScapDetail(scapDetail);
+    var actualTender = actualTenderService.findByScapDetail(scapDetail);
     var contractedActivities = actualTender
         .map(actualTenderActivityService::getActivitiesWithContractAwarded)
         .orElse(Collections.emptyList());
@@ -115,7 +115,7 @@ public class ContractingPerformanceController {
                                                                Integer contractingPerformanceId) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
-    var actualTender = actualTenderService.getByScapDetail(scapDetail);
+    var actualTender = actualTenderService.findByScapDetail(scapDetail);
     var contractedActivities = actualTender
         .map(actualTenderActivityService::getActivitiesWithContractAwarded)
         .orElse(Collections.emptyList());
@@ -139,7 +139,7 @@ public class ContractingPerformanceController {
                                                              BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
-    var actualTender = actualTenderService.getByScapDetail(scapDetail);
+    var actualTender = actualTenderService.findByScapDetail(scapDetail);
     var contractedActivities = actualTender
         .map(actualTenderActivityService::getActivitiesWithContractAwarded)
         .orElse(Collections.emptyList());

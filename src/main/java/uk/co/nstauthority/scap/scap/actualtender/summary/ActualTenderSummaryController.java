@@ -66,7 +66,7 @@ public class ActualTenderSummaryController {
   public ModelAndView renderActualTenderSummary(@PathVariable("scapId") ScapId scapId) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
-    var actualTender = actualTenderService.getByScapDetailOrThrow(scapDetail);
+    var actualTender = actualTenderService.getByScapDetail(scapDetail);
     var actualTenderActivities = actualTenderActivityService.getAllByActualTender(actualTender);
 
     if (actualTenderActivities.isEmpty()) {
@@ -87,7 +87,7 @@ public class ActualTenderSummaryController {
                                               BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
-    var actualTender = actualTenderService.getByScapDetailOrThrow(scapDetail);
+    var actualTender = actualTenderService.getByScapDetail(scapDetail);
     var actualTenderActivities = actualTenderActivityService.getAllByActualTender(actualTender);
 
     if (actualTenderActivities.isEmpty()) {

@@ -78,7 +78,7 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
         .renderHasActualTenderForm(scap.getScapId()));
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
+    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(Collections.emptyList());
 
     mockMvc.perform(get(
@@ -100,12 +100,12 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
         RemunerationModel.OTHER, "remuneration model name",
         ContractStage.CONTRACT_AWARDED,
         Map.of("ITT participant 1", false, "ITT participant 2", false),
-        Map.of("bid participant 1", false, "bid participant 2", false), 
+        Map.of("bid participant 1", false, "bid participant 2", false),
         awardedContractSummaryView,
         true);
     var actualTenderActivitySummaryViews = List.of(actualTenderSummaryView);
 
-    when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
+    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(actualTenderActivities);
     when(actualTenderSummaryViewService.getByActualTenderActivities(actualTenderActivities, scap.getScapId()))
         .thenReturn(actualTenderActivitySummaryViews);
@@ -126,7 +126,7 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
         .renderHasActualTenderForm(scap.getScapId()));
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
+    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(Collections.emptyList());
 
     mockMvc.perform(post(
@@ -160,7 +160,7 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
         new FieldError("form", "testField", "Test error message")
     );
 
-    when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
+    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(actualTenderActivities);
     when(actualTenderSummaryViewService.getByActualTenderActivities(actualTenderActivities, scap.getScapId()))
         .thenReturn(actualTenderActivitySummaryViews);
@@ -204,7 +204,7 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
     var bindingResultNoErrors = new BeanPropertyBindingResult(form, "form");
     var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getScapId()));
 
-    when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
+    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(actualTenderActivities);
     when(actualTenderSummaryViewService.getByActualTenderActivities(actualTenderActivities, scap.getScapId()))
         .thenReturn(actualTenderActivitySummaryViews);
@@ -245,7 +245,7 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
     var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderActivityController.class)
         .renderActualTenderActivityForm(scap.getScapId(), null));
 
-    when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
+    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(actualTenderActivities);
     when(actualTenderSummaryViewService.getByActualTenderActivities(actualTenderActivities, scap.getScapId()))
         .thenReturn(actualTenderActivitySummaryViews);

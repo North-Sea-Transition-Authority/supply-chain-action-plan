@@ -284,7 +284,7 @@ class ScapSummaryViewServiceTest {
 
   @Test
   void getActualTenderSummaryView_NoActualTenderEntity() {
-    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.empty());
+    when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
     var actualTenderSummaryView = scapSummaryViewService.getActualTenderSummaryView(scapDetail);
 
@@ -301,7 +301,7 @@ class ScapSummaryViewServiceTest {
     var actualTender = new ActualTender();
     actualTender.setHasActualTenders(false);
 
-    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
+    when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
 
     var actualTenderSummaryView = scapSummaryViewService.getActualTenderSummaryView(scapDetail);
 
@@ -329,7 +329,7 @@ class ScapSummaryViewServiceTest {
         )
     );
 
-    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
+    when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(List.of(actualTenderActivity));
     when(actualTenderSummaryViewService.getByActualTenderActivities(List.of(actualTenderActivity), scapDetail.getScap().getScapId()))
         .thenReturn(activityViews);

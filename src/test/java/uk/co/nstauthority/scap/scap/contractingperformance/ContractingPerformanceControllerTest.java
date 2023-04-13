@@ -73,7 +73,7 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
     var scopeTitlesMap = Map.of(String.valueOf(activity.getId()), "Activity scope title");
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
+    when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
     when(contractingPerformanceService.getActivitiesWithoutContractingPerformance(activities)).thenReturn(activities);
     when(contractingPerformanceFormService.getScopeTitlesMap(activities)).thenReturn(scopeTitlesMap);
@@ -93,7 +93,7 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
   @Test
   void renderNewContractingPerformanceForm_NoActualTender() throws Exception {
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.empty());
+    when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
     mockMvc.perform(get(
         ReverseRouter.route(on(ContractingPerformanceController.class)
@@ -114,7 +114,7 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
     var scopeTitlesMap = Map.of(String.valueOf(activity.getId()), "Activity scope title");
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
+    when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
     when(contractingPerformanceService.getActivitiesWithoutContractingPerformance(activities)).thenReturn(activities);
     when(contractingPerformanceFormService.getScopeTitlesMap(activities)).thenReturn(scopeTitlesMap);
@@ -146,7 +146,7 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
         .renderContractingPerformanceSummary(scap.getScapId()));
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
+    when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
@@ -177,7 +177,7 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
     );
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
+    when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
@@ -212,7 +212,7 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
     );
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.empty());
+    when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceFormService.validate(eq(form), any(BindingResult.class), eq(Collections.emptyList())))
@@ -245,7 +245,7 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
     var scopeTitlesMap = Map.of(String.valueOf(activity.getId()), "Activity scope title");
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
+    when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
     when(contractingPerformanceService.getById(contractingPerformanceId)).thenReturn(contractingPerformance);
     when(contractingPerformanceService.getActivitiesWithoutContractingPerformancesWithCurrent(activities, contractingPerformance))
@@ -277,7 +277,7 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
         .renderContractingPerformanceSummary(scap.getScapId()));
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
+    when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);
@@ -310,7 +310,7 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
         new FieldError("form", "testField", "test error message")
     );
 
-    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
+    when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
     when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
         .thenReturn(contractingPerformanceOverview);

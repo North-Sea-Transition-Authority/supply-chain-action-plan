@@ -46,7 +46,7 @@ class ActualTenderServiceTest {
 
     when(actualTenderRepository.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
 
-    var returnedValue = actualTenderService.getByScapDetail(scapDetail);
+    var returnedValue = actualTenderService.findByScapDetail(scapDetail);
 
     assertThat(returnedValue).contains(actualTender);
   }
@@ -57,7 +57,7 @@ class ActualTenderServiceTest {
 
     when(actualTenderRepository.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
 
-    var returnedValue = actualTenderService.getByScapDetailOrThrow(scapDetail);
+    var returnedValue = actualTenderService.getByScapDetail(scapDetail);
 
     assertThat(returnedValue).isEqualTo(actualTender);
   }
@@ -66,7 +66,7 @@ class ActualTenderServiceTest {
   void getByScapDetailOrThrow_isNotPresent_assertThrows() {
     when(actualTenderRepository.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> actualTenderService.getByScapDetailOrThrow(scapDetail))
+    assertThatThrownBy(() -> actualTenderService.getByScapDetail(scapDetail))
         .isInstanceOf(ScapEntityNotFoundException.class);
   }
 

@@ -25,7 +25,7 @@ public class ActualTenderTaskListItemService {
   }
 
   public boolean isValid(ScapDetail scapDetail) {
-    var actualTenderOpt = actualTenderService.getByScapDetail(scapDetail);
+    var actualTenderOpt = actualTenderService.findByScapDetail(scapDetail);
 
     if (actualTenderOpt.isEmpty()) {
       return false;

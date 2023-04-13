@@ -136,7 +136,7 @@ class DeleteActualTenderActivityControllerTest extends AbstractScapSubmitterCont
     var actualTender = new ActualTender();
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
+    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
     when(actualTenderActivityService.hasActualTenderActivity(actualTender)).thenReturn(true);
 
@@ -157,7 +157,7 @@ class DeleteActualTenderActivityControllerTest extends AbstractScapSubmitterCont
     var actualTender = new ActualTender();
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
+    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
     when(actualTenderActivityService.hasActualTenderActivity(actualTender)).thenReturn(false);
 

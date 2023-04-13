@@ -22,12 +22,12 @@ public class ActualTenderService {
     this.clock = clock;
   }
 
-  public Optional<ActualTender> getByScapDetail(ScapDetail scapDetail) {
+  public Optional<ActualTender> findByScapDetail(ScapDetail scapDetail) {
     return actualTenderRepository.findByScapDetail(scapDetail);
   }
 
-  public ActualTender getByScapDetailOrThrow(ScapDetail scapDetail) {
-    return getByScapDetail(scapDetail)
+  public ActualTender getByScapDetail(ScapDetail scapDetail) {
+    return findByScapDetail(scapDetail)
         .orElseThrow(() -> new ScapEntityNotFoundException(
             String.format("Could not find actual tender for ScapDetail with ID [%d]", scapDetail.getId())));
   }

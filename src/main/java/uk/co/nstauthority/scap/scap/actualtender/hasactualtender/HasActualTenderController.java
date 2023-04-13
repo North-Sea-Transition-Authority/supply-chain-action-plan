@@ -59,7 +59,7 @@ public class HasActualTenderController {
   public ModelAndView renderHasActualTenderForm(@PathVariable("scapId") ScapId scapId) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
-    var actualTender = actualTenderService.getByScapDetail(scapDetail);
+    var actualTender = actualTenderService.findByScapDetail(scapDetail);
     var form = actualTender
         .map(hasActualTenderFormService::getForm)
         .orElse(new HasActualTenderForm());
@@ -76,7 +76,7 @@ public class HasActualTenderController {
                                        BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
-    var actualTender = actualTenderService.getByScapDetail(scapDetail);
+    var actualTender = actualTenderService.findByScapDetail(scapDetail);
 
     if (hasExistingActualTenderActivities(actualTender)) {
       return ReverseRouter.redirect(on(ActualTenderSummaryController.class).renderActualTenderSummary(scapId));

@@ -56,7 +56,7 @@ class HasActualTenderControllerTest extends AbstractScapSubmitterControllerTest 
   void renderHasActualTenderForm_expectIsOk() throws Exception {
 
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
-    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.empty());
+    when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
     mockMvc.perform(
         get(ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scap.getScapId()))))
@@ -75,7 +75,7 @@ class HasActualTenderControllerTest extends AbstractScapSubmitterControllerTest 
     form.setHasActualTender(YesNo.NO);
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
+    when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(hasActualTenderFormService.getForm(actualTender)).thenReturn(form);
 
     mockMvc.perform(
@@ -97,7 +97,7 @@ class HasActualTenderControllerTest extends AbstractScapSubmitterControllerTest 
         .renderActualTenderSummary(scap.getScapId()));
 
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
-    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
+    when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(hasActualTenderFormService.getForm(actualTender)).thenReturn(form);
     when(actualTenderActivityService.hasActualTenderActivity(actualTender)).thenReturn(true);
 
@@ -116,7 +116,7 @@ class HasActualTenderControllerTest extends AbstractScapSubmitterControllerTest 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.empty());
+    when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
     when(hasActualTenderFormService.validate(eq(form), any(BindingResult.class))).thenReturn(bindingResult);
 
     mockMvc.perform(
@@ -139,7 +139,7 @@ class HasActualTenderControllerTest extends AbstractScapSubmitterControllerTest 
     var existingActualTender = new ActualTender();
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(existingActualTender));
+    when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(existingActualTender));
     when(hasActualTenderFormService.validate(eq(form), any(BindingResult.class))).thenReturn(bindingResult);
 
     mockMvc.perform(
@@ -189,7 +189,7 @@ class HasActualTenderControllerTest extends AbstractScapSubmitterControllerTest 
         .renderActualTenderSummary(scap.getScapId()));
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
-    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
+    when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(hasActualTenderFormService.getForm(actualTender)).thenReturn(form);
     when(actualTenderActivityService.hasActualTenderActivity(actualTender)).thenReturn(true);
 

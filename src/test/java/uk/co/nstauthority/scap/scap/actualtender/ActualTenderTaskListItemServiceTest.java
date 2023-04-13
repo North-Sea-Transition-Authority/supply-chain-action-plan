@@ -50,7 +50,7 @@ class ActualTenderTaskListItemServiceTest {
 
   @Test
   void isValid_NoActualTenderOverview_AssertFalse() {
-    when(actualTenderService.getByScapDetail(SCAP_DETAIL)).thenReturn(Optional.empty());
+    when(actualTenderService.findByScapDetail(SCAP_DETAIL)).thenReturn(Optional.empty());
 
     assertFalse(actualTenderTaskListItemService.isValid(SCAP_DETAIL));
 
@@ -62,7 +62,7 @@ class ActualTenderTaskListItemServiceTest {
     var actualTender = new ActualTender();
     actualTender.setHasActualTenders(false);
 
-    when(actualTenderService.getByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(actualTender));
+    when(actualTenderService.findByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(actualTender));
 
     assertTrue(actualTenderTaskListItemService.isValid(SCAP_DETAIL));
 
@@ -74,7 +74,7 @@ class ActualTenderTaskListItemServiceTest {
     var actualTender = new ActualTender();
     actualTender.setHasActualTenders(true);
 
-    when(actualTenderService.getByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(actualTender));
+    when(actualTenderService.findByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(Collections.emptyList());
 
     assertFalse(actualTenderTaskListItemService.isValid(SCAP_DETAIL));
@@ -97,7 +97,7 @@ class ActualTenderTaskListItemServiceTest {
         .withValid(true)
         .build();
 
-    when(actualTenderService.getByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(actualTender));
+    when(actualTenderService.findByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(actualTenderActivities);
     when(actualTenderSummaryViewService.getByActualTenderActivities(actualTenderActivities, SCAP_ID))
         .thenReturn(List.of(view1, view2));
@@ -123,7 +123,7 @@ class ActualTenderTaskListItemServiceTest {
         .withValid(true)
         .build();
 
-    when(actualTenderService.getByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(actualTender));
+    when(actualTenderService.findByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(actualTenderActivities);
     when(actualTenderSummaryViewService.getByActualTenderActivities(actualTenderActivities, SCAP_ID))
         .thenReturn(List.of(view1, view2));
@@ -149,7 +149,7 @@ class ActualTenderTaskListItemServiceTest {
         .withValid(true)
         .build();
 
-    when(actualTenderService.getByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(actualTender));
+    when(actualTenderService.findByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getAllByActualTender(actualTender)).thenReturn(actualTenderActivities);
     when(actualTenderSummaryViewService.getByActualTenderActivities(actualTenderActivities, SCAP_ID))
         .thenReturn(List.of(view1, view2));

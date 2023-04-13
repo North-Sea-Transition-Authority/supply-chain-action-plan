@@ -130,7 +130,7 @@ public class ScapSummaryViewService {
 
   @VisibleForTesting
   public ActualTenderSummaryView getActualTenderSummaryView(ScapDetail scapDetail) {
-    var actualTenderOpt = actualTenderService.getByScapDetail(scapDetail);
+    var actualTenderOpt = actualTenderService.findByScapDetail(scapDetail);
     return actualTenderOpt.map(actualTender -> {
       if (Boolean.FALSE.equals(actualTender.getHasActualTenders())) {
         return new ActualTenderSummaryView(false, Collections.emptyList());

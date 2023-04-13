@@ -75,7 +75,7 @@ public class ActualTenderCopyServiceTest {
     oldActualTender.setHasMoreActualTenders(HasMoreActualTenderActivities.NO);
     oldActualTender.setScapDetail(oldScapDetail);
     oldActualTender.setId(5000);
-    when(actualTenderService.getByScapDetailOrThrow(oldScapDetail)).thenReturn(oldActualTender);
+    when(actualTenderService.getByScapDetail(oldScapDetail)).thenReturn(oldActualTender);
 
     actualTenderCopyService.copyEntity(oldScapDetail, newScapDetail, NewScapType.REINSTATEMENT);
     verify(entityManager).persist(actualTenderCaptor.capture());
@@ -97,7 +97,7 @@ public class ActualTenderCopyServiceTest {
     oldActualTender.setHasMoreActualTenders(HasMoreActualTenderActivities.NO);
     oldActualTender.setScapDetail(oldScapDetail);
     oldActualTender.setId(5000);
-    when(actualTenderService.getByScapDetailOrThrow(oldScapDetail)).thenReturn(oldActualTender);
+    when(actualTenderService.getByScapDetail(oldScapDetail)).thenReturn(oldActualTender);
 
     actualTenderCopyService.copyEntity(oldScapDetail, newScapDetail, NewScapType.DRAFT_UPDATE);
     verify(entityManager).persist(actualTenderCaptor.capture());
@@ -127,7 +127,7 @@ public class ActualTenderCopyServiceTest {
     oldContractingPerformance.setActualTenderActivity(oldActivity);
     oldContractingPerformance.setId(5000);
 
-    when(actualTenderService.getByScapDetailOrThrow(oldScapDetail)).thenReturn(oldActualTender);
+    when(actualTenderService.getByScapDetail(oldScapDetail)).thenReturn(oldActualTender);
     when(actualTenderActivityCopyService.copyActualTenderActivities(eq(oldActualTender), any(ActualTender.class)))
         .thenReturn(activitiesMap);
     when(contractingPerformanceService.getAllByActualTenderActivities(activitiesMap.keySet().stream().toList()))
@@ -159,7 +159,7 @@ public class ActualTenderCopyServiceTest {
     oldInvitationParticpant.setBidParticipant(true);
     oldInvitationParticpant.setCompanyName("TEST");
 
-    when(actualTenderService.getByScapDetailOrThrow(oldScapDetail)).thenReturn(oldActualTender);
+    when(actualTenderService.getByScapDetail(oldScapDetail)).thenReturn(oldActualTender);
     when(actualTenderActivityCopyService.copyActualTenderActivities(eq(oldActualTender), any(ActualTender.class)))
         .thenReturn(activitiesMap);
     when(invitationToTenderParticipantService.getInvitationToTenderParticipants(oldActivity))

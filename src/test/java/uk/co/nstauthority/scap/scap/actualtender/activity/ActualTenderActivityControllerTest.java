@@ -78,7 +78,7 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
   @Test
   void renderActualTenderActivityForm() throws Exception {
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
-    when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
+    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(actualTender);
 
     mockMvc.perform(
         get(ReverseRouter.route(on(ActualTenderActivityController.class)
@@ -103,7 +103,7 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
         .renderBidParticipantsForm(scap.getScapId(), createdTenderActivity.getId(), null));
 
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
-    when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
+    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender)))
         .thenReturn(bindingResult);
     when(actualTenderActivityService.createActualTenderActivity(actualTender, form))
@@ -130,7 +130,7 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
         .renderActualTenderSummary(scap.getScapId()));
 
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
-    when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
+    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender)))
         .thenReturn(bindingResult);
     when(actualTenderActivityService.createActualTenderActivity(actualTender, form))
@@ -154,7 +154,7 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
     bindingResult.addError(new FieldError("form", "testField", "Test field must not be blank"));
 
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
-    when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
+    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender)))
         .thenReturn(bindingResult);
     when(actualTenderActivityFormService
@@ -254,7 +254,7 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
         .renderActualTenderSummary(scap.getScapId()));
 
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
-    when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
+    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
     when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender), eq(actualTenderActivity)))
         .thenReturn(bindingResultWithoutErrors);
@@ -282,7 +282,7 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
 
     when(actualTenderActivityService.getById(actualTenderActivity.getId()))
         .thenReturn(actualTenderActivity);
-    when(actualTenderService.getByScapDetailOrThrow(scapDetail)).thenReturn(actualTender);
+    when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender), eq(actualTenderActivity)))
         .thenReturn(bindingResultWithErrors);
     when(actualTenderActivityFormService
