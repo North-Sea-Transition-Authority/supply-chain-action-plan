@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -27,7 +28,8 @@ public class ProjectPerformance implements ScapDetailChild {
   @JoinColumn(name = "scap_detail_id")
   private ScapDetail scapDetail;
 
-  private Boolean isProjectCompleted;
+  @Column(name = "is_project_completed")
+  private Boolean projectCompleted;
 
   private LocalDate startDate;
 
@@ -70,11 +72,11 @@ public class ProjectPerformance implements ScapDetailChild {
   }
 
   public Boolean getProjectCompleted() {
-    return isProjectCompleted;
+    return projectCompleted;
   }
 
   public void setProjectCompleted(Boolean projectCompleted) {
-    isProjectCompleted = projectCompleted;
+    this.projectCompleted = projectCompleted;
   }
 
   public LocalDate getStartDate() {

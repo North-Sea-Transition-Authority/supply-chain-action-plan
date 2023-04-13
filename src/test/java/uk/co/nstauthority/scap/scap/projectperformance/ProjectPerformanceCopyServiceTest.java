@@ -90,10 +90,14 @@ class ProjectPerformanceCopyServiceTest {
     projectPerformanceCopyService.copyEntity(oldScapDetail, newScapDetail, NewScapType.DRAFT_UPDATE);
     verify(entityManager).persist(performanceCaptor.capture());
     var result = performanceCaptor.getValue();
-    assertValuesEqual(result, oldProjectPerformance, List.of("id", "scapDetail", "isProjectCompleted", "createdTimestamp"));
+
+    var excludedFields = List.of("id", "scapDetail", "getProjectCompleted", "createdTimestamp", "projectCompleted");
+    assertValuesEqual(result, oldProjectPerformance, excludedFields);
     assertThat(result.getScapDetail()).isEqualTo(newScapDetail);
-    assertThat(result.getProjectCompleted()).isNull();
-    assertThat(result.getId()).isNull();
+    assertThat(result).extracting(
+        ProjectPerformance::getProjectCompleted,
+        ProjectPerformance::getId
+    ).containsOnlyNulls();
   }
 
 }

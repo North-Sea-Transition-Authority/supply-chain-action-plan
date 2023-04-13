@@ -412,7 +412,7 @@ class ScapSummaryViewServiceTest {
     var projectPerformanceSummaryView = scapSummaryViewService.getProjectPerformanceSummaryView(scapDetail);
 
     assertThat(projectPerformanceSummaryView).extracting(
-        ProjectPerformanceSummaryView::isProjectCompleted,
+        ProjectPerformanceSummaryView::projectCompleted,
         ProjectPerformanceSummaryView::startDate,
         ProjectPerformanceSummaryView::completionDate,
         ProjectPerformanceSummaryView::outturnCost
@@ -434,7 +434,7 @@ class ScapSummaryViewServiceTest {
     var projectPerformanceSummaryView = scapSummaryViewService.getProjectPerformanceSummaryView(scapDetail);
 
     assertThat(projectPerformanceSummaryView).extracting(
-        ProjectPerformanceSummaryView::isProjectCompleted,
+        ProjectPerformanceSummaryView::projectCompleted,
         ProjectPerformanceSummaryView::startDate,
         ProjectPerformanceSummaryView::completionDate,
         ProjectPerformanceSummaryView::outturnCost

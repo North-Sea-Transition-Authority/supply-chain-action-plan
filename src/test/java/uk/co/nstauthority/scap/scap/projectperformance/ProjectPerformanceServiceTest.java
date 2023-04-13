@@ -17,7 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @SuppressWarnings("OptionalGetWithoutIsPresent")
@@ -53,7 +52,7 @@ class ProjectPerformanceServiceTest {
     var argumentCaptor = ArgumentCaptor.forClass(ProjectPerformance.class);
     var projectPerformance = new ProjectPerformance(48);
     var form = new ProjectPerformanceForm();
-    form.setIsProjectCompleted(YesNo.YES);
+    form.setProjectCompleted(true);
     form.setStartDay("30");
     form.setStartMonth("12");
     form.setStartYear("1999");
@@ -86,7 +85,7 @@ class ProjectPerformanceServiceTest {
     var argumentCaptor = ArgumentCaptor.forClass(ProjectPerformance.class);
     var projectPerformance = new ProjectPerformance(48);
     var form = new ProjectPerformanceForm();
-    form.setIsProjectCompleted(YesNo.NO);
+    form.setProjectCompleted(false);
     form.setStartDay("30");
     form.setStartMonth("12");
     form.setStartYear("1999");
@@ -114,7 +113,7 @@ class ProjectPerformanceServiceTest {
   void saveProjectPerformance_InvalidStartDate_AssertThrows() {
     var projectPerformance = new ProjectPerformance(48);
     var form = new ProjectPerformanceForm();
-    form.setIsProjectCompleted(YesNo.YES);
+    form.setProjectCompleted(true);
     form.setStartDay("NaN");
     form.setStartMonth("12");
     form.setStartYear("1999");
@@ -130,7 +129,7 @@ class ProjectPerformanceServiceTest {
   void saveProjectPerformance_InvalidCompletionDate_AssertThrows() {
     var projectPerformance = new ProjectPerformance(48);
     var form = new ProjectPerformanceForm();
-    form.setIsProjectCompleted(YesNo.YES);
+    form.setProjectCompleted(true);
     form.setStartDay("30");
     form.setStartMonth("12");
     form.setStartYear("1999");
@@ -149,7 +148,7 @@ class ProjectPerformanceServiceTest {
   void saveProjectPerformance_InvalidOutturnCost_AssertThrows() {
     var projectPerformance = new ProjectPerformance(48);
     var form = new ProjectPerformanceForm();
-    form.setIsProjectCompleted(YesNo.YES);
+    form.setProjectCompleted(true);
     form.setStartDay("30");
     form.setStartMonth("12");
     form.setStartYear("1999");
@@ -169,7 +168,7 @@ class ProjectPerformanceServiceTest {
     var argumentCaptor = ArgumentCaptor.forClass(ProjectPerformance.class);
     var scapDetail = new ScapDetail();
     var form = new ProjectPerformanceForm();
-    form.setIsProjectCompleted(YesNo.YES);
+    form.setProjectCompleted(true);
     form.setStartDay("30");
     form.setStartMonth("12");
     form.setStartYear("1999");

@@ -2,8 +2,8 @@
 
 <#macro projectPerformanceSummary projectPerformanceSummaryView>
 <#-- @ftlvariable name="projectPerformanceSummaryView" type="uk.co.nstauthority.scap.scap.summary.ProjectPerformanceSummaryView" -->
-  <#if projectPerformanceSummaryView.isProjectCompleted()?has_content>
-    <#if projectPerformanceSummaryView.isProjectCompleted()>
+  <#if projectPerformanceSummaryView.projectCompleted()?has_content>
+    <#if projectPerformanceSummaryView.projectCompleted()>
       <@projectPerformanceSummaryCard projectPerformanceSummaryView=projectPerformanceSummaryView />
     <#else>
       <@fdsInsetText.insetText>

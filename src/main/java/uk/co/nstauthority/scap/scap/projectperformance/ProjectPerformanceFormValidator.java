@@ -12,13 +12,12 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 import uk.co.fivium.formlibrary.validator.date.ThreeFieldDateInputValidator;
 import uk.co.fivium.formlibrary.validator.decimal.DecimalInputValidator;
-import uk.co.nstauthority.scap.enumutil.YesNo;
 
 @Service
 class ProjectPerformanceFormValidator implements Validator {
 
   @VisibleForTesting
-  static final String PROJECT_COMPLETED_FIELD_NAME = "isProjectCompleted";
+  static final String PROJECT_COMPLETED_FIELD_NAME = "projectCompleted";
 
   private final Clock clock;
 
@@ -43,7 +42,7 @@ class ProjectPerformanceFormValidator implements Validator {
         "Select whether the full project has been completed"
     );
 
-    if (YesNo.YES.equals(form.getIsProjectCompleted())) {
+    if (Boolean.TRUE.equals(form.getProjectCompleted())) {
 
       var currentDate = LocalDate.ofInstant(clock.instant(), clock.getZone());
       currentDate = currentDate.plusDays(1);

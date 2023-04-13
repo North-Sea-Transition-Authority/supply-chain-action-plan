@@ -16,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
-import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.utils.ValidatorTestingUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,7 +59,7 @@ class ProjectPerformanceFormValidatorTest {
 
   @Test
   void validate_ProjectNotCompleted_AssertValid() {
-    form.setIsProjectCompleted(YesNo.NO);
+    form.setProjectCompleted(false);
 
     projectPerformanceFormValidator.validate(form, errors);
 
@@ -69,7 +68,7 @@ class ProjectPerformanceFormValidatorTest {
 
   @Test
   void validate_ProjectCompleted_OtherwiseEmpty_AssertErrors() {
-    form.setIsProjectCompleted(YesNo.YES);
+    form.setProjectCompleted(true);
 
     projectPerformanceFormValidator.validate(form, errors);
 
@@ -90,7 +89,7 @@ class ProjectPerformanceFormValidatorTest {
   void validate_FutureDates_AssertErrors() {
     var currentInstant = clock.instant();
     var currentDate = LocalDate.ofInstant(currentInstant, clock.getZone());
-    form.setIsProjectCompleted(YesNo.YES);
+    form.setProjectCompleted(true);
     form.setStartDay(String.valueOf(currentDate.getDayOfMonth() + 1));
     form.setStartMonth(String.valueOf(currentDate.getMonthValue()));
     form.setStartYear(String.valueOf(currentDate.getYear()));
@@ -117,7 +116,7 @@ class ProjectPerformanceFormValidatorTest {
   void validate_EndBeforeStart_AssertErrors() {
     var currentInstant = clock.instant();
     var currentDate = LocalDate.ofInstant(currentInstant, clock.getZone());
-    form.setIsProjectCompleted(YesNo.YES);
+    form.setProjectCompleted(true);
     form.setStartDay(String.valueOf(currentDate.getDayOfMonth() - 1));
     form.setStartMonth(String.valueOf(currentDate.getMonthValue()));
     form.setStartYear(String.valueOf(currentDate.getYear()));
@@ -141,7 +140,7 @@ class ProjectPerformanceFormValidatorTest {
   void validate_ProjectCompleted_AssertValid() {
     var currentInstant = clock.instant();
     var currentDate = LocalDate.ofInstant(currentInstant, clock.getZone());
-    form.setIsProjectCompleted(YesNo.YES);
+    form.setProjectCompleted(true);
     form.setStartDay(String.valueOf(currentDate.getDayOfMonth() - 1));
     form.setStartMonth(String.valueOf(currentDate.getMonthValue()));
     form.setStartYear(String.valueOf(currentDate.getYear() - 1));

@@ -300,7 +300,7 @@ public class ScapSummaryModelAndViewGenerator {
 
     private void addScapApprovalRequestForm(ModelAndView modelAndView) {
       modelAndView.addObject("scapApprovalForm", scapApprovalForm);
-      modelAndView.addObject("projectClosedOut", scapSummary.projectPerformanceSummaryView().isProjectCompleted());
+      modelAndView.addObject("projectClosedOut", scapSummary.projectPerformanceSummaryView().projectCompleted());
       modelAndView.addObject("approvalDocumentUploads", existingApprovalFiles);
       modelAndView.addObject("approvalFormSubmitUrl",
           ReverseRouter.route(on(ScapApprovalController.class)

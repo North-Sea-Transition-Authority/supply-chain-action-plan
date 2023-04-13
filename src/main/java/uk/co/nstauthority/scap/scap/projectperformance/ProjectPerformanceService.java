@@ -5,7 +5,6 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Service
@@ -37,7 +36,7 @@ public class ProjectPerformanceService {
 
   @Transactional
   void updateProjectPerformance(ProjectPerformance projectPerformance, ProjectPerformanceForm form) {
-    projectPerformance.setProjectCompleted(YesNo.YES.equals(form.getIsProjectCompleted()));
+    projectPerformance.setProjectCompleted(Boolean.TRUE.equals(form.getProjectCompleted()));
     if (Boolean.TRUE.equals(projectPerformance.getProjectCompleted())) {
       var startDate = form.getStartDate().getAsLocalDate()
           .orElseThrow(() -> new ClassCastException("Could not get %s/%s/%s as LocalDate".formatted(
@@ -56,10 +55,6 @@ public class ProjectPerformanceService {
       projectPerformance.setStartDate(startDate);
       projectPerformance.setCompletionDate(completionDate);
       projectPerformance.setOutturnCost(outturnCost);
-    } else {
-      projectPerformance.setStartDate(null);
-      projectPerformance.setCompletionDate(null);
-      projectPerformance.setOutturnCost(null);
     }
     projectPerformanceRepository.save(projectPerformance);
   }

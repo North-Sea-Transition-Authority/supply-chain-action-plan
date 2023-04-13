@@ -170,7 +170,7 @@ public class ScapSummaryViewService {
   }
 
   public ScapSubmissionStage inferSubmissionStatusFromSummary(ScapSummaryView scapSummaryView) {
-    if (Boolean.TRUE.equals(scapSummaryView.projectPerformanceSummaryView().isProjectCompleted())) {
+    if (Boolean.TRUE.equals(scapSummaryView.projectPerformanceSummaryView().projectCompleted())) {
       return ScapSubmissionStage.PROJECT_COMPLETED;
     }
     if (Boolean.TRUE.equals(scapSummaryView.contractingPerformanceOverviewSummaryView().hasContractingPerformance())) {

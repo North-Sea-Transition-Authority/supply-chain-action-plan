@@ -3,11 +3,10 @@ package uk.co.nstauthority.scap.scap.projectperformance;
 import uk.co.fivium.formlibrary.input.DecimalInput;
 import uk.co.fivium.formlibrary.input.IntegerInput;
 import uk.co.fivium.formlibrary.input.ThreeFieldDateInput;
-import uk.co.nstauthority.scap.enumutil.YesNo;
 
 public class ProjectPerformanceForm {
 
-  private YesNo isProjectCompleted;
+  private Boolean projectCompleted;
   private final IntegerInput startDay;
   private final IntegerInput startMonth;
   private final IntegerInput startYear;
@@ -42,12 +41,12 @@ public class ProjectPerformanceForm {
     this.outturnCost = new DecimalInput("outturnCost", "the project outturn cost");
   }
 
-  public YesNo getIsProjectCompleted() {
-    return isProjectCompleted;
+  public Boolean getProjectCompleted() {
+    return projectCompleted;
   }
 
-  public void setIsProjectCompleted(YesNo isProjectCompleted) {
-    this.isProjectCompleted = isProjectCompleted;
+  public void setProjectCompleted(Boolean projectCompleted) {
+    this.projectCompleted = projectCompleted;
   }
 
   public ThreeFieldDateInput getStartDate() {

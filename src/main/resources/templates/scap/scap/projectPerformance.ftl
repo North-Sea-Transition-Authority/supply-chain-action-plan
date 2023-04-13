@@ -11,7 +11,7 @@
     yearPath="form.startYear.inputValue"
     labelText="Actual execution start date"
     hintText="For example, 31 3 2023"
-    nestingPath="form.isProjectCompleted"
+    nestingPath="form.projectCompleted"
   />
   <@fdsDateInput.dateInput
     formId="endDate"
@@ -20,7 +20,7 @@
     yearPath="form.completionYear.inputValue"
     labelText="Actual commissioning or completion date"
     hintText="For example, 31 3 2024"
-    nestingPath="form.isProjectCompleted"
+    nestingPath="form.projectCompleted"
   />
   <@fdsTextInput.textInput
     path="form.outturnCost.inputValue"
@@ -29,33 +29,30 @@
     suffix="million"
     suffixScreenReaderPrompt="in millions"
     inputClass="govuk-input--width-7"
-    nestingPath="form.isProjectCompleted"
+    nestingPath="form.projectCompleted"
   />
 </#assign>
 
 <@defaultPage
   htmlTitle=pageTitle
-  pageHeading=pageTitle
+  pageHeading=""
   pageSize=PageSize.TWO_THIRDS_COLUMN
   errorItems=errorList
   backLinkUrl=springUrl(backLinkUrl)
 >
   <@fdsForm.htmlForm>
     <@fdsRadio.radioGroup
-      path="form.isProjectCompleted"
+      path="form.projectCompleted"
       labelText="Has the full project been completed?"
+      fieldsetHeadingClass="govuk-heading-xl"
+
       hintText="For example, fully commissioned or fully decommissioned"
       hiddenContent=true
     >
-      <#assign firstItem=true />
-      <#list radioItems as k, v>
-        <@fdsRadio.radioItem path="form.isProjectCompleted" itemMap={k : v} isFirstItem=firstItem >
-          <#if k == "YES">
-            ${yesContent}
-          </#if>
-        </@fdsRadio.radioItem>
-        <#assign firstItem=false />
-      </#list>
+      <@fdsRadio.radioYes path="form.projectCompleted">
+        ${yesContent}
+      </@fdsRadio.radioYes>
+      <@fdsRadio.radioNo path="form.projectCompleted"/>
     </@fdsRadio.radioGroup>
     <@fdsAction.button buttonText="Save and complete"/>
   </@fdsForm.htmlForm>

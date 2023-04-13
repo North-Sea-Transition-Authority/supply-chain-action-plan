@@ -5,13 +5,13 @@ import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
-import uk.co.nstauthority.scap.enumutil.YesNo;
 
 @ExtendWith(MockitoExtension.class)
 class ProjectPerformanceFormServiceTest {
@@ -44,7 +44,7 @@ class ProjectPerformanceFormServiceTest {
     var form = projectPerformanceFormService.getForm(projectPerformance);
 
     assertThat(form).extracting(
-        ProjectPerformanceForm::getIsProjectCompleted,
+        ProjectPerformanceForm::getProjectCompleted,
         form1 -> form1.getStartDay().getInputValue(),
         form1 -> form1.getStartMonth().getInputValue(),
         form1 -> form1.getStartYear().getInputValue(),
@@ -53,7 +53,7 @@ class ProjectPerformanceFormServiceTest {
         form1 -> form1.getCompletionYear().getInputValue(),
         form1 -> form1.getOutturnCost().getInputValue()
     ).containsExactly(
-        YesNo.NO,
+        false,
         null, null, null,
         null, null, null,
         null
@@ -74,12 +74,15 @@ class ProjectPerformanceFormServiceTest {
     var form = projectPerformanceFormService.getForm(projectPerformance);
 
     assertThat(form).extracting(
-        ProjectPerformanceForm::getIsProjectCompleted,
-        form1 -> form1.getStartDate().getAsLocalDate().get(),
-        form1 -> form1.getCompletionDate().getAsLocalDate().get(),
-        form1 -> form1.getOutturnCost().getAsBigDecimal().get()
+        ProjectPerformanceForm::getProjectCompleted,
+        form1 -> form1.getStartDate().getAsLocalDate(),
+        form1 -> form1.getCompletionDate().getAsLocalDate(),
+        form1 -> form1.getOutturnCost().getAsBigDecimal()
     ).containsExactly(
-        YesNo.YES, startDate, endDate, outturnCost
+        true,
+        Optional.of(startDate),
+        Optional.of(endDate),
+        Optional.of(outturnCost)
     );
   }
 }
