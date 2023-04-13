@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectType;
+import uk.co.nstauthority.scap.util.ValidationUtil;
 
 @Service
 class WorkAreaFilterService {
@@ -41,7 +42,8 @@ class WorkAreaFilterService {
       conditions.add(getStatusCondition(filter.getScapStatuses()));
     }
 
-    if (StringUtils.isNotBlank(filter.getReferenceSearchTerm())) {
+    if (StringUtils.isNotBlank(filter.getReferenceSearchTerm())
+        && filter.getReferenceSearchTerm().length() <= ValidationUtil.TEXT_AREA_STANDARD_LIMIT) {
       conditions.add(getReferenceCondition(filter.getReferenceSearchTerm()));
     }
 

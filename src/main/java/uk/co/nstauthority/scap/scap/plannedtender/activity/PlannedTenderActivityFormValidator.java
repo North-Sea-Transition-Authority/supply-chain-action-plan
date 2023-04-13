@@ -10,6 +10,7 @@ import uk.co.fivium.formlibrary.validator.date.ThreeFieldDateInputValidator;
 import uk.co.fivium.formlibrary.validator.decimal.DecimalInputValidator;
 import uk.co.fivium.formlibrary.validator.string.StringInputValidator;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
+import uk.co.nstauthority.scap.util.ValidationUtil;
 
 @Service
 public class PlannedTenderActivityFormValidator implements Validator {
@@ -22,7 +23,9 @@ public class PlannedTenderActivityFormValidator implements Validator {
   public void validate(@NotNull Object target, @NotNull Errors errors) {
     var form = (PlannedTenderActivityForm) target;
 
-    StringInputValidator.builder().validate(form.getScopeDescription(), errors);
+    StringInputValidator.builder()
+        .mustHaveCharacterCountAtMost(ValidationUtil.TEXT_AREA_STANDARD_LIMIT)
+        .validate(form.getScopeDescription(), errors);
 
     DecimalInputValidator.builder()
         .mustHaveNoMoreThanDecimalPlaces(3)
@@ -35,10 +38,14 @@ public class PlannedTenderActivityFormValidator implements Validator {
         "Enter a remuneration model");
 
     if (RemunerationModel.OTHER.equals(form.getRemunerationModel())) {
-      StringInputValidator.builder().validate(form.getRemunerationModelName(), errors);
+      StringInputValidator.builder()
+          .mustHaveCharacterCountAtMost(ValidationUtil.TEXT_AREA_STANDARD_LIMIT)
+          .validate(form.getRemunerationModelName(), errors);
     }
 
-    StringInputValidator.builder().validate(form.getAwardRationale(), errors);
+    StringInputValidator.builder()
+        .mustHaveCharacterCountAtMost(ValidationUtil.TEXT_AREA_STANDARD_LIMIT)
+        .validate(form.getAwardRationale(), errors);
 
     ThreeFieldDateInputValidator.builder().validate(form.getIndicativeActualTenderStartDate(), errors);
 

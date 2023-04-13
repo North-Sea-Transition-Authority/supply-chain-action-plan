@@ -15,6 +15,7 @@ import uk.co.fivium.formlibrary.validator.string.StringInputValidator;
 import uk.co.nstauthority.scap.fds.searchselector.ManualEntryUtil;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
+import uk.co.nstauthority.scap.util.ValidationUtil;
 
 @Service
 class ActualTenderActivityFormValidator implements SmartValidator {
@@ -64,13 +65,17 @@ class ActualTenderActivityFormValidator implements SmartValidator {
 
     validateScopeTitle(form, errors, actualTender, actualTenderActivityFormValidatorHint);
 
-    StringInputValidator.builder().validate(form.getScopeDescription(), errors);
+    StringInputValidator.builder()
+        .mustHaveCharacterCountAtMost(ValidationUtil.TEXT_AREA_STANDARD_LIMIT)
+        .validate(form.getScopeDescription(), errors);
     ValidationUtils.rejectIfEmpty(
         errors, "remunerationModel",
         "remunerationModel.required",
         MISSING_REMUNERATION_MODEL_ERROR);
     if (RemunerationModel.OTHER.equals(form.getRemunerationModel())) {
-      StringInputValidator.builder().validate(form.getRemunerationModelName(), errors);
+      StringInputValidator.builder()
+          .mustHaveCharacterCountAtMost(ValidationUtil.TEXT_AREA_STANDARD_LIMIT)
+          .validate(form.getRemunerationModelName(), errors);
     }
     ValidationUtils.rejectIfEmpty(
         errors, "contractStage",

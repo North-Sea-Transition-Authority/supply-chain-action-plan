@@ -41,10 +41,11 @@ class ProjectDetailsFormValidator implements Validator {
   public void validate(@NotNull Object target, @NotNull Errors errors) {
     var form = (ProjectDetailsForm) target;
 
-    StringInputValidator.builder().validate(form.getProjectName(), errors);
+    StringInputValidator.builder()
+        .mustHaveCharacterCountAtMost(ValidationUtil.TEXT_AREA_STANDARD_LIMIT)
+        .validate(form.getProjectName(), errors);
 
-    StringInputValidator
-        .builder()
+    StringInputValidator.builder()
         .mustHaveCharacterCountAtMost(ValidationUtil.TEXT_AREA_STANDARD_LIMIT)
         .validate(form.getProjectSummary(), errors);
 

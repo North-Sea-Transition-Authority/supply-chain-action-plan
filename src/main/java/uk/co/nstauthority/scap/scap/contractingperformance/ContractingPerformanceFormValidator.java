@@ -10,6 +10,7 @@ import org.springframework.validation.SmartValidator;
 import org.springframework.validation.ValidationUtils;
 import uk.co.fivium.formlibrary.validator.decimal.DecimalInputValidator;
 import uk.co.fivium.formlibrary.validator.string.StringInputValidator;
+import uk.co.nstauthority.scap.util.ValidationUtil;
 
 @Service
 class ContractingPerformanceFormValidator implements SmartValidator {
@@ -58,6 +59,7 @@ class ContractingPerformanceFormValidator implements SmartValidator {
 
     StringInputValidator.builder()
         .isOptional()
+        .mustHaveCharacterCountAtMost(ValidationUtil.TEXT_AREA_STANDARD_LIMIT)
         .validate(form.getOutturnRationale(), errors);
   }
 }

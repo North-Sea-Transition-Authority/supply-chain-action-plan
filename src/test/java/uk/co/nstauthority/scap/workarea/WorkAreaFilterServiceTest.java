@@ -23,11 +23,12 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectType;
+import uk.co.nstauthority.scap.util.ValidationUtil;
 
 @ExtendWith(MockitoExtension.class)
 class WorkAreaFilterServiceTest {
 
-  private Clock clock =  Clock.fixed(Instant.ofEpochSecond(1667576106), ZoneId.systemDefault());
+  private final Clock clock =  Clock.fixed(Instant.ofEpochSecond(1667576106), ZoneId.systemDefault());
 
   @InjectMocks
   WorkAreaFilterService workAreaFilterService = new WorkAreaFilterService(clock);
@@ -71,6 +72,17 @@ class WorkAreaFilterServiceTest {
     assertThat(conditions).containsExactly(
         upper(SCAPS.REFERENCE).contains(upper(searchTerm))
     );
+  }
+
+  @Test
+  void getConditions_TooLongScapReferenceEntered_AssertNoCondition() {
+    var searchTerm = "1".repeat(ValidationUtil.TEXT_AREA_STANDARD_LIMIT + 1);
+    form.setReferenceSearchTerm(searchTerm);
+    filter.update(form);
+
+    var conditions = workAreaFilterService.getConditions(filter);
+
+    assertThat(conditions).isEmpty();
   }
 
   @Test

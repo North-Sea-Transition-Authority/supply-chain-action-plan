@@ -17,6 +17,7 @@ import uk.co.fivium.formlibrary.validator.integer.IntegerInputValidator;
 import uk.co.fivium.formlibrary.validator.string.StringInputValidator;
 import uk.co.nstauthority.scap.energyportal.CountryService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
+import uk.co.nstauthority.scap.util.ValidationUtil;
 
 @Service
 class AwardedContractFormValidator implements SmartValidator {
@@ -76,6 +77,7 @@ class AwardedContractFormValidator implements SmartValidator {
         .validate(form.getAwardValue(), errors);
 
     StringInputValidator.builder()
+        .mustHaveCharacterCountAtMost(ValidationUtil.TEXT_AREA_STANDARD_LIMIT)
         .validate(form.getAwardRationale(), errors);
 
     ValidationUtils.rejectIfEmpty(
