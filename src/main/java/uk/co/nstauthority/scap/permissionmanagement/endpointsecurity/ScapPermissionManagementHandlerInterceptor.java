@@ -66,6 +66,9 @@ public class ScapPermissionManagementHandlerInterceptor extends AbstractHandlerI
   }
 
   private void checkIsMemberOfScapTeamWithPermission(Scap scap, ServiceUserDetail user, List<RolePermission> permissions) {
+    if (teamService.userIsMemberOfRegulatorTeam(user)) {
+      return;
+    }
     var team = teamService.getByEnergyPortalOrgGroupId(scap.getOrganisationGroupId());
     var teamMember = teamMemberService.getTeamMember(team, user.getWebUserAccountId());
 
@@ -74,7 +77,6 @@ public class ScapPermissionManagementHandlerInterceptor extends AbstractHandlerI
         .map(TeamRole::getRolePermissions)
         .flatMap(Collection::stream)
         .anyMatch(permissions::contains);
-
     if (teamMemberPermissions) {
       return;
     }
