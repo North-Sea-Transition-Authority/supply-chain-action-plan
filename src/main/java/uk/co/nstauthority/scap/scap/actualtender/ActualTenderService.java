@@ -35,12 +35,12 @@ public class ActualTenderService {
   @Transactional
   public void createActualTender(ScapDetail scapDetail, YesNo hasActualTenders) {
     var actualTender = new ActualTender(scapDetail, clock.instant());
-    updateHasActualTenders(actualTender, hasActualTenders);
+    updateHasActualTenders(actualTender, YesNo.YES.equals(hasActualTenders));
   }
 
   @Transactional
-  public void updateHasActualTenders(ActualTender actualTender, YesNo hasActualTenders) {
-    actualTender.setHasActualTenders(YesNo.YES.equals(hasActualTenders));
+  public void updateHasActualTenders(ActualTender actualTender, Boolean hasActualTenders) {
+    actualTender.setHasActualTenders(hasActualTenders);
     actualTenderRepository.save(actualTender);
   }
 

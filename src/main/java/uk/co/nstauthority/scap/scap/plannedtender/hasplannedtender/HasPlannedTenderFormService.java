@@ -36,7 +36,7 @@ public class HasPlannedTenderFormService {
     var form = new HasPlannedTenderForm();
     if (Boolean.TRUE.equals(plannedTender.getHasPlannedTenders())) {
       form.setHasPlannedTender(YesNo.YES);
-    } else {
+    } else if (Boolean.FALSE.equals(plannedTender.getHasPlannedTenders())) {
       form.setHasPlannedTender(YesNo.NO);
     }
     return form;

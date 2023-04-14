@@ -150,7 +150,7 @@ class HasActualTenderControllerTest extends AbstractScapSubmitterControllerTest 
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name(String.format("redirect:%s", expectedRedirectUrl)));
 
-    verify(actualTenderService).updateHasActualTenders(existingActualTender, form.getHasActualTender());
+    verify(actualTenderService).updateHasActualTenders(existingActualTender, YesNo.YES.equals(form.getHasActualTender()));
   }
 
   @Test

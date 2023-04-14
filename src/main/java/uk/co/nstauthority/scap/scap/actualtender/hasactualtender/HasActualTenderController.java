@@ -90,7 +90,9 @@ public class HasActualTenderController {
         form,
         () -> {
           actualTender.ifPresentOrElse(
-              existingActualTender -> actualTenderService.updateHasActualTenders(existingActualTender, form.getHasActualTender()),
+              existingActualTender -> actualTenderService.updateHasActualTenders(
+                  existingActualTender,
+                  YesNo.YES.equals(form.getHasActualTender())),
               () -> actualTenderService.createActualTender(scapDetail, form.getHasActualTender())
           );
           if (YesNo.YES.equals(form.getHasActualTender())) {

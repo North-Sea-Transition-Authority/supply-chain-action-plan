@@ -87,7 +87,7 @@ class ActualTenderServiceTest {
     var createdTimestamp = Instant.ofEpochSecond(1666885004);
     var existingActualTender = new ActualTender(scapDetail, createdTimestamp);
 
-    actualTenderService.updateHasActualTenders(existingActualTender, YesNo.NO);
+    actualTenderService.updateHasActualTenders(existingActualTender, false);
 
     verify(actualTenderRepository).save(argumentCaptor.capture());
     assertThat(argumentCaptor.getValue()).extracting(
