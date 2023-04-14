@@ -14,19 +14,17 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
-import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermission;
 import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerBodyLine;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
-import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
@@ -36,7 +34,6 @@ import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 @Controller
 @RequestMapping("{scapId}/")
 @UserHasAnyPermission(permissions = RolePermission.REVIEW_SCAP)
-@ScapHasStatus(permittedStatuses = ScapDetailStatus.SUBMITTED)
 public class ConsultationResponseController {
 
   private final CaseEventService caseEventService;
@@ -51,7 +48,7 @@ public class ConsultationResponseController {
 
   private final ConsultationResponseFormValidator consultationResponseFormValidator;
 
-  private final SupportingDocumentService supportingDocumentService;
+  private final CaseEventDocumentService caseEventDocumentService;
 
   private final TeamService teamService;
 
@@ -64,7 +61,7 @@ public class ConsultationResponseController {
                                         ScapSummaryViewService scapSummaryViewService,
                                         OrganisationGroupService organisationGroupService,
                                         ConsultationResponseFormValidator consultationRequestFormValidator,
-                                        SupportingDocumentService supportingDocumentService,
+                                        CaseEventDocumentService caseEventDocumentService,
                                         TeamService teamService,
                                         UserDetailService userDetailService) {
     this.caseEventService = caseEventService;
@@ -73,7 +70,7 @@ public class ConsultationResponseController {
     this.scapSummaryViewService = scapSummaryViewService;
     this.organisationGroupService = organisationGroupService;
     this.consultationResponseFormValidator = consultationRequestFormValidator;
-    this.supportingDocumentService = supportingDocumentService;
+    this.caseEventDocumentService = caseEventDocumentService;
     this.teamService = teamService;
     this.userDetailService = userDetailService;
   }
@@ -95,7 +92,7 @@ public class ConsultationResponseController {
     var generator = ScapSummaryModelAndViewGenerator.generator(
             scapDetail,
             scapSummary,
-            supportingDocumentService)
+            caseEventDocumentService)
         .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
         .withConsultationResponseForm(consultationResponseForm)
         .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
@@ -109,10 +106,16 @@ public class ConsultationResponseController {
         generator.generate(),
         consultationResponseForm,
         () -> {
+          var uploadedFile = consultationResponseForm.getSupportingDocuments().isEmpty()
+              ? null
+              : consultationResponseForm.getSupportingDocuments().get(0).getUploadedFileId();
+
+          caseEventDocumentService.updateSupportingDocumentFileDescriptions(consultationResponseForm.getSupportingDocuments());
           caseEventService.recordNewEvent(CaseEventSubject.SCAP_CONSULTATION_RESPONSE,
               scapDetail,
               scapDetail.getVersionNumber(),
-              consultationResponseForm.getResponseComments().getInputValue());
+              consultationResponseForm.getResponseComments().getInputValue(),
+              uploadedFile);
           NotificationBannerUtils.successBannerRedirect(
               "Success",
               new NotificationBannerBodyLine(

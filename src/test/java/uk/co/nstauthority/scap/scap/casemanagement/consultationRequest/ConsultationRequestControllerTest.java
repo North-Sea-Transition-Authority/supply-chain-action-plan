@@ -31,6 +31,7 @@ import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestController;
@@ -39,7 +40,6 @@ import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.Consultat
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
-import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
@@ -66,7 +66,7 @@ class ConsultationRequestControllerTest extends AbstractControllerTest {
   private ConsultationRequestFormValidator consultationRequestFormValidator;
 
   @MockBean
-  private SupportingDocumentService supportingDocumentService;
+  private CaseEventDocumentService caseEventDocumentService;
 
   private static final ScapId SCAP_ID = new ScapId(1111);
 
@@ -80,11 +80,11 @@ class ConsultationRequestControllerTest extends AbstractControllerTest {
 
   @BeforeEach
   void setup() {
-    when(supportingDocumentService.buildFileUploadTemplate(SCAP_ID, SupportingDocumentType.APPROVAL_DOCUMENT))
+    when(caseEventDocumentService.buildFileUploadTemplate(SCAP_ID, SupportingDocumentType.APPROVAL_DOCUMENT))
         .thenReturn(new FileUploadTemplate("TEST", "TEST", "TEST", "100", ".xml"));
-    when(supportingDocumentService.buildFileUploadTemplate(SCAP_ID, SupportingDocumentType.CONSULTATION_REPORT))
+    when(caseEventDocumentService.buildFileUploadTemplate(SCAP_ID, SupportingDocumentType.CONSULTATION_REPORT))
         .thenReturn(new FileUploadTemplate("TEST", "TEST", "TEST", "100", ".xml"));
-    when(supportingDocumentService.buildFileUploadTemplate(SCAP_ID, SupportingDocumentType.FURTHER_INFORMATION))
+    when(caseEventDocumentService.buildFileUploadTemplate(SCAP_ID, SupportingDocumentType.FURTHER_INFORMATION))
         .thenReturn(new FileUploadTemplate("TEST", "TEST", "TEST", "100", ".xml"));
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));

@@ -22,11 +22,11 @@ import uk.co.nstauthority.scap.notify.ScapEmailService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
-import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
@@ -49,7 +49,7 @@ public class ScapWithdrawController {
 
   private final OrganisationGroupService organisationGroupService;
   private final ScapWithdrawalFormValidator scapWithdrawalFormValidator;
-  private final SupportingDocumentService supportingDocumentService;
+  private final CaseEventDocumentService caseEventDocumentService;
   private final ScapEmailService scapEmailService;
 
   private final TeamService teamService;
@@ -62,7 +62,7 @@ public class ScapWithdrawController {
                                 ScapSummaryViewService scapSummaryViewService,
                                 OrganisationGroupService organisationGroupService,
                                 ScapWithdrawalFormValidator scapWithdrawalFormValidator,
-                                SupportingDocumentService supportingDocumentService,
+                                CaseEventDocumentService caseEventDocumentService,
                                 ScapEmailService scapEmailService,
                                 TeamService teamService,
                                 UserDetailService userDetailService) {
@@ -72,7 +72,7 @@ public class ScapWithdrawController {
     this.scapSummaryViewService = scapSummaryViewService;
     this.organisationGroupService = organisationGroupService;
     this.scapWithdrawalFormValidator = scapWithdrawalFormValidator;
-    this.supportingDocumentService = supportingDocumentService;
+    this.caseEventDocumentService = caseEventDocumentService;
     this.scapEmailService = scapEmailService;
     this.teamService = teamService;
     this.userDetailService = userDetailService;
@@ -96,7 +96,7 @@ public class ScapWithdrawController {
     var generator =
         ScapSummaryModelAndViewGenerator.generator(scapDetail,
                 scapSummary,
-                supportingDocumentService)
+                caseEventDocumentService)
             .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
             .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
             .withScapVersions(scapDetailService.getAllVersionsForUser(scapDetail.getScap()))

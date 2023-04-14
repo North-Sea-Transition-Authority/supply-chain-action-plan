@@ -1,17 +1,14 @@
-package uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments;
+package uk.co.nstauthority.scap.scap.casemanagement;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
@@ -32,20 +29,20 @@ import uk.co.nstauthority.scap.file.UploadedFile;
 import uk.co.nstauthority.scap.file.VirtualFolder;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocument;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @ExtendWith(MockitoExtension.class)
-class SupportingDocumentServiceTest {
+class CaseEventsDocumentServiceTest {
 
   @Mock
   private FileUploadService fileUploadService;
   @Mock
   private FileUploadValidationService fileUploadValidationService;
-  @Mock
-  private SupportingDocumentRepository supportingDocumentRepository;
 
   @InjectMocks
-  private SupportingDocumentService supportingDocumentService;
+  private CaseEventDocumentService caseEventDocumentService;
   private static final String filename = FileTestUtil.VALID_FILENAME;
   private static final long fileSize = FileTestUtil.VALID_FILE_SIZE;
   private static final String contentType = FileTestUtil.VALID_CONTENT_TYPE;
@@ -70,7 +67,7 @@ class SupportingDocumentServiceTest {
     when(fileUploadValidationService.validateFileUpload(multipartFile, fileSize, filename))
         .thenReturn(uploadErrorType);
 
-    var fileUploadResult = supportingDocumentService.processFileUpload(submissionDetail, SupportingDocumentType.ADDITIONAL_DOCUMENT, multipartFile);
+    var fileUploadResult = caseEventDocumentService.processFileUpload(multipartFile);
 
     assertThat(fileUploadResult.isValid()).isFalse();
   }
@@ -83,7 +80,7 @@ class SupportingDocumentServiceTest {
         .when(fileUploadService)
         .createUploadedFile(virtualFolder, fileSize, filename, contentType);
 
-    var fileUploadResult = supportingDocumentService.processFileUpload(submissionDetail, SupportingDocumentType.ADDITIONAL_DOCUMENT, multipartFile);
+    var fileUploadResult = caseEventDocumentService.processFileUpload(multipartFile);
 
     assertThat(fileUploadResult.isValid()).isTrue();
   }
@@ -91,87 +88,26 @@ class SupportingDocumentServiceTest {
   @Test
   void deleteFile_FileDeleted_SupportingDocAndFileDeleted() {
     var uuid = UUID.randomUUID();
-    var supportingDocument = mock(SupportingDocument.class);
     when(fileUploadService.findUploadedFileOrThrow(uuid)).thenReturn(uploadedFile);
-    when(supportingDocumentRepository.findByScapDetailAndUploadedFile(scapDetail, uploadedFile))
-        .thenReturn(supportingDocument);
-    when(supportingDocumentRepository.findAllByUploadedFile(uploadedFile))
-        .thenReturn(Collections.singletonList(supportingDocument));
 
-    var fileDeleteResult = supportingDocumentService.deleteFile(scapDetail, uuid);
+    var fileDeleteResult = caseEventDocumentService.deleteFile(uuid);
 
-    verify(supportingDocumentRepository, times(1)).delete(supportingDocument);
     verify(fileUploadService, times(1)).deleteFile(uploadedFile);
     assertThat(fileDeleteResult.isValid()).isTrue();
-  }
-
-  @Test
-  void deleteFile_FileDeletedButExistsInOtherVersion_OnlySupportingDocDeleted() {
-    var supportingDocument1 = mock(SupportingDocument.class);
-    var supportingDocument2 = mock(SupportingDocument.class);
-    when(fileUploadService.findUploadedFileOrThrow(uploadedFile.getId())).thenReturn(uploadedFile);
-    when(supportingDocumentRepository.findByScapDetailAndUploadedFile(scapDetail, uploadedFile))
-        .thenReturn(supportingDocument1);
-    when(supportingDocumentRepository.findAllByUploadedFile(uploadedFile))
-        .thenReturn(List.of(supportingDocument1, supportingDocument2));
-
-    var fileDeleteResult = supportingDocumentService.deleteFile(scapDetail, uploadedFile.getId());
-
-    verify(supportingDocumentRepository, times(1)).delete(supportingDocument1);
-    verify(fileUploadService, never()).deleteFile(uploadedFile);
-    assertThat(fileDeleteResult.isValid()).isTrue();
-  }
-
-  @Test
-  void getFileUploadFormListForSubmissionAndType() {
-    var uuid = UUID.randomUUID();
-    var supportingDocumentType = SupportingDocumentType.ADDITIONAL_DOCUMENT;
-    var supportingDocument = createSupportingDocument(uuid, supportingDocumentType);
-
-    when(supportingDocumentRepository.findAllByScapDetailAndSupportingDocumentType(scapDetail,
-        supportingDocumentType)).thenReturn(List.of(supportingDocument));
-    when(fileUploadService.createFileUploadForm(uploadedFile)).thenReturn(createFileUploadForm());
-
-    var fileUploadForms = supportingDocumentService.getFileUploadFormListForScapDetailAndType(
-        scapDetail, supportingDocumentType);
-
-    assertThat(fileUploadForms)
-        .extracting(
-            FileUploadForm::getUploadedFileId,
-            FileUploadForm::getUploadedFileDescription,
-            FileUploadForm::getUploadedFileInstant
-        )
-        .contains(
-            tuple(
-                uploadedFile.getId(),
-                uploadedFile.getDescription(),
-                uploadedFile.getUploadedTimeStamp()
-            )
-        );
-  }
-
-  @Test
-  void getUploadedFileViewList() {
-    var uuid = UUID.randomUUID();
-    var fileUploadIdList = List.of(uuid);
-
-    var uploadedFileViews = supportingDocumentService.getUploadedFileViewList(fileUploadIdList);
-
-    verify(fileUploadService).getUploadedFileViewList(fileUploadIdList);
   }
 
   @Test
   void buildFileUploadTemplate_AdditionDocumentType() {
     var supportingDocumentType = SupportingDocumentType.ADDITIONAL_DOCUMENT;
 
-    var fileUploadTemplate = supportingDocumentService.buildFileUploadTemplate(
+    var fileUploadTemplate = caseEventDocumentService.buildFileUploadTemplate(
         scapId, supportingDocumentType);
 
     verify(fileUploadService).buildFileUploadTemplate(
-        ReverseRouter.route(on(AdditionalDocumentsController.class).download(scapId, null)),
-        ReverseRouter.route(on(AdditionalDocumentsController.class)
-            .upload(scapId, null)),
-        ReverseRouter.route(on(AdditionalDocumentsController.class).delete(scapId, null))
+        ReverseRouter.route(on(CaseEventsDocumentController.class).download(scapId, null)),
+        ReverseRouter.route(on(CaseEventsDocumentController.class)
+            .upload(scapId, supportingDocumentType, null)),
+        ReverseRouter.route(on(CaseEventsDocumentController.class).delete(scapId, null))
     );
   }
 
@@ -179,14 +115,14 @@ class SupportingDocumentServiceTest {
   void buildFileUploadTemplate_ConsultationResponseType() {
     var supportingDocumentType = SupportingDocumentType.CONSULTATION_REPORT;
 
-    var fileUploadTemplate = supportingDocumentService.buildFileUploadTemplate(
+    var fileUploadTemplate = caseEventDocumentService.buildFileUploadTemplate(
         scapId, supportingDocumentType);
 
     verify(fileUploadService).buildFileUploadTemplate(
-        ReverseRouter.route(on(AdditionalDocumentsController.class).download(scapId, null)),
-        ReverseRouter.route(on(AdditionalDocumentsController.class)
-            .upload(scapId, null)),
-        ReverseRouter.route(on(AdditionalDocumentsController.class).delete(scapId, null))
+        ReverseRouter.route(on(CaseEventsDocumentController.class).download(scapId,null)),
+        ReverseRouter.route(on(CaseEventsDocumentController.class)
+            .upload(scapId,supportingDocumentType, null)),
+        ReverseRouter.route(on(CaseEventsDocumentController.class).delete(scapId,null))
     );
   }
 
@@ -195,7 +131,7 @@ class SupportingDocumentServiceTest {
     var fileUploadForm = mock(FileUploadForm.class);
     var fileUploadFormList = List.of(fileUploadForm);
 
-    supportingDocumentService.updateSupportingDocumentFileDescriptions(fileUploadFormList);
+    caseEventDocumentService.updateSupportingDocumentFileDescriptions(fileUploadFormList);
 
     verify(fileUploadService).updateFileUploadDescriptions(fileUploadFormList);
   }
@@ -207,10 +143,7 @@ class SupportingDocumentServiceTest {
     supportingDocument.setUploadedFile(uploadedFile);
 
     when(fileUploadService.findUploadedFileOrThrow(uploadedFile.getId())).thenReturn(uploadedFile);
-    when(supportingDocumentRepository.findByScapDetailAndUploadedFile(scapDetail, uploadedFile))
-        .thenReturn(supportingDocument);
-
-    var returnedUploadedFile = supportingDocumentService.findUploadedFileOrThrow(scapDetail, uploadedFile.getId());
+    var returnedUploadedFile = caseEventDocumentService.getUploadedFile(uploadedFile.getId());
 
     assertThat(returnedUploadedFile).isEqualTo(uploadedFile);
   }
@@ -225,9 +158,9 @@ class SupportingDocumentServiceTest {
 
   private FileUploadForm createFileUploadForm() {
     var fileUploadForm = new FileUploadForm();
-    fileUploadForm.setUploadedFileId(SupportingDocumentServiceTest.uploadedFile.getId());
-    fileUploadForm.setUploadedFileDescription(SupportingDocumentServiceTest.uploadedFile.getDescription());
-    fileUploadForm.setUploadedFileInstant(SupportingDocumentServiceTest.uploadedFile.getUploadedTimeStamp());
+    fileUploadForm.setUploadedFileId(CaseEventsDocumentServiceTest.uploadedFile.getId());
+    fileUploadForm.setUploadedFileDescription(CaseEventsDocumentServiceTest.uploadedFile.getDescription());
+    fileUploadForm.setUploadedFileInstant(CaseEventsDocumentServiceTest.uploadedFile.getUploadedTimeStamp());
     return fileUploadForm;
   }
 }

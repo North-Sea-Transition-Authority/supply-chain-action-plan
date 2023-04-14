@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments;
+package uk.co.nstauthority.scap.scap.casemanagement;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
@@ -30,14 +30,15 @@ import uk.co.nstauthority.scap.file.UploadedFile;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 
 @ContextConfiguration(classes = CaseEventsDocumentController.class)
-class ConsultationDocumentsControllerTest extends AbstractScapSubmitterControllerTest {
+class CaseEventsDocumentsControllerTest extends AbstractScapSubmitterControllerTest {
 
   private static final ServiceUserDetail USER = ServiceUserDetailTestUtil.Builder().build();
 
   @MockBean
-  SupportingDocumentService supportingDocumentService;
+  CaseEventDocumentService caseEventDocumentService;
 
   @MockBean
   FileUploadService fileUploadService;
@@ -63,19 +64,19 @@ class ConsultationDocumentsControllerTest extends AbstractScapSubmitterControlle
 
     MockMultipartFile mockMultipartFile = new MockMultipartFile("file", (byte[]) null);
     mockMvc.perform(multipart(ReverseRouter.route(
-            on(CaseEventsDocumentController.class).upload(SCAP_ID, supportingDocumentType, null)))
+            on(CaseEventsDocumentController.class).upload(SCAP_ID,supportingDocumentType, null)))
             .file(mockMultipartFile)
             .with(user(USER))
             .with(csrf()))
         .andExpect(status().isOk());
 
-    verify(supportingDocumentService).processFileUpload(scapDetail, supportingDocumentType, mockMultipartFile);
+    verify(caseEventDocumentService).processFileUpload(mockMultipartFile);
   }
 
   @Test
   void download_assertStatusOk() throws Exception {
     when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
-    when(supportingDocumentService.findUploadedFileOrThrow(scapDetail, uploadedFile.getId())).thenReturn(uploadedFile);
+    when(caseEventDocumentService.getUploadedFile(uploadedFile.getId())).thenReturn(uploadedFile);
     var fileResource = new ClassPathResource("banner.txt");
     when(fileUploadService.downloadFile(uploadedFile)).thenReturn(fileResource.getInputStream());
 
@@ -109,6 +110,6 @@ class ConsultationDocumentsControllerTest extends AbstractScapSubmitterControlle
             .with(csrf()))
         .andExpect(status().isOk());
 
-    verify(supportingDocumentService, times(1)).deleteFile(scapDetail, uploadedFile.getId());
+    verify(caseEventDocumentService, times(1)).deleteFile(uploadedFile.getId());
   }
 }

@@ -16,13 +16,13 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventView;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
-import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
@@ -44,7 +44,7 @@ public class ScapSummaryController {
 
   private final UserDetailService userDetailService;
 
-  private final SupportingDocumentService supportingDocumentService;
+  private final CaseEventDocumentService caseEventDocumentService;
 
   public ScapSummaryController(ScapDetailService scapDetailService,
                                ScapSummaryViewService scapSummaryViewService,
@@ -52,7 +52,7 @@ public class ScapSummaryController {
                                OrganisationGroupService organisationGroupService,
                                TeamService teamService,
                                TeamMemberService teamMemberService, UserDetailService userDetailService,
-                               SupportingDocumentService supportingDocumentService) {
+                               CaseEventDocumentService caseEventDocumentService) {
     this.scapDetailService = scapDetailService;
     this.scapSummaryViewService = scapSummaryViewService;
     this.caseEventService = caseEventService;
@@ -60,7 +60,7 @@ public class ScapSummaryController {
     this.teamService = teamService;
     this.teamMemberService = teamMemberService;
     this.userDetailService = userDetailService;
-    this.supportingDocumentService = supportingDocumentService;
+    this.caseEventDocumentService = caseEventDocumentService;
   }
 
   //TODO:SCAP2022-232 - Smoke test all statuses against this method
@@ -102,7 +102,7 @@ public class ScapSummaryController {
     var generator = ScapSummaryModelAndViewGenerator.generator(
                 scapDetail,
                 scapSummary,
-                supportingDocumentService)
+                caseEventDocumentService)
         .withScapStatus(scapSummaryViewService.inferSubmissionStatusFromSummary(scapSummary))
         .withCaseEventTimeline(getCaseEventView(scapId))
         .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))

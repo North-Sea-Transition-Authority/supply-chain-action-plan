@@ -17,6 +17,7 @@ import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,17 +29,18 @@ import org.springframework.validation.BindingResult;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.enumutil.YesNo;
+import uk.co.nstauthority.scap.file.FileUploadForm;
 import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.notify.ScapEmailService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
-import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
@@ -62,7 +64,7 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
   private ScapApprovalFormValidator scapApprovalFormValidator;
 
   @MockBean
-  SupportingDocumentService supportingDocumentService;
+  CaseEventDocumentService caseEventDocumentService;
 
   @MockBean
   private ScapEmailService scapEmailService;
@@ -77,11 +79,11 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
 
   @BeforeEach
   void setup() {
-    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
+    when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
-    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.APPROVAL_DOCUMENT)))
+    when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.APPROVAL_DOCUMENT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
-    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.FURTHER_INFORMATION)))
+    when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.FURTHER_INFORMATION)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
@@ -110,7 +112,8 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
     verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_APPROVED,
         scapDetail,
         1,
-        getScapApprovalForm().getApprovalComments().getInputValue());
+        getScapApprovalForm().getApprovalComments().getInputValue(),
+        null);
     verify(scapDetailService).approveScap(scapDetail);
   }
 
@@ -130,7 +133,33 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
         .andExpect(status().is3xxRedirection())
         .andExpect(flash().attributeExists("notificationBannerView"));
 
-    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_APPROVED, scapDetail, 1, TEST_STRING);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_APPROVED, scapDetail, 1, TEST_STRING, null);
+    verify(scapDetailService).approveScap(scapDetail);
+    verify(scapEmailService).sendScapApprovalEmails(scapDetail, null, false);
+  }
+
+  @Test
+  void saveApproval_ValidationSuccesful_savedWithFile() throws Exception {
+    var form = getScapApprovalForm();
+    var file = new FileUploadForm();
+    file.setUploadedFileId(UUID.randomUUID());
+    file.setUploadedFileDescription("Description");
+    form.setApprovalDocuments(List.of(file));
+    mockMvc.perform(post(ReverseRouter.route(on(ScapApprovalController.class)
+            .saveScapApprovalForm(
+                SCAP_ID,
+                CaseEventAction.APPROVED,
+                false,
+                getScapApprovalForm(),
+                null,
+                null)))
+            .with(authenticatedScapUser())
+            .with(csrf())
+            .flashAttr("scapApprovalForm", form))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(flash().attributeExists("notificationBannerView"));
+
+    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_APPROVED, scapDetail, 1, TEST_STRING, file.getUploadedFileId());
     verify(scapDetailService).approveScap(scapDetail);
     verify(scapEmailService).sendScapApprovalEmails(scapDetail, null, false);
   }

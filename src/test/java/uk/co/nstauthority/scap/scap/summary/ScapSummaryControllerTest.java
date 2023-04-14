@@ -29,6 +29,7 @@ import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventView;
@@ -37,7 +38,6 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailEntityTestUtil;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsService;
-import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
@@ -64,7 +64,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
   EnergyPortalUserService energyPortalUserService;
 
   @MockBean
-  SupportingDocumentService supportingDocumentService;
+  CaseEventDocumentService caseEventDocumentService;
 
   private static final ScapId SCAP_ID = new ScapId(1000);
 
@@ -87,11 +87,11 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     when(scapDetailService.getActionableScapDetail(SCAP_ID, testUser)).thenReturn(scapDetail);
     when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
     when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
-    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
+    when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
-    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.APPROVAL_DOCUMENT)))
+    when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.APPROVAL_DOCUMENT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
-    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.FURTHER_INFORMATION)))
+    when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.FURTHER_INFORMATION)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
   }
 
@@ -172,7 +172,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
 
   @Test
   void renderSummary_RegulatorUser_CaseEventEmpty() throws Exception {
-    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
+    when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(true);
@@ -189,7 +189,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
 
   @Test
   void renderSummary_IndustryUser_CaseEventEmpty() throws Exception {
-    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
+    when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(false);
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
@@ -205,7 +205,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
 
   @Test
   void renderSummary_IndustryUser_VersionSelected() throws Exception {
-    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
+    when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(false);
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
@@ -222,7 +222,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
 
   @Test
   void renderSummary_RegulatorUser_VersionApplicable() throws Exception {
-    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
+    when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(false);
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
@@ -267,6 +267,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
         "",
         "TEST TESTER",
         "",
+        null,
         null);
     return List.of(timelineEvent);
   }

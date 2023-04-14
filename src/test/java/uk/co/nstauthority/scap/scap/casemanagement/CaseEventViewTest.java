@@ -18,6 +18,7 @@ class CaseEventViewTest {
         "2020-03-02 00:00:00",
         "Testing Account",
         null,
+        null,
         null);
 
     assertFalse(timelineEventView.hasComments());
@@ -31,6 +32,7 @@ class CaseEventViewTest {
         "2020-03-02 00:00:00",
         "Testing Account",
         "this event view has comments",
+        null,
         null);
 
     assertTrue(timelineEventView.hasComments());
@@ -44,6 +46,7 @@ class CaseEventViewTest {
         "2020-03-02 00:00:00",
         "Testing Account",
         "this event view has comments",
+        null,
         null);
 
     assertFalse(caseEventView.hasBeenRespondedTo());
@@ -57,7 +60,8 @@ class CaseEventViewTest {
         "2020-03-02 00:00:00",
         "Testing Account",
         "this event view has comments",
-        "2020-05-02 00:00:00");
+        "2020-05-02 00:00:00",
+        null);
 
     assertTrue(caseEventView.hasBeenRespondedTo());
   }

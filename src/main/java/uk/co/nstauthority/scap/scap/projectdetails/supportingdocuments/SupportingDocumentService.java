@@ -9,7 +9,6 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.file.FileDeleteResult;
 import uk.co.nstauthority.scap.file.FileUploadForm;
 import uk.co.nstauthority.scap.file.FileUploadResult;
@@ -81,21 +80,13 @@ public class SupportingDocumentService {
   }
 
   public FileUploadTemplate buildFileUploadTemplate(ScapId scapDetailId, SupportingDocumentType supportingDocumentType) {
-    return switch (supportingDocumentType) {
-      case ADDITIONAL_DOCUMENT -> fileUploadService.buildFileUploadTemplate(
-          ReverseRouter.route(on(AdditionalDocumentsController.class).download(scapDetailId, null)),
+    return fileUploadService.buildFileUploadTemplate(
+          ReverseRouter.route(
+              on(AdditionalDocumentsController.class).download(scapDetailId, null)),
           ReverseRouter.route(
               on(AdditionalDocumentsController.class).upload(scapDetailId, null)),
-          ReverseRouter.route(on(AdditionalDocumentsController.class).delete(scapDetailId, null))
-      );
-      case CONSULTATION_REPORT, APPROVAL_DOCUMENT, FURTHER_INFORMATION -> fileUploadService.buildFileUploadTemplate(
-          ReverseRouter.route(on(CaseEventsDocumentController.class).download(scapDetailId, null)),
           ReverseRouter.route(
-              on(CaseEventsDocumentController.class).upload(scapDetailId, supportingDocumentType, null)),
-          ReverseRouter.route(on(CaseEventsDocumentController.class).delete(scapDetailId, null))
-      );
-      default -> throw new ScapEntityNotFoundException("Could not find document management paths for document type");
-    };
+              on(AdditionalDocumentsController.class).delete(scapDetailId, null)));
   }
 
   @Transactional

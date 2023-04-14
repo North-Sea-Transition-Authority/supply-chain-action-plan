@@ -1,5 +1,4 @@
-<#import '../../../fds/components/timeline/timeline.ftl' as fdsTimeline>
-<#import '../../../fds/components/dataItems/dataItems.ftl' as fdsDataItems>
+<#include '../../layout/layout.ftl'>
 
 <#-- @ftlvariable name="caseEvents" type="java.util.List<uk.co.nstauthority.scap.scap.casemanagement.CaseEventView>" -->
 
@@ -27,10 +26,15 @@
           <@fdsDataItems.dataValues key="Comments" value=caseEvent.comments()></@fdsDataItems.dataValues>
         </@fdsDataItems.dataItem>
       </#if>
-      <#if caseEvent.hasBeenRespondedTo()>
-          <@fdsDataItems.dataItem>
-              <@fdsDataItems.dataValues key="Responded to on" value=caseEvent.dateOfResponse()></@fdsDataItems.dataValues>
-          </@fdsDataItems.dataItem>
+      <#if caseEvent.hasSupportingDocument()>
+        <@fdsDataItems.dataItem>
+          <#assign fileUploadLink>
+            <@fdsAction.link linkText=caseEvent.supportingDocument().fileName()!"" linkUrl=springUrl(caseEvent.supportingDocument().fileUrl())/>
+          </#assign>
+          <@fdsDataItems.dataValues key="Supporting document" value='${fileUploadLink}'></@fdsDataItems.dataValues>
+          <@fdsDataItems.dataValues key="Document description" value=caseEvent.supportingDocument().fileDescription()!""></@fdsDataItems.dataValues>
+          <@fdsDataItems.dataValues key="" value=''></@fdsDataItems.dataValues>
+        </@fdsDataItems.dataItem>
       </#if>
     </@fdsTimeline.timelineEvent>
   </@fdsTimeline.timelineTimeStamp>

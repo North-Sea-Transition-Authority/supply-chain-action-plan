@@ -22,12 +22,12 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
-import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
@@ -54,7 +54,7 @@ public class UpdateRequestController {
 
   private final UpdateRequestFormValidator updateRequestFormValidator;
 
-  private final SupportingDocumentService supportingDocumentService;
+  private final CaseEventDocumentService caseEventDocumentService;
 
   private final TeamService teamService;
 
@@ -69,7 +69,7 @@ public class UpdateRequestController {
                                  ScapSummaryViewService scapSummaryViewService,
                                  OrganisationGroupService organisationGroupService,
                                  UpdateRequestFormValidator updateRequestFormValidator,
-                                 SupportingDocumentService supportingDocumentService,
+                                 CaseEventDocumentService caseEventDocumentService,
                                  TeamService teamService,
                                  UserDetailService userDetailService,
                                  UpdateRequestService updateRequestService) {
@@ -79,7 +79,7 @@ public class UpdateRequestController {
     this.scapSummaryViewService = scapSummaryViewService;
     this.organisationGroupService = organisationGroupService;
     this.updateRequestFormValidator = updateRequestFormValidator;
-    this.supportingDocumentService = supportingDocumentService;
+    this.caseEventDocumentService = caseEventDocumentService;
     this.teamService = teamService;
     this.userDetailService = userDetailService;
     this.updateRequestService = updateRequestService;
@@ -103,7 +103,7 @@ public class UpdateRequestController {
     var generator = ScapSummaryModelAndViewGenerator.generator(
                 scapDetail,
                 scapSummary,
-                supportingDocumentService)
+                caseEventDocumentService)
         .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
         .withUpdateRequestForm(updateRequestForm)
         .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
@@ -122,8 +122,7 @@ public class UpdateRequestController {
           caseEventService.recordNewEvent(CaseEventSubject.SCAP_UPDATE_REQUESTED,
               scapDetail,
               scapDetail.getVersionNumber(),
-              updateRequestForm.getInfoRequest().getInputValue(),
-              updateRequestForm.getDueDate().getAsLocalDate().get());
+              updateRequestForm.getInfoRequest().getInputValue());
 
           NotificationBannerUtils.successBannerRedirect(
               "Success",

@@ -25,12 +25,11 @@ import uk.co.nstauthority.scap.notify.ScapEmailService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
-import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
-import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
@@ -55,7 +54,7 @@ public class ScapApprovalController {
 
   private final ScapApprovalFormValidator scapApprovalFormValidator;
 
-  private final SupportingDocumentService supportingDocumentService;
+  private final CaseEventDocumentService caseEventDocumentService;
   private final ScapEmailService scapEmailService;
 
   private final TeamService teamService;
@@ -69,7 +68,7 @@ public class ScapApprovalController {
                                 ScapSummaryViewService scapSummaryViewService,
                                 OrganisationGroupService organisationGroupService,
                                 ScapApprovalFormValidator scapApprovalFormValidator,
-                                SupportingDocumentService supportingDocumentService,
+                                CaseEventDocumentService caseEventDocumentService,
                                 ScapEmailService scapEmailService, TeamService teamService,
                                 UserDetailService userDetailService) {
     this.caseEventService = caseEventService;
@@ -78,7 +77,7 @@ public class ScapApprovalController {
     this.scapSummaryViewService = scapSummaryViewService;
     this.organisationGroupService = organisationGroupService;
     this.scapApprovalFormValidator = scapApprovalFormValidator;
-    this.supportingDocumentService = supportingDocumentService;
+    this.caseEventDocumentService = caseEventDocumentService;
     this.scapEmailService = scapEmailService;
     this.teamService = teamService;
     this.userDetailService = userDetailService;
@@ -100,17 +99,12 @@ public class ScapApprovalController {
         .getOrganisationGroupById(scapDetail.getScap().getOrganisationGroupId(),
             "Get Org Group for Summary of SCAP ID: %s".formatted(scapId.scapId()));
 
-    var existingFiles = supportingDocumentService.getFileUploadFormListForScapDetailAndType(
-        scapDetail,
-        SupportingDocumentType.APPROVAL_DOCUMENT);
-
     var generator =
         ScapSummaryModelAndViewGenerator.generator(scapDetail,
                 scapSummary,
-                supportingDocumentService)
+                caseEventDocumentService)
             .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
             .withScapApprovalForm(scapApprovalForm)
-            .withScapApprovalDocuments(existingFiles)
             .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
             .withScapVersions(scapDetailService.getAllVersionsForUser(scapDetail.getScap()))
             .withUpdatePermission(teamService.userIsMemberOfRegulatorTeam(userDetailService.getUserDetail()))
@@ -122,11 +116,16 @@ public class ScapApprovalController {
         generator.generate(),
         scapApprovalForm,
         () -> {
+          var uploadedFile = scapApprovalForm.getApprovalDocuments().isEmpty()
+              ? null
+              : scapApprovalForm.getApprovalDocuments().get(0).getUploadedFileId();
+          caseEventDocumentService.updateSupportingDocumentFileDescriptions(scapApprovalForm.getApprovalDocuments());
           caseEventService.recordNewEvent(
               scapApprovalForm.getProjectClosedOut().equals(YesNo.YES) ? SCAP_CLOSED_OUT : SCAP_APPROVED,
               scapDetail,
               scapDetail.getVersionNumber(),
-              scapApprovalForm.getApprovalComments().getInputValue());
+              scapApprovalForm.getApprovalComments().getInputValue(),
+              uploadedFile);
           var projectClosedOut = scapApprovalForm.getProjectClosedOut().equals(YesNo.YES);
           if (projectClosedOut) {
             scapDetailService.closeOutScap(scapDetail);

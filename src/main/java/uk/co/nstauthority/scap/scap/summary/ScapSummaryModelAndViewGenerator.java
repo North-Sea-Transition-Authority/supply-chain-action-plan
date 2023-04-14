@@ -17,6 +17,7 @@ import uk.co.nstauthority.scap.error.exception.IllegalUtilClassInstantiationExce
 import uk.co.nstauthority.scap.file.FileUploadForm;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventView;
 import uk.co.nstauthority.scap.scap.casemanagement.approval.ScapApprovalController;
@@ -40,7 +41,6 @@ import uk.co.nstauthority.scap.scap.casemanagement.withdraw.ScapWithdrawControll
 import uk.co.nstauthority.scap.scap.casemanagement.withdraw.ScapWithdrawalForm;
 import uk.co.nstauthority.scap.scap.delete.ScapDeletionController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
-import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.util.DateUtil;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
@@ -52,8 +52,8 @@ public class ScapSummaryModelAndViewGenerator {
 
   public static Generator generator(ScapDetail scapDetail,
                                     ScapSummaryView scapSummaryView,
-                                    SupportingDocumentService supportingDocumentService) {
-    return new Generator(scapDetail, scapSummaryView, supportingDocumentService);
+                                    CaseEventDocumentService caseEventDocumentService) {
+    return new Generator(scapDetail, scapSummaryView, caseEventDocumentService);
   }
 
   public static class Generator {
@@ -63,7 +63,7 @@ public class ScapSummaryModelAndViewGenerator {
     private OrganisationGroup orgGroup;
     private boolean updateInProgress = false;
     private boolean updatePermission = false;
-    private final SupportingDocumentService supportingDocumentService;
+    private final CaseEventDocumentService caseEventDocumentService;
     private ScapSubmissionStage scapStatus = ScapSubmissionStage.DRAFT;
     private List<CaseEventView> caseEventTimeline = emptyList();
     private List<ScapDetail> scapVersions = emptyList();
@@ -81,10 +81,10 @@ public class ScapSummaryModelAndViewGenerator {
 
     public Generator(ScapDetail scapDetail,
                      ScapSummaryView scapSummary,
-                     SupportingDocumentService supportingDocumentService) {
+                     CaseEventDocumentService caseEventDocumentService) {
       this.scapDetail = scapDetail;
       this.scapSummary = scapSummary;
-      this.supportingDocumentService = supportingDocumentService;
+      this.caseEventDocumentService = caseEventDocumentService;
     }
 
     public Generator withScapVersions(List<ScapDetail> applicableVersions) {
@@ -257,7 +257,7 @@ public class ScapSummaryModelAndViewGenerator {
                   null,
                   null)));
       modelAndView.addObject("furtherInfoDocumentTemplate",
-          supportingDocumentService.buildFileUploadTemplate(scapDetail.getScap().getScapId(), FURTHER_INFORMATION));
+          caseEventDocumentService.buildFileUploadTemplate(scapDetail.getScap().getScapId(), FURTHER_INFORMATION));
     }
 
     private void addConsultationRequestForm(ModelAndView modelAndView) {
@@ -283,7 +283,7 @@ public class ScapSummaryModelAndViewGenerator {
                   null,
                   null)));
       modelAndView.addObject("supportingDocumentsTemplate",
-          supportingDocumentService.buildFileUploadTemplate(scapDetail.getScap().getScapId(), CONSULTATION_REPORT));
+          caseEventDocumentService.buildFileUploadTemplate(scapDetail.getScap().getScapId(), CONSULTATION_REPORT));
     }
 
     private void addUpdateRequestForm(ModelAndView modelAndView) {
@@ -311,7 +311,7 @@ public class ScapSummaryModelAndViewGenerator {
                   null,
                   null)));
       modelAndView.addObject("approvalDocumentsTemplate",
-          supportingDocumentService.buildFileUploadTemplate(scapDetail.getScap().getScapId(), APPROVAL_DOCUMENT));
+          caseEventDocumentService.buildFileUploadTemplate(scapDetail.getScap().getScapId(), APPROVAL_DOCUMENT));
     }
 
     private void addWithdrawForm(ModelAndView modelAndView) {

@@ -21,11 +21,11 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
-import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
@@ -49,7 +49,7 @@ public class ScapReinstateController {
 
   private final OrganisationGroupService organisationGroupService;
   private final ScapReinstateFormValidator scapReinstateFormValidator;
-  private final SupportingDocumentService supportingDocumentService;
+  private final CaseEventDocumentService caseEventDocumentService;
   private final ScapService scapService;
 
   private final TeamService teamService;
@@ -63,7 +63,7 @@ public class ScapReinstateController {
                                  ScapSummaryViewService scapSummaryViewService,
                                  OrganisationGroupService organisationGroupService,
                                  ScapReinstateFormValidator scapReinstateFormValidator,
-                                 SupportingDocumentService supportingDocumentService,
+                                 CaseEventDocumentService caseEventDocumentService,
                                  ScapService scapService,
                                  TeamService teamService,
                                  UserDetailService userDetailService) {
@@ -73,7 +73,7 @@ public class ScapReinstateController {
     this.scapSummaryViewService = scapSummaryViewService;
     this.organisationGroupService = organisationGroupService;
     this.scapReinstateFormValidator = scapReinstateFormValidator;
-    this.supportingDocumentService = supportingDocumentService;
+    this.caseEventDocumentService = caseEventDocumentService;
     this.scapService = scapService;
     this.teamService = teamService;
     this.userDetailService = userDetailService;
@@ -97,7 +97,7 @@ public class ScapReinstateController {
     var generator =
         ScapSummaryModelAndViewGenerator.generator(scapDetail,
                 scapSummary,
-                supportingDocumentService)
+                caseEventDocumentService)
             .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
             .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
             .withScapReinstateForm(scapReinstateForm)

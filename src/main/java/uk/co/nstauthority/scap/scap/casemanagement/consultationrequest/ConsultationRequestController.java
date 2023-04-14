@@ -21,12 +21,12 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
-import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
@@ -51,7 +51,7 @@ public class ConsultationRequestController {
 
   private final ConsultationRequestFormValidator consultationRequestFormValidator;
 
-  private final SupportingDocumentService supportingDocumentService;
+  private final CaseEventDocumentService caseEventDocumentService;
 
   private final TeamService teamService;
 
@@ -64,7 +64,7 @@ public class ConsultationRequestController {
                                        ScapSummaryViewService scapSummaryViewService,
                                        OrganisationGroupService organisationGroupService,
                                        ConsultationRequestFormValidator consultationRequestFormValidator,
-                                       SupportingDocumentService supportingDocumentService,
+                                       CaseEventDocumentService caseEventDocumentService,
                                        TeamService teamService,
                                        UserDetailService userDetailService) {
     this.caseEventService = caseEventService;
@@ -73,7 +73,7 @@ public class ConsultationRequestController {
     this.scapSummaryViewService = scapSummaryViewService;
     this.organisationGroupService = organisationGroupService;
     this.consultationRequestFormValidator = consultationRequestFormValidator;
-    this.supportingDocumentService = supportingDocumentService;
+    this.caseEventDocumentService = caseEventDocumentService;
     this.teamService = teamService;
     this.userDetailService = userDetailService;
   }
@@ -96,7 +96,7 @@ public class ConsultationRequestController {
     var generator = ScapSummaryModelAndViewGenerator.generator(
                 scapDetail,
                 scapSummary,
-                supportingDocumentService)
+                caseEventDocumentService)
         .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
         .withConsultationRequestForm(consultationRequestForm)
         .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))

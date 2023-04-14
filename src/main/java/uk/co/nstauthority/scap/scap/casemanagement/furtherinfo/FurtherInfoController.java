@@ -22,12 +22,12 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
-import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
@@ -54,7 +54,7 @@ public class FurtherInfoController {
 
   private final FurtherInfoRequestFormValidator furtherInfoRequestFormValidator;
 
-  private final SupportingDocumentService supportingDocumentService;
+  private final CaseEventDocumentService caseEventDocumentService;
 
   private final TeamService teamService;
 
@@ -69,7 +69,7 @@ public class FurtherInfoController {
                                ScapSummaryViewService scapSummaryViewService,
                                OrganisationGroupService organisationGroupService,
                                FurtherInfoRequestFormValidator furtherInfoRequestFormValidator,
-                               SupportingDocumentService supportingDocumentService,
+                               CaseEventDocumentService caseEventDocumentService,
                                TeamService teamService,
                                UserDetailService userDetailService,
                                UpdateRequestService updateRequestService) {
@@ -79,7 +79,7 @@ public class FurtherInfoController {
     this.scapSummaryViewService = scapSummaryViewService;
     this.organisationGroupService = organisationGroupService;
     this.furtherInfoRequestFormValidator = furtherInfoRequestFormValidator;
-    this.supportingDocumentService = supportingDocumentService;
+    this.caseEventDocumentService = caseEventDocumentService;
     this.teamService = teamService;
     this.userDetailService = userDetailService;
     this.updateRequestService = updateRequestService;
@@ -102,7 +102,7 @@ public class FurtherInfoController {
     var generator = ScapSummaryModelAndViewGenerator.generator(
                 scapDetail,
                 scapSummary,
-                supportingDocumentService)
+                caseEventDocumentService)
         .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
         .withFurtherInfoRequestFrom(infoRequestForm)
         .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))

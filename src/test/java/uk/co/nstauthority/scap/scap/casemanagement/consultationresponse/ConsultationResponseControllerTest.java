@@ -16,6 +16,7 @@ import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,16 +29,17 @@ import org.springframework.validation.BindingResult;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
+import uk.co.nstauthority.scap.file.FileUploadForm;
 import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
-import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
@@ -64,7 +66,7 @@ class ConsultationResponseControllerTest extends AbstractControllerTest {
   private ConsultationResponseFormValidator consultationResponseFormValidator;
 
   @MockBean
-  private SupportingDocumentService supportingDocumentService;
+  private CaseEventDocumentService caseEventDocumentService;
 
   private static final ScapId SCAP_ID = new ScapId(1111);
 
@@ -78,11 +80,11 @@ class ConsultationResponseControllerTest extends AbstractControllerTest {
 
   @BeforeEach
   void setup() {
-    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
+    when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
-    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.APPROVAL_DOCUMENT)))
+    when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.APPROVAL_DOCUMENT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
-    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.FURTHER_INFORMATION)))
+    when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.FURTHER_INFORMATION)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
@@ -108,7 +110,30 @@ class ConsultationResponseControllerTest extends AbstractControllerTest {
             .flashAttr("form", getConsultationResponseForm()))
         .andExpect(status().is3xxRedirection())
         .andExpect(flash().attributeExists("notificationBannerView"));
-    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_CONSULTATION_RESPONSE, SCAP_DETAIL, 1, TEST_STRING);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_CONSULTATION_RESPONSE, SCAP_DETAIL, 1, TEST_STRING, null);
+  }
+
+  @Test
+  void consultationResponse_ValidationSuccesful_savedWithFile() throws Exception {
+    var form = getConsultationResponseForm();
+    var file = new FileUploadForm();
+    file.setUploadedFileId(UUID.randomUUID());
+    file.setUploadedFileDescription("Description");
+    form.setSupportingDocuments(List.of(file));
+    mockMvc.perform(post(ReverseRouter.route(on(ConsultationResponseController.class)
+            .saveConsultationResponseForm(
+                SCAP_ID,
+                CaseEventAction.CONSULTATION_RESPONSE,
+                false,
+                getConsultationResponseForm(),
+                null,
+                null)))
+            .with(authenticatedScapUser())
+            .with(csrf())
+            .flashAttr("form", form))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(flash().attributeExists("notificationBannerView"));
+    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_CONSULTATION_RESPONSE, SCAP_DETAIL, 1, TEST_STRING, file.getUploadedFileId());
   }
 
   @Test

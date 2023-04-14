@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.scap.casemanagement;
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventGroups.CONSULTATIONS;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventGroups.DECISIONS;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventGroups.FURTHER_INFO;
@@ -16,7 +17,6 @@ import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_WITHDRAWN;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,11 +35,15 @@ import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
+import uk.co.nstauthority.scap.file.FileUploadService;
+import uk.co.nstauthority.scap.file.UploadedFile;
+import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
+import uk.co.nstauthority.scap.scap.summary.files.FileUploadSummaryView;
 import uk.co.nstauthority.scap.util.DateUtil;
 import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
 import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestType;
@@ -58,6 +63,8 @@ public class CaseEventService {
 
   private final UpdateRequestService updateRequestService;
 
+  private final FileUploadService fileUploadService;
+
   private static final Set<CaseEventSubject> RESPONSE_ACTIONS = Set.of(FURTHER_INFO_RESPONSE,
       SCAP_SUBMITTED,
       SCAP_APPROVED);
@@ -71,13 +78,15 @@ public class CaseEventService {
                           CaseEventRepository caseEventRepository,
                           TeamService teamService,
                           ScapDetailService scapDetailService,
-                          UpdateRequestService updateRequestService) {
+                          UpdateRequestService updateRequestService,
+                          FileUploadService fileUploadService) {
     this.userDetailService = userDetailService;
     this.energyPortalUserService = energyPortalUserService;
     this.caseEventRepository = caseEventRepository;
     this.teamService = teamService;
     this.scapDetailService = scapDetailService;
     this.updateRequestService = updateRequestService;
+    this.fileUploadService = fileUploadService;
   }
 
   @Transactional
@@ -92,8 +101,13 @@ public class CaseEventService {
                                   ScapDetail scapDetail,
                                   Integer scapVersion,
                                   String comments,
-                                  LocalDate dueDate) {
+                                  UUID fileId) {
     updateRequestService.resolveUpdateRequest(scapDetail, subject);
+    UploadedFile uploadedFile = null;
+    if (fileId != null) {
+      uploadedFile = fileUploadService.findUploadedFileOrThrow(fileId);
+    }
+
 
     var caseEvent = new CaseEvent();
     caseEvent.setCaseEventSubject(subject);
@@ -101,6 +115,7 @@ public class CaseEventService {
     caseEvent.setScapId(scapDetail.getScap().getScapId().scapId());
     caseEvent.setVersionNumber(scapVersion);
     caseEvent.setComments(comments);
+    caseEvent.setUploadedFile(uploadedFile);
 
     var loggedInUser = userDetailService.getUserDetail();
     caseEvent.setEventByWuaId(loggedInUser.getWebUserAccountId().id());
@@ -136,7 +151,8 @@ public class CaseEventService {
                 DateUtil.instantToString(caseEvent.getEventTime()),
                 userDisplayNames.get(caseEvent.getEventByWuaId()),
                 caseEvent.getComments(),
-                getDateOfResponseToInfoRequest(caseEvent).map(DateUtil::instantToString).orElse(null)))
+                getDateOfResponseToInfoRequest(caseEvent).map(DateUtil::instantToString).orElse(null),
+                getFileUploadView(caseEvent.getScapId(), caseEvent.getUploadedFile())))
         .toList();
   }
 
@@ -208,5 +224,16 @@ public class CaseEventService {
     regulatorMap.put(CONSULTATIONS.getDisplayName(), consultations);
     regulatorMap.put(FURTHER_INFO.getDisplayName(), furtherInfo);
     return regulatorMap;
+  }
+
+  private FileUploadSummaryView getFileUploadView(Integer scapId, UploadedFile uploadedFile) {
+    if (uploadedFile != null) {
+      return new FileUploadSummaryView(
+          uploadedFile.getFilename(),
+          uploadedFile.getDescription(),
+          ReverseRouter.route(on(CaseEventsDocumentController.class)
+              .download(new ScapId(scapId), uploadedFile.getId())));
+    }
+    return null;
   }
 }

@@ -9,7 +9,10 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import uk.co.nstauthority.scap.file.UploadedFile;
 
 @Entity
 @Table(name = "case_events")
@@ -33,6 +36,10 @@ public class CaseEvent {
   @Column(name = "event_by")
   private Long eventByWuaId;
   private String comments;
+
+  @OneToOne
+  @JoinColumn(name = "file_id")
+  private UploadedFile uploadedFile;
 
   public CaseEvent() {
   }
@@ -88,5 +95,13 @@ public class CaseEvent {
 
   public void setComments(String comments) {
     this.comments = comments;
+  }
+
+  public UploadedFile getUploadedFile() {
+    return uploadedFile;
+  }
+
+  public void setUploadedFile(UploadedFile uploadedFile) {
+    this.uploadedFile = uploadedFile;
   }
 }

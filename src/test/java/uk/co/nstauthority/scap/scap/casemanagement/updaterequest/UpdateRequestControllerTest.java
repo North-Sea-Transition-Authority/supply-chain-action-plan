@@ -33,12 +33,12 @@ import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
-import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
@@ -69,7 +69,7 @@ class UpdateRequestControllerTest extends AbstractControllerTest {
   private UpdateRequestFormValidator updateRequestFormValidator;
 
   @MockBean
-  private SupportingDocumentService supportingDocumentService;
+  private CaseEventDocumentService caseEventDocumentService;
 
   private static final ScapId SCAP_ID = new ScapId(1111);
 
@@ -83,11 +83,11 @@ class UpdateRequestControllerTest extends AbstractControllerTest {
 
   @BeforeEach
   void setup() {
-    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
+    when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
-    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.APPROVAL_DOCUMENT)))
+    when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.APPROVAL_DOCUMENT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
-    when(supportingDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.FURTHER_INFORMATION)))
+    when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.FURTHER_INFORMATION)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
@@ -113,7 +113,7 @@ class UpdateRequestControllerTest extends AbstractControllerTest {
             .flashAttr("updateRequestForm", getInfoRequestedForm()))
         .andExpect(status().is3xxRedirection())
         .andExpect(flash().attributeExists("notificationBannerView"));
-    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_UPDATE_REQUESTED, SCAP_DETAIL, 1, TEST_STRING, LocalDate.now().plusDays(5L));
+    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_UPDATE_REQUESTED, SCAP_DETAIL, 1, TEST_STRING);
   }
 
   @Test

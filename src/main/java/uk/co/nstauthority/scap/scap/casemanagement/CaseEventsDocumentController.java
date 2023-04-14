@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments;
+package uk.co.nstauthority.scap.scap.casemanagement;
 
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,32 +12,30 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
-import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermission;
 import uk.co.nstauthority.scap.file.FileDeleteResult;
 import uk.co.nstauthority.scap.file.FileUploadResult;
 import uk.co.nstauthority.scap.file.FileUploadService;
 import uk.co.nstauthority.scap.file.FileUploadUtils;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
+import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @RestController
 @RequestMapping("/{scapId}/case-events/")
-@UserHasAnyPermission(permissions = {RolePermission.SUBMIT_SCAP, RolePermission.REVIEW_SCAP})
-@ScapHasStatus(permittedStatuses = ScapDetailStatus.SUBMITTED)
+@PermissionsRequiredForScap(permissions = {RolePermission.SUBMIT_SCAP, RolePermission.REVIEW_SCAP})
 public class CaseEventsDocumentController {
 
-  private final SupportingDocumentService supportingDocumentService;
+  private final CaseEventDocumentService caseEventDocumentService;
   private final ScapDetailService scapDetailService;
   private final FileUploadService fileUploadService;
 
   @Autowired
-  public CaseEventsDocumentController(SupportingDocumentService supportingDocumentService,
+  public CaseEventsDocumentController(CaseEventDocumentService caseEventDocumentService,
                                       ScapDetailService scapDetailService,
                                       FileUploadService fileUploadService) {
-    this.supportingDocumentService = supportingDocumentService;
+    this.caseEventDocumentService = caseEventDocumentService;
     this.scapDetailService = scapDetailService;
     this.fileUploadService = fileUploadService;
   }
@@ -47,16 +45,14 @@ public class CaseEventsDocumentController {
   public FileUploadResult upload(@PathVariable("scapId") ScapId scapId,
                                  @PathVariable("supportingDocumentType") SupportingDocumentType supportingDocumentType,
                                  @RequestParam("file") MultipartFile multipartFile) {
-    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
-    return supportingDocumentService.processFileUpload(scapDetail, supportingDocumentType, multipartFile);
+    return caseEventDocumentService.processFileUpload(multipartFile);
   }
 
   @GetMapping("download/{uploadedFileId}")
   @ResponseBody
   public ResponseEntity<InputStreamResource> download(@PathVariable("scapId") ScapId scapId,
                                                       @PathVariable("uploadedFileId") UUID uploadedFileId) {
-    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
-    var uploadedFile = supportingDocumentService.findUploadedFileOrThrow(scapDetail, uploadedFileId);
+    var uploadedFile = caseEventDocumentService.getUploadedFile(uploadedFileId);
     var inputStream = fileUploadService.downloadFile(uploadedFile);
     return FileUploadUtils.getFileResourceResponseEntity(uploadedFile, new InputStreamResource(inputStream));
   }
@@ -65,7 +61,6 @@ public class CaseEventsDocumentController {
   @ResponseBody
   public FileDeleteResult delete(@PathVariable("scapId") ScapId scapId,
                                  @PathVariable("uploadedFileId") UUID uploadedFileId) {
-    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
-    return supportingDocumentService.deleteFile(scapDetail, uploadedFileId);
+    return caseEventDocumentService.deleteFile(uploadedFileId);
   }
 }

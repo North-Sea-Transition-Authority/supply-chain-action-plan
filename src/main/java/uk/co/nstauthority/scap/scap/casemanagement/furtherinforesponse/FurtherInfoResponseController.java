@@ -1,8 +1,6 @@
 package uk.co.nstauthority.scap.scap.casemanagement.furtherinforesponse;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.CONSULTATION_REPORT;
-import static uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType.FURTHER_INFORMATION;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,12 +21,12 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
-import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
@@ -53,7 +51,7 @@ public class FurtherInfoResponseController {
 
   private final FurtherInfoResponseFormValidator furtherInfoResponseFormValidator;
 
-  private final SupportingDocumentService supportingDocumentService;
+  private final CaseEventDocumentService caseEventDocumentService;
 
   private final TeamService teamService;
 
@@ -66,7 +64,7 @@ public class FurtherInfoResponseController {
                                        ScapSummaryViewService scapSummaryViewService,
                                        OrganisationGroupService organisationGroupService,
                                        FurtherInfoResponseFormValidator furtherInfoResponseFormValidator,
-                                       SupportingDocumentService supportingDocumentService,
+                                       CaseEventDocumentService caseEventDocumentService,
                                        TeamService teamService,
                                        UserDetailService userDetailService) {
     this.caseEventService = caseEventService;
@@ -75,7 +73,7 @@ public class FurtherInfoResponseController {
     this.scapSummaryViewService = scapSummaryViewService;
     this.organisationGroupService = organisationGroupService;
     this.furtherInfoResponseFormValidator = furtherInfoResponseFormValidator;
-    this.supportingDocumentService = supportingDocumentService;
+    this.caseEventDocumentService = caseEventDocumentService;
     this.teamService = teamService;
     this.userDetailService = userDetailService;
   }
@@ -95,16 +93,10 @@ public class FurtherInfoResponseController {
     var orgGroup = organisationGroupService
         .getOrganisationGroupById(scapDetail.getScap().getOrganisationGroupId(),
             "Get Org Group for Summary of SCAP ID: %s".formatted(scapId.scapId()));
-
-    var existingFiles = supportingDocumentService.getFileUploadFormListForScapDetailAndType(
-        scapDetail,
-        FURTHER_INFORMATION);
-
-    supportingDocumentService.getFileUploadFormListForScapDetailAndType(scapDetail, CONSULTATION_REPORT);
     var generator =
         ScapSummaryModelAndViewGenerator.generator(scapDetail,
                 scapSummary,
-                supportingDocumentService)
+                caseEventDocumentService)
             .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
             .withFurtherInfoResponseForm(furtherInfoResponseForm)
             .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
@@ -118,10 +110,15 @@ public class FurtherInfoResponseController {
         generator.generate(),
         furtherInfoResponseForm,
         () -> {
+          var uploadedFile = furtherInfoResponseForm.getInfoResponseDocuments().isEmpty()
+              ? null
+              : furtherInfoResponseForm.getInfoResponseDocuments().get(0).getUploadedFileId();
+          caseEventDocumentService.updateSupportingDocumentFileDescriptions(furtherInfoResponseForm.getInfoResponseDocuments());
           caseEventService.recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE,
               scapDetail,
               scapDetail.getVersionNumber(),
-              furtherInfoResponseForm.getInfoResponse().getInputValue());
+              furtherInfoResponseForm.getInfoResponse().getInputValue(),
+              uploadedFile);
           NotificationBannerUtils.successBannerRedirect(
               "Success",
               new NotificationBannerBodyLine(
