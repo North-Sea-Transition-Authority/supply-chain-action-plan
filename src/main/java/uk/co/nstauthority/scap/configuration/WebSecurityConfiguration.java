@@ -18,6 +18,7 @@ import org.springframework.security.saml2.provider.service.registration.RelyingP
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.Saml2MessageBinding;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import uk.co.nstauthority.scap.authentication.SamlResponseParser;
 import uk.co.nstauthority.scap.authentication.ServiceLogoutSuccessHandler;
 
@@ -60,7 +61,10 @@ public class WebSecurityConfiguration {
         .and()
         .saml2Login(saml2 -> saml2.authenticationManager(new ProviderManager(authenticationProvider)))
           .logout()
-          .logoutSuccessHandler(serviceLogoutSuccessHandler);
+          .logoutSuccessHandler(serviceLogoutSuccessHandler)
+        .and()
+        .exceptionHandling()
+        .accessDeniedHandler(serviceDeniedHandler());
 
 
     return httpSecurity.build();
@@ -70,6 +74,11 @@ public class WebSecurityConfiguration {
   protected RelyingPartyRegistrationRepository relyingPartyRegistrations() throws Exception {
     var registration = getRelyingPartyRegistration();
     return new InMemoryRelyingPartyRegistrationRepository(registration);
+  }
+
+  @Bean
+  protected AccessDeniedHandler serviceDeniedHandler() throws Exception {
+    return new ServiceDeniedHandler();
   }
 
   @Bean

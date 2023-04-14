@@ -47,6 +47,11 @@ public class DefaultErrorController implements ErrorController {
     return modelAndView;
   }
 
+  @RequestMapping("/error/forbidden")
+  public ModelAndView handleForbidden() {
+    return new ModelAndView(ErrorView.UNAUTHORISED.getViewName());
+  }
+
   private String getViewName(int statusCode) {
     return switch (statusCode) {
       case SC_NOT_FOUND, SC_METHOD_NOT_ALLOWED -> ErrorView.PAGE_NOT_FOUND.getViewName();
@@ -54,5 +59,4 @@ public class DefaultErrorController implements ErrorController {
       default -> ErrorView.DEFAULT_ERROR.getViewName();
     };
   }
-
 }

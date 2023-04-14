@@ -23,6 +23,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
   private static final String LOGOUT_EXCLUSION_PATH = "/api/v1/logout/*";
 
+  private static final String ERROR_EXCLUSION_PATH = "/error/**";
+
   private final TeamPermissionManagementHandlerInterceptor teamPermissionManagementHandlerInterceptor;
   private final TeamManagementHandlerInterceptor teamManagementHandlerInterceptor;
 
@@ -53,14 +55,14 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addInterceptor(new ResponseBufferSizeHandlerInterceptor())
-        .excludePathPatterns(ASSET_EXCLUSION_PATH);
+        .excludePathPatterns(ASSET_EXCLUSION_PATH, ERROR_EXCLUSION_PATH);
     registry.addInterceptor(scapPermissionManagementHandlerInterceptor)
-        .excludePathPatterns(ASSET_EXCLUSION_PATH);
+        .excludePathPatterns(ASSET_EXCLUSION_PATH, ERROR_EXCLUSION_PATH);
     registry.addInterceptor(teamPermissionManagementHandlerInterceptor)
         .addPathPatterns("/permission-management/**")
-        .excludePathPatterns(LOGOUT_EXCLUSION_PATH);
+        .excludePathPatterns(LOGOUT_EXCLUSION_PATH, ERROR_EXCLUSION_PATH);
     registry.addInterceptor(scapHandlerInterceptor)
-        .excludePathPatterns(ASSET_EXCLUSION_PATH);
+        .excludePathPatterns(ASSET_EXCLUSION_PATH, ERROR_EXCLUSION_PATH);
     registry.addInterceptor(teamManagementHandlerInterceptor)
         .addPathPatterns("/permission-management/**");
     // TODO SCAP2022-203: Condense interceptors to just teamHandlerInterceptor and scapHandlerInterceptor
