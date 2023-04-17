@@ -20,11 +20,20 @@
 </#macro>
 
 <#macro scapVersions availableVersions>
-    <@fdsActionDropdown.actionDropdown dropdownButtonText="Versions">
-      <#list availableVersions as value, key>
-        <@fdsActionDropdown.actionDropdownItem actionText=key linkAction=true linkActionUrl=springUrl(versionSubmitUrl + value)/>
-      </#list>
-    </@fdsActionDropdown.actionDropdown>
+  <@fdsForm.htmlForm actionUrl=springUrl(versionSubmitUrl)>
+    <div class="inline-input-action">
+
+      <@fdsSelect.select
+        path="versionSelectForm.requestedVersion"
+        options=availableVersions
+        labelText="Change the selected version"
+      />
+      <@fdsAction.button
+        buttonText="View"
+        buttonClass="govuk-button govuk-button--secondary"
+      />
+    </div>
+  </@fdsForm.htmlForm>
 </#macro>
 
 <#-- @ftlvariable name="backLinkUrl" type="java.lang.String" -->
@@ -56,13 +65,12 @@ backLinkUrl=springUrl(backLinkUrl)
           </#if>
         </#if>
       </@fdsForm.htmlForm>
-      <@scapVersions availableVersions/>
     </@fdsAction.buttonGroup>
   <@fdsAction.buttonGroup>
-    <@fdsAction.link linkText="Print" linkUrl="javascript:window.print()" linkClass="govuk-button govuk-button--secondary"/>
     <#list applicableActions as group, actions>
       <@buttongroup group=group actions=actions/>
     </#list>
+    <@fdsAction.link linkText="Print" linkUrl="javascript:window.print()" linkClass="govuk-button govuk-button--secondary"/>
   </@fdsAction.buttonGroup>
   <@fdsDetails.summaryDetails detailsClass="print-details" summaryTitle="How can I save a PDF copy of the application?">
     <p class="govuk-body">
@@ -77,6 +85,10 @@ backLinkUrl=springUrl(backLinkUrl)
       </#if>
     </@fdsTabs.tabList>
     <@fdsTabs.tabContent tabAnchor="summary-tab">
+      <#if currentVersionTitle?has_content>
+        <h2 class="govuk-heading-l">${currentVersionTitle}</h2>
+      </#if>
+      <@scapVersions availableVersions/>
       <@scapSummary.summary scapSummaryView/>
     </@fdsTabs.tabContent>
       <#if caseEvents?has_content>
@@ -95,4 +107,3 @@ backLinkUrl=springUrl(backLinkUrl)
   <#include 'caseActions/withdrawScap.ftl'/>
   <#include 'caseActions/reinstateScap.ftl'/>
 </@defaultPage>
-

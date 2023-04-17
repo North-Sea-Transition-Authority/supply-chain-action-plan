@@ -50,3 +50,8 @@
   }
 }
 
+.govuk-form-group  {
+  @include govuk-media-query($media-type: print) {
+    display: none;
+  }
+}

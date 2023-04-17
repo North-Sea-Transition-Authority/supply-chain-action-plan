@@ -78,6 +78,8 @@ public class ScapSummaryModelAndViewGenerator {
     private UpdateRequestForm updateRequestForm = new UpdateRequestForm();
     private ScapReinstateForm scapReinstateForm = new ScapReinstateForm();
     private List<FileUploadForm> existingApprovalFiles = new ArrayList<>();
+    private VersionSelectForm versionSelectForm = new VersionSelectForm();
+    private String currentVersionTitle = "";
 
     public Generator(ScapDetail scapDetail,
                      ScapSummaryView scapSummary,
@@ -177,6 +179,14 @@ public class ScapSummaryModelAndViewGenerator {
       return this;
     }
 
+    public Generator withCurrentVersion(Integer currentVersion) {
+      var form = new VersionSelectForm();
+      form.setRequestedVersion(currentVersion);
+      this.versionSelectForm = form;
+      this.currentVersionTitle = "Version " + currentVersion;
+      return this;
+    }
+
     public ModelAndView generate() {
       var modelAndView = new ModelAndView("scap/scap/summary/scapSummaryOverview")
           .addObject("scapSummaryView", scapSummary)
@@ -192,7 +202,9 @@ public class ScapSummaryModelAndViewGenerator {
           .addObject("updateInProgress", updateInProgress)
           .addObject("updatePermission", updatePermission)
           .addObject("deleteScapUrl", ReverseRouter.route(
-              on(ScapDeletionController.class).renderScapDeletionConfirmation(scapDetail.getScap().getScapId())));
+              on(ScapDeletionController.class).renderScapDeletionConfirmation(scapDetail.getScap().getScapId())))
+          .addObject("versionSelectForm", versionSelectForm)
+          .addObject("currentVersionTitle", currentVersionTitle);
 
 
       addVersionSelectForm(modelAndView);
@@ -336,16 +348,20 @@ public class ScapSummaryModelAndViewGenerator {
               null)));
     }
 
-    private Map<Integer, String> getScapVersionOptions() {
+    private Map<String, String> getScapVersionOptions() {
       return scapVersions.stream()
           .collect(Collectors.toMap(
-              ScapDetail::getVersionNumber,
-              detail -> "(%d) %s : %s".formatted(
-                  detail.getVersionNumber(),
-                  detail.getStatus().getDisplayName(),
-                  DateUtil.instantToString(detail.getCreatedTimestamp())
-              )
+              detail -> String.valueOf(detail.getVersionNumber()),
+              this::scapDetailVersionDisplayText
           ));
+    }
+
+    private String scapDetailVersionDisplayText(ScapDetail scapDetail) {
+      return "(%d) %s : %s".formatted(
+          scapDetail.getVersionNumber(),
+          scapDetail.getStatus().getDisplayName(),
+          DateUtil.instantToString(scapDetail.getCreatedTimestamp())
+      );
     }
   }
 }

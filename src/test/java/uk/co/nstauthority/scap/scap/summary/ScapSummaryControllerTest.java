@@ -5,7 +5,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -297,5 +299,22 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     list.add(scapDetail3);
 
     return list;
+  }
+
+  @Test
+  void getScapVersionSummary() throws Exception {
+    var requestedVersion = 3;
+    var expectedRedirectUrl = ReverseRouter.route(on(ScapSummaryController.class)
+        .getScapSummary(SCAP_ID, requestedVersion));
+    var form = new VersionSelectForm();
+    form.setRequestedVersion(requestedVersion);
+
+    mockMvc.perform(post(
+        ReverseRouter.route(on(ScapSummaryController.class).getScapVersionSummary(SCAP_ID, null)))
+            .with(csrf())
+            .with(authenticatedScapUser())
+            .flashAttr("versionSelectForm", form))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl(expectedRedirectUrl));
   }
 }

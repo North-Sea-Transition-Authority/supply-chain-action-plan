@@ -50,7 +50,6 @@ import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.technicalsupport.IncludeTechnicalSupportConfigurationProperties;
 import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 
-//@AutoConfigureMockMvc
 @IncludeServiceBrandingConfigurationProperties
 @IncludeTechnicalSupportConfigurationProperties
 @IncludeBusinessSupportConfiguration
@@ -107,10 +106,6 @@ public abstract class AbstractControllerTest {
 
   public static RequestPostProcessor authenticatedScapUser() {
     return user(testUser, Collections.singleton(new SimpleGrantedAuthority("SCAP_ACCESS_PRIVILEGE")));
-  }
-
-  public static RequestPostProcessor authenticatedEnergyPortalUser() {
-    return user(testUser);
   }
 
   @TestConfiguration

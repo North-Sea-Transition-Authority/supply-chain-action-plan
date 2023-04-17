@@ -5,9 +5,12 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
@@ -108,9 +111,18 @@ public class ScapSummaryController {
         .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
         .withUpdatePermission(teamService.userIsMemberOfRegulatorTeam(userDetailService.getUserDetail()))
         .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId))
-        .withScapVersions(scapDetailService.getAllVersionsForUser(scapDetail.getScap()));
+        .withScapVersions(scapDetailService.getAllVersionsForUser(scapDetail.getScap()))
+        .withCurrentVersion(Objects.nonNull(versionNumber) ? versionNumber : scapDetail.getVersionNumber());
     orgGroup.ifPresent(generator::withOrgGroup);
     return generator.generate();
+  }
+
+  @PostMapping("/")
+  public ModelAndView getScapVersionSummary(@PathVariable("scapId") ScapId scapId,
+                                            @ModelAttribute("versionSelectForm") VersionSelectForm form) {
+    return ReverseRouter.redirect(on(ScapSummaryController.class)
+        .getScapSummary(scapId, form.getRequestedVersion()))
+        .addObject("versionSelectForm", form);
   }
 
   private List<CaseEventView> getCaseEventView(ScapId scapId) {

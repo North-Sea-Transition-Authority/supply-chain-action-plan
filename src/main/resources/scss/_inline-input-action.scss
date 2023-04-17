@@ -1,0 +1,9 @@
+// Custom component to display inputs and buttons/links inline
+.inline-input-action {
+  display: flex;
+  align-items: flex-end;
+
+  & > .govuk-form-group {
+    @include govuk-responsive-margin(3, "right");
+  }
+}
