@@ -22,7 +22,7 @@
             allowedExtensions=supportingDocumentsTemplate.allowedExtensions()
             dropzoneLinkScreenReaderText="Choose a file to upload"
             existingFiles=supportingDocumentsUploads
-            multiFile=true
+            multiFile=false
             />
         </@fdsFieldset.fieldset>
 

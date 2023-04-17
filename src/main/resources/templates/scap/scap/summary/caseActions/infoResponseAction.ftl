@@ -4,19 +4,26 @@
         path="infoResponseForm.infoResponse.inputValue"
         labelText=""
         hintText=""/>
-        <@fdsFileUpload.fileUpload
-        id="infoResponseDocuments"
-        formName="infoResponseForm"
-        path="infoResponseForm.infoResponseDocuments"
-        downloadUrl=furtherInfoDocumentTemplate.downloadUrl()
-        uploadUrl=furtherInfoDocumentTemplate.uploadUrl()
-        deleteUrl=furtherInfoDocumentTemplate.deleteUrl()
-        maxAllowedSize=furtherInfoDocumentTemplate.maxAllowedSize()
-        allowedExtensions=furtherInfoDocumentTemplate.allowedExtensions()
-        dropzoneLinkScreenReaderText="Choose a file to upload"
-        existingFiles=furtherInfoDocumentUploads
-        multiFile=true
-        />
+        <@fdsFieldset.fieldset
+        legendHeading="Supporting Response documents"
+        legendHeadingSize="h2"
+        legendHeadingClass="govuk-fieldset__legend--m"
+        optionalLabel=true
+        >
+          <@fdsFileUpload.fileUpload
+          id="infoResponseDocuments"
+          formName="infoResponseForm"
+          path="infoResponseForm.infoResponseDocuments"
+          downloadUrl=furtherInfoDocumentTemplate.downloadUrl()
+          uploadUrl=furtherInfoDocumentTemplate.uploadUrl()
+          deleteUrl=furtherInfoDocumentTemplate.deleteUrl()
+          maxAllowedSize=furtherInfoDocumentTemplate.maxAllowedSize()
+          allowedExtensions=furtherInfoDocumentTemplate.allowedExtensions()
+          dropzoneLinkScreenReaderText="Choose a file to upload"
+          existingFiles=furtherInfoDocumentUploads
+          multiFile=false
+          />
+        </@fdsFieldset.fieldset>
         <@fdsAction.button buttonText="Update SCAP" buttonName="INFO_RESPONSE"/>
     </@fdsForm.htmlForm>
 </@fdsSlideOutPanel.slideOutPanel>
