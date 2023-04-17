@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
 import uk.co.nstauthority.scap.legal.AccessibilityStatementController;
 import uk.co.nstauthority.scap.legal.ContactInformationController;
+import uk.co.nstauthority.scap.legal.CookiesController;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 
 @Service
@@ -26,5 +27,7 @@ public class FooterService {
     model.put("contactUrl",
         ReverseRouter.route(on(ContactInformationController.class).renderContactInformation()));
     model.put("privacyStatementUrl", customerConfigurationProperties.privacyStatementUrl());
+    model.put("cookiesStatementUrl",
+        ReverseRouter.route(on(CookiesController.class).getCookiePreferences()));
   }
 }

@@ -10,6 +10,7 @@
 <#-- @ftlvariable name="accessibilityStatementUrl" type="String" -->
 <#-- @ftlvariable name="contactUrl" type="String" -->
 <#-- @ftlvariable name="privacyStatementUrl" type="String" -->
+<#-- @ftlvariable name="cookiesStatementUrl" type="String" -->
 
 <#if notificationBannerView??>
   <#assign notificationBannerContent>
@@ -34,9 +35,9 @@
   wrapperWidth=false
   topNavigation=false
 >
-  <#local serviceName = serviceBranding.name() />
-  <#local customerMnemonic = customerBranding.mnemonic() />
-  <#local serviceHomeUrl = springUrl(serviceHomeUrl) />
+  <#assign serviceName = serviceBranding.name() />
+  <#assign customerMnemonic = customerBranding.mnemonic() />
+  <#assign serviceHomeUrl = springUrl(serviceHomeUrl) />
 
   <#assign fullWidthColumn=false />
   <#assign oneHalfColumn=false />
@@ -85,12 +86,18 @@
       <@fdsFooter.footerMetaLink linkText="Accessibility statement" linkUrl=springUrl(accessibilityStatementUrl)/>
       <@fdsFooter.footerMetaLink linkText="Contact" linkUrl=springUrl(contactUrl)/>
       <@fdsFooter.footerMetaLink linkText="Privacy" linkUrl=privacyStatementUrl/>
+      <@fdsFooter.footerMetaLink linkText="Cookies" linkUrl=springUrl(cookiesStatementUrl)/>
     </@fdsFooter.footerMeta>
   </#assign>
 
   <#assign footerContent>
     <@fdsFooter.footer metaLinks=true footerMetaContent=footerMetaContent wrapperWidth=wrapperWidth/>
   </#assign>
+
+  <@fdsCookieBanner.analyticsCookieBanner
+    serviceName=serviceBranding.name()
+    cookieSettingsUrl=springUrl(cookiesStatementUrl)
+  />
 
   <@fdsDefaultPageTemplate
     htmlTitle=htmlTitle
