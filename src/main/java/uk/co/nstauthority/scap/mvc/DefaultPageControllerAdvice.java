@@ -77,7 +77,7 @@ class DefaultPageControllerAdvice {
     try {
       model.addAttribute("loggedInUser", userDetailService.getUserDetail());
     } catch (InvalidAuthenticationException e) {
-      LOGGER.error("Could not get logged in user", e);
+      LOGGER.warn("Could not get logged in user (were you expecting this to be an authenticated endpoint?)");
     }
   }
 

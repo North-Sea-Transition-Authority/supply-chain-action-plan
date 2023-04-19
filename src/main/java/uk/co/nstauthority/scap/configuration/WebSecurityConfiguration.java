@@ -52,7 +52,7 @@ public class WebSecurityConfiguration {
           .ignoringAntMatchers("/notify/callback", "/api/v1/logout/*")
         .and()
         .authorizeHttpRequests()
-          .mvcMatchers("/assets/**", "/notify/callback", "/api/v1/logout/*")
+          .mvcMatchers("/assets/**", "/notify/callback", "/api/v1/logout/*", "/actuator/health")
             .permitAll()
           .mvcMatchers("/*")
             .hasAuthority(SCAP_ACCESS_PERMISSION)
@@ -71,13 +71,13 @@ public class WebSecurityConfiguration {
   }
 
   @Bean
-  protected RelyingPartyRegistrationRepository relyingPartyRegistrations() throws Exception {
+  protected RelyingPartyRegistrationRepository relyingPartyRegistrations() throws CertificateException {
     var registration = getRelyingPartyRegistration();
     return new InMemoryRelyingPartyRegistrationRepository(registration);
   }
 
   @Bean
-  protected AccessDeniedHandler serviceDeniedHandler() throws Exception {
+  protected AccessDeniedHandler serviceDeniedHandler() {
     return new ServiceDeniedHandler();
   }
 
