@@ -4,6 +4,8 @@
 <#import '../timeline/scapTimelineEvents.ftl' as timeline>
 
 <#assign pageTitle = projectName!'' />
+<#assign customerMnemonic = customerBranding.mnemonic() />
+
 <#macro buttongroup group actions>
     <#if actions?size gt 1>
       <@fdsActionDropdown.actionDropdown dropdownButtonText="${group}">
@@ -54,18 +56,30 @@ pageSize=PageSize.FULL_WIDTH
 backLinkUrl=springUrl(backLinkUrl)
 >
   <@scapSummaryCard.summaryCard/>
-    <@fdsAction.buttonGroup>
-      <@fdsForm.htmlForm springUrl(updateScapUrl)>
-        <#if applicableActions["Update SCAP"]??>
-          <#if updateInProgress>
-            <@fdsAction.button buttonText="Resume SCAP update"/>
-            <@fdsAction.link linkText="Delete draft update" linkUrl=springUrl(deleteScapUrl) linkClass="govuk-button govuk-button--secondary" role=true />
-          <#else>
-            <@fdsAction.button buttonText="Update SCAP"/>
-          </#if>
+  <#if updateText?has_content>
+    <@fdsNotificationBanner.notificationBannerInfo bannerTitleText="An update has been requested for this SCAP">
+      <@fdsNotificationBanner.notificationBannerContent headingText=" ">
+        Update your SCAP to provide the information requested.
+        <@fdsDetails.summaryDetails summaryTitle="What information has the ${customerMnemonic} asked to be updated?">
+          <p class="govuk-body">
+            ${updateText}
+          </p>
+        </@fdsDetails.summaryDetails>
+      </@fdsNotificationBanner.notificationBannerContent>
+    </@fdsNotificationBanner.notificationBannerInfo>
+  </#if>
+  <@fdsAction.buttonGroup>
+    <@fdsForm.htmlForm springUrl(updateScapUrl)>
+      <#if applicableActions["Update SCAP"]??>
+        <#if updateInProgress>
+          <@fdsAction.button buttonText="Resume SCAP update"/>
+          <@fdsAction.link linkText="Delete draft update" linkUrl=springUrl(deleteScapUrl) linkClass="govuk-button govuk-button--secondary" role=true />
+        <#else>
+          <@fdsAction.button buttonText="Update SCAP"/>
         </#if>
-      </@fdsForm.htmlForm>
-    </@fdsAction.buttonGroup>
+      </#if>
+    </@fdsForm.htmlForm>
+  </@fdsAction.buttonGroup>
   <@fdsAction.buttonGroup>
     <#list applicableActions as group, actions>
       <@buttongroup group=group actions=actions/>

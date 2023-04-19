@@ -63,6 +63,7 @@ public class ScapSummaryModelAndViewGenerator {
     private OrganisationGroup orgGroup;
     private boolean updateInProgress = false;
     private boolean updatePermission = false;
+    private String updateRequestText = null;
     private final CaseEventDocumentService caseEventDocumentService;
     private ScapSubmissionStage scapStatus = ScapSubmissionStage.DRAFT;
     private List<CaseEventView> caseEventTimeline = emptyList();
@@ -111,6 +112,11 @@ public class ScapSummaryModelAndViewGenerator {
 
     public Generator withUpdatePermission(boolean updatePermission) {
       this.updatePermission = updatePermission;
+      return this;
+    }
+
+    public Generator withUpdateRequestText(String text) {
+      updateRequestText = text;
       return this;
     }
 
@@ -201,6 +207,7 @@ public class ScapSummaryModelAndViewGenerator {
           .addObject("applicableActions", applicableActions)
           .addObject("updateInProgress", updateInProgress)
           .addObject("updatePermission", updatePermission)
+          .addObject("updateText", updateRequestText)
           .addObject("deleteScapUrl", ReverseRouter.route(
               on(ScapDeletionController.class).renderScapDeletionConfirmation(scapDetail.getScap().getScapId())))
           .addObject("versionSelectForm", versionSelectForm)

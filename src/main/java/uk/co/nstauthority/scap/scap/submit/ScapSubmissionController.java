@@ -29,6 +29,7 @@ import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
 
 @Controller
 @RequestMapping("{scapId}/submit")
@@ -49,6 +50,8 @@ class ScapSubmissionController {
   private final ScapEmailService scapEmailService;
   private final ScapSubmissionService scapSubmissionService;
 
+  private final UpdateRequestService updateRequestService;
+
   @Autowired
   ScapSubmissionController(ScapService scapService,
                            ScapDetailService scapDetailService,
@@ -56,6 +59,7 @@ class ScapSubmissionController {
                            CaseEventService caseEventService,
                            ReviewAndSubmitFormService reviewAndSubmitFormService,
                            ControllerHelperService controllerHelperService,
+                           UpdateRequestService updateRequestService,
                            ScapEmailService scapEmailService,
                            ScapSubmissionService scapSubmissionService) {
     this.scapService = scapService;
@@ -65,6 +69,7 @@ class ScapSubmissionController {
     this.reviewAndSubmitFormService = reviewAndSubmitFormService;
     this.controllerHelperService = controllerHelperService;
     this.scapEmailService = scapEmailService;
+    this.updateRequestService = updateRequestService;
     this.scapSubmissionService = scapSubmissionService;
   }
 
@@ -73,8 +78,13 @@ class ScapSubmissionController {
     var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
     var form = reviewAndSubmitFormService.getForm(scapDetail);
 
+    var updateRequest = updateRequestService.findNextDueUpdate(scapId)
+        .map(request -> request.getCaseEvent().getComments())
+        .orElse(null);
+
     return scapSubmissionConfirmationModelAndView(scapId, scapDetail)
-        .addObject("form", form);
+        .addObject("form", form)
+        .addObject("updateText", updateRequest);
   }
 
   @GetMapping("/success")
@@ -85,6 +95,7 @@ class ScapSubmissionController {
     return new ModelAndView("scap/scap/submit/submissionSuccess")
         .addObject("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)))
         .addObject("scapReference", scap.getReference());
+
   }
 
   @PostMapping

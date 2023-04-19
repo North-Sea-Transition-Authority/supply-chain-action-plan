@@ -24,10 +24,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEvent;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailEntityTestUtil;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @ExtendWith(MockitoExtension.class)
@@ -80,7 +82,8 @@ class UpdateRequestServiceTest {
     when(userDetailService.getUserDetail()).thenReturn(user);
     var argumentCaptor = ArgumentCaptor.forClass(UpdateRequest.class);
     var localDate = LocalDate.now();
-    updateRequestService.createUpdateRequest(scapDetail, UpdateRequestType.FURTHER_INFORMATION, localDate);
+    var caseEvent = new CaseEvent();
+    updateRequestService.createUpdateRequest(scapDetail, UpdateRequestType.FURTHER_INFORMATION, localDate, caseEvent);
     verify(updateRequestRepository).save(argumentCaptor.capture());
 
     assertThat(argumentCaptor.getValue())
@@ -153,5 +156,25 @@ class UpdateRequestServiceTest {
         .findFirstByScapDetailAndResolutionDateNullAndUpdateRequestTypeOrderByCreatedTimestampDesc(scapDetail, UpdateRequestType.FURTHER_INFORMATION))
         .thenReturn(Optional.of(updateRequest));
     assertThat(updateRequestService.getUpdateDueDate(SCAP_ID, UpdateRequestType.FURTHER_INFORMATION)).contains(dueDate);
+  }
+
+  @Test
+  void findNextDueUpdate_noRequests() {
+    assertThat(updateRequestService.findNextDueUpdate(SCAP_ID)).isEmpty();
+  }
+
+  @Test
+  void findNextDueUpdate_RequestOutstanding() {
+    var updateRequest = new UpdateRequest(UUID.randomUUID());
+    var newCaseEvent = new CaseEvent();
+    updateRequest.setCaseEvent(newCaseEvent);
+    updateRequest.setUpdateRequestType(UpdateRequestType.FURTHER_INFORMATION);
+    updateRequest.setScapDetail(scapDetail);
+
+    when(scapDetailService.findLatestByScapIdAndStatus(SCAP_ID, ScapDetailStatus.SUBMITTED)).thenReturn(Optional.ofNullable(scapDetail));
+    when(updateRequestRepository
+        .findFirstByScapDetailAndResolutionDateNullOrderByCreatedTimestampDesc(scapDetail))
+        .thenReturn(Optional.of(updateRequest));
+    assertThat(updateRequestService.findNextDueUpdate(SCAP_ID)).contains(updateRequest);
   }
 }

@@ -18,9 +18,11 @@ import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -31,6 +33,7 @@ import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEvent;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
@@ -46,6 +49,9 @@ import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryView;
 import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderSummaryView;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequest;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestType;
 
 @ContextConfiguration(classes = ScapSummaryController.class)
 class ScapSummaryControllerTest extends AbstractControllerTest {
@@ -61,6 +67,9 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
 
   @MockBean
   CaseEventService caseEventService;
+
+  @MockBean
+  UpdateRequestService updateRequestService;
 
   @MockBean
   EnergyPortalUserService energyPortalUserService;
@@ -206,6 +215,25 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
   }
 
   @Test
+  void renderSummary_IndustryUser_UpdateRequest() throws Exception {
+    when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
+        .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
+    when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(false);
+    when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
+    when(caseEventService.getEventViewByScapId(SCAP_ID)).thenReturn(getTimelineView());
+    when(updateRequestService.findNextDueUpdate(SCAP_ID)).thenReturn(Optional.of(getUpdateRequest()));
+
+
+    mockMvc.perform(get(
+            ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
+            .with(authenticatedScapUser()))
+        .andExpect(status().isOk())
+        .andExpect(view().name("scap/scap/summary/scapSummaryOverview"))
+        .andExpect(model().attribute("updateText", "TEST"));
+    verify(caseEventService, never()).getEventViewByScapId(SCAP_ID);
+  }
+
+  @Test
   void renderSummary_IndustryUser_VersionSelected() throws Exception {
     when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
@@ -316,5 +344,16 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
             .flashAttr("versionSelectForm", form))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl(expectedRedirectUrl));
+  }
+  
+  private UpdateRequest getUpdateRequest() {
+    var caseEvent = new CaseEvent();
+    caseEvent.setComments("TEST");
+
+    return new UpdateRequest(
+        scapDetail,
+        UpdateRequestType.UPDATE,
+        LocalDate.now(),
+        caseEvent);
   }
 }

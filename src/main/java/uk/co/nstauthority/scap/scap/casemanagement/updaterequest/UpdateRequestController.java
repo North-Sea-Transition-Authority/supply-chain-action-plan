@@ -118,12 +118,15 @@ public class UpdateRequestController {
           var dueDate = updateRequestForm.getDueDate().getAsLocalDate().orElseThrow(
               () -> new ScapEntityNotFoundException("Could not find Due Date")
           );
-          updateRequestService.createUpdateRequest(scapDetail, UpdateRequestType.UPDATE, dueDate);
-          caseEventService.recordNewEvent(CaseEventSubject.SCAP_UPDATE_REQUESTED,
+          var caseEvent = caseEventService.recordNewEvent(CaseEventSubject.SCAP_UPDATE_REQUESTED,
               scapDetail,
               scapDetail.getVersionNumber(),
               updateRequestForm.getInfoRequest().getInputValue());
-
+          updateRequestService.createUpdateRequest(
+              scapDetail,
+              UpdateRequestType.UPDATE,
+              dueDate,
+              caseEvent);
           NotificationBannerUtils.successBannerRedirect(
               "Success",
               new NotificationBannerBodyLine(

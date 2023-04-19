@@ -19,6 +19,8 @@ import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil
 import static uk.co.nstauthority.scap.utils.ControllerTestingUtil.bindingResultWithErrors;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,6 +33,7 @@ import org.springframework.validation.BindingResult;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.notify.ScapEmailService;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEvent;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
@@ -38,6 +41,9 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequest;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestType;
 
 @ExtendWith(MockitoExtension.class)
 @WithMockUser
@@ -57,6 +63,9 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
   ScapEmailService scapEmailService;
 
   @MockBean
+  UpdateRequestService updateRequestService;
+
+  @MockBean
   ScapSubmissionService scapSubmissionService;
 
   @BeforeEach
@@ -72,6 +81,7 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
     when(reviewAndSubmitFormService.getForm(scapDetail)).thenReturn(new ReviewAndSubmitForm());
     when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
     when(scapSubmissionService.isScapValid(scapDetail)).thenReturn(true);
+    when(updateRequestService.findNextDueUpdate(SCAP_ID)).thenReturn(Optional.of(getUpdateRequest()));
 
     mockMvc.perform(get(
         ReverseRouter.route(on(ScapSubmissionController.class).renderScapSubmissionConfirmation(SCAP_ID))))
@@ -81,7 +91,8 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
             ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID))))
         .andExpect(model().attribute("scapSummaryView", getScapSummaryView()))
         .andExpect(model().attribute("isValid", true))
-        .andExpect(model().attributeExists("form"));
+        .andExpect(model().attributeExists("form"))
+        .andExpect(model().attribute("updateText", "TEST"));
   }
 
   @Test
@@ -179,5 +190,16 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
         .andExpect(model().attribute("workAreaUrl",
             ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null))))
         .andExpect(model().attribute("scapReference", scap.getReference()));
+  }
+
+  private UpdateRequest getUpdateRequest() {
+    var caseEvent = new CaseEvent();
+    caseEvent.setComments("TEST");
+
+    return new UpdateRequest(
+        scapDetail,
+        UpdateRequestType.UPDATE,
+        LocalDate.now(),
+        caseEvent);
   }
 }

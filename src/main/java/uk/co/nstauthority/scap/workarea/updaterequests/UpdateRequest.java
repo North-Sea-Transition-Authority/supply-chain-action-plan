@@ -11,7 +11,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEvent;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Entity
@@ -24,6 +26,10 @@ public class UpdateRequest {
   @ManyToOne
   @JoinColumn(name = "scap_detail_id")
   private ScapDetail scapDetail;
+
+  @OneToOne
+  @JoinColumn(name = "case_event_id")
+  private CaseEvent caseEvent;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "request_type")
@@ -47,10 +53,14 @@ public class UpdateRequest {
   public UpdateRequest() {
   }
 
-  public UpdateRequest(ScapDetail scapDetail, UpdateRequestType updateRequestType, LocalDate dueDate) {
+  public UpdateRequest(ScapDetail scapDetail,
+                       UpdateRequestType updateRequestType,
+                       LocalDate dueDate,
+                       CaseEvent caseEvent) {
     this.scapDetail = scapDetail;
     this.updateRequestType = updateRequestType;
     this.dueDate = dueDate;
+    this.caseEvent = caseEvent;
   }
 
   public UUID getId() {
@@ -73,12 +83,16 @@ public class UpdateRequest {
     this.updateRequestType = updateRequestType;
   }
 
-  public LocalDate getCreatedTimestamp() {
-    return createdTimestamp;
+  public CaseEvent getCaseEvent() {
+    return caseEvent;
   }
 
-  public void setCreatedTimestamp(LocalDate createdTimestamp) {
-    this.createdTimestamp = createdTimestamp;
+  public void setCaseEvent(CaseEvent caseEvent) {
+    this.caseEvent = caseEvent;
+  }
+
+  public LocalDate getCreatedTimestamp() {
+    return createdTimestamp;
   }
 
   public LocalDate getDueDate() {

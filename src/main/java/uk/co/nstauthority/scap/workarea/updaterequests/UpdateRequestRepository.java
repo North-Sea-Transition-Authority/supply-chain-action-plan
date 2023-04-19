@@ -6,6 +6,8 @@ import org.springframework.data.repository.CrudRepository;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 public interface UpdateRequestRepository extends CrudRepository<UpdateRequest, Integer> {
+  Optional<UpdateRequest> findFirstByScapDetailAndResolutionDateNullOrderByCreatedTimestampDesc(ScapDetail scapDetail);
+
   List<UpdateRequest> findByScapDetailAndUpdateRequestTypeInAndResolutionDateNull(
       ScapDetail scapDetail,
       List<UpdateRequestType> updateRequestTypes);

@@ -7,9 +7,11 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
+import uk.co.nstauthority.scap.scap.casemanagement.CaseEvent;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @Service
@@ -34,8 +36,11 @@ public class UpdateRequestService {
     this.clock = clock;
   }
 
-  public UpdateRequest createUpdateRequest(ScapDetail scapDetail, UpdateRequestType requestType, LocalDate dueDate) {
-    var updateRequest = new UpdateRequest(scapDetail, requestType, dueDate);
+  public UpdateRequest createUpdateRequest(ScapDetail scapDetail,
+                                           UpdateRequestType requestType,
+                                           LocalDate dueDate,
+                                           CaseEvent caseEvent) {
+    var updateRequest = new UpdateRequest(scapDetail, requestType, dueDate, caseEvent);
     updateRequest.setCreatedByUserId(userDetailService.getUserDetail().getWebUserAccountId().toInt());
     return updateRequestRepository.save(updateRequest);
   }
@@ -55,6 +60,15 @@ public class UpdateRequestService {
       updateRequest.setResolvedByUserId(userId);
     });
     updateRequestRepository.saveAll(resolvedRequests);
+  }
+
+  public Optional<UpdateRequest> findNextDueUpdate(ScapId scapId) {
+    var scapDetail = scapDetailService.findLatestByScapIdAndStatus(scapId, ScapDetailStatus.SUBMITTED);
+    if (scapDetail.isEmpty()) {
+      return Optional.empty();
+    }
+    return updateRequestRepository.findFirstByScapDetailAndResolutionDateNullOrderByCreatedTimestampDesc(
+        scapDetail.get());
   }
 
   public Optional<LocalDate> getUpdateDueDate(ScapId scapId, UpdateRequestType requestType) {

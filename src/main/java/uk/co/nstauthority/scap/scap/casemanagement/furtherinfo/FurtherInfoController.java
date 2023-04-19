@@ -115,12 +115,14 @@ public class FurtherInfoController {
         generator.generate(),
         infoRequestForm,
         () -> {
-          updateRequestService.createUpdateRequest(scapDetail, UpdateRequestType.FURTHER_INFORMATION, LocalDate.now());
-          caseEventService.recordNewEvent(CaseEventSubject.FURTHER_INFO_REQUESTED,
+          var caseEvent = caseEventService.recordNewEvent(CaseEventSubject.FURTHER_INFO_REQUESTED,
               scapDetail,
               scapDetail.getVersionNumber(),
               infoRequestForm.getInfoRequest().getInputValue());
-
+          updateRequestService.createUpdateRequest(scapDetail,
+              UpdateRequestType.FURTHER_INFORMATION,
+              LocalDate.now(),
+              caseEvent);
           NotificationBannerUtils.successBannerRedirect(
               "Success",
               new NotificationBannerBodyLine(

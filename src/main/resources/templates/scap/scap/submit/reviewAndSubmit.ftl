@@ -2,6 +2,7 @@
 <#import '../summary/scapSummary.ftl' as scapSummary>
 
 <#assign pageTitle = "Check your answers before submitting your SCAP" />
+<#assign customerMnemonic = customerBranding.mnemonic() />
 
 <#-- @ftlvariable name="scapSummaryView" type="uk.co.nstauthority.scap.scap.summary.ScapSummaryView" -->
 <#-- @ftlvariable name="errorList" type="java.util.List<uk.co.nstauthority.scap.fds.ErrorItem>" -->
@@ -14,6 +15,11 @@
   singleErrorMessage=incompleteErrorMessage
   errorItems=errorList
 >
+  <#if updateText?has_content>
+    <@fdsDetails.summaryDetails summaryTitle="What information has the ${customerMnemonic} asked to be updated?">
+      <p class="govuk-body">${updateText}</p>
+    </@fdsDetails.summaryDetails>
+  </#if>
   <@scapSummary.summary scapSummaryView=scapSummaryView />
 
   <@fdsForm.htmlForm>

@@ -28,6 +28,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
 
 @Controller
 @RequestMapping("{scapId}")
@@ -49,12 +50,15 @@ public class ScapSummaryController {
 
   private final CaseEventDocumentService caseEventDocumentService;
 
+  private final UpdateRequestService updateRequestService;
+
   public ScapSummaryController(ScapDetailService scapDetailService,
                                ScapSummaryViewService scapSummaryViewService,
                                CaseEventService caseEventService,
                                OrganisationGroupService organisationGroupService,
                                TeamService teamService,
                                TeamMemberService teamMemberService, UserDetailService userDetailService,
+                               UpdateRequestService updateRequestService,
                                CaseEventDocumentService caseEventDocumentService) {
     this.scapDetailService = scapDetailService;
     this.scapSummaryViewService = scapSummaryViewService;
@@ -63,6 +67,7 @@ public class ScapSummaryController {
     this.teamService = teamService;
     this.teamMemberService = teamMemberService;
     this.userDetailService = userDetailService;
+    this.updateRequestService = updateRequestService;
     this.caseEventDocumentService = caseEventDocumentService;
   }
 
@@ -114,6 +119,11 @@ public class ScapSummaryController {
         .withScapVersions(scapDetailService.getAllVersionsForUser(scapDetail.getScap()))
         .withCurrentVersion(Objects.nonNull(versionNumber) ? versionNumber : scapDetail.getVersionNumber());
     orgGroup.ifPresent(generator::withOrgGroup);
+    updateRequestService.findNextDueUpdate(scapId)
+        .ifPresent(requestEvent -> generator.withUpdateRequestText(requestEvent
+            .getCaseEvent()
+            .getComments()));
+
     return generator.generate();
   }
 
