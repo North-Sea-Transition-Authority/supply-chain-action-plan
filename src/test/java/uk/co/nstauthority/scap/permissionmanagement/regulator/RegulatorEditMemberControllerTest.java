@@ -9,28 +9,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.validation.BeanPropertyBindingResult;
-import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
-import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRolesForm;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
-import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewTestUtil;
-import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRoleService;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 @ContextConfiguration(classes = RegulatorEditMemberController.class)
 class RegulatorEditMemberControllerTest extends AbstractRegulatorTeamControllerTest {
@@ -58,7 +51,7 @@ class RegulatorEditMemberControllerTest extends AbstractRegulatorTeamControllerT
     user = ServiceUserDetailTestUtil.Builder().build();
 
     when(regulatorTeamService.getTeam(user)).thenReturn(team);
-    when(teamMemberViewService.getTeamMemberViewOrThrow(teamMember)).thenReturn(teamMemberView);
+    when(teamMemberViewService.getTeamMemberView(teamMember)).thenReturn(teamMemberView);
   }
 
   @Test

@@ -26,7 +26,7 @@ public class ContractingPerformanceTaskListItemService {
   }
 
   public boolean isValid(ScapDetail scapDetail) {
-    var contractingPerformanceOverviewOpt = contractingPerformanceOverviewService.getByScapDetail(scapDetail);
+    var contractingPerformanceOverviewOpt = contractingPerformanceOverviewService.findByScapDetail(scapDetail);
     if (contractingPerformanceOverviewOpt.isEmpty()) {
       return false;
     }

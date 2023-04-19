@@ -54,7 +54,7 @@ class HasPlannedTenderFormServiceTest {
 
   @Test
   void getForm_noExistingPlannedTender() {
-    when(plannedTenderService.getScapPlannedTenderByScapDetail(scapDetail)).thenReturn(Optional.empty());
+    when(plannedTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
     var form = hasPlannedTenderFormService.getForm(scapDetail);
 
@@ -66,7 +66,7 @@ class HasPlannedTenderFormServiceTest {
     var existingPlannedTender = new PlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 4, 23));
     existingPlannedTender.setHasPlannedTenders(true);
 
-    when(plannedTenderService.getScapPlannedTenderByScapDetail(scapDetail))
+    when(plannedTenderService.findByScapDetail(scapDetail))
         .thenReturn(Optional.of(existingPlannedTender));
 
     var form = hasPlannedTenderFormService.getForm(scapDetail);
@@ -79,7 +79,7 @@ class HasPlannedTenderFormServiceTest {
     var existingPlannedTender = new PlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 4, 23));
     existingPlannedTender.setHasPlannedTenders(false);
 
-    when(plannedTenderService.getScapPlannedTenderByScapDetail(scapDetail))
+    when(plannedTenderService.findByScapDetail(scapDetail))
         .thenReturn(Optional.of(existingPlannedTender));
 
     var form = hasPlannedTenderFormService.getForm(scapDetail);

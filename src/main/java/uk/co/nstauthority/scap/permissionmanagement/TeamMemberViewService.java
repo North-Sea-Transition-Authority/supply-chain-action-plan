@@ -28,18 +28,18 @@ public class TeamMemberViewService {
     this.energyPortalUserService = energyPortalUserService;
   }
 
-  public List<TeamMemberView> getTeamMemberViewsForTeam(Team team) {
+  public List<TeamMemberView> findTeamMemberViewsForTeam(Team team) {
     var members = teamMemberService.getTeamMembers(team);
     return createUserViewsFromTeamMembers(members);
   }
 
-  public Optional<TeamMemberView> getTeamMemberView(TeamMember teamMember) {
+  public Optional<TeamMemberView> findTeamMemberView(TeamMember teamMember) {
     return createUserViewsFromTeamMembers(List.of(teamMember))
         .stream()
         .findFirst();
   }
 
-  public TeamMemberView getTeamMemberViewOrThrow(TeamMember teamMember) {
+  public TeamMemberView getTeamMemberView(TeamMember teamMember) {
     return createUserViewsFromTeamMembers(List.of(teamMember))
         .stream()
         .findFirst()

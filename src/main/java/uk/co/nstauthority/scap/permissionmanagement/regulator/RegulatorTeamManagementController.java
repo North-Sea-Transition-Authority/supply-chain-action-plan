@@ -67,7 +67,7 @@ public class RegulatorTeamManagementController {
         .addObject("pageTitle", "Manage %s".formatted(customerConfigurationProperties.mnemonic()))
         .addObject("teamName", customerConfigurationProperties.mnemonic())
         .addObject("teamRoles", RegulatorTeamRole.values())
-        .addObject("teamMembers", teamMemberViewService.getTeamMemberViewsForTeam(team));
+        .addObject("teamMembers", teamMemberViewService.findTeamMemberViewsForTeam(team));
 
     if (regulatorTeamService.isAccessManager(teamId, userDetailService.getUserDetail())) {
       modelAndView

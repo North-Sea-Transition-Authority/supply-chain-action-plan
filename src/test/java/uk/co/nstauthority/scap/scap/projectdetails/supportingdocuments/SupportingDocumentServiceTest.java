@@ -92,7 +92,7 @@ class SupportingDocumentServiceTest {
   void deleteFile_FileDeleted_SupportingDocAndFileDeleted() {
     var uuid = UUID.randomUUID();
     var supportingDocument = mock(SupportingDocument.class);
-    when(fileUploadService.findUploadedFileOrThrow(uuid)).thenReturn(uploadedFile);
+    when(fileUploadService.getUploadedFile(uuid)).thenReturn(uploadedFile);
     when(supportingDocumentRepository.findByScapDetailAndUploadedFile(scapDetail, uploadedFile))
         .thenReturn(supportingDocument);
     when(supportingDocumentRepository.findAllByUploadedFile(uploadedFile))
@@ -109,7 +109,7 @@ class SupportingDocumentServiceTest {
   void deleteFile_FileDeletedButExistsInOtherVersion_OnlySupportingDocDeleted() {
     var supportingDocument1 = mock(SupportingDocument.class);
     var supportingDocument2 = mock(SupportingDocument.class);
-    when(fileUploadService.findUploadedFileOrThrow(uploadedFile.getId())).thenReturn(uploadedFile);
+    when(fileUploadService.getUploadedFile(uploadedFile.getId())).thenReturn(uploadedFile);
     when(supportingDocumentRepository.findByScapDetailAndUploadedFile(scapDetail, uploadedFile))
         .thenReturn(supportingDocument1);
     when(supportingDocumentRepository.findAllByUploadedFile(uploadedFile))
@@ -206,11 +206,11 @@ class SupportingDocumentServiceTest {
         UUID.randomUUID(), SupportingDocumentType.ADDITIONAL_DOCUMENT);
     supportingDocument.setUploadedFile(uploadedFile);
 
-    when(fileUploadService.findUploadedFileOrThrow(uploadedFile.getId())).thenReturn(uploadedFile);
+    when(fileUploadService.getUploadedFile(uploadedFile.getId())).thenReturn(uploadedFile);
     when(supportingDocumentRepository.findByScapDetailAndUploadedFile(scapDetail, uploadedFile))
         .thenReturn(supportingDocument);
 
-    var returnedUploadedFile = supportingDocumentService.findUploadedFileOrThrow(scapDetail, uploadedFile.getId());
+    var returnedUploadedFile = supportingDocumentService.getUploadedFile(scapDetail, uploadedFile.getId());
 
     assertThat(returnedUploadedFile).isEqualTo(uploadedFile);
   }

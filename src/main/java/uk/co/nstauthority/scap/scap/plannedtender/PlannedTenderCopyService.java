@@ -37,7 +37,7 @@ public class PlannedTenderCopyService implements CopyService {
 
   @Override
   public void copyEntity(ScapDetail oldScapDetail, ScapDetail newScapDetail, NewScapType newScapType) {
-    var oldPlannedTender = plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(oldScapDetail);
+    var oldPlannedTender = plannedTenderService.getByScapDetail(oldScapDetail);
     var newPlannedTender = (PlannedTender) entityCopyService.copyChild(newScapDetail, oldPlannedTender);
 
     if (DRAFT_UPDATE.equals(newScapType)) {

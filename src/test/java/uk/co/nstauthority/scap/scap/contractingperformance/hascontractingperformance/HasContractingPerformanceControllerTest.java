@@ -62,7 +62,7 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
 
   @Test
   void renderHasContractingPerformanceForm_NoExistingContractPerformanceOverview() throws Exception {
-    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail)).thenReturn(Optional.empty());
+    when(contractingPerformanceOverviewService.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
     mockMvc.perform(get(
         ReverseRouter.route(on(HasContractingPerformanceController.class)
@@ -82,7 +82,7 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
     var existingContractPerformanceOverview = new ContractingPerformanceOverview();
     var filledForm = new HasContractingPerformanceForm();
 
-    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
+    when(contractingPerformanceOverviewService.findByScapDetail(scapDetail))
         .thenReturn(Optional.of(existingContractPerformanceOverview));
     when(contractingPerformanceFormService.getForm(existingContractPerformanceOverview)).thenReturn(filledForm);
 
@@ -106,7 +106,7 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
     var expectedRedirectUrl = ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
         .renderContractingPerformanceSummary(SCAP_ID));
 
-    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
+    when(contractingPerformanceOverviewService.findByScapDetail(scapDetail))
         .thenReturn(Optional.of(existingContractPerformanceOverview));
     when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(SCAP_ID)).thenReturn(summaryViews);
     doReturn(false).when(summaryViews).isEmpty();
@@ -125,7 +125,7 @@ class HasContractingPerformanceControllerTest extends AbstractScapSubmitterContr
     var expectedRedirectUrl = ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
         .renderContractingPerformanceSummary(SCAP_ID));
 
-    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
+    when(contractingPerformanceOverviewService.findByScapDetail(scapDetail))
         .thenReturn(Optional.of(existingContractPerformanceOverview));
     when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(SCAP_ID)).thenReturn(summaryViews);
     doReturn(false).when(summaryViews).isEmpty();

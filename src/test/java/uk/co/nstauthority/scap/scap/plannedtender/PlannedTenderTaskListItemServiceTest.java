@@ -58,7 +58,7 @@ class PlannedTenderTaskListItemServiceTest {
 
   @Test
   void isValid_NoPlannedTenderOverview_AssertFalse() {
-    when(plannedTenderService.getScapPlannedTenderByScapDetail(SCAP_DETAIL)).thenReturn(Optional.empty());
+    when(plannedTenderService.findByScapDetail(SCAP_DETAIL)).thenReturn(Optional.empty());
 
     assertFalse(plannedTenderTaskListItemService.isValid(SCAP_DETAIL));
 
@@ -76,7 +76,7 @@ class PlannedTenderTaskListItemServiceTest {
     var hasPlannedTenderForm = new HasPlannedTenderForm();
     var bindingResult = ValidatorTestingUtil.bindingResultWithErrors(hasPlannedTenderForm);
 
-    when(plannedTenderService.getScapPlannedTenderByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(plannedTender));
+    when(plannedTenderService.findByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(plannedTender));
     when(hasPlannedTenderFormService.scapPlannedTenderToForm(plannedTender)).thenReturn(hasPlannedTenderForm);
     when(hasPlannedTenderFormService.validate(eq(hasPlannedTenderForm), any(BindingResult.class)))
         .thenReturn(bindingResult);
@@ -98,7 +98,7 @@ class PlannedTenderTaskListItemServiceTest {
     hasPlannedTenderForm.setHasPlannedTender(YesNo.NO);
     var bindingResult = ValidatorTestingUtil.bindingResultWithoutErrors(hasPlannedTenderForm);
 
-    when(plannedTenderService.getScapPlannedTenderByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(plannedTender));
+    when(plannedTenderService.findByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(plannedTender));
     when(hasPlannedTenderFormService.scapPlannedTenderToForm(plannedTender)).thenReturn(hasPlannedTenderForm);
     when(hasPlannedTenderFormService.validate(eq(hasPlannedTenderForm), any(BindingResult.class)))
         .thenReturn(bindingResult);
@@ -120,7 +120,7 @@ class PlannedTenderTaskListItemServiceTest {
     hasPlannedTenderForm.setHasPlannedTender(YesNo.YES);
     var bindingResult = ValidatorTestingUtil.bindingResultWithoutErrors(hasPlannedTenderForm);
 
-    when(plannedTenderService.getScapPlannedTenderByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(plannedTender));
+    when(plannedTenderService.findByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(plannedTender));
     when(hasPlannedTenderFormService.scapPlannedTenderToForm(plannedTender)).thenReturn(hasPlannedTenderForm);
     when(hasPlannedTenderFormService.validate(eq(hasPlannedTenderForm), any(BindingResult.class)))
         .thenReturn(bindingResult);
@@ -149,7 +149,7 @@ class PlannedTenderTaskListItemServiceTest {
     var plannedTenderActivityErrors = ValidatorTestingUtil
         .bindingResultWithErrors(plannedTenderActivityForm);
 
-    when(plannedTenderService.getScapPlannedTenderByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(plannedTender));
+    when(plannedTenderService.findByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(plannedTender));
     when(hasPlannedTenderFormService.scapPlannedTenderToForm(plannedTender)).thenReturn(hasPlannedTenderForm);
     when(hasPlannedTenderFormService.validate(eq(hasPlannedTenderForm), any(BindingResult.class)))
         .thenReturn(bindingResult);
@@ -183,7 +183,7 @@ class PlannedTenderTaskListItemServiceTest {
     var plannedTenderActivityErrors = ValidatorTestingUtil
         .bindingResultWithoutErrors(plannedTenderActivityForm);
 
-    when(plannedTenderService.getScapPlannedTenderByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(plannedTender));
+    when(plannedTenderService.findByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(plannedTender));
     when(hasPlannedTenderFormService.scapPlannedTenderToForm(plannedTender)).thenReturn(hasPlannedTenderForm);
     when(hasPlannedTenderFormService.validate(eq(hasPlannedTenderForm), any(BindingResult.class)))
         .thenReturn(bindingResult);
@@ -217,7 +217,7 @@ class PlannedTenderTaskListItemServiceTest {
     var plannedTenderActivityErrors = ValidatorTestingUtil
         .bindingResultWithoutErrors(plannedTenderActivityForm);
 
-    when(plannedTenderService.getScapPlannedTenderByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(plannedTender));
+    when(plannedTenderService.findByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(plannedTender));
     when(hasPlannedTenderFormService.scapPlannedTenderToForm(plannedTender)).thenReturn(hasPlannedTenderForm);
     when(hasPlannedTenderFormService.validate(eq(hasPlannedTenderForm), any(BindingResult.class)))
         .thenReturn(bindingResult);

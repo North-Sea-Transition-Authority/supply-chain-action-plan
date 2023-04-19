@@ -58,7 +58,7 @@ public class IndustryTeamManagementController {
         .addObject("pageTitle", "Manage %s".formatted(team.getDisplayName()))
         .addObject("teamName", team.getDisplayName())
         .addObject("teamRoles", IndustryTeamRole.values())
-        .addObject("teamMembers", teamMemberViewService.getTeamMemberViewsForTeam(team));
+        .addObject("teamMembers", teamMemberViewService.findTeamMemberViewsForTeam(team));
 
     if (industryTeamService.isAccessManager(teamId, user)) {
       modelAndView

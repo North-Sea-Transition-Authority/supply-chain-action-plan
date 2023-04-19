@@ -75,7 +75,7 @@ public class DeleteContractingPerformanceController {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestByScap(scap);
     var contractingPerformanceOverview = contractingPerformanceOverviewService
-        .getByScapDetailOrThrow(scapDetail);
+        .getByScapDetail(scapDetail);
 
     var contractingPerformance = contractingPerformanceService.getById(contractingPerformanceId);
     contractingPerformanceService.deleteContractingPerformance(contractingPerformance);

@@ -47,7 +47,7 @@ class PlannedTenderCopyServiceTest {
     oldPlannedTender.setHasPlannedTenders(true);
     oldPlannedTender.setHasMorePlannedTenderActivities(HasMorePlannedTenderActivities.NO);
 
-    when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(oldScapDetail))
+    when(plannedTenderService.getByScapDetail(oldScapDetail))
         .thenReturn(oldPlannedTender);
     plannedTenderCopyService.copyEntity(oldScapDetail, newScapDetail, NewScapType.REINSTATEMENT);
     verify(entityManager).persist(plannedTenderCaptor.capture());
@@ -67,7 +67,7 @@ class PlannedTenderCopyServiceTest {
 
     var oldPlannedTender = new PlannedTender();
 
-    when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(oldScapDetail))
+    when(plannedTenderService.getByScapDetail(oldScapDetail))
         .thenReturn(oldPlannedTender);
     plannedTenderCopyService.copyEntity(oldScapDetail, newScapDetail, NewScapType.DRAFT_UPDATE);
     verify(entityManager).persist(any(PlannedTender.class));

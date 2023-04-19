@@ -59,7 +59,7 @@ public class ScapDeletionController {
   ModelAndView deleteScap(@PathVariable("scapId") ScapId scapId,
                           RedirectAttributes redirectAttributes) {
     var reference = scapService.getScapById(scapId).getReference();
-    var scapDetail = scapDetailService.getLatestByScapIdOrThrow(scapId);
+    var scapDetail = scapDetailService.getLatestByScapId(scapId);
     scapDetailService.deleteScapDetail(scapDetail);
 
     var successMessage = "%s deleted successfully".formatted(reference);

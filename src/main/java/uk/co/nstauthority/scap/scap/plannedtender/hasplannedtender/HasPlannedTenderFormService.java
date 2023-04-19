@@ -27,7 +27,7 @@ public class HasPlannedTenderFormService {
   }
 
   public HasPlannedTenderForm getForm(ScapDetail scapDetail) {
-    return plannedTenderService.getScapPlannedTenderByScapDetail(scapDetail)
+    return plannedTenderService.findByScapDetail(scapDetail)
         .map(this::scapPlannedTenderToForm)
         .orElse(new HasPlannedTenderForm());
   }

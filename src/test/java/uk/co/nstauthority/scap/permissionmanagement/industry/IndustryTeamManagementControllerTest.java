@@ -64,7 +64,7 @@ class IndustryTeamManagementControllerTest extends AbstractIndustryTeamControlle
     var teamMemberView = TeamMemberViewTestUtil.Builder()
       .withRole(IndustryTeamRole.ACCESS_MANAGER)
       .build();
-    when(teamMemberViewService.getTeamMemberViewsForTeam(team)).thenReturn(List.of(teamMemberView));
+    when(teamMemberViewService.findTeamMemberViewsForTeam(team)).thenReturn(List.of(teamMemberView));
 
     mockMvc.perform(
       get(ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId)))
@@ -87,7 +87,7 @@ class IndustryTeamManagementControllerTest extends AbstractIndustryTeamControlle
     var expectedAddUrl = ReverseRouter.route(on(IndustryAddMemberController.class).renderAddTeamMember(teamId));
 
     when(industryTeamService.isAccessManager(teamId, testUser)).thenReturn(true);
-    when(teamMemberViewService.getTeamMemberViewsForTeam(team)).thenReturn(List.of(teamMemberView));
+    when(teamMemberViewService.findTeamMemberViewsForTeam(team)).thenReturn(List.of(teamMemberView));
     when(teamMemberService.isMemberOfTeamWithAnyRoleOf(teamId, testUser, Set.of(IndustryTeamRole.ACCESS_MANAGER.name())))
       .thenReturn(canRemoveUsers);
 
@@ -121,7 +121,7 @@ class IndustryTeamManagementControllerTest extends AbstractIndustryTeamControlle
         testUser,
         Set.of(ORGANISATION_ACCESS_MANAGER.name())))
         .thenReturn(true);
-    when(teamMemberViewService.getTeamMemberViewsForTeam(team)).thenReturn(List.of(teamMemberView));
+    when(teamMemberViewService.findTeamMemberViewsForTeam(team)).thenReturn(List.of(teamMemberView));
     when(teamMemberService.isMemberOfTeamWithAnyRoleOf(teamId, testUser, Set.of(IndustryTeamRole.ACCESS_MANAGER.name())))
         .thenReturn(canRemoveUsers);
 

@@ -31,7 +31,7 @@ public class PlannedTenderTaskListItemService {
   }
 
   public boolean isValid(ScapDetail scapDetail) {
-    var plannedTenderOpt = plannedTenderService.getScapPlannedTenderByScapDetail(scapDetail);
+    var plannedTenderOpt = plannedTenderService.findByScapDetail(scapDetail);
 
     if (plannedTenderOpt.isEmpty()) {
       return false;

@@ -68,7 +68,7 @@ public class ContractingPerformanceController {
 
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestByScap(scap);
-    var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail);
+    var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetail(scapDetail);
     var actualTender = actualTenderService.findByScapDetail(scapDetail);
     var contractedActivities = actualTender
         .map(actualTenderActivityService::getActivitiesWithContractAwarded)
@@ -86,7 +86,7 @@ public class ContractingPerformanceController {
                                                         BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestByScap(scap);
-    var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail);
+    var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetail(scapDetail);
     var actualTender = actualTenderService.findByScapDetail(scapDetail);
     var contractedActivities = actualTender
         .map(actualTenderActivityService::getActivitiesWithContractAwarded)

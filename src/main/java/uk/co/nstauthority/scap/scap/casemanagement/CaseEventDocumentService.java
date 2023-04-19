@@ -67,7 +67,7 @@ public class CaseEventDocumentService {
 
   @Transactional
   public FileDeleteResult deleteFile(UUID uploadedFileId) {
-    var uploadedFile = fileUploadService.findUploadedFileOrThrow(uploadedFileId);
+    var uploadedFile = fileUploadService.getUploadedFile(uploadedFileId);
     fileUploadService.deleteFile(uploadedFile);
 
     return FileDeleteResult.success(uploadedFile.getId().toString());
@@ -79,6 +79,6 @@ public class CaseEventDocumentService {
   }
 
   public UploadedFile getUploadedFile(UUID uploadedFileId) {
-    return fileUploadService.findUploadedFileOrThrow(uploadedFileId);
+    return fileUploadService.getUploadedFile(uploadedFileId);
   }
 }

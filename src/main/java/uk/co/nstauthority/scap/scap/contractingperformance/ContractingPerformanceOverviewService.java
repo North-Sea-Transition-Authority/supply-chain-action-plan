@@ -23,12 +23,12 @@ public class ContractingPerformanceOverviewService {
     this.clock = clock;
   }
 
-  public Optional<ContractingPerformanceOverview> getByScapDetail(ScapDetail scapDetail) {
+  public Optional<ContractingPerformanceOverview> findByScapDetail(ScapDetail scapDetail) {
     return contractingPerformanceOverviewRepository.findByScapDetail(scapDetail);
   }
 
-  public ContractingPerformanceOverview getByScapDetailOrThrow(ScapDetail scapDetail) {
-    return getByScapDetail(scapDetail).orElseThrow(
+  public ContractingPerformanceOverview getByScapDetail(ScapDetail scapDetail) {
+    return findByScapDetail(scapDetail).orElseThrow(
         () -> new ScapEntityNotFoundException(
             "Could not find Contracting Performance Overview for ScapDetail with ID [%d]"
                 .formatted(scapDetail.getId())));
@@ -36,7 +36,7 @@ public class ContractingPerformanceOverviewService {
 
   @Transactional
   public void saveContractingPerformance(ScapDetail scapDetail, YesNo hasContractingPerformance) {
-    var contractingPerformanceOverview = getByScapDetail(scapDetail)
+    var contractingPerformanceOverview = findByScapDetail(scapDetail)
         .orElse(new ContractingPerformanceOverview(scapDetail, clock.instant()));
     contractingPerformanceOverview.setHasContractingPerformance(YesNo.YES.equals(hasContractingPerformance));
     contractingPerformanceOverviewRepository.save(contractingPerformanceOverview);

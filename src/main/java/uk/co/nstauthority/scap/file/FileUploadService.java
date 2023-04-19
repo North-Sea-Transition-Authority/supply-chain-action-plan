@@ -41,8 +41,8 @@ public class FileUploadService {
     return fileUploadStorageService.downloadFile(uploadedFile);
   }
 
-  public UploadedFile findUploadedFileOrThrow(UUID uploadedFileId) {
-    return uploadedFilePersistenceService.findUploadedFileOrThrow(uploadedFileId);
+  public UploadedFile getUploadedFile(UUID uploadedFileId) {
+    return uploadedFilePersistenceService.getUploadedFile(uploadedFileId);
   }
 
   public List<UploadedFileView> getUploadedFileViewList(List<UUID> fileUploadIdList) {
@@ -55,7 +55,7 @@ public class FileUploadService {
   public void updateFileUploadDescriptions(List<FileUploadForm> fileUploadFormList) {
     fileUploadFormList
         .forEach(fileUploadForm -> {
-          var uploadedFile = findUploadedFileOrThrow(fileUploadForm.getUploadedFileId());
+          var uploadedFile = getUploadedFile(fileUploadForm.getUploadedFileId());
           uploadedFilePersistenceService.updateFileDescription(uploadedFile, fileUploadForm.getUploadedFileDescription());
         });
   }

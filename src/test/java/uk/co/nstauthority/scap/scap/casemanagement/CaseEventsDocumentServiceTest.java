@@ -88,7 +88,7 @@ class CaseEventsDocumentServiceTest {
   @Test
   void deleteFile_FileDeleted_SupportingDocAndFileDeleted() {
     var uuid = UUID.randomUUID();
-    when(fileUploadService.findUploadedFileOrThrow(uuid)).thenReturn(uploadedFile);
+    when(fileUploadService.getUploadedFile(uuid)).thenReturn(uploadedFile);
 
     var fileDeleteResult = caseEventDocumentService.deleteFile(uuid);
 
@@ -142,7 +142,7 @@ class CaseEventsDocumentServiceTest {
         UUID.randomUUID(), SupportingDocumentType.ADDITIONAL_DOCUMENT);
     supportingDocument.setUploadedFile(uploadedFile);
 
-    when(fileUploadService.findUploadedFileOrThrow(uploadedFile.getId())).thenReturn(uploadedFile);
+    when(fileUploadService.getUploadedFile(uploadedFile.getId())).thenReturn(uploadedFile);
     var returnedUploadedFile = caseEventDocumentService.getUploadedFile(uploadedFile.getId());
 
     assertThat(returnedUploadedFile).isEqualTo(uploadedFile);

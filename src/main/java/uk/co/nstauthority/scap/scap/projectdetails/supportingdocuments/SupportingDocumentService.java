@@ -91,7 +91,7 @@ public class SupportingDocumentService {
 
   @Transactional
   public FileDeleteResult deleteFile(ScapDetail scapDetail, UUID uploadedFileId) {
-    var uploadedFile = fileUploadService.findUploadedFileOrThrow(uploadedFileId);
+    var uploadedFile = fileUploadService.getUploadedFile(uploadedFileId);
     var supportingDocuments = supportingDocumentRepository.findAllByUploadedFile(uploadedFile);
 
     var supportingDocument =
@@ -112,8 +112,8 @@ public class SupportingDocumentService {
     fileUploadService.updateFileUploadDescriptions(fileUploadFormList);
   }
 
-  UploadedFile findUploadedFileOrThrow(ScapDetail scapDetail, UUID uploadedFileId) {
-    var uploadedFile = fileUploadService.findUploadedFileOrThrow(uploadedFileId);
+  UploadedFile getUploadedFile(ScapDetail scapDetail, UUID uploadedFileId) {
+    var uploadedFile = fileUploadService.getUploadedFile(uploadedFileId);
     var supportingDocument = supportingDocumentRepository.findByScapDetailAndUploadedFile(
         scapDetail, uploadedFile);
     return supportingDocument.getUploadedFile();

@@ -49,7 +49,7 @@ public abstract class AbstractRegulatorTeamControllerTest extends AbstractContro
     when(teamMemberService.findTeamMember(any(Team.class), any())).thenReturn(Optional.of(teamMember));
     when(teamMemberService.getTeamMember(any(Team.class), eq(webUserAccountId))).thenReturn(teamMember);
     when(teamMemberService.isMemberOfTeam(any(TeamId.class), eq(user))).thenReturn(true);
-    when(teamMemberViewService.getTeamMemberViewOrThrow(any(TeamMember.class))).thenReturn(getTeamMemberView());
+    when(teamMemberViewService.getTeamMemberView(any(TeamMember.class))).thenReturn(getTeamMemberView());
   }
 
   private ServiceUserDetail getUser() {

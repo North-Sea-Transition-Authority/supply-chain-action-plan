@@ -29,7 +29,7 @@ public class FileUploadSummaryViewService {
 
     return fileUploadList
         .stream()
-        .map(fileUpload -> fileUploadService.findUploadedFileOrThrow(fileUpload.getUploadedFileId()))
+        .map(fileUpload -> fileUploadService.getUploadedFile(fileUpload.getUploadedFileId()))
         .map(uploadedFile -> new FileUploadSummaryView(
             uploadedFile.getFilename(),
             uploadedFile.getDescription(),

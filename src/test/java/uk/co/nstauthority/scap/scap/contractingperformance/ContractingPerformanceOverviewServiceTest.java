@@ -48,7 +48,7 @@ class ContractingPerformanceOverviewServiceTest {
         .thenReturn(Optional.of(contractingPerformanceOverview));
 
     var returnedContractingPerformanceOverview = contractingPerformanceOverviewService
-        .getByScapDetail(scapDetail);
+        .findByScapDetail(scapDetail);
 
     assertThat(returnedContractingPerformanceOverview).contains(contractingPerformanceOverview);
   }
@@ -61,7 +61,7 @@ class ContractingPerformanceOverviewServiceTest {
         .thenReturn(Optional.of(contractingPerformanceOverview));
 
     var returnedContractingPerformanceOverview = contractingPerformanceOverviewService
-        .getByScapDetailOrThrow(scapDetail);
+        .getByScapDetail(scapDetail);
 
     assertThat(returnedContractingPerformanceOverview).isEqualTo(contractingPerformanceOverview);
   }
@@ -71,7 +71,7 @@ class ContractingPerformanceOverviewServiceTest {
     when(contractingPerformanceOverviewRepository.findByScapDetail(scapDetail))
         .thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
+    assertThatThrownBy(() -> contractingPerformanceOverviewService.getByScapDetail(scapDetail))
         .isInstanceOf(ScapEntityNotFoundException.class);
   }
 

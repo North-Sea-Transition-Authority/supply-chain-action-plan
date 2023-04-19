@@ -82,7 +82,7 @@ class ActualTenderCopyService implements CopyService {
   }
 
   private void copyContractingPerformance(Map<ActualTenderActivity, ActualTenderActivity> activities, ScapDetail newScapDetail) {
-    var newOverview = contractingPerformanceOverviewService.getByScapDetailOrThrow(newScapDetail);
+    var newOverview = contractingPerformanceOverviewService.getByScapDetail(newScapDetail);
     contractingPerformanceService.getAllByActualTenderActivities(activities.keySet().stream().toList())
         .forEach(performance -> {
           entityManager.detach(performance);

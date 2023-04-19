@@ -74,7 +74,7 @@ public abstract class RemoveMemberController {
     }
 
     var teamMember = teamMemberOptional.get();
-    var userView = teamMemberViewService.getTeamMemberViewOrThrow(teamMember);
+    var userView = teamMemberViewService.getTeamMemberView(teamMember);
     var teamName = customerConfigurationProperties.mnemonic();
     if (team.getTeamType().equals(TeamType.INDUSTRY)) {
       teamName = team.getDisplayName();
@@ -105,7 +105,7 @@ public abstract class RemoveMemberController {
       return renderRemoveMember(teamId, wuaId)
           .addObject("singleErrorMessage", TeamMemberRemovalService.LAST_ACCESS_MANAGER_ERROR_MESSAGE);
     }
-    var userView = teamMemberViewService.getTeamMemberViewOrThrow(teamMember);
+    var userView = teamMemberViewService.getTeamMemberView(teamMember);
 
     SuccessBannerUtil.add(redirectAttributes,
         "%s has been removed from the team".formatted(userView.getDisplayName()));

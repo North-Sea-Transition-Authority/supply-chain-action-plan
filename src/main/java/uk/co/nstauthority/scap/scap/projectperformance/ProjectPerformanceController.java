@@ -46,7 +46,7 @@ public class ProjectPerformanceController {
 
   @GetMapping
   public ModelAndView renderProjectPerformanceForm(@PathVariable("scapId") ScapId scapId) {
-    var scapDetail = scapDetailService.getLatestByScapIdOrThrow(scapId);
+    var scapDetail = scapDetailService.getLatestByScapId(scapId);
     var projectPerformance = projectPerformanceService.findByScapDetail(scapDetail);
 
     var form = projectPerformance.map(projectPerformanceFormService::getForm)
@@ -60,7 +60,7 @@ public class ProjectPerformanceController {
   public ModelAndView saveProjectPerformanceForm(@PathVariable("scapId") ScapId scapId,
                                                  @ModelAttribute("form") ProjectPerformanceForm form,
                                                  BindingResult bindingResult) {
-    var scapDetail = scapDetailService.getLatestByScapIdOrThrow(scapId);
+    var scapDetail = scapDetailService.getLatestByScapId(scapId);
     var projectPerformance = projectPerformanceService.findByScapDetail(scapDetail);
 
     bindingResult = projectPerformanceFormService.validate(form, bindingResult);

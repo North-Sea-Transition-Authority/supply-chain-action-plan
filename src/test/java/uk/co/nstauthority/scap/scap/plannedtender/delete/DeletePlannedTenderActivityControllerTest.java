@@ -132,7 +132,7 @@ class DeletePlannedTenderActivityControllerTest extends AbstractScapSubmitterCon
         .renderHasPlannedTenderActivityForm(SCAP_ID));
     var plannedTender = new PlannedTender();
 
-    when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail)).thenReturn(plannedTender);
+    when(plannedTenderService.getByScapDetail(scapDetail)).thenReturn(plannedTender);
     when(plannedTenderActivityService.getPlannedTenderDetailById(PLANNED_ACTIVITY_ID)).thenReturn(plannedTenderActivity);
 
     mockMvc.perform(post(
@@ -153,7 +153,7 @@ class DeletePlannedTenderActivityControllerTest extends AbstractScapSubmitterCon
     var plannedTender = new PlannedTender();
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail)).thenReturn(plannedTender);
+    when(plannedTenderService.getByScapDetail(scapDetail)).thenReturn(plannedTender);
     when(plannedTenderActivityService.getPlannedTenderDetailById(PLANNED_ACTIVITY_ID)).thenReturn(plannedTenderActivity);
     when(plannedTenderActivityService.hasExistingTenderDetails(plannedTender)).thenReturn(true);
 

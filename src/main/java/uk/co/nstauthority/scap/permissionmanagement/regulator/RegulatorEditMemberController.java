@@ -65,7 +65,7 @@ public class RegulatorEditMemberController {
     var team = teamService.getTeam(teamId);
 
     var teamMember = teamMemberService.getTeamMember(team, wuaId);
-    var userView = teamMemberViewService.getTeamMemberViewOrThrow(teamMember);
+    var userView = teamMemberViewService.getTeamMemberView(teamMember);
     form.setRoles(TeamRoleUtil.getRoleNames(teamMember.roles()));
 
     return getEditModelAndView(teamId, userView, form);
@@ -82,7 +82,7 @@ public class RegulatorEditMemberController {
 
     var teamMember = teamMemberService.getTeamMember(team, wuaId);
 
-    var userView = teamMemberViewService.getTeamMemberViewOrThrow(teamMember);
+    var userView = teamMemberViewService.getTeamMemberView(teamMember);
 
     regulatorTeamMemberEditRolesValidator.validate(form, bindingResult,
         new RegulatorTeamMemberEditRolesValidatorDto(team, teamMember));

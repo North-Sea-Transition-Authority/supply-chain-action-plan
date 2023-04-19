@@ -77,7 +77,7 @@ class UploadedFilePersistenceServiceTest {
   void findUploadedFileOrThrow_UploadedFileFound_VerifyInteractions() {
     var uuid = UUID.randomUUID();
     when(uploadedFileRepository.findById(uuid)).thenReturn(Optional.of(mock(UploadedFile.class)));
-    var uploadedFile = uploadedFilePersistenceService.findUploadedFileOrThrow(uuid);
+    var uploadedFile = uploadedFilePersistenceService.getUploadedFile(uuid);
     verify(uploadedFileRepository).findById(uuid);
   }
 
@@ -87,7 +87,7 @@ class UploadedFilePersistenceServiceTest {
     when(uploadedFileRepository.findById(uuid)).thenReturn(Optional.empty());
 
     assertThatExceptionOfType(ScapEntityNotFoundException.class).isThrownBy(() -> {
-      var uploadedFile = uploadedFilePersistenceService.findUploadedFileOrThrow(uuid);
+      var uploadedFile = uploadedFilePersistenceService.getUploadedFile(uuid);
     });
   }
 

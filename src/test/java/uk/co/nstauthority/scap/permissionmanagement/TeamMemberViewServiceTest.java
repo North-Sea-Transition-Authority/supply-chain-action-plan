@@ -57,7 +57,7 @@ class TeamMemberViewServiceTest {
     when(energyPortalUserService.findByWuaIds(List.of(new WebUserAccountId(wuaId))))
         .thenReturn(List.of(portalUser));
 
-    var result = teamMemberViewService.getTeamMemberViewsForTeam(team);
+    var result = teamMemberViewService.findTeamMemberViewsForTeam(team);
 
     assertThat(result).extracting(
         TeamMemberView::wuaId,
@@ -105,7 +105,7 @@ class TeamMemberViewServiceTest {
     when(energyPortalUserService.findByWuaIds(List.of(new WebUserAccountId(wuaId))))
         .thenReturn(List.of(portalUser));
 
-    var result = teamMemberViewService.getTeamMemberView(teamMember);
+    var result = teamMemberViewService.findTeamMemberView(teamMember);
 
     assertTrue(result.isPresent());
     assertThat(result.get()).extracting(

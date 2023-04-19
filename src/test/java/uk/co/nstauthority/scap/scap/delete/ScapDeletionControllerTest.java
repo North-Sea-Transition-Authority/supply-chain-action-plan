@@ -53,7 +53,7 @@ class ScapDeletionControllerTest extends AbstractScapSubmitterControllerTest {
   void deleteScap_firstDraft() throws Exception {
     var scapDetail = new ScapDetail();
     scapDetail.setVersionNumber(1);
-    when(scapDetailService.getLatestByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(scapDetail);
     mockMvc.perform(
         post(ReverseRouter.route(on(ScapDeletionController.class).deleteScap(SCAP_ID, null)))
             .with(csrf()))
@@ -67,7 +67,7 @@ class ScapDeletionControllerTest extends AbstractScapSubmitterControllerTest {
   void deleteScap_draftUpdate() throws Exception {
     var scapDetail = new ScapDetail();
     scapDetail.setVersionNumber(2);
-    when(scapDetailService.getLatestByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(scapDetail);
     mockMvc.perform(
             post(ReverseRouter.route(on(ScapDeletionController.class).deleteScap(SCAP_ID, null)))
                 .with(csrf()))

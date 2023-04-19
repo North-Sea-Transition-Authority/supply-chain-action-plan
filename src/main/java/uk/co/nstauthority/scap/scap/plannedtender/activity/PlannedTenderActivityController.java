@@ -59,7 +59,7 @@ public class PlannedTenderActivityController {
                                                     @ModelAttribute("form") PlannedTenderActivityForm form) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestByScap(scap);
-    var scapPlannedTender = plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail);
+    var scapPlannedTender = plannedTenderService.getByScapDetail(scapDetail);
 
     return plannedTenderDetailFormModelAndView(scapId, getBackLinkUrl(scapId, scapPlannedTender));
 
@@ -72,7 +72,7 @@ public class PlannedTenderActivityController {
     bindingResult = plannedTenderActivityFormService.validate(bindingResult, form);
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestByScap(scap);
-    var scapPlannedTender = plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail);
+    var scapPlannedTender = plannedTenderService.getByScapDetail(scapDetail);
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,

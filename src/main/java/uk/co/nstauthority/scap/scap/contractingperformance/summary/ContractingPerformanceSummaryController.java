@@ -60,7 +60,7 @@ public class ContractingPerformanceSummaryController {
   public ModelAndView renderContractingPerformanceSummary(@PathVariable("scapId") ScapId scapId) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestByScap(scap);
-    var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail);
+    var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetail(scapDetail);
 
     var summaryViews = contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(scapId);
     if (summaryViews.isEmpty()) {
@@ -78,7 +78,7 @@ public class ContractingPerformanceSummaryController {
                                                         BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestByScap(scap);
-    var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail);
+    var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetail(scapDetail);
 
     var summaryViews = contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(scapId);
     if (summaryViews.isEmpty()) {

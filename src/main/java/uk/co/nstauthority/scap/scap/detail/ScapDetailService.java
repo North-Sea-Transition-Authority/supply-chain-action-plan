@@ -161,7 +161,7 @@ public class ScapDetailService {
         ));
   }
 
-  public ScapDetail getLatestByScapIdOrThrow(ScapId scapId) {
+  public ScapDetail getLatestByScapId(ScapId scapId) {
     return findLatestByScapId(scapId).orElseThrow(
         () -> new ScapEntityNotFoundException(
             String.format("Could not find a ScapDetail for Scap with ID [%d]", scapId.scapId())
@@ -306,7 +306,7 @@ public class ScapDetailService {
     if (isRegulator) {
       return getLatestByScapIdAndStatusNotIn(scapId, Collections.singletonList(DRAFT));
     } else {
-      return getLatestByScapIdOrThrow(scapId);
+      return getLatestByScapId(scapId);
     }
   }
 

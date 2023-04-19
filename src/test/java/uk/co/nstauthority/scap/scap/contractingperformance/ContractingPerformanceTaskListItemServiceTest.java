@@ -26,17 +26,17 @@ import uk.co.nstauthority.scap.utils.ValidatorTestingUtil;
 
 @ExtendWith(MockitoExtension.class)
 class ContractingPerformanceTaskListItemServiceTest {
-  
-  
+
+
   @Mock
   private ContractingPerformanceOverviewService contractingPerformanceOverviewService;
-  
+
   @Mock
   private ContractingPerformanceService contractingPerformanceService;
-  
+
   @Mock
   private ContractingPerformanceFormService contractingPerformanceFormService;
-  
+
   @InjectMocks
   private ContractingPerformanceTaskListItemService contractingPerformanceTaskListItemService;
 
@@ -50,7 +50,7 @@ class ContractingPerformanceTaskListItemServiceTest {
 
   @Test
   void isValid_NoPlannedTenderOverview_AssertFalse() {
-    when(contractingPerformanceOverviewService.getByScapDetail(SCAP_DETAIL)).thenReturn(Optional.empty());
+    when(contractingPerformanceOverviewService.findByScapDetail(SCAP_DETAIL)).thenReturn(Optional.empty());
 
     assertFalse(contractingPerformanceTaskListItemService.isValid(SCAP_DETAIL));
 
@@ -66,7 +66,7 @@ class ContractingPerformanceTaskListItemServiceTest {
     var contractingPerformanceOverview = new ContractingPerformanceOverview();
     contractingPerformanceOverview.setHasContractingPerformance(false);
 
-    when(contractingPerformanceOverviewService.getByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(contractingPerformanceOverview));
+    when(contractingPerformanceOverviewService.findByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(contractingPerformanceOverview));
 
     assertTrue(contractingPerformanceTaskListItemService.isValid(SCAP_DETAIL));
 
@@ -81,7 +81,7 @@ class ContractingPerformanceTaskListItemServiceTest {
   void isValid_HasPlannedTenderActivities_NoneAdded_AssertFalse() {
     var contractingPerformanceOverview = new ContractingPerformanceOverview();
 
-    when(contractingPerformanceOverviewService.getByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(contractingPerformanceOverview));
+    when(contractingPerformanceOverviewService.findByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(contractingPerformanceOverview));
     when(contractingPerformanceService.getAllByContractingPerformanceOverview(contractingPerformanceOverview))
         .thenReturn(Collections.emptyList());
 
@@ -104,7 +104,7 @@ class ContractingPerformanceTaskListItemServiceTest {
     var form = new ContractingPerformanceForm();
     var bindingResult = ValidatorTestingUtil.bindingResultWithErrors(form);
 
-    when(contractingPerformanceOverviewService.getByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(contractingPerformanceOverview));
+    when(contractingPerformanceOverviewService.findByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(contractingPerformanceOverview));
     when(contractingPerformanceService.getAllByContractingPerformanceOverview(contractingPerformanceOverview))
         .thenReturn(Collections.singletonList(contractingPerformance));
     when(contractingPerformanceFormService.getForm(contractingPerformance)).thenReturn(form);
@@ -132,7 +132,7 @@ class ContractingPerformanceTaskListItemServiceTest {
     var form = new ContractingPerformanceForm();
     var bindingResult = ValidatorTestingUtil.bindingResultWithoutErrors(form);
 
-    when(contractingPerformanceOverviewService.getByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(contractingPerformanceOverview));
+    when(contractingPerformanceOverviewService.findByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(contractingPerformanceOverview));
     when(contractingPerformanceService.getAllByContractingPerformanceOverview(contractingPerformanceOverview))
         .thenReturn(Collections.singletonList(contractingPerformance));
     when(contractingPerformanceFormService.getForm(contractingPerformance)).thenReturn(form);
@@ -160,7 +160,7 @@ class ContractingPerformanceTaskListItemServiceTest {
     var form = new ContractingPerformanceForm();
     var bindingResult = ValidatorTestingUtil.bindingResultWithoutErrors(form);
 
-    when(contractingPerformanceOverviewService.getByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(contractingPerformanceOverview));
+    when(contractingPerformanceOverviewService.findByScapDetail(SCAP_DETAIL)).thenReturn(Optional.of(contractingPerformanceOverview));
     when(contractingPerformanceService.getAllByContractingPerformanceOverview(contractingPerformanceOverview))
         .thenReturn(Collections.singletonList(contractingPerformance));
     when(contractingPerformanceFormService.getForm(contractingPerformance)).thenReturn(form);

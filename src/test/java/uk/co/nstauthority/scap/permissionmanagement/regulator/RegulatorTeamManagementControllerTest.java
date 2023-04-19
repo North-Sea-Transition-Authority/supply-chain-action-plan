@@ -119,7 +119,7 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
       .withRole(RegulatorTeamRole.ACCESS_MANAGER)
       .build();
 
-    when(teamMemberViewService.getTeamMemberViewsForTeam(team)).thenReturn(List.of(teamMemberView));
+    when(teamMemberViewService.findTeamMemberViewsForTeam(team)).thenReturn(List.of(teamMemberView));
 
     var mnemonic = applicationContext.getBean(CustomerConfigurationProperties.class).mnemonic();
 
@@ -151,7 +151,7 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
       .withRoles(Set.of(RegulatorTeamRole.ACCESS_MANAGER))
       .build();
 
-    when(teamMemberViewService.getTeamMemberViewsForTeam(team)).thenReturn(List.of(teamMemberView));
+    when(teamMemberViewService.findTeamMemberViewsForTeam(team)).thenReturn(List.of(teamMemberView));
     when(teamMemberService.isMemberOfTeamWithAnyRoleOf(teamId, user, Set.of(RegulatorTeamRole.ACCESS_MANAGER.name())))
       .thenReturn(canRemoveUsers);
 

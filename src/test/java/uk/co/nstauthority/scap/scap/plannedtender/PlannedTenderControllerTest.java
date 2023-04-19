@@ -79,7 +79,7 @@ class PlannedTenderControllerTest extends AbstractScapSubmitterControllerTest {
     );
     var form = new PlannedTenderForm();
 
-    when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
+    when(plannedTenderService.getByScapDetail(scapDetail))
         .thenReturn(plannedTender);
     when(plannedTenderActivityService.getTenderDetailsByPlannedTender(plannedTender))
         .thenReturn(existingTenderDetails);
@@ -103,7 +103,7 @@ class PlannedTenderControllerTest extends AbstractScapSubmitterControllerTest {
     var expectedRedirectUrl = ReverseRouter.route(on(HasPlannedTenderController.class)
         .renderHasPlannedTenderActivityForm(scap.getScapId()));
 
-    when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
+    when(plannedTenderService.getByScapDetail(scapDetail))
         .thenReturn(plannedTender);
     when(plannedTenderActivityService.getTenderDetailsByPlannedTender(plannedTender))
         .thenReturn(Collections.emptyList());
@@ -122,7 +122,7 @@ class PlannedTenderControllerTest extends AbstractScapSubmitterControllerTest {
     var expectedRedirectUrl = ReverseRouter.route(on(PlannedTenderActivityController.class)
             .renderPlannedTenderDetailForm(scap.getScapId(), null));
 
-    when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
+    when(plannedTenderService.getByScapDetail(scapDetail))
         .thenReturn(plannedTender);
     when(plannedTenderActivityService.getTenderDetailsByPlannedTender(plannedTender))
         .thenReturn(Collections.emptyList());
@@ -149,7 +149,7 @@ class PlannedTenderControllerTest extends AbstractScapSubmitterControllerTest {
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getScapId()));
 
-    when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
+    when(plannedTenderService.getByScapDetail(scapDetail))
         .thenReturn(plannedTender);
     when(plannedTenderActivityService.getTenderDetailsByPlannedTender(plannedTender))
         .thenReturn(Collections.emptyList());
@@ -176,7 +176,7 @@ class PlannedTenderControllerTest extends AbstractScapSubmitterControllerTest {
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scap.getScapId()));
 
-    when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
+    when(plannedTenderService.getByScapDetail(scapDetail))
         .thenReturn(plannedTender);
     when(plannedTenderActivityService.getTenderDetailsByPlannedTender(plannedTender))
         .thenReturn(Collections.emptyList());
@@ -204,7 +204,7 @@ class PlannedTenderControllerTest extends AbstractScapSubmitterControllerTest {
     bindingResult.addError(
         new FieldError("form", "hasMorePlannedTenderActivities", "This field is required"));
 
-    when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
+    when(plannedTenderService.getByScapDetail(scapDetail))
         .thenReturn(plannedTender);
     when(plannedTenderActivityService.getTenderDetailsByPlannedTender(plannedTender))
         .thenReturn(Collections.emptyList());

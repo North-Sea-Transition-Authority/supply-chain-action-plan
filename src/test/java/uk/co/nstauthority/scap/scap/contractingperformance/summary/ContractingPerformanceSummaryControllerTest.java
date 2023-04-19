@@ -75,7 +75,7 @@ class ContractingPerformanceSummaryControllerTest extends AbstractScapSubmitterC
 
   @Test
   void renderContractingPerformanceSummary() throws Exception {
-    when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(SCAP_ID))
         .thenReturn(summaryViews);
@@ -133,7 +133,7 @@ class ContractingPerformanceSummaryControllerTest extends AbstractScapSubmitterC
         "form", "testField", "test error message"
     ));
 
-    when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(SCAP_ID))
         .thenReturn(summaryViews);
@@ -164,7 +164,7 @@ class ContractingPerformanceSummaryControllerTest extends AbstractScapSubmitterC
     form.setHasMoreContractingPerformance(hasMoreContractingPerformance);
     var bindingResultWithoutErrors = new BeanPropertyBindingResult(form, "form");
 
-    when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(SCAP_ID))
         .thenReturn(summaryViews);
@@ -190,7 +190,7 @@ class ContractingPerformanceSummaryControllerTest extends AbstractScapSubmitterC
     form.setHasMoreContractingPerformance(hasMoreContractingPerformance);
     var bindingResultWithoutErrors = new BeanPropertyBindingResult(form, "form");
 
-    when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(SCAP_ID))
         .thenReturn(summaryViews);

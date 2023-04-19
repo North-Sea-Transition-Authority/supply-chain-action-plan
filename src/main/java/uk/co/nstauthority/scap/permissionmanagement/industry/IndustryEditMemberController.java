@@ -67,7 +67,7 @@ public class IndustryEditMemberController {
     var form = new TeamMemberRolesForm();
     var team = teamService.getTeam(teamId);
     var teamMember = teamMemberService.getTeamMember(team, wuaId);
-    var userView = teamMemberViewService.getTeamMemberViewOrThrow(teamMember);
+    var userView = teamMemberViewService.getTeamMemberView(teamMember);
 
     form.setRoles(TeamRoleUtil.getRoleNames(teamMember.roles()));
     return getEditModelAndView(teamId, userView, form);
@@ -82,7 +82,7 @@ public class IndustryEditMemberController {
 
     var team = teamService.getTeam(teamId);
     var teamMember = teamMemberService.getTeamMember(team, wuaId);
-    var userView = teamMemberViewService.getTeamMemberViewOrThrow(teamMember);
+    var userView = teamMemberViewService.getTeamMemberView(teamMember);
 
     industryTeamMemberEditRolesValidator.validate(form, bindingResult,
         new IndustryTeamMemberEditRolesValidatorDto(team, teamMember));

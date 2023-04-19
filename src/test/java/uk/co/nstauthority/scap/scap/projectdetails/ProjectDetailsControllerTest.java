@@ -76,7 +76,7 @@ class ProjectDetailsControllerTest extends AbstractScapSubmitterControllerTest {
 
   @Test
   void renderProjectDetailsForm_noProjectDetails_assertCorrectResponse() throws Exception {
-    when(scapDetailService.getLatestByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(scapDetail);
     when(projectDetailsService.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
     when(supportingDocumentService.buildFileUploadTemplate(SCAP_ID, SupportingDocumentType.ADDITIONAL_DOCUMENT))
         .thenReturn(fileUploadTemplate);
@@ -120,7 +120,7 @@ class ProjectDetailsControllerTest extends AbstractScapSubmitterControllerTest {
         new AddToListItem(String.valueOf(installationId), "Test facility", true)
     );
 
-    when(scapDetailService.getLatestByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(scapDetail);
     when(projectDetailsService.findByScapDetail(scapDetail)).thenReturn(Optional.of(projectDetails));
     when(projectDetailsService.getProjectFields(projectDetails)).thenReturn(projectFields);
     when(projectDetailsService.getProjectFacilities(projectDetails)).thenReturn(projectFacilities);
@@ -163,7 +163,7 @@ class ProjectDetailsControllerTest extends AbstractScapSubmitterControllerTest {
         new ErrorItem(10, errorField, errorMessage)
     );
 
-    when(scapDetailService.getLatestByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(scapDetail);
     when(projectDetailsFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResult);
     when(validationErrorOrderingService.getErrorItemsFromBindingResult(form, bindingResult))
@@ -197,7 +197,7 @@ class ProjectDetailsControllerTest extends AbstractScapSubmitterControllerTest {
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID));
 
-    when(scapDetailService.getLatestByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(scapDetail);
     when(projectDetailsFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResult);
 

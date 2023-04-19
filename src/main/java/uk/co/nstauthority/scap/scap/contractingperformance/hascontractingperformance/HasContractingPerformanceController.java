@@ -58,7 +58,7 @@ public class HasContractingPerformanceController {
   public ModelAndView renderHasContractingPerformanceForm(@PathVariable("scapId") ScapId scapId) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestByScap(scap);
-    var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetail(scapDetail);
+    var contractingPerformanceOverview = contractingPerformanceOverviewService.findByScapDetail(scapDetail);
     var summaryViews = contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(scapId);
 
     if (!summaryViews.isEmpty()) {

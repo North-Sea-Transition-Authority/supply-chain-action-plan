@@ -42,7 +42,7 @@ class UploadedFilePersistenceService {
     return uploadedFile;
   }
 
-  UploadedFile findUploadedFileOrThrow(UUID uploadedFileId) {
+  UploadedFile getUploadedFile(UUID uploadedFileId) {
     return uploadedFileRepository.findById(uploadedFileId)
         .orElseThrow(() -> new ScapEntityNotFoundException(
             String.format("Could not find uploaded file with ID %s", uploadedFileId)));

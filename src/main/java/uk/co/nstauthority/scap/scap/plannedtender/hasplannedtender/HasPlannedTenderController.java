@@ -58,7 +58,7 @@ public class HasPlannedTenderController {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestByScap(scap);
     var form = hasPlannedTenderFormService.getForm(scapDetail);
-    var existingPlannedTender = plannedTenderService.getScapPlannedTenderByScapDetail(scapDetail);
+    var existingPlannedTender = plannedTenderService.findByScapDetail(scapDetail);
     if (existingPlannedTender.map(plannedTenderActivityService::hasExistingTenderDetails).orElse(false)) {
       return ReverseRouter.redirect(on(PlannedTenderController.class).renderPlannedTenderActivities(scapId));
     }
@@ -71,7 +71,7 @@ public class HasPlannedTenderController {
                                                    BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestByScap(scap);
-    var existingPlannedTender = plannedTenderService.getScapPlannedTenderByScapDetail(scapDetail);
+    var existingPlannedTender = plannedTenderService.findByScapDetail(scapDetail);
 
     if (existingPlannedTender.map(plannedTenderActivityService::hasExistingTenderDetails).orElse(false)) {
       return ReverseRouter.redirect(on(PlannedTenderController.class).renderPlannedTenderActivities(scapId));

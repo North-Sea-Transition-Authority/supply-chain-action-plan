@@ -219,7 +219,7 @@ class ScapSummaryViewServiceTest {
 
   @Test
   void getPlannedTenderSummaryView_NoPlannedTenderEntity() {
-    when(plannedTenderService.getScapPlannedTenderByScapDetail(scapDetail)).thenReturn(Optional.empty());
+    when(plannedTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
     var plannedTenderSummaryView = scapSummaryViewService.getPlannedTenderSummaryView(scapDetail);
 
@@ -237,7 +237,7 @@ class ScapSummaryViewServiceTest {
     var plannedTender = new PlannedTender();
     plannedTender.setHasPlannedTenders(false);
 
-    when(plannedTenderService.getScapPlannedTenderByScapDetail(scapDetail)).thenReturn(Optional.of(plannedTender));
+    when(plannedTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(plannedTender));
 
     var plannedTenderSummaryView = scapSummaryViewService.getPlannedTenderSummaryView(scapDetail);
 
@@ -258,7 +258,7 @@ class ScapSummaryViewServiceTest {
     plannedTender.setHasPlannedTenders(true);
     var plannedTenderActivity = getValidPlannedTenderActivity();
 
-    when(plannedTenderService.getScapPlannedTenderByScapDetail(scapDetail)).thenReturn(Optional.of(plannedTender));
+    when(plannedTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(plannedTender));
     when(plannedTenderActivityService.getTenderDetailsByPlannedTender(plannedTender))
         .thenReturn(List.of(plannedTenderActivity));
 
@@ -346,7 +346,7 @@ class ScapSummaryViewServiceTest {
 
   @Test
   void getContractingPerformanceOverviewSummaryView_NoContractingPerformanceOverview() {
-    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail)).thenReturn(Optional.empty());
+    when(contractingPerformanceOverviewService.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
     var contractingPerformanceOverviewSummaryView = scapSummaryViewService.getContractingPerformanceOverviewSummaryView(scapDetail);
 
@@ -366,7 +366,7 @@ class ScapSummaryViewServiceTest {
     var contractingPerformanceOverview = new ContractingPerformanceOverview();
     contractingPerformanceOverview.setHasContractingPerformance(false);
 
-    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail)).thenReturn(Optional.of(contractingPerformanceOverview));
+    when(contractingPerformanceOverviewService.findByScapDetail(scapDetail)).thenReturn(Optional.of(contractingPerformanceOverview));
 
     var contractingPerformanceOverviewSummaryView = scapSummaryViewService.getContractingPerformanceOverviewSummaryView(scapDetail);
 
@@ -390,7 +390,7 @@ class ScapSummaryViewServiceTest {
         null, null, null, null, null
     ));
 
-    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail)).thenReturn(Optional.of(contractingPerformanceOverview));
+    when(contractingPerformanceOverviewService.findByScapDetail(scapDetail)).thenReturn(Optional.of(contractingPerformanceOverview));
     when(contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(scapDetail.getScap().getScapId()))
         .thenReturn(contractingPerformanceViews);
 

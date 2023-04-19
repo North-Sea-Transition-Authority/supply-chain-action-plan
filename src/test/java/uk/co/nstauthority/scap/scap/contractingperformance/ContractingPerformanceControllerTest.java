@@ -118,7 +118,7 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
     when(contractingPerformanceService.getActivitiesWithoutContractingPerformance(activities)).thenReturn(activities);
     when(contractingPerformanceFormService.getScopeTitlesMap(activities)).thenReturn(scopeTitlesMap);
-    when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceService.hasContractingPerformance(contractingPerformanceOverview))
         .thenReturn(true);
@@ -148,7 +148,7 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
-    when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceFormService.getScopeTitlesMap(activities)).thenReturn(scopeTitlesMap);
     when(contractingPerformanceFormService.validate(eq(form), any(BindingResult.class), eq(activities)))
@@ -179,7 +179,7 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
-    when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceService.getActivitiesWithoutContractingPerformance(activities)).thenReturn(activities);
     when(contractingPerformanceFormService.getScopeTitlesMap(activities)).thenReturn(scopeTitlesMap);
@@ -213,7 +213,7 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
-    when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceFormService.validate(eq(form), any(BindingResult.class), eq(Collections.emptyList())))
         .thenReturn(bindingResultWithErrors);
@@ -279,7 +279,7 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
-    when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceService.getById(contractingPerformanceId)).thenReturn(contractingPerformance);
     when(contractingPerformanceFormService.getScopeTitlesMap(activities)).thenReturn(scopeTitlesMap);
@@ -312,7 +312,7 @@ class ContractingPerformanceControllerTest extends AbstractScapSubmitterControll
 
     when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(actualTenderActivityService.getActivitiesWithContractAwarded(actualTender)).thenReturn(activities);
-    when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceService.getById(contractingPerformanceId)).thenReturn(contractingPerformance);
     when(contractingPerformanceService.getActivitiesWithoutContractingPerformancesWithCurrent(activities, contractingPerformance))

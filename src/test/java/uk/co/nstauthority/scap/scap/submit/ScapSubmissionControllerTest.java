@@ -77,7 +77,7 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
   @Test
   @DisplayName("Render SCAP submission confirmation when all sections complete")
   void renderScapSubmissionConfirmation_AllSectionsComplete_IsSubmittable() throws Exception {
-    when(scapDetailService.getLatestByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(scapDetail);
     when(reviewAndSubmitFormService.getForm(scapDetail)).thenReturn(new ReviewAndSubmitForm());
     when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
     when(scapSubmissionService.isScapValid(scapDetail)).thenReturn(true);
@@ -98,7 +98,7 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
   @Test
   @DisplayName("Render SCAP submission confirmation when not complete")
   void renderScapSubmissionConfirmation_NotComplete() throws Exception {
-    when(scapDetailService.getLatestByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(scapDetail);
     when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
 
     mockMvc.perform(get(
@@ -117,7 +117,7 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
     var expectedRedirectUrl = ReverseRouter.route(on(ScapSubmissionController.class)
         .renderScapSubmissionSuccess(SCAP_ID));
 
-    when(scapDetailService.getLatestByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(scapDetail);
     when(reviewAndSubmitFormService.validate(any(), any())).thenReturn(emptyBindingResult());
     when(scapSubmissionService.isScapValid(scapDetail)).thenReturn(true);
 
@@ -142,7 +142,7 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
   void submitScap_NotReviewedInternally_AssertThrows() throws Exception {
     var form = new ReviewAndSubmitForm();
 
-    when(scapDetailService.getLatestByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(scapDetail);
     when(reviewAndSubmitFormService.validate(eq(form), any(BindingResult.class)))
         .thenReturn(bindingResultWithErrors(form));
     when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
@@ -161,7 +161,7 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
   @Test
   @DisplayName("Assert that submitting a SCAP which is not complete throws a 400")
   void submitScap_NotValid_AssertThrows() throws Exception {
-    when(scapDetailService.getLatestByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(scapDetail);
 
     mockMvc.perform(post(
         ReverseRouter.route(on(ScapSubmissionController.class).submitScap(SCAP_ID, null, emptyBindingResult())))

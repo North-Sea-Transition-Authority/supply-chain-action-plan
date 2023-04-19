@@ -105,7 +105,7 @@ public class CaseEventService {
     updateRequestService.resolveUpdateRequest(scapDetail, subject);
     UploadedFile uploadedFile = null;
     if (fileId != null) {
-      uploadedFile = fileUploadService.findUploadedFileOrThrow(fileId);
+      uploadedFile = fileUploadService.getUploadedFile(fileId);
     }
 
 
@@ -169,7 +169,7 @@ public class CaseEventService {
 
   public Map<String, List<CaseEventSubject>> getApplicableActionsForScap(ScapId scapId) {
     var user = userDetailService.getUserDetail();
-    var scapDetail = scapDetailService.getLatestByScapIdOrThrow(scapId);
+    var scapDetail = scapDetailService.getLatestByScapId(scapId);
 
     var actionMap = new LinkedHashMap<String, List<CaseEventSubject>>();
     if (teamService.userIsMemberOfRegulatorTeam(user)) {

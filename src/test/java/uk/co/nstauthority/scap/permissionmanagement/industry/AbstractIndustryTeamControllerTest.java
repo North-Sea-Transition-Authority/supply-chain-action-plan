@@ -41,7 +41,7 @@ public abstract class AbstractIndustryTeamControllerTest extends AbstractControl
     when(teamMemberService.findTeamMember(any(Team.class), eq(webUserAccountId))).thenReturn(Optional.of(getTeamMember()));
     when(teamMemberService.getTeamMember(any(Team.class), eq(webUserAccountId))).thenReturn(getTeamMember());
     when(teamMemberService.isMemberOfTeam(any(TeamId.class), eq(testUser))).thenReturn(true);
-    when(teamMemberViewService.getTeamMemberViewOrThrow(any(TeamMember.class))).thenReturn(getTeamMemberView());
+    when(teamMemberViewService.getTeamMemberView(any(TeamMember.class))).thenReturn(getTeamMemberView());
   }
 
   private TeamMember getTeamMember() {

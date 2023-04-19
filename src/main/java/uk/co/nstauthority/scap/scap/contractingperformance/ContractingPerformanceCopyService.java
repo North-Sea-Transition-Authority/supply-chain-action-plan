@@ -32,7 +32,7 @@ public class ContractingPerformanceCopyService implements CopyService {
 
   @Override
   public void copyEntity(ScapDetail oldScapDetail, ScapDetail newScapDetail, NewScapType newScapType) {
-    var oldContractingPerofmanceOverview = contractingOverviewService.getByScapDetailOrThrow(oldScapDetail);
+    var oldContractingPerofmanceOverview = contractingOverviewService.getByScapDetail(oldScapDetail);
     var newContractingPerfomanceOverview = (ContractingPerformanceOverview) entityCopyService
         .copyChild(newScapDetail, oldContractingPerofmanceOverview);
 

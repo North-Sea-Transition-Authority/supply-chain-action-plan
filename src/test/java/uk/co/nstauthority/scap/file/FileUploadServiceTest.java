@@ -68,7 +68,7 @@ class FileUploadServiceTest {
   void updateFileUploadDescriptions() {
     var uuid = UUID.randomUUID();
     var fileUploadForm = createFileUploadForm(uuid);
-    when(fileUploadService.findUploadedFileOrThrow(uuid)).thenReturn(uploadedFile);
+    when(fileUploadService.getUploadedFile(uuid)).thenReturn(uploadedFile);
 
     fileUploadService.updateFileUploadDescriptions(List.of(fileUploadForm));
 

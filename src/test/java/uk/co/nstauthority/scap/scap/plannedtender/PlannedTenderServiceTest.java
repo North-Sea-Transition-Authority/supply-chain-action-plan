@@ -83,7 +83,7 @@ class PlannedTenderServiceTest {
     when(plannedTenderRepository.findByScapDetail(scapDetail)).thenReturn(Optional.of(plannedTender));
 
     var foundPlannedTender = plannedTenderService
-        .getScapPlannedTenderByScapDetail(scapDetail);
+        .findByScapDetail(scapDetail);
 
     assertThat(foundPlannedTender).isEqualTo(Optional.of(plannedTender));
   }
@@ -92,7 +92,7 @@ class PlannedTenderServiceTest {
   void getScapPlannedTenderByScapDetailOrThrow_assertThrows() {
     when(plannedTenderRepository.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
+    assertThatThrownBy(() -> plannedTenderService.getByScapDetail(scapDetail))
         .isInstanceOf(ScapEntityNotFoundException.class);
   }
 

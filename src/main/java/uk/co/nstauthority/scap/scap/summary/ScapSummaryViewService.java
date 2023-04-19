@@ -112,7 +112,7 @@ public class ScapSummaryViewService {
 
   @VisibleForTesting
   public PlannedTenderSummaryView getPlannedTenderSummaryView(ScapDetail scapDetail) {
-    var plannedTenderOpt = plannedTenderService.getScapPlannedTenderByScapDetail(scapDetail);
+    var plannedTenderOpt = plannedTenderService.findByScapDetail(scapDetail);
     return plannedTenderOpt.map(
         plannedTender -> {
           if (Boolean.FALSE.equals(plannedTender.getHasPlannedTenders())) {
@@ -145,7 +145,7 @@ public class ScapSummaryViewService {
 
   @VisibleForTesting
   public ContractingPerformanceOverviewSummaryView getContractingPerformanceOverviewSummaryView(ScapDetail scapDetail) {
-    var contractingPerformanceOverviewOpt = contractingPerformanceOverviewService.getByScapDetail(scapDetail);
+    var contractingPerformanceOverviewOpt = contractingPerformanceOverviewService.findByScapDetail(scapDetail);
     return contractingPerformanceOverviewOpt.map(contractingPerformanceOverview -> {
       if (Boolean.FALSE.equals(contractingPerformanceOverview.getHasContractingPerformance())) {
         return new ContractingPerformanceOverviewSummaryView(false, Collections.emptyList());

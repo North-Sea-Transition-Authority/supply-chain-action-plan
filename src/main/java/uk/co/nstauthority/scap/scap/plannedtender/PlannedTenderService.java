@@ -20,11 +20,11 @@ public class PlannedTenderService {
     this.clock = clock;
   }
 
-  public Optional<PlannedTender> getScapPlannedTenderByScapDetail(ScapDetail scapDetail) {
+  public Optional<PlannedTender> findByScapDetail(ScapDetail scapDetail) {
     return plannedTenderRepository.findByScapDetail(scapDetail);
   }
 
-  public PlannedTender getScapPlannedTenderByScapDetailOrThrow(ScapDetail scapDetail) {
+  public PlannedTender getByScapDetail(ScapDetail scapDetail) {
     return plannedTenderRepository.findByScapDetail(scapDetail)
         .orElseThrow(() -> new ScapEntityNotFoundException(
             String.format("Could not find ScapPlannedTender for ScapDetail with ID [%d]", scapDetail.getId())

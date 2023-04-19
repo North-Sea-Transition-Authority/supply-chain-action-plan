@@ -98,7 +98,7 @@ class DeleteContractingPerformanceControllerTest extends AbstractScapSubmitterCo
     var expectedRedirectUrl = ReverseRouter.route(on(HasContractingPerformanceController.class)
         .renderHasContractingPerformanceForm(SCAP_ID));
 
-    when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceService.getById(contractingPerformanceId)).thenReturn(contractingPerformance);
     when(contractingPerformanceService.hasContractingPerformance(contractingPerformanceOverview)).thenReturn(false);
@@ -124,7 +124,7 @@ class DeleteContractingPerformanceControllerTest extends AbstractScapSubmitterCo
     var expectedRedirectUrl = ReverseRouter.route(on(ContractingPerformanceSummaryController.class)
         .renderContractingPerformanceSummary(SCAP_ID));
 
-    when(contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail))
+    when(contractingPerformanceOverviewService.getByScapDetail(scapDetail))
         .thenReturn(contractingPerformanceOverview);
     when(contractingPerformanceService.getById(contractingPerformanceId)).thenReturn(contractingPerformance);
     when(contractingPerformanceService.hasContractingPerformance(contractingPerformanceOverview)).thenReturn(true);

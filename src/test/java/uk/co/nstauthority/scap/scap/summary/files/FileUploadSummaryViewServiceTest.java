@@ -57,7 +57,7 @@ class FileUploadSummaryViewServiceTest {
     doReturn(Collections.singletonList(mockFileUpload)).when(supportingDocumentService)
         .getFileUploadFormListForScapDetailAndType(scapDetail, type);
     doReturn(fileId).when(mockFileUpload).getUploadedFileId();
-    doReturn(uploadedFile).when(fileUploadService).findUploadedFileOrThrow(fileId);
+    doReturn(uploadedFile).when(fileUploadService).getUploadedFile(fileId);
 
     var fileUploadSummaryViews = fileUploadSummaryViewService
         .getAllByScapDetailAndDocumentType(scapDetail, type);

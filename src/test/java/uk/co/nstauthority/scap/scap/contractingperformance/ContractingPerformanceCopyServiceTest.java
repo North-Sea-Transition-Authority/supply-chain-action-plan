@@ -50,7 +50,7 @@ class ContractingPerformanceCopyServiceTest {
     oldContractingPerformanceOverview.setScapDetail(oldScapDetail);
     oldContractingPerformanceOverview.setId(5000);
 
-    when(contractingPerformanceOverviewService.getByScapDetailOrThrow(oldScapDetail)).thenReturn(oldContractingPerformanceOverview);
+    when(contractingPerformanceOverviewService.getByScapDetail(oldScapDetail)).thenReturn(oldContractingPerformanceOverview);
 
     contractingPerformanceCopyService.copyEntity(oldScapDetail, newScapDetail, NewScapType.REINSTATEMENT);
     verify(entityManager).persist(contractingCaptor.capture());
@@ -72,7 +72,7 @@ class ContractingPerformanceCopyServiceTest {
     oldContractingPerformanceOverview.setScapDetail(oldScapDetail);
     oldContractingPerformanceOverview.setId(5000);
 
-    when(contractingPerformanceOverviewService.getByScapDetailOrThrow(oldScapDetail)).thenReturn(oldContractingPerformanceOverview);
+    when(contractingPerformanceOverviewService.getByScapDetail(oldScapDetail)).thenReturn(oldContractingPerformanceOverview);
 
     contractingPerformanceCopyService.copyEntity(oldScapDetail, newScapDetail, NewScapType.DRAFT_UPDATE);
     verify(contractingPerformanceOverviewRepository).save(contractingCaptor.capture());

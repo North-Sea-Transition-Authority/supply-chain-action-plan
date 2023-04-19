@@ -61,7 +61,7 @@ public class DeletePlannedTenderActivityController {
                                                 RedirectAttributes redirectAttributes) {
     var scap = scapService.getScapById(scapId);
     var scapDetail = scapDetailService.getLatestByScap(scap);
-    var plannedTender = plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail);
+    var plannedTender = plannedTenderService.getByScapDetail(scapDetail);
     var plannedTenderDetail = plannedTenderActivityService.getPlannedTenderDetailById(plannedTenderDetailId);
     plannedTenderActivityService.deletePlannedTenderDetail(plannedTenderDetail);
 
