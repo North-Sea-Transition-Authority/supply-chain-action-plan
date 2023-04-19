@@ -75,7 +75,7 @@ class ScapSubmissionController {
 
   @GetMapping
   ModelAndView renderScapSubmissionConfirmation(@PathVariable("scapId") ScapId scapId) {
-    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
+    var scapDetail = scapDetailService.getLatestByScapIdOrThrow(scapId);
     var form = reviewAndSubmitFormService.getForm(scapDetail);
 
     var updateRequest = updateRequestService.findNextDueUpdate(scapId)
@@ -102,7 +102,7 @@ class ScapSubmissionController {
   ModelAndView submitScap(@PathVariable("scapId") ScapId scapId,
                           @ModelAttribute("form") ReviewAndSubmitForm form,
                           BindingResult bindingResult) {
-    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
+    var scapDetail = scapDetailService.getLatestByScapIdOrThrow(scapId);
 
     if (!scapSubmissionService.isScapValid(scapDetail)) {
       throw new ScapBadRequestException(

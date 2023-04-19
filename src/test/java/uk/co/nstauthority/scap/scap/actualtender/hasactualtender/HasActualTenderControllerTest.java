@@ -55,7 +55,7 @@ class HasActualTenderControllerTest extends AbstractScapSubmitterControllerTest 
   @Test
   void renderHasActualTenderForm_expectIsOk() throws Exception {
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
     when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
     mockMvc.perform(
@@ -96,7 +96,7 @@ class HasActualTenderControllerTest extends AbstractScapSubmitterControllerTest 
     var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderSummaryController.class)
         .renderActualTenderSummary(scap.getScapId()));
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
     when(actualTenderService.findByScapDetail(scapDetail)).thenReturn(Optional.of(actualTender));
     when(hasActualTenderFormService.getForm(actualTender)).thenReturn(form);
     when(actualTenderActivityService.hasActualTenderActivity(actualTender)).thenReturn(true);

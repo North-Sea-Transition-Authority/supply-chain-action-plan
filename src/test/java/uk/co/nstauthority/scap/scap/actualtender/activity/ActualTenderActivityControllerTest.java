@@ -77,7 +77,7 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
 
   @Test
   void renderActualTenderActivityForm() throws Exception {
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(actualTender);
 
     mockMvc.perform(
@@ -102,7 +102,7 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
     var expectedRedirectUrl = ReverseRouter.route(on(BidParticipantsController.class)
         .renderBidParticipantsForm(scap.getScapId(), createdTenderActivity.getId(), null));
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender)))
         .thenReturn(bindingResult);
@@ -129,7 +129,7 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
     var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderSummaryController.class)
         .renderActualTenderSummary(scap.getScapId()));
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender)))
         .thenReturn(bindingResult);
@@ -153,7 +153,7 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("form", "testField", "Test field must not be blank"));
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender)))
         .thenReturn(bindingResult);
@@ -253,7 +253,7 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
     var expectedRedirectUrl = ReverseRouter.route(on(ActualTenderSummaryController.class)
         .renderActualTenderSummary(scap.getScapId()));
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
     when(actualTenderService.getByScapDetail(scapDetail)).thenReturn(actualTender);
     when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
     when(actualTenderActivityFormService.validate(eq(form), any(BindingResult.class), eq(actualTender), eq(actualTenderActivity)))

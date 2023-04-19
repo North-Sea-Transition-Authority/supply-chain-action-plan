@@ -67,7 +67,7 @@ public class ContractingPerformanceController {
                                                           @ModelAttribute("form") ContractingPerformanceForm form) {
 
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail);
     var actualTender = actualTenderService.findByScapDetail(scapDetail);
     var contractedActivities = actualTender
@@ -85,7 +85,7 @@ public class ContractingPerformanceController {
                                                         @ModelAttribute("form") ContractingPerformanceForm form,
                                                         BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail);
     var actualTender = actualTenderService.findByScapDetail(scapDetail);
     var contractedActivities = actualTender
@@ -114,7 +114,7 @@ public class ContractingPerformanceController {
                                                                @PathVariable("contractingPerformanceId")
                                                                Integer contractingPerformanceId) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     var actualTender = actualTenderService.findByScapDetail(scapDetail);
     var contractedActivities = actualTender
         .map(actualTenderActivityService::getActivitiesWithContractAwarded)
@@ -138,7 +138,7 @@ public class ContractingPerformanceController {
                                                              @ModelAttribute("form") ContractingPerformanceForm form,
                                                              BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     var actualTender = actualTenderService.findByScapDetail(scapDetail);
     var contractedActivities = actualTender
         .map(actualTenderActivityService::getActivitiesWithContractAwarded)

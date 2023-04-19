@@ -30,7 +30,7 @@ class TaskListService {
   @Transactional
   public List<TaskListSection> getTaskListSections(ScapId scapId) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
 
     return sectionServices.stream()
         .map(service -> service.getSection(scapDetail))

@@ -58,7 +58,7 @@ public class HasActualTenderController {
   @GetMapping
   public ModelAndView renderHasActualTenderForm(@PathVariable("scapId") ScapId scapId) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     var actualTender = actualTenderService.findByScapDetail(scapDetail);
     var form = actualTender
         .map(hasActualTenderFormService::getForm)
@@ -75,7 +75,7 @@ public class HasActualTenderController {
                                        @ModelAttribute("form") HasActualTenderForm form,
                                        BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     var actualTender = actualTenderService.findByScapDetail(scapDetail);
 
     if (hasExistingActualTenderActivities(actualTender)) {

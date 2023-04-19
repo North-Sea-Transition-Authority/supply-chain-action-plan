@@ -72,7 +72,7 @@ public class UpdateRequestService {
   }
 
   public Optional<LocalDate> getUpdateDueDate(ScapId scapId, UpdateRequestType requestType) {
-    var scapDetail = scapDetailService.findLatestSubmittedScapDetail(scapId);
+    var scapDetail = scapDetailService.findLatestSubmitted(scapId);
     if (scapDetail.isEmpty()) {
       return Optional.empty();
     }

@@ -96,7 +96,7 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(scapService.getScapById(SCAP_ID.scapId())).thenReturn(scap);
     when(scapDetailService.getActionableScapDetail(SCAP_ID,testUser)).thenReturn(scapDetail);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
     when(organisationGroupService.getOrganisationGroupById(ORG_GROUP_ID, PURPOSE)).thenReturn(Optional.of(getOrgGroup()));
     when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());
   }

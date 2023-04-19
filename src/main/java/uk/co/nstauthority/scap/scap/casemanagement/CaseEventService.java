@@ -169,7 +169,7 @@ public class CaseEventService {
 
   public Map<String, List<CaseEventSubject>> getApplicableActionsForScap(ScapId scapId) {
     var user = userDetailService.getUserDetail();
-    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
+    var scapDetail = scapDetailService.getLatestByScapIdOrThrow(scapId);
 
     var actionMap = new LinkedHashMap<String, List<CaseEventSubject>>();
     if (teamService.userIsMemberOfRegulatorTeam(user)) {

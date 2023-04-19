@@ -90,7 +90,7 @@ class ScapInstateControllerTest extends AbstractControllerTest {
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
     when(scapService.getScapById(anyInt())).thenReturn(scap);
     when(scapDetailService.getActionableScapDetail(SCAP_ID, testUser)).thenReturn(SCAP_DETAIL);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(SCAP_DETAIL);
+    when(scapDetailService.getLatestByScap(scap)).thenReturn(SCAP_DETAIL);
     when(scapDetailService.getLatestSubmittedScapDetail(SCAP_ID)).thenReturn(SCAP_DETAIL);
     when(organisationGroupService.getOrganisationGroupById(eq(ORG_GROUP_ID), any()))
         .thenReturn(Optional.of(OrganisationGroup.newBuilder().build()));

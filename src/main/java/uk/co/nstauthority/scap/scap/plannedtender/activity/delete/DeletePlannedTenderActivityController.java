@@ -60,7 +60,7 @@ public class DeletePlannedTenderActivityController {
                                                 @PathVariable("plannedTenderDetailId") Integer plannedTenderDetailId,
                                                 RedirectAttributes redirectAttributes) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     var plannedTender = plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail);
     var plannedTenderDetail = plannedTenderActivityService.getPlannedTenderDetailById(plannedTenderDetailId);
     plannedTenderActivityService.deletePlannedTenderDetail(plannedTenderDetail);

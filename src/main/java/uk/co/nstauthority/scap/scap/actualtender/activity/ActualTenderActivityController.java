@@ -76,7 +76,7 @@ public class ActualTenderActivityController {
   public ModelAndView renderActualTenderActivityForm(@PathVariable("scapId") ScapId scapId,
                                                      @ModelAttribute("form") ActualTenderActivityForm form) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     actualTenderService.getByScapDetail(scapDetail);
     var backLinkUrl = ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scapId));
 
@@ -88,7 +88,7 @@ public class ActualTenderActivityController {
                                                    @ModelAttribute("form") ActualTenderActivityForm form,
                                                    BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     var actualTender = actualTenderService.getByScapDetail(scapDetail);
     var backLinkUrl = ReverseRouter.route(on(HasActualTenderController.class).renderHasActualTenderForm(scapId));
 
@@ -140,7 +140,7 @@ public class ActualTenderActivityController {
                                                            @ModelAttribute("form") ActualTenderActivityForm form,
                                                            BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     var actualTender = actualTenderService.getByScapDetail(scapDetail);
     var actualTenderActivity = actualTenderActivityService.getById(activityId);
     var backLinkUrl = ReverseRouter.route(on(ActualTenderSummaryController.class).renderActualTenderSummary(scapId));

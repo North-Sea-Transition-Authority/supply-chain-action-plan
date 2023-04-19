@@ -56,7 +56,7 @@ public class PlannedTenderController {
   @GetMapping
   public ModelAndView renderPlannedTenderActivities(@PathVariable("scapId") ScapId scapId) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     var plannedTender = plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail);
     var existingTenderDetails = plannedTenderActivityService.getTenderDetailsByPlannedTender(plannedTender);
     var form = plannedTenderFormService.getForm(plannedTender);
@@ -73,7 +73,7 @@ public class PlannedTenderController {
                                                        @ModelAttribute("form") PlannedTenderForm form,
                                                        BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     var plannedTender = plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail);
     var existingTenderDetails = plannedTenderActivityService.getTenderDetailsByPlannedTender(plannedTender);
     bindingResult = plannedTenderFormService.validate(form, bindingResult);

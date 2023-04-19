@@ -59,7 +59,7 @@ public class ContractingPerformanceSummaryController {
   @GetMapping
   public ModelAndView renderContractingPerformanceSummary(@PathVariable("scapId") ScapId scapId) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail);
 
     var summaryViews = contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(scapId);
@@ -77,7 +77,7 @@ public class ContractingPerformanceSummaryController {
                                                         @ModelAttribute("form") HasMoreContractingPerformanceForm form,
                                                         BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     var contractingPerformanceOverview = contractingPerformanceOverviewService.getByScapDetailOrThrow(scapDetail);
 
     var summaryViews = contractingPerformanceSummaryViewService.getContractingPerformanceSummaryViews(scapId);

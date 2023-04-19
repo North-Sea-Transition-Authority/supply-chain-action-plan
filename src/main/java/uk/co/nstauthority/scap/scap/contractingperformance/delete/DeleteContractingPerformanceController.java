@@ -73,7 +73,7 @@ public class DeleteContractingPerformanceController {
                                                        Integer contractingPerformanceId,
                                                        RedirectAttributes redirectAttributes) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     var contractingPerformanceOverview = contractingPerformanceOverviewService
         .getByScapDetailOrThrow(scapDetail);
 

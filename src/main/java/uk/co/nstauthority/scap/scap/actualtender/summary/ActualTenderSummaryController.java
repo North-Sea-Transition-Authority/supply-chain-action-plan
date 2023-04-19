@@ -65,7 +65,7 @@ public class ActualTenderSummaryController {
   @Transactional
   public ModelAndView renderActualTenderSummary(@PathVariable("scapId") ScapId scapId) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     var actualTender = actualTenderService.getByScapDetail(scapDetail);
     var actualTenderActivities = actualTenderActivityService.getAllByActualTender(actualTender);
 
@@ -86,7 +86,7 @@ public class ActualTenderSummaryController {
                                               @ModelAttribute("form") ActualTenderSummaryForm form,
                                               BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     var actualTender = actualTenderService.getByScapDetail(scapDetail);
     var actualTenderActivities = actualTenderActivityService.getAllByActualTender(actualTender);
 

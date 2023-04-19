@@ -46,7 +46,7 @@ public class ScapDeletionController {
   @GetMapping
   public ModelAndView renderScapDeletionConfirmation(@PathVariable("scapId") ScapId scapId) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     var scapSummaryView = scapSummaryViewService.getScapSummaryView(scapDetail);
 
     return new ModelAndView("scap/scap/deleteScap")
@@ -59,7 +59,7 @@ public class ScapDeletionController {
   ModelAndView deleteScap(@PathVariable("scapId") ScapId scapId,
                           RedirectAttributes redirectAttributes) {
     var reference = scapService.getScapById(scapId).getReference();
-    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
+    var scapDetail = scapDetailService.getLatestByScapIdOrThrow(scapId);
     scapDetailService.deleteScapDetail(scapDetail);
 
     var successMessage = "%s deleted successfully".formatted(reference);

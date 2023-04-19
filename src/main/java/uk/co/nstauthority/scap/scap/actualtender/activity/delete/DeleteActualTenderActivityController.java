@@ -85,7 +85,7 @@ public class DeleteActualTenderActivityController {
                                                        @PathVariable("activityId") Integer activityId,
                                                        RedirectAttributes redirectAttributes) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     var actualTender = actualTenderService.getByScapDetail(scapDetail);
     var actualTenderActivity = actualTenderActivityService.getById(activityId);
     deleteActualTenderActivityService.deleteActualTenderActivity(actualTenderActivity);

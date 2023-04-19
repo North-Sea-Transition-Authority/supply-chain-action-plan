@@ -157,7 +157,7 @@ class OrganisationGroupControllerTest extends AbstractScapSubmitterControllerTes
     var scap = new Scap(SCAP_ID);
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
     when(organisationGroupFormService.validate(any(OrganisationGroupForm.class), any(BindingResult.class)))
         .thenReturn(new BeanPropertyBindingResult(form, "form"));
 

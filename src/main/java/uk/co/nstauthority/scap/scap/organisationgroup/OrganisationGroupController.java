@@ -83,7 +83,7 @@ public class OrganisationGroupController {
   @ScapHasStatus(permittedStatuses = ScapDetailStatus.DRAFT)
   public ModelAndView renderExistingScapOrganisationGroupForm(@PathVariable("scapId") ScapId scapId) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     var form = organisationGroupFormService.getForm(scapDetail);
     var existingScapBackLinkUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId));
 
@@ -98,7 +98,7 @@ public class OrganisationGroupController {
                                                         @PathVariable("scapId") ScapId scapId,
                                                         BindingResult bindingResult) {
     var scap = scapService.getScapById(scapId);
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     bindingResult = organisationGroupFormService.validate(form, bindingResult);
     if (bindingResult.hasErrors()) {
       var existingScapBackLinkUrl = ReverseRouter.route(on(TaskListController.class).renderTaskList(scapId));

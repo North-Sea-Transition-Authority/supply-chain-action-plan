@@ -28,7 +28,7 @@ class TaskListControllerTest extends AbstractScapSubmitterControllerTest {
 
   @Test
   void renderTaskList() throws Exception {
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
 
     mockMvc.perform(
         get(ReverseRouter.route(on(TaskListController.class).renderTaskList(SCAP_ID))))

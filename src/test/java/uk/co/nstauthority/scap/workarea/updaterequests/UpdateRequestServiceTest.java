@@ -151,7 +151,7 @@ class UpdateRequestServiceTest {
     updateRequest.setScapDetail(scapDetail);
     updateRequest.setDueDate(dueDate);
 
-    when(scapDetailService.findLatestSubmittedScapDetail(SCAP_ID)).thenReturn(Optional.ofNullable(scapDetail));
+    when(scapDetailService.findLatestSubmitted(SCAP_ID)).thenReturn(Optional.ofNullable(scapDetail));
     when(updateRequestRepository
         .findFirstByScapDetailAndResolutionDateNullAndUpdateRequestTypeOrderByCreatedTimestampDesc(scapDetail, UpdateRequestType.FURTHER_INFORMATION))
         .thenReturn(Optional.of(updateRequest));

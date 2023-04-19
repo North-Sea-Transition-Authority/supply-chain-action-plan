@@ -61,7 +61,7 @@ class TaskListServiceTest {
   @Test
   void getTaskListSections() {
     when(scapService.getScapById(SCAP_ID)).thenReturn(SCAP);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(SCAP)).thenReturn(SCAP_DETAIL);
+    when(scapDetailService.getLatestByScap(SCAP)).thenReturn(SCAP_DETAIL);
     when(taskListSectionService1.getSection(SCAP_DETAIL)).thenReturn(Optional.of(TASK_LIST_SECTION_1));
     when(taskListSectionService2.getSection(SCAP_DETAIL)).thenReturn(Optional.of(TASK_LIST_SECTION_2));
 

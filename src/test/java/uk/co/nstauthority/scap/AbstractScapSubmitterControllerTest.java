@@ -51,7 +51,7 @@ public abstract class AbstractScapSubmitterControllerTest extends AbstractContro
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(scapService.getScapById(SCAP_ID.scapId())).thenReturn(scap);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
     when(teamService.getByEnergyPortalOrgGroupId(anyInt())).thenReturn(team);
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.findTeamMember(any(Team.class), eq(webUserAccountId))).thenReturn(Optional.of(getTeamMember()));

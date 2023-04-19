@@ -110,26 +110,30 @@ public class ScapDetailService {
         ));
   }
 
-  public Optional<ScapDetail> getLatestScapDetailByScap(Scap scap) {
+  public ScapDetail getLatestByScap(Scap scap) {
+    return findLatestByScap(scap).orElseThrow(
+        () -> new ScapEntityNotFoundException(
+            String.format("Could not find a ScapDetail for Scap with ID [%d]", scap.getId())
+        ));
+  }
+
+  public Optional<ScapDetail> findLatestByScap(Scap scap) {
     return scapDetailRepository.findAllByScap(scap)
         .stream()
         .filter(ScapDetail::getTipFlag)
         .findFirst();
   }
 
-  public ScapDetail getLatestScapDetailByScapOrThrow(Scap scap) {
-    return getLatestScapDetailByScap(scap).orElseThrow(
-        () -> new ScapEntityNotFoundException(
-            String.format("Could not find a ScapDetail for Scap with ID [%d]", scap.getId())
-        ));
-  }
-
-  public Optional<ScapDetail> findLatestScapDetailByScapId(ScapId scapId) {
+  public Optional<ScapDetail> findLatestByScapId(ScapId scapId) {
     return scapDetailRepository.findFirstByScapIdAndTipFlag(scapId.scapId(), true);
   }
 
   public Optional<ScapDetail> findLatestByScapIdAndStatus(ScapId scapId, ScapDetailStatus status) {
     return scapDetailRepository.findFirstByScapIdAndStatusOrderByVersionNumberDesc(scapId.scapId(), status);
+  }
+
+  public Optional<ScapDetail> findLatestByScapIdAndStatusIn(ScapId scapId, List<ScapDetailStatus> statuses) {
+    return scapDetailRepository.findFirstByScapIdAndStatusInOrderByVersionNumberDesc(scapId.scapId(), statuses);
   }
 
   public Optional<ScapDetail> findLatestByScapIdAndStatusNotIn(ScapId scapId, List<ScapDetailStatus> statuses) {
@@ -144,8 +148,8 @@ public class ScapDetailService {
             ));
   }
 
-  public Optional<ScapDetail> findLatestByScapIdAndStatusIn(ScapId scapId, List<ScapDetailStatus> statuses) {
-    return scapDetailRepository.findFirstByScapIdAndStatusInOrderByVersionNumberDesc(scapId.scapId(), statuses);
+  public Optional<ScapDetail> findLatestSubmitted(ScapId scapId) {
+    return scapDetailRepository.findFirstByScapIdAndTipFlagAndStatus(scapId.scapId(), true, SUBMITTED);
   }
 
   public ScapDetail getLatestByScapIdAndStatus(ScapId scapId, ScapDetailStatus status) {
@@ -157,19 +161,15 @@ public class ScapDetailService {
         ));
   }
 
-  public ScapDetail getLatestScapDetailByScapIdOrThrow(ScapId scapId) {
-    return findLatestScapDetailByScapId(scapId).orElseThrow(
+  public ScapDetail getLatestByScapIdOrThrow(ScapId scapId) {
+    return findLatestByScapId(scapId).orElseThrow(
         () -> new ScapEntityNotFoundException(
             String.format("Could not find a ScapDetail for Scap with ID [%d]", scapId.scapId())
         ));
   }
 
-  public Optional<ScapDetail> findLatestSubmittedScapDetail(ScapId scapId) {
-    return scapDetailRepository.findFirstByScapIdAndTipFlagAndStatus(scapId.scapId(), true, SUBMITTED);
-  }
-
   public ScapDetail getLatestSubmittedScapDetail(ScapId scapId) {
-    return findLatestSubmittedScapDetail(scapId).orElseThrow(
+    return findLatestSubmitted(scapId).orElseThrow(
         () -> new ScapEntityNotFoundException(
             String.format("Could not find a ScapDetail for Scap with ID [%s]", scapId.scapId())
         ));
@@ -306,7 +306,7 @@ public class ScapDetailService {
     if (isRegulator) {
       return getLatestByScapIdAndStatusNotIn(scapId, Collections.singletonList(DRAFT));
     } else {
-      return getLatestScapDetailByScapIdOrThrow(scapId);
+      return getLatestByScapIdOrThrow(scapId);
     }
   }
 

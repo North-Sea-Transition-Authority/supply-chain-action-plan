@@ -171,7 +171,7 @@ class ScapDetailServiceTest {
     var details = getListScapDetail();
     when(scapDetailRepository.findAllByScap(scap)).thenReturn(details);
 
-    var scapDetail = scapDetailService.getLatestScapDetailByScap(scap);
+    var scapDetail = scapDetailService.findLatestByScap(scap);
     assertThat(scapDetail).contains(details.get(1));
   }
 
@@ -180,7 +180,7 @@ class ScapDetailServiceTest {
     var details = getListScapDetail();
     when(scapDetailRepository.findAllByScap(scap)).thenReturn(details);
 
-    var scapDetail = scapDetailService.getLatestScapDetailByScapOrThrow(scap);
+    var scapDetail = scapDetailService.getLatestByScap(scap);
     assertThat(scapDetail).isEqualTo(details.get(1));
   }
 
@@ -188,7 +188,7 @@ class ScapDetailServiceTest {
   void getLatestScapDetailByScapOrThrow_assertThrows() {
     when(scapDetailRepository.findAllByScap(scap)).thenReturn(emptyList());
 
-    assertThatThrownBy(() -> scapDetailService.getLatestScapDetailByScapOrThrow(scap))
+    assertThatThrownBy(() -> scapDetailService.getLatestByScap(scap))
         .isInstanceOf(ScapEntityNotFoundException.class);
   }
 
@@ -204,7 +204,7 @@ class ScapDetailServiceTest {
 
     when(scapDetailRepository.findFirstByScapIdAndTipFlag(scap.getId(), true)).thenReturn(Optional.of(scapDetail));
 
-    var returnedScapDetail = scapDetailService.findLatestScapDetailByScapId(scap.getScapId());
+    var returnedScapDetail = scapDetailService.findLatestByScapId(scap.getScapId());
 
     assertThat(returnedScapDetail).contains(scapDetail);
   }
@@ -215,7 +215,7 @@ class ScapDetailServiceTest {
 
     when(scapDetailRepository.findFirstByScapIdAndTipFlag(scap.getId(), true)).thenReturn(Optional.of(scapDetail));
 
-    var returnedScapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scap.getScapId());
+    var returnedScapDetail = scapDetailService.getLatestByScapIdOrThrow(scap.getScapId());
 
     assertThat(returnedScapDetail).isEqualTo(scapDetail);
   }
@@ -224,7 +224,7 @@ class ScapDetailServiceTest {
   void getLatestScapDetailByScapIdOrThrow_NotFound_AssertThrows() {
     when(scapDetailRepository.findFirstByScapIdAndTipFlag(scap.getId(), true)).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> scapDetailService.getLatestScapDetailByScapIdOrThrow(scap.getScapId()))
+    assertThatThrownBy(() -> scapDetailService.getLatestByScapIdOrThrow(scap.getScapId()))
         .isInstanceOf(ScapEntityNotFoundException.class);
   }
 
@@ -233,7 +233,7 @@ class ScapDetailServiceTest {
     when(scapDetailRepository.findFirstByScapIdAndTipFlagAndStatus(scap.getId(), true, SUBMITTED))
         .thenReturn(Optional.empty());
 
-    assertThat(scapDetailService.findLatestSubmittedScapDetail(scap.getScapId())).isEmpty();
+    assertThat(scapDetailService.findLatestSubmitted(scap.getScapId())).isEmpty();
   }
 
   @Test
@@ -242,7 +242,7 @@ class ScapDetailServiceTest {
     when(scapDetailRepository.findFirstByScapIdAndTipFlagAndStatus(scap.getId(), true, SUBMITTED))
         .thenReturn(Optional.of(scapDetail));
 
-    assertThat(scapDetailService.findLatestSubmittedScapDetail(scap.getScapId())).isNotEmpty();
+    assertThat(scapDetailService.findLatestSubmitted(scap.getScapId())).isNotEmpty();
   }
 
   @Test

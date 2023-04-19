@@ -56,7 +56,7 @@ public class ProjectDetailsController {
 
   @GetMapping
   public ModelAndView renderProjectDetailsForm(@PathVariable("scapId") ScapId scapId) {
-    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
+    var scapDetail = scapDetailService.getLatestByScapIdOrThrow(scapId);
     var projectDetails = projectDetailsService.findByScapDetail(scapDetail);
     var projectFacilities = projectDetails
         .map(projectDetailsService::getProjectFacilities)
@@ -89,7 +89,7 @@ public class ProjectDetailsController {
   ModelAndView saveProjectDetailsForm(@PathVariable("scapId") ScapId scapId,
                                       @ModelAttribute("form") ProjectDetailsForm form,
                                       BindingResult bindingResult) {
-    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
+    var scapDetail = scapDetailService.getLatestByScapIdOrThrow(scapId);
     var preselectedFields = projectDetailsFormService.getPreselectedFields(form.getFieldIds());
     var preselectedFacilities = projectDetailsFormService.getPreselectedFacilities(form.getInstallationIds());
     var supportingDocuments = projectDetailsFormService.getSupportingDocuments(form);

@@ -46,7 +46,7 @@ public class AdditionalDocumentsController {
   @ResponseBody
   public FileUploadResult upload(@PathVariable("scapId") ScapId scapId,
                                  @RequestParam("file") MultipartFile multipartFile) {
-    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
+    var scapDetail = scapDetailService.getLatestByScapIdOrThrow(scapId);
     return supportingDocumentService.processFileUpload(scapDetail, SupportingDocumentType.ADDITIONAL_DOCUMENT, multipartFile);
   }
 
@@ -54,7 +54,7 @@ public class AdditionalDocumentsController {
   @ResponseBody
   public ResponseEntity<InputStreamResource> download(@PathVariable("scapId") ScapId scapId,
                                                       @PathVariable("uploadedFileId") UUID uploadedFileId) {
-    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
+    var scapDetail = scapDetailService.getLatestByScapIdOrThrow(scapId);
     var uploadedFile = supportingDocumentService.findUploadedFileOrThrow(scapDetail, uploadedFileId);
     var inputStream = fileUploadService.downloadFile(uploadedFile);
     return FileUploadUtils.getFileResourceResponseEntity(uploadedFile, new InputStreamResource(inputStream));
@@ -64,7 +64,7 @@ public class AdditionalDocumentsController {
   @ResponseBody
   public FileDeleteResult delete(@PathVariable("scapId") ScapId scapId,
                                  @PathVariable("uploadedFileId") UUID uploadedFileId) {
-    var scapDetail = scapDetailService.getLatestScapDetailByScapIdOrThrow(scapId);
+    var scapDetail = scapDetailService.getLatestByScapIdOrThrow(scapId);
     return supportingDocumentService.deleteFile(scapDetail, uploadedFileId);
   }
 }

@@ -51,7 +51,7 @@ class ProjectPerformanceControllerTest extends AbstractScapSubmitterControllerTe
 
   @Test
   void renderProjectPerformanceForm_NoExistingProjectPerformance() throws Exception {
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
     when(projectPerformanceService.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
 
     mockMvc.perform(get(
@@ -69,7 +69,7 @@ class ProjectPerformanceControllerTest extends AbstractScapSubmitterControllerTe
     var projectPerformance = new ProjectPerformance();
     var form = new ProjectPerformanceForm();
 
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
     when(projectPerformanceService.findByScapDetail(scapDetail))
         .thenReturn(Optional.of(projectPerformance));
     when(projectPerformanceFormService.getForm(projectPerformance)).thenReturn(form);
@@ -92,7 +92,7 @@ class ProjectPerformanceControllerTest extends AbstractScapSubmitterControllerTe
         "form", "testField", "Test error message"
     ));
 
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
     when(projectPerformanceService.findByScapDetail(scapDetail))
         .thenReturn(Optional.empty());
     when(projectPerformanceFormService.validate(eq(form), any(BindingResult.class)))
@@ -121,7 +121,7 @@ class ProjectPerformanceControllerTest extends AbstractScapSubmitterControllerTe
     var expectedRedirectUrl = ReverseRouter.route(on(TaskListController.class)
         .renderTaskList(SCAP_ID));
 
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
     when(projectPerformanceService.findByScapDetail(scapDetail))
         .thenReturn(Optional.empty());
     when(projectPerformanceFormService.validate(eq(form), any(BindingResult.class)))
@@ -145,7 +145,7 @@ class ProjectPerformanceControllerTest extends AbstractScapSubmitterControllerTe
         .renderTaskList(SCAP_ID));
     var projectPerformance = new ProjectPerformance();
 
-    when(scapDetailService.getLatestScapDetailByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScapIdOrThrow(SCAP_ID)).thenReturn(scapDetail);
     when(projectPerformanceService.findByScapDetail(scapDetail))
         .thenReturn(Optional.of(projectPerformance));
     when(projectPerformanceFormService.validate(eq(form), any(BindingResult.class)))

@@ -65,7 +65,7 @@ class PlannedTenderActivityControllerTest extends AbstractScapSubmitterControlle
 
   @Test
   void renderPlannedTenderDetailForm() throws Exception {
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail)).thenReturn(plannedTender);
     when(plannedTenderActivityService.hasExistingTenderDetails(plannedTender)).thenReturn(false);
 
@@ -84,7 +84,7 @@ class PlannedTenderActivityControllerTest extends AbstractScapSubmitterControlle
 
   @Test
   void renderPlannedTenderDetailForm_noScapDetail_expectNotFound() throws Exception {
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap))
+    when(scapDetailService.getLatestByScap(scap))
         .thenThrow(new ScapEntityNotFoundException("No scap detail found for SCAP with ID [33]"));
 
     mockMvc.perform(
@@ -95,7 +95,7 @@ class PlannedTenderActivityControllerTest extends AbstractScapSubmitterControlle
 
   @Test
   void renderPlannedTenderDetailForm_noScapPlannedTender_expectNotFound() throws Exception {
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
         .thenThrow(new ScapEntityNotFoundException("No scap planned tender found for SCAP with ID [32]"));
 
@@ -111,7 +111,7 @@ class PlannedTenderActivityControllerTest extends AbstractScapSubmitterControlle
     var expectedRedirectUrl = ReverseRouter.route(on(PlannedTenderController.class)
         .renderPlannedTenderActivities(SCAP_ID));
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail)).thenReturn(plannedTender);
     when(plannedTenderActivityFormService.validate(any(BindingResult.class), eq(form)))
         .thenReturn(new BeanPropertyBindingResult(form, "form"));
@@ -134,7 +134,7 @@ class PlannedTenderActivityControllerTest extends AbstractScapSubmitterControlle
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("form", "scopeDescription.inputValue", "Required"));
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail)).thenReturn(plannedTender);
     when(plannedTenderActivityFormService.validate(any(BindingResult.class), eq(form)))
         .thenReturn(bindingResult);
@@ -161,7 +161,7 @@ class PlannedTenderActivityControllerTest extends AbstractScapSubmitterControlle
   void savePlannedTenderDetailForm_noScapDetail_expectNotFound() throws Exception {
     var form = new PlannedTenderActivityForm();
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap))
+    when(scapDetailService.getLatestByScap(scap))
         .thenThrow(new ScapEntityNotFoundException("No scap detail found for SCAP with ID [36]"));
 
     mockMvc.perform(
@@ -178,7 +178,7 @@ class PlannedTenderActivityControllerTest extends AbstractScapSubmitterControlle
   void savePlannedTenderDetailForm_noPlannedTender_expectNotFound() throws Exception {
     var form = new PlannedTenderActivityForm();
 
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
     when(plannedTenderService.getScapPlannedTenderByScapDetailOrThrow(scapDetail))
         .thenThrow(new ScapEntityNotFoundException("No scap planned tender found for SCAP with ID [37]"));
 

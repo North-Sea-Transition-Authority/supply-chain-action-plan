@@ -53,7 +53,7 @@ class ScapUpdateControllerTest extends AbstractControllerTest {
   @Test
   void updateScap_noUpdateInProgress_newDraft() throws Exception {
     scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
     when(scapDetailService.findLatestByScapIdAndStatus(SCAP_ID, ScapDetailStatus.DRAFT)).thenReturn(Optional.empty());
 
     mockMvc.perform(post(ReverseRouter.route(on(ScapUpdateController.class)
@@ -73,7 +73,7 @@ class ScapUpdateControllerTest extends AbstractControllerTest {
       mode = EnumSource.Mode.EXCLUDE)
   void updateScap_NotInState_Throws(ScapDetailStatus status) throws Exception {
     scapDetail.setStatus(status);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
 
     mockMvc.perform(post(ReverseRouter.route(on(ScapUpdateController.class)
             .startScapUpdate(
@@ -88,7 +88,7 @@ class ScapUpdateControllerTest extends AbstractControllerTest {
   @Test
   void updateScap_UpdateInProgress_skipsNewDraft() throws Exception {
     scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
-    when(scapDetailService.getLatestScapDetailByScapOrThrow(any(Scap.class))).thenReturn(scapDetail);
+    when(scapDetailService.getLatestByScap(any(Scap.class))).thenReturn(scapDetail);
     when(scapDetailService.findLatestByScapIdAndStatus(SCAP_ID, ScapDetailStatus.DRAFT)).thenReturn(Optional.of(new ScapDetail()));
 
     mockMvc.perform(post(ReverseRouter.route(on(ScapUpdateController.class)
