@@ -1,12 +1,13 @@
 package uk.co.nstauthority.scap.scap.detail;
 
+import static java.util.Collections.singletonList;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.APPROVED;
+import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.DELETED;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.DRAFT;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.SUBMITTED;
 
 import java.time.Clock;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -304,9 +305,9 @@ public class ScapDetailService {
         new TeamId(teamService.getRegulatorTeam().getUuid()),
         user);
     if (isRegulator) {
-      return getLatestByScapIdAndStatusNotIn(scapId, Collections.singletonList(DRAFT));
+      return getLatestByScapIdAndStatusNotIn(scapId, List.of(DRAFT, DELETED));
     } else {
-      return getLatestByScapId(scapId);
+      return getLatestByScapIdAndStatusNotIn(scapId, singletonList(DELETED));
     }
   }
 

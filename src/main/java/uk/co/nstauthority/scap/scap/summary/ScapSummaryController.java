@@ -2,10 +2,12 @@ package uk.co.nstauthority.scap.scap.summary;
 
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import static uk.co.nstauthority.scap.permissionmanagement.RolePermission.REVIEW_SCAP;
+import static uk.co.nstauthority.scap.permissionmanagement.RolePermission.SUBMIT_SCAP;
+import static uk.co.nstauthority.scap.permissionmanagement.RolePermission.VIEW_SCAP;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -16,13 +18,12 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
-import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventView;
-import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
@@ -32,6 +33,7 @@ import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
 
 @Controller
 @RequestMapping("{scapId}")
+@PermissionsRequiredForScap(permissions = {SUBMIT_SCAP, REVIEW_SCAP, VIEW_SCAP})
 public class ScapSummaryController {
 
   private final ScapDetailService scapDetailService;
@@ -90,25 +92,24 @@ public class ScapSummaryController {
       ScapDetailStatus.WITHDRAWN})
   public ModelAndView getScapSummary(@PathVariable("scapId") ScapId scapId,
                                      @PathVariable("versionNumber") Integer versionNumber) {
-    var scapDetail = scapDetailService.getActionableScapDetail(scapId, userDetailService.getUserDetail());
-    ScapDetail versionedDetail = null;
-    if (versionNumber != null) {
+    var versionedDetail = scapDetailService.getActionableScapDetail(scapId, userDetailService.getUserDetail());
+    if (versionNumber != null && versionNumber < versionedDetail.getVersionNumber()) {
       versionedDetail = scapDetailService.getByScapIdAndVersionNumber(scapId, versionNumber);
     }
 
     var user = userDetailService.getUserDetail();
     var userPermissions = teamMemberService.getAllPermissionsForUser(user);
-    if (ScapDetailStatus.DRAFT.equals(scapDetail.getStatus())
-        && scapDetail.getVersionNumber() == 1
-        && userPermissions.contains(RolePermission.SUBMIT_SCAP)) {
+    if (ScapDetailStatus.DRAFT.equals(versionedDetail.getStatus())
+        && versionedDetail.getVersionNumber() == 1
+        && userPermissions.contains(SUBMIT_SCAP)) {
       return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
     }
-    var scapSummary = scapSummaryViewService.getScapSummaryView(versionedDetail != null ? versionedDetail : scapDetail);
+    var scapSummary = scapSummaryViewService.getScapSummaryView(versionedDetail);
     var orgGroup = organisationGroupService
-        .getOrganisationGroupById(scapDetail.getScap().getOrganisationGroupId(), "Get Org Group for Summary");
+        .getOrganisationGroupById(versionedDetail.getScap().getOrganisationGroupId(), "Get Org Group for Summary");
 
     var generator = ScapSummaryModelAndViewGenerator.generator(
-                scapDetail,
+                versionedDetail,
                 scapSummary,
                 caseEventDocumentService)
         .withScapStatus(scapSummaryViewService.inferSubmissionStatusFromSummary(scapSummary))
@@ -116,8 +117,8 @@ public class ScapSummaryController {
         .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
         .withUpdatePermission(teamService.userIsMemberOfRegulatorTeam(userDetailService.getUserDetail()))
         .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId))
-        .withScapVersions(scapDetailService.getAllVersionsForUser(scapDetail.getScap()))
-        .withCurrentVersion(Objects.nonNull(versionNumber) ? versionNumber : scapDetail.getVersionNumber());
+        .withScapVersions(scapDetailService.getAllVersionsForUser(versionedDetail.getScap()))
+        .withCurrentVersion(versionedDetail.getVersionNumber());
     orgGroup.ifPresent(generator::withOrgGroup);
     updateRequestService.findNextDueUpdate(scapId)
         .ifPresent(requestEvent -> generator.withUpdateRequestText(requestEvent

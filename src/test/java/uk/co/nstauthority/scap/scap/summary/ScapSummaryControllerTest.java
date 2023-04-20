@@ -1,6 +1,7 @@
 package uk.co.nstauthority.scap.scap.summary;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -13,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import static uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole.SCAP_CASE_OFFICER;
 import static uk.co.nstauthority.scap.scap.projectdetails.ProjectType.FIELD_DEVELOPMENT_PLAN;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getScapSummaryView;
 
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -33,6 +36,9 @@ import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
+import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamView;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEvent;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
@@ -83,14 +89,17 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
 
   private ScapDetail scapDetail;
 
+  private Scap scap;
+
   @BeforeEach
   void setup() {
-    var scap = new Scap(SCAP_ID);
+    scap = new Scap(SCAP_ID);
     scap.setReference("TEST PROJECT NAME");
+    scap.setOrganisationGroupId(1000);
     scapDetail = ScapDetailEntityTestUtil.scapDetailBuilder()
         .withScap(scap)
         .withStatus(ScapDetailStatus.DRAFT)
-        .withVersionNumber(1)
+        .withVersionNumber(SCAP_VERSION)
         .build();
 
     when(userDetailService.getUserDetail()).thenReturn(testUser);
@@ -104,6 +113,9 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.FURTHER_INFORMATION)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
+    when(teamService.getByEnergyPortalOrgGroupId(anyInt())).thenReturn(new Team());
+    when(teamMemberService.getTeamMember(any(Team.class), eq(testUser.getWebUserAccountId())))
+        .thenReturn(new TeamMember(testUser.getWebUserAccountId(), new TeamView(null, null, null), Set.of(SCAP_CASE_OFFICER)));
   }
 
   @Test
@@ -129,7 +141,12 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
     when(teamMemberService.getAllPermissionsForUser(testUser))
         .thenReturn(Collections.singletonList(RolePermission.SUBMIT_SCAP));
-
+    scapDetail = ScapDetailEntityTestUtil.scapDetailBuilder()
+        .withScap(scap)
+        .withStatus(ScapDetailStatus.DRAFT)
+        .withVersionNumber(1)
+        .build();
+    when(scapDetailService.getActionableScapDetail(SCAP_ID, testUser)).thenReturn(scapDetail);
     mockMvc.perform(get(
         ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
             .with(authenticatedScapUser()))
@@ -240,14 +257,16 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(false);
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
     when(caseEventService.getEventViewByScapId(SCAP_ID)).thenReturn(getTimelineView());
+    when(scapDetailService.getActionableScapDetail(SCAP_ID, testUser)).thenReturn(scapDetail);
+    when(scapDetailService.getByScapIdAndVersionNumber(SCAP_ID, 4)).thenReturn(scapDetail);
 
     mockMvc.perform(get(
-            ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID, SCAP_VERSION)))
+            ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID, 4)))
             .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/summary/scapSummaryOverview"));
     verify(caseEventService, never()).getEventViewByScapId(SCAP_ID);
-    verify(scapDetailService).getByScapIdAndVersionNumber(SCAP_ID, SCAP_VERSION);
+    verify(scapDetailService).getByScapIdAndVersionNumber(SCAP_ID, 4);
   }
 
   @Test
@@ -345,7 +364,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl(expectedRedirectUrl));
   }
-  
+
   private UpdateRequest getUpdateRequest() {
     var caseEvent = new CaseEvent();
     caseEvent.setComments("TEST");
