@@ -16,6 +16,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.APPROVED;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.CLOSED_OUT;
+import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.DELETED;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.DRAFT;
 import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.SUBMITTED;
 
@@ -626,11 +627,11 @@ class ScapDetailServiceTest {
     var team = TeamTestUtil.Builder().build();
     when(teamService.getRegulatorTeam()).thenReturn(team);
     when(teamMemberService.isMemberOfTeam(new TeamId(team.getUuid()), user)).thenReturn(true);
-    when(scapDetailRepository.findFirstByScapIdAndStatusNotInOrderByVersionNumberDesc(scap.getScapId().scapId(), List.of(DRAFT)))
+    when(scapDetailRepository.findFirstByScapIdAndStatusNotInOrderByVersionNumberDesc(scap.getScapId().scapId(), List.of(DRAFT, DELETED)))
         .thenReturn(Optional.of(getListScapDetail().get(0)));
 
     scapDetailService.getActionableScapDetail(scap.getScapId(), user);
-    verify(scapDetailRepository).findFirstByScapIdAndStatusNotInOrderByVersionNumberDesc(scap.getScapId().scapId(), List.of(DRAFT));
+    verify(scapDetailRepository).findFirstByScapIdAndStatusNotInOrderByVersionNumberDesc(scap.getScapId().scapId(), List.of(DRAFT, DELETED));
   }
 
   @Test
@@ -638,11 +639,11 @@ class ScapDetailServiceTest {
     var team = TeamTestUtil.Builder().build();
     when(teamService.getRegulatorTeam()).thenReturn(team);
     when(teamMemberService.isMemberOfTeam(new TeamId(team.getUuid()), getUserDetail())).thenReturn(false);
-    when(scapDetailRepository.findFirstByScapIdAndTipFlag(scap.getScapId().scapId(), true))
+    when(scapDetailRepository.findFirstByScapIdAndStatusNotInOrderByVersionNumberDesc(scap.getScapId().scapId(), List.of(DELETED)))
         .thenReturn(Optional.of(getListScapDetail().get(0)));
 
     scapDetailService.getActionableScapDetail(scap.getScapId(), getUserDetail());
-    verify(scapDetailRepository).findFirstByScapIdAndTipFlag(scap.getScapId().scapId(), true);
+    verify(scapDetailRepository).findFirstByScapIdAndStatusNotInOrderByVersionNumberDesc(scap.getScapId().scapId(), List.of(DELETED));
   }
 
   @Test
