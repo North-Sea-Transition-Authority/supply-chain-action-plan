@@ -25,7 +25,7 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 @Controller
 @IsMemberOfTeamOrRegulator
 @RequestMapping("/permission-management/industry")
-public class IndustryTeamManagementController {
+public class IndustryTeamMemberController {
 
   private final TeamMemberViewService teamMemberViewService;
 
@@ -37,11 +37,11 @@ public class IndustryTeamManagementController {
   private final UserDetailService userDetailService;
 
   @Autowired
-  IndustryTeamManagementController(TeamMemberViewService teamMemberViewService,
-                                   IndustryTeamService industryTeamService,
-                                   TeamMemberService teamMemberService,
-                                   TeamService teamService,
-                                   UserDetailService userDetailService) {
+  IndustryTeamMemberController(TeamMemberViewService teamMemberViewService,
+                               IndustryTeamService industryTeamService,
+                               TeamMemberService teamMemberService,
+                               TeamService teamService,
+                               UserDetailService userDetailService) {
     this.teamMemberViewService = teamMemberViewService;
     this.industryTeamService = industryTeamService;
     this.teamMemberService = teamMemberService;

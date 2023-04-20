@@ -18,8 +18,8 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
-import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamManagementController;
-import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamManagementController;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamMemberController;
+import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamMemberController;
 import uk.co.nstauthority.scap.util.SuccessBannerUtil;
 
 public abstract class RemoveMemberController {
@@ -61,10 +61,10 @@ public abstract class RemoveMemberController {
     if (teamMemberOptional.isEmpty()) {
       switch (team.getTeamType()) {
         case REGULATOR -> {
-          return ReverseRouter.redirect(on(RegulatorTeamManagementController.class).renderMemberList(teamId));
+          return ReverseRouter.redirect(on(RegulatorTeamMemberController.class).renderMemberList(teamId));
         }
         case INDUSTRY -> {
-          return ReverseRouter.redirect(on(IndustryTeamManagementController.class).renderMemberList(teamId));
+          return ReverseRouter.redirect(on(IndustryTeamMemberController.class).renderMemberList(teamId));
         }
         default -> {
           return ReverseRouter.redirect(on(TeamManagementController.class).renderTeamList());

@@ -12,6 +12,8 @@ pageHeading=pageTitle
 errorItems=errorList
 pageSize=PageSize.FULL_WIDTH
 topNavigation=true
+backLink=true
+backLinkUrl=springUrl(teamListUrl)
 >
     <@fdsForm.htmlForm actionUrl=springUrl(submitFormUrl)>
       <@fdsSearchSelector.searchSelectorRest path="form.organisationGroupId.inputValue"

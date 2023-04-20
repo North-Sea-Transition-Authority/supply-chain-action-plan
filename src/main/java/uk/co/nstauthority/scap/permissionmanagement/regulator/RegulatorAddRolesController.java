@@ -81,7 +81,7 @@ class RegulatorAddRolesController extends AddRolesController {
         webUserAccountId,
         form,
         bindingResult,
-        ReverseRouter.redirect(on(RegulatorTeamManagementController.class).renderMemberList(teamId)),
+        ReverseRouter.redirect(on(RegulatorTeamMemberController.class).renderMemberList(teamId)),
         ReverseRouter.redirect(on(RegulatorAddRolesController.class).renderAddTeamMemberRoles(teamId, webUserAccountId)));
   }
 }

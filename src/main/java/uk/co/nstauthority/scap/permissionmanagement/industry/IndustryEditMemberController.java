@@ -93,7 +93,7 @@ public class IndustryEditMemberController {
         form,
         () -> {
           teamMemberRoleService.updateUserTeamRoles(team, teamMember.wuaId().id(), form.getRoles());
-          return ReverseRouter.redirect(on(IndustryTeamManagementController.class).renderMemberList(teamId));
+          return ReverseRouter.redirect(on(IndustryTeamMemberController.class).renderMemberList(teamId));
         });
 
   }
@@ -104,7 +104,7 @@ public class IndustryEditMemberController {
         .addObject("pageTitle", userView.getDisplayName())
         .addObject("roles", DisplayableEnumOptionUtil.getDisplayableOptionsWithDescription(IndustryTeamRole.class))
         .addObject("backLinkUrl",
-          ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId))
+          ReverseRouter.route(on(IndustryTeamMemberController.class).renderMemberList(teamId))
         );
   }
 }

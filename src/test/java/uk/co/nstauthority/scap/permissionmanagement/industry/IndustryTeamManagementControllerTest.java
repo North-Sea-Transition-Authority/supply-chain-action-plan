@@ -24,7 +24,7 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamManagementController;
 
-@ContextConfiguration(classes = IndustryTeamManagementController.class)
+@ContextConfiguration(classes = IndustryTeamMemberController.class)
 class IndustryTeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
   @MockBean
   private IndustryTeamService industryTeamService;
@@ -36,14 +36,14 @@ class IndustryTeamManagementControllerTest extends AbstractIndustryTeamControlle
   @Test
   void renderMemberList_whenNotAuthenticated_thenUnauthorised() throws Exception {
     mockMvc.perform(
-      get(ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId))))
+      get(ReverseRouter.route(on(IndustryTeamMemberController.class).renderMemberList(teamId))))
       .andExpect(status().is3xxRedirection());
   }
 
   @Test
   void renderMemberList_whenMemberOfTeam_thenOk() throws Exception {
     mockMvc.perform(
-      get(ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId)))
+      get(ReverseRouter.route(on(IndustryTeamMemberController.class).renderMemberList(teamId)))
         .with(authenticatedScapUser())
         .with(csrf()))
         .andExpect(status().isOk());
@@ -54,7 +54,7 @@ class IndustryTeamManagementControllerTest extends AbstractIndustryTeamControlle
     when(teamService.getTeam(teamId)).thenThrow(ScapEntityNotFoundException.class);
 
     mockMvc.perform(
-      get(ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId)))
+      get(ReverseRouter.route(on(IndustryTeamMemberController.class).renderMemberList(teamId)))
         .with(authenticatedScapUser()))
         .andExpect(status().isNotFound());
   }
@@ -67,7 +67,7 @@ class IndustryTeamManagementControllerTest extends AbstractIndustryTeamControlle
     when(teamMemberViewService.findTeamMemberViewsForTeam(team)).thenReturn(List.of(teamMemberView));
 
     mockMvc.perform(
-      get(ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId)))
+      get(ReverseRouter.route(on(IndustryTeamMemberController.class).renderMemberList(teamId)))
         .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/teamMembers"))
@@ -92,7 +92,7 @@ class IndustryTeamManagementControllerTest extends AbstractIndustryTeamControlle
       .thenReturn(canRemoveUsers);
 
     mockMvc.perform(
-      get(ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId)))
+      get(ReverseRouter.route(on(IndustryTeamMemberController.class).renderMemberList(teamId)))
         .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/teamMembers"))
@@ -126,7 +126,7 @@ class IndustryTeamManagementControllerTest extends AbstractIndustryTeamControlle
         .thenReturn(canRemoveUsers);
 
     mockMvc.perform(
-            get(ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId)))
+            get(ReverseRouter.route(on(IndustryTeamMemberController.class).renderMemberList(teamId)))
                 .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/teamMembers"))

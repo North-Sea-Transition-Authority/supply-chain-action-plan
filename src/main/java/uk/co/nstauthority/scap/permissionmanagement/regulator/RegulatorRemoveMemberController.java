@@ -53,7 +53,7 @@ public class RegulatorRemoveMemberController extends RemoveMemberController {
   public ModelAndView renderRemoveMember(@PathVariable("teamId") TeamId teamId,
                                          @PathVariable("wuaId") WebUserAccountId wuaId) {
     return super.renderRemoveMember(teamId, wuaId)
-        .addObject("backLinkUrl", ReverseRouter.route(on(RegulatorTeamManagementController.class)
+        .addObject("backLinkUrl", ReverseRouter.route(on(RegulatorTeamMemberController.class)
             .renderMemberList(teamId)))
         .addObject("removeUrl", ReverseRouter.route(on(RegulatorRemoveMemberController.class)
             .removeMember(teamId, wuaId, null)));
@@ -66,6 +66,6 @@ public class RegulatorRemoveMemberController extends RemoveMemberController {
     return super.removeMember(teamId,
         wuaId,
         redirectAttributes,
-        ReverseRouter.redirect(on(RegulatorTeamManagementController.class).renderMemberList(teamId)));
+        ReverseRouter.redirect(on(RegulatorTeamMemberController.class).renderMemberList(teamId)));
   }
 }

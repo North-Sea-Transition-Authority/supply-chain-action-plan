@@ -60,7 +60,9 @@ class ActualTenderCopyService implements CopyService {
     var newActualTender = (ActualTender) entityCopyService.copyChild(newScapDetail, oldActualTender);
 
     if (NewScapType.DRAFT_UPDATE.equals(newScapType)) {
-      actualTenderService.updateHasActualTenders(newActualTender, null);
+      if (!Boolean.TRUE.equals(oldActualTender.getHasActualTenders())) {
+        actualTenderService.updateHasActualTenders(newActualTender, null);
+      }
       actualTenderService.updateHasMoreActualTenders(newActualTender, null);
     }
 

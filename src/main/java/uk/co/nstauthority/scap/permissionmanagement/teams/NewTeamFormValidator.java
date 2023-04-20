@@ -10,14 +10,14 @@ import uk.co.fivium.formlibrary.validator.decimal.DecimalInputValidator;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 
 @Service
-public class NewTeamFormvalidator implements Validator {
+public class NewTeamFormValidator implements Validator {
 
   private final OrganisationGroupService organisationGroupService;
 
   private final TeamService teamService;
 
   @Autowired
-  public NewTeamFormvalidator(OrganisationGroupService organisationGroupService, TeamService teamService) {
+  public NewTeamFormValidator(OrganisationGroupService organisationGroupService, TeamService teamService) {
     this.organisationGroupService = organisationGroupService;
     this.teamService = teamService;
   }

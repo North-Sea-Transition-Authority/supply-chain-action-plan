@@ -83,7 +83,7 @@ class IndustryAddRolesController extends AddRolesController {
         webUserAccountId,
         form,
         bindingResult,
-        ReverseRouter.redirect(on(IndustryTeamManagementController.class).renderMemberList(teamId)),
+        ReverseRouter.redirect(on(IndustryTeamMemberController.class).renderMemberList(teamId)),
         ReverseRouter.redirect(on(IndustryAddRolesController.class).renderAddTeamMemberRoles(teamId, webUserAccountId)));
   }
 }

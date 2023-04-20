@@ -52,7 +52,7 @@ public class IndustryRemoveMemberController extends RemoveMemberController {
   public ModelAndView renderRemoveMember(@PathVariable("teamId") TeamId teamId,
                                          @PathVariable("wuaId") WebUserAccountId wuaId) {
     return super.renderRemoveMember(teamId, wuaId)
-        .addObject("backLinkUrl", ReverseRouter.route(on(IndustryTeamManagementController.class)
+        .addObject("backLinkUrl", ReverseRouter.route(on(IndustryTeamMemberController.class)
             .renderMemberList(teamId)))
         .addObject("removeUrl", ReverseRouter.route(on(IndustryRemoveMemberController.class)
             .removeMember(teamId, wuaId, null)));
@@ -65,6 +65,6 @@ public class IndustryRemoveMemberController extends RemoveMemberController {
     return super.removeMember(teamId,
         wuaId,
         redirectAttributes,
-        ReverseRouter.redirect(on(IndustryTeamManagementController.class).renderMemberList(teamId)));
+        ReverseRouter.redirect(on(IndustryTeamMemberController.class).renderMemberList(teamId)));
   }
 }

@@ -31,7 +31,7 @@ class NewTeamFormValidatorTest {
   TeamService teamService;
 
   @InjectMocks
-  NewTeamFormvalidator validator;
+  NewTeamFormValidator validator;
 
   private NewTeamForm form;
 

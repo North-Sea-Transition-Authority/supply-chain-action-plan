@@ -33,7 +33,7 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 
-@ContextConfiguration(classes = RegulatorTeamManagementController.class)
+@ContextConfiguration(classes = RegulatorTeamMemberController.class)
 class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
 
   @MockBean
@@ -60,7 +60,7 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
   @Test
   void renderMemberListRedirect_whenNotAuthenticated_thenUnauthorised() throws Exception {
     mockMvc.perform(
-      get(ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberListRedirect())))
+      get(ReverseRouter.route(on(RegulatorTeamMemberController.class).renderMemberListRedirect())))
       .andExpect(status().is3xxRedirection());
   }
 
@@ -69,7 +69,7 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
     var teamId = new TeamId(UUID.randomUUID());
 
     mockMvc.perform(
-      get(ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberList(teamId))))
+      get(ReverseRouter.route(on(RegulatorTeamMemberController.class).renderMemberList(teamId))))
       .andExpect(status().is3xxRedirection());
   }
 
@@ -85,7 +85,7 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
     when(teamService.getTeam(teamId)).thenReturn(team);
 
     mockMvc.perform(
-      get(ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberList(teamId)))
+      get(ReverseRouter.route(on(RegulatorTeamMemberController.class).renderMemberList(teamId)))
         .with(user(user)))
         .andExpect(status().isOk());
   }
@@ -99,7 +99,7 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
     when(teamService.getTeam(teamId)).thenThrow(ScapEntityNotFoundException.class);
 
     mockMvc.perform(
-      get(ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberList(teamId)))
+      get(ReverseRouter.route(on(RegulatorTeamMemberController.class).renderMemberList(teamId)))
         .with(user(user)))
         .andExpect(status().isNotFound());
   }
@@ -124,7 +124,7 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
     var mnemonic = applicationContext.getBean(CustomerConfigurationProperties.class).mnemonic();
 
     mockMvc.perform(
-      get(ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberList(teamId)))
+      get(ReverseRouter.route(on(RegulatorTeamMemberController.class).renderMemberList(teamId)))
         .with(user(user)))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/teamMembers"))
@@ -158,7 +158,7 @@ class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
     var mnemonic = applicationContext.getBean(CustomerConfigurationProperties.class).mnemonic();
 
     mockMvc.perform(
-      get(ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberList(teamId)))
+      get(ReverseRouter.route(on(RegulatorTeamMemberController.class).renderMemberList(teamId)))
         .with(user(user)))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/teamMembers"))

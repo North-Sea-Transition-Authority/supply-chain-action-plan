@@ -3,9 +3,6 @@ package uk.co.nstauthority.scap.permissionmanagement.teams;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -22,11 +19,10 @@ import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermissi
 import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerBodyLine;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
-import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
-import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamManagementController;
-import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamManagementController;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamMemberController;
+import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamMemberController;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupRestController;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
@@ -48,7 +44,7 @@ public class TeamManagementController {
 
   private final OrganisationGroupService organisationGroupService;
 
-  private final NewTeamFormvalidator newTeamFormvalidator;
+  private final NewTeamFormValidator newTeamFormvalidator;
   private final String organisationGroupSearchRestUrl =
       ReverseRouter.route(on(OrganisationGroupRestController.class).getOrganisationGroupSearchResults(null));
 
@@ -58,7 +54,7 @@ public class TeamManagementController {
                                   UserDetailService userDetailService,
                                   ControllerHelperService controllerHelperService,
                                   OrganisationGroupService organisationGroupService,
-                                  NewTeamFormvalidator newTeamFormvalidator) {
+                                  NewTeamFormValidator newTeamFormvalidator) {
     this.teamService = teamService;
     this.teamMemberService = teamMemberService;
     this.userDetailService = userDetailService;
@@ -85,9 +81,9 @@ public class TeamManagementController {
     }
     var team = teams.get(0);
     if (team.teamType().equals(TeamType.REGULATOR)) {
-      return ReverseRouter.redirect(on(RegulatorTeamManagementController.class).renderMemberList(team.teamId()));
+      return ReverseRouter.redirect(on(RegulatorTeamMemberController.class).renderMemberList(team.teamId()));
     } else {
-      return ReverseRouter.redirect(on(IndustryTeamManagementController.class).renderMemberList(team.teamId()));
+      return ReverseRouter.redirect(on(IndustryTeamMemberController.class).renderMemberList(team.teamId()));
     }
   }
 
@@ -99,7 +95,7 @@ public class TeamManagementController {
         .addObject("removeUrl",
             ReverseRouter.route(on(TeamManagementController.class).archiveTeam(teamId, null)))
         .addObject("backLinkUrl",
-            ReverseRouter.route(on(IndustryTeamManagementController.class).renderMemberList(teamId)));
+            ReverseRouter.route(on(IndustryTeamMemberController.class).renderMemberList(teamId)));
   }
 
   @PostMapping("/delete/{teamId}")
@@ -120,7 +116,8 @@ public class TeamManagementController {
         .addObject("organisationGroupSearchRestUrl", organisationGroupSearchRestUrl)
         .addObject("submitFormUrl",
             ReverseRouter.route(on(TeamManagementController.class).addNewIndustryTeam(null, null)))
-        .addObject("pageTitle", "Add new industry team");
+        .addObject("pageTitle", "Add new industry team")
+        .addObject("teamListUrl", ReverseRouter.route(on(TeamManagementController.class).renderTeamList()));
   }
 
   @PostMapping("/new-team")
@@ -154,28 +151,5 @@ public class TeamManagementController {
       return view;
     }
     return renderNewIndustryTeamForm(form);
-  }
-
-  private List<TeamView> getTeamList() {
-    List<Team> teams;
-    var user = userDetailService.getUserDetail();
-    var regulatorTeams = teamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR);
-
-    if (!(regulatorTeams.isEmpty())) {
-      var regTeamMember = teamMemberService.getTeamMember(regulatorTeams.get(0), user.getWebUserAccountId());
-      if (regTeamMember.roles().contains(RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER)) {
-        teams = StreamSupport.stream(teamService.getAllTeams().spliterator(), false)
-            .collect(Collectors.toList());
-      } else {
-        teams = teamService.getTeamsThatUserBelongsTo(user);
-      }
-    } else {
-      teams = teamService.getTeamsThatUserBelongsTo(user);
-    }
-
-    return teams
-        .stream()
-        .map(TeamView::fromTeam)
-        .collect(Collectors.toList());
   }
 }

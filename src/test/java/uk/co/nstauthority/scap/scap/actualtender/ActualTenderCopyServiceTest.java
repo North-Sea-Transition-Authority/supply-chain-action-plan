@@ -32,7 +32,7 @@ import uk.co.nstauthority.scap.scap.detail.NewScapType;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @ExtendWith(MockitoExtension.class)
-public class ActualTenderCopyServiceTest {
+class ActualTenderCopyServiceTest {
   EntityManager entityManager = mock(EntityManager.class);
 
   ActualTenderService actualTenderService = mock(ActualTenderService.class);
@@ -106,7 +106,44 @@ public class ActualTenderCopyServiceTest {
 
     assertThat(result).isNotEqualTo(oldActualTender);
     assertValuesEqual(result, oldActualTender, List.of("id", "scapDetail", "createdTimestamp"));
-    assertThat(result.getScapDetail()).isEqualTo(newScapDetail);
+    assertThat(result).extracting(
+        ActualTender::getId,
+        ActualTender::getScapDetail,
+        ActualTender::getHasActualTenders
+    ).containsExactly(
+        null,
+        newScapDetail,
+        true
+    );
+    assertThat(result.getId()).isNull();
+  }
+
+  @Test
+  void copyEntity_ActualTender_DraftUpdate_NoActualTenders() {
+    var oldScapDetail = new ScapDetail();
+    var newScapDetail = new ScapDetail();
+
+    var oldActualTender = new ActualTender();
+    oldActualTender.setHasActualTenders(false);
+    oldActualTender.setScapDetail(oldScapDetail);
+    oldActualTender.setId(5000);
+    when(actualTenderService.getByScapDetail(oldScapDetail)).thenReturn(oldActualTender);
+
+    actualTenderCopyService.copyEntity(oldScapDetail, newScapDetail, NewScapType.DRAFT_UPDATE);
+    verify(entityManager).persist(actualTenderCaptor.capture());
+    verify(actualTenderService).updateHasMoreActualTenders(any(ActualTender.class), eq(null));
+    verify(actualTenderService).updateHasActualTenders(any(ActualTender.class), eq(null));
+    var result = actualTenderCaptor.getValue();
+
+    assertThat(result).isNotEqualTo(oldActualTender);
+    assertValuesEqual(result, oldActualTender, List.of("id", "scapDetail", "createdTimestamp"));
+    assertThat(result).extracting(
+        ActualTender::getId,
+        ActualTender::getScapDetail
+    ).containsExactly(
+        null,
+        newScapDetail
+    );
     assertThat(result.getId()).isNull();
   }
 

@@ -21,7 +21,7 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 @Controller
 @IsMemberOfTeamOrRegulator
 @RequestMapping("/permission-management/regulator")
-public class RegulatorTeamManagementController {
+public class RegulatorTeamMemberController {
 
   private final TeamMemberViewService teamMemberViewService;
   private final RegulatorTeamService regulatorTeamService;
@@ -32,12 +32,12 @@ public class RegulatorTeamManagementController {
   private final TeamService teamService;
 
   @Autowired
-  RegulatorTeamManagementController(TeamMemberViewService teamMemberViewService,
-                                    RegulatorTeamService regulatorTeamService,
-                                    UserDetailService userDetailService,
-                                    CustomerConfigurationProperties customerConfigurationProperties,
-                                    TeamMemberService teamMemberService,
-                                    TeamService teamService) {
+  RegulatorTeamMemberController(TeamMemberViewService teamMemberViewService,
+                                RegulatorTeamService regulatorTeamService,
+                                UserDetailService userDetailService,
+                                CustomerConfigurationProperties customerConfigurationProperties,
+                                TeamMemberService teamMemberService,
+                                TeamService teamService) {
     this.teamMemberViewService = teamMemberViewService;
     this.regulatorTeamService = regulatorTeamService;
     this.userDetailService = userDetailService;
@@ -51,7 +51,7 @@ public class RegulatorTeamManagementController {
 
     var team = regulatorTeamService.getTeam(userDetailService.getUserDetail());
 
-    return ReverseRouter.redirect(on(RegulatorTeamManagementController.class)
+    return ReverseRouter.redirect(on(RegulatorTeamMemberController.class)
         .renderMemberList(new TeamId(team.getUuid())));
   }
 

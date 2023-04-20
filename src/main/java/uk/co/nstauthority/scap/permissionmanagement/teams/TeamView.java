@@ -6,8 +6,8 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
-import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamManagementController;
-import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamManagementController;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamMemberController;
+import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamMemberController;
 
 public record TeamView(TeamId teamId, TeamType teamType, String DisplayName) {
 
@@ -19,9 +19,9 @@ public record TeamView(TeamId teamId, TeamType teamType, String DisplayName) {
   public String manageUrl() {
     return switch (teamType) {
       case REGULATOR -> ReverseRouter.route(on(
-          RegulatorTeamManagementController.class).renderMemberList(teamId));
+          RegulatorTeamMemberController.class).renderMemberList(teamId));
       case INDUSTRY -> ReverseRouter.route(on(
-          IndustryTeamManagementController.class).renderMemberList(teamId));
+          IndustryTeamMemberController.class).renderMemberList(teamId));
     };
   }
 }

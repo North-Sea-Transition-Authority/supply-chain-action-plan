@@ -20,6 +20,7 @@
   errorItems=errorList
   pageSize=PageSize.FULL_WIDTH
   topNavigation=true
+  backLink=true
 >
 
   <@roleDescriptions.roleDescriptions roles=teamRoles/>

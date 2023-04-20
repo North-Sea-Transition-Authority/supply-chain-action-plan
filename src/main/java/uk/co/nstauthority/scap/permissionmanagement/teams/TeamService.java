@@ -33,13 +33,13 @@ public class TeamService {
 
   private final TeamMemberService teamMemberService;
 
-  private final NewTeamFormvalidator newTeamFormvalidator;
+  private final NewTeamFormValidator newTeamFormvalidator;
 
   @Autowired
   protected TeamService(TeamRepository teamRepository,
                         TeamMemberRoleService teamMemberRoleService,
                         TeamMemberService teamMemberService,
-                        @Lazy NewTeamFormvalidator newTeamFormvalidator) {
+                        @Lazy NewTeamFormValidator newTeamFormvalidator) {
     this.teamRepository = teamRepository;
     this.teamMemberRoleService = teamMemberRoleService;
     this.teamMemberService = teamMemberService;

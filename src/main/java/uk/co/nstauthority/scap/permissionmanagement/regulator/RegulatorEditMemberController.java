@@ -93,7 +93,7 @@ public class RegulatorEditMemberController {
         form,
         () -> {
           teamMemberRoleService.updateUserTeamRoles(team, teamMember.wuaId().id(), form.getRoles());
-          return ReverseRouter.redirect(on(RegulatorTeamManagementController.class).renderMemberList(teamId));
+          return ReverseRouter.redirect(on(RegulatorTeamMemberController.class).renderMemberList(teamId));
         });
 
   }
@@ -105,7 +105,7 @@ public class RegulatorEditMemberController {
         .addObject("userDisplayName", userView.getDisplayName())
         .addObject("roles", DisplayableEnumOptionUtil.getDisplayableOptionsWithDescription(RegulatorTeamRole.class))
         .addObject("backLinkUrl",
-          ReverseRouter.route(on(RegulatorTeamManagementController.class).renderMemberList(teamId))
+          ReverseRouter.route(on(RegulatorTeamMemberController.class).renderMemberList(teamId))
         );
   }
 

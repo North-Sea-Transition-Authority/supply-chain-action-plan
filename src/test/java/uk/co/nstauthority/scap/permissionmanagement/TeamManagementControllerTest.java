@@ -28,7 +28,7 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.industry.AbstractIndustryTeamControllerTest;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.teams.NewTeamForm;
-import uk.co.nstauthority.scap.permissionmanagement.teams.NewTeamFormvalidator;
+import uk.co.nstauthority.scap.permissionmanagement.teams.NewTeamFormValidator;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamManagementController;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamView;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
@@ -40,7 +40,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
   private OrganisationGroupService organisationGroupService;
 
   @MockBean
-  private NewTeamFormvalidator newTeamFormvalidator;
+  private NewTeamFormValidator newTeamFormvalidator;
 
   @Test
   void renderTeamList_notAuthorised_thenUnAuthorised() throws Exception {
@@ -109,7 +109,8 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
             .build());
     when(teamService.findTeamsByUser(testUser)).thenReturn(List.of(TeamView.fromTeam(team), TeamView.fromTeam(regulatorTeam)));
     when(teamService.getRegulatorTeam()).thenReturn(regulatorTeam);
-    when(teamMemberService.isMemberOfTeamWithAnyRoleOf(eq(TeamId.valueOf(regulatorTeam.getUuid())), eq(testUser), eq(roles))).thenReturn(true);
+    when(teamMemberService.isMemberOfTeamWithAnyRoleOf(TeamId.valueOf(regulatorTeam.getUuid()), testUser, roles))
+        .thenReturn(true);
     mockMvc.perform(
             get(ReverseRouter.route(on(TeamManagementController.class).renderTeamList()))
                 .with(authenticatedScapUser()))
@@ -148,6 +149,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
             .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/addTeam"))
+        .andExpect(model().attribute("teamListUrl", ReverseRouter.route(on(TeamManagementController.class).renderTeamList())))
     ;
   }
 
