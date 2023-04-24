@@ -5,6 +5,7 @@ import java.util.Optional;
 import javax.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @Repository
@@ -34,7 +35,7 @@ class ContractingPerformanceSummaryDtoRepository {
             "ata.remunerationModelName, " +
             "ittp.companyName, ac.preferredBidderCountryId, cp.outturnCost, cp.outturnRationale) " +
             "FROM Scap s " +
-            "JOIN ScapDetail sd ON sd.scap = s AND sd.tipFlag = true " +
+            "JOIN ScapDetail sd ON sd.scap = s AND sd.status = :status " +
             "JOIN ContractingPerformanceOverview cpo ON cpo.scapDetail = sd " +
             "JOIN ContractingPerformance cp ON cp.contractingPerformanceOverview = cpo " +
             "JOIN ActualTenderActivity ata ON cp.actualTenderActivity = ata " +
@@ -44,6 +45,7 @@ class ContractingPerformanceSummaryDtoRepository {
             "AND :contractingPerformanceId IS NULL OR cp.id = :contractingPerformanceId", ContractingPerformanceSummaryDto.class)
         .setParameter("scapId", scapId.scapId())
         .setParameter("contractingPerformanceId", contractingPerformanceId)
+        .setParameter("status", ScapDetailStatus.DRAFT)
         .getResultList();
   }
 }

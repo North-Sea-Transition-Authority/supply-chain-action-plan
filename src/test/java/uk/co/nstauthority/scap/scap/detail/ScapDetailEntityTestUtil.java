@@ -13,7 +13,6 @@ public class ScapDetailEntityTestUtil {
     private Integer scapDetailId;
     private Scap scap;
     private Integer versionNumber;
-    private Boolean tipFlag;
     private ScapDetailStatus scapDetailStatus;
     private Instant createdTimestamp;
     private Integer createdByUserId;
@@ -34,11 +33,6 @@ public class ScapDetailEntityTestUtil {
 
     public Builder withVersionNumber(Integer versionNumber) {
       this.versionNumber = versionNumber;
-      return this;
-    }
-
-    public Builder withTipFlag(Boolean tipFlag) {
-      this.tipFlag = tipFlag;
       return this;
     }
 
@@ -81,7 +75,6 @@ public class ScapDetailEntityTestUtil {
       var scapDetail = new ScapDetail(scapDetailId);
       scapDetail.setScap(scap);
       scapDetail.setVersionNumber(versionNumber);
-      scapDetail.setTipFlag(tipFlag);
       scapDetail.setStatus(scapDetailStatus);
       scapDetail.setCreatedTimestamp(createdTimestamp);
       scapDetail.setCreatedByUserId(createdByUserId);

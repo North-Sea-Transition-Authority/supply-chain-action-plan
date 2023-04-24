@@ -71,7 +71,7 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
   @BeforeEach
   void setup() {
     scap.setReference("SCAP/2022/1");
-    scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, Instant.now(), 1);
+    scapDetail = new ScapDetail(scap, 1, ScapDetailStatus.DRAFT, Instant.now(), 1);
   }
 
   @Test

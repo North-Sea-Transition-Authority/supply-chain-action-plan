@@ -89,7 +89,6 @@ public abstract class AbstractScapSubmitterControllerTest extends AbstractContro
     scapDetail.setCreatedTimestamp(Instant.now());
     scapDetail.setStatus(ScapDetailStatus.DRAFT);
     scapDetail.setVersionNumber(1);
-    scapDetail.setTipFlag(true);
     scapDetail.setCreatedByUserId(TestUserProvider.getUser().getWebUserAccountId().toInt());
     return scapDetail;
   }

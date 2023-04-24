@@ -31,8 +31,6 @@ public class ScapDetail {
 
   private Integer versionNumber;
 
-  private Boolean tipFlag;
-
   @Enumerated(EnumType.STRING)
   @Audited
   private ScapDetailStatus status;
@@ -70,12 +68,11 @@ public class ScapDetail {
     this.id = id.scapId();
   }
 
-  public ScapDetail(Scap scap, Integer versionNumber, Boolean tipFlag, ScapDetailStatus status,
+  public ScapDetail(Scap scap, Integer versionNumber, ScapDetailStatus status,
                     Instant createdTimestamp, Integer createdByUserId) {
     this.scap = scap;
     this.createdTimestamp = createdTimestamp;
     this.versionNumber = versionNumber;
-    this.tipFlag = tipFlag;
     this.status = status;
     this.createdByUserId = createdByUserId;
   }
@@ -98,14 +95,6 @@ public class ScapDetail {
 
   public void setVersionNumber(Integer versionNumber) {
     this.versionNumber = versionNumber;
-  }
-
-  public Boolean getTipFlag() {
-    return tipFlag;
-  }
-
-  public void setTipFlag(Boolean tipFlag) {
-    this.tipFlag = tipFlag;
   }
 
   public ScapDetailStatus getStatus() {

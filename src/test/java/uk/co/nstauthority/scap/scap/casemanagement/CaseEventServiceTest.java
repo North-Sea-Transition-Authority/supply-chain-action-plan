@@ -140,7 +140,7 @@ class CaseEventServiceTest {
     var user = ServiceUserDetailTestUtil.Builder().build();
     when(userDetailService.getUserDetail()).thenReturn(user);
     when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(true);
-    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
+    when(scapDetailService.getActionableScapDetail(SCAP_ID, user)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
         .withStatus(ScapDetailStatus.APPROVED)
         .withScap(ScapEntityTestUtil.scapBuilder().withScapId(SCAP_ID).build())
         .build());
@@ -158,7 +158,7 @@ class CaseEventServiceTest {
     var user = ServiceUserDetailTestUtil.Builder().build();
     when(userDetailService.getUserDetail()).thenReturn(user);
     when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(true);
-    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
+    when(scapDetailService.getActionableScapDetail(SCAP_ID, user)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
         .withStatus(ScapDetailStatus.WITHDRAWN)
         .withScap(ScapEntityTestUtil.scapBuilder().withScapId(SCAP_ID).build())
         .build());
@@ -176,7 +176,7 @@ class CaseEventServiceTest {
     var user = ServiceUserDetailTestUtil.Builder().build();
     when(userDetailService.getUserDetail()).thenReturn(user);
     when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(true);
-    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
+    when(scapDetailService.getActionableScapDetail(SCAP_ID, user)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
         .withStatus(ScapDetailStatus.APPROVED)
         .withScap(ScapEntityTestUtil.scapBuilder().withScapId(SCAP_ID).build())
         .build());
@@ -194,7 +194,7 @@ class CaseEventServiceTest {
     var user = ServiceUserDetailTestUtil.Builder().build();
     when(userDetailService.getUserDetail()).thenReturn(user);
     when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(false);
-    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
+    when(scapDetailService.getActionableScapDetail(SCAP_ID, user)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
         .withStatus(ScapDetailStatus.APPROVED)
         .build());
 
@@ -209,7 +209,7 @@ class CaseEventServiceTest {
     var user = ServiceUserDetailTestUtil.Builder().build();
     when(userDetailService.getUserDetail()).thenReturn(user);
     when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(false);
-    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
+    when(scapDetailService.getActionableScapDetail(SCAP_ID, user)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
         .withStatus(ScapDetailStatus.CLOSED_OUT)
         .build());
 
@@ -225,7 +225,7 @@ class CaseEventServiceTest {
     var user = ServiceUserDetailTestUtil.Builder().build();
     when(userDetailService.getUserDetail()).thenReturn(user);
     when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(false);
-    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
+    when(scapDetailService.getActionableScapDetail(SCAP_ID, user)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
         .withStatus(ScapDetailStatus.APPROVED)
         .build());
 

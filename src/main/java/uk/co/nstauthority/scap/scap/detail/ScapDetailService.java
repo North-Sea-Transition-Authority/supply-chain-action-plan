@@ -8,6 +8,7 @@ import static uk.co.nstauthority.scap.scap.detail.ScapDetailStatus.SUBMITTED;
 
 import java.time.Clock;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -69,7 +70,6 @@ public class ScapDetailService {
 
     var versionNumber = latestScapDetail.map(ScapDetail::getVersionNumber).orElse(0) + 1;
 
-    var isLatestScapDetail = true;
     var userId = userDetailService
         .getUserDetail()
         .wuaId()
@@ -77,14 +77,12 @@ public class ScapDetailService {
 
     var newScapDetail = new ScapDetail(scap,
         versionNumber,
-        isLatestScapDetail,
         ScapDetailStatus.DRAFT,
         clock.instant(),
         userId);
 
     if (latestScapDetail.isPresent()) {
       var oldScapDetail = latestScapDetail.get();
-      oldScapDetail.setTipFlag(false);
       scapDetailRepository.save(oldScapDetail);
       updateDraftInfo(oldScapDetail, newScapDetail, isReinstatement);
     } else {
@@ -121,16 +119,20 @@ public class ScapDetailService {
   public Optional<ScapDetail> findLatestByScap(Scap scap) {
     return scapDetailRepository.findAllByScap(scap)
         .stream()
-        .filter(ScapDetail::getTipFlag)
+        .sorted(Comparator.comparing(ScapDetail::getCreatedTimestamp).reversed())
         .findFirst();
   }
 
   public Optional<ScapDetail> findLatestByScapId(ScapId scapId) {
-    return scapDetailRepository.findFirstByScapIdAndTipFlag(scapId.scapId(), true);
+    return scapDetailRepository.findAllByScapId(scapId.scapId())
+        .stream()
+        .sorted(Comparator.comparing(ScapDetail::getCreatedTimestamp).reversed())
+        .findFirst();
   }
 
   public Optional<ScapDetail> findLatestByScapIdAndStatus(ScapId scapId, ScapDetailStatus status) {
-    return scapDetailRepository.findFirstByScapIdAndStatusOrderByVersionNumberDesc(scapId.scapId(), status);
+    return scapDetailRepository.findFirstByScapIdAndStatusInOrderByVersionNumberDesc(scapId.scapId(),
+        singletonList(status));
   }
 
   public Optional<ScapDetail> findLatestByScapIdAndStatusIn(ScapId scapId, List<ScapDetailStatus> statuses) {
@@ -150,7 +152,10 @@ public class ScapDetailService {
   }
 
   public Optional<ScapDetail> findLatestSubmitted(ScapId scapId) {
-    return scapDetailRepository.findFirstByScapIdAndTipFlagAndStatus(scapId.scapId(), true, SUBMITTED);
+    return scapDetailRepository.findFirstByScapIdAndStatusInOrderByVersionNumberDesc(
+        scapId.scapId(),
+        Collections.singletonList(SUBMITTED)
+    );
   }
 
   public ScapDetail getLatestByScapIdAndStatus(ScapId scapId, ScapDetailStatus status) {
@@ -252,7 +257,6 @@ public class ScapDetailService {
         ScapDetailStatus.DRAFT);
     for (var detail : draftScaps) {
       detail.setStatus(ScapDetailStatus.DELETED);
-      detail.setTipFlag(false);
       updatedScaps.add(detail);
     }
     scapDetail.setStatus(ScapDetailStatus.WITHDRAWN);
@@ -277,18 +281,8 @@ public class ScapDetailService {
 
   @Transactional
   public void deleteScapDetail(ScapDetail scapDetail) {
-    if (scapDetail.getVersionNumber() != 1) {
-      var previousVersion = scapDetail.getVersionNumber() - 1;
-      findByScapIdAndVersionNumber(scapDetail.getScap().getScapId(), previousVersion)
-          .ifPresent(previousScapDetail -> {
-            previousScapDetail.setTipFlag(true);
-            scapDetailRepository.save(previousScapDetail);
-          });
-    }
-
-    scapDetail.setTipFlag(false);
     scapDetail.setStatus(ScapDetailStatus.DELETED);
-
+    scapDetail.setVersionNumber(-1);
     scapDetailRepository.save(scapDetail);
   }
 

@@ -51,8 +51,8 @@ class ContractingPerformanceSummaryDtoRepositoryIntegrationTest extends Abstract
     entityManager.persist(scap);
     entityManager.persist(otherScap);
 
-    var scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, Instant.now(), 0);
-    var otherScapDetail = new ScapDetail(otherScap, 1, true, ScapDetailStatus.DRAFT, Instant.now(), 0);
+    var scapDetail = new ScapDetail(scap, 1, ScapDetailStatus.DRAFT, Instant.now(), 0);
+    var otherScapDetail = new ScapDetail(otherScap, 1, ScapDetailStatus.DRAFT, Instant.now(), 0);
 
     entityManager.persist(scapDetail);
     entityManager.persist(otherScapDetail);

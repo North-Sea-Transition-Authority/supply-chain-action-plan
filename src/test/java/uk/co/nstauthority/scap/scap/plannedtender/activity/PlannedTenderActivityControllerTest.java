@@ -59,7 +59,7 @@ class PlannedTenderActivityControllerTest extends AbstractScapSubmitterControlle
 
   @BeforeEach
   void setup() {
-    scapDetail = new ScapDetail(scap, 1, true, ScapDetailStatus.DRAFT, EntityTestingUtil.dateToInstant(2000, 4, 23), 1);
+    scapDetail = new ScapDetail(scap, 1, ScapDetailStatus.DRAFT, EntityTestingUtil.dateToInstant(2000, 4, 23), 1);
     plannedTender = new PlannedTender(scapDetail, EntityTestingUtil.dateToInstant(2000, 4, 23));
   }
 

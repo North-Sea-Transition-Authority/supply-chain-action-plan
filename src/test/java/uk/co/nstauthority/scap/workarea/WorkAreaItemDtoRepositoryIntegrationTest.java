@@ -49,8 +49,8 @@ class WorkAreaItemDtoRepositoryIntegrationTest extends AbstractIntegrationTest {
   void setup() {
     scap = new Scap(55, clock.instant(), "TEST-SCAP-REF/1");
     otherOrganisationScap = new Scap(1200, clock.instant(), "TEST-SCAP-REF/2");
-    scapDetail = new ScapDetail(scap, 2, true, ScapDetailStatus.DRAFT, clock.instant(), 1);
-    otherScapDetail = new ScapDetail(otherOrganisationScap, 4, true, ScapDetailStatus.SUBMITTED, clock.instant(), 1);
+    scapDetail = new ScapDetail(scap, 2, ScapDetailStatus.DRAFT, clock.instant(), 1);
+    otherScapDetail = new ScapDetail(otherOrganisationScap, 4, ScapDetailStatus.SUBMITTED, clock.instant(), 1);
     projectDetails = new ProjectDetails(scapDetail, clock.instant());
     projectDetails.setProjectName("Test project name");
     projectPerformance = new ProjectPerformance(scapDetail, clock.instant());
