@@ -1,6 +1,7 @@
 package uk.co.nstauthority.scap.util;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import uk.co.fivium.formlibrary.validator.date.DateUtils;
@@ -14,6 +15,10 @@ public class DateUtil {
   }
 
   public static String instantToString(Instant timeStamp) {
+    return formatter.withZone(ZoneId.systemDefault()).format(timeStamp);
+  }
+
+  public static String localDateToString(LocalDate timeStamp) {
     return formatter.withZone(ZoneId.systemDefault()).format(timeStamp);
   }
 }

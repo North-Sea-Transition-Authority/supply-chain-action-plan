@@ -49,6 +49,10 @@ public class CaseEvent {
     this.id = id;
   }
 
+  public Integer getId() {
+    return id;
+  }
+
   public CaseEventSubject getTimelineEventSubject() {
     return caseEventSubject;
   }

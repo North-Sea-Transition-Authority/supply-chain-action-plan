@@ -21,6 +21,11 @@
         <@fdsDataItems.dataValues key="Added by" value=caseEvent.userDisplayName()></@fdsDataItems.dataValues>
         <@fdsDataItems.dataValues key="Application Version" value=caseEvent.versionNumber()></@fdsDataItems.dataValues>
       </@fdsDataItems.dataItem>
+      <#if caseEvent.hasDueDate()>
+        <@fdsDataItems.dataItem>
+          <@fdsDataItems.dataValues key="Required update date" value=caseEvent.dateOfUpdateDeadline()></@fdsDataItems.dataValues>
+        </@fdsDataItems.dataItem>
+      </#if>
       <#if caseEvent.hasComments()>
         <@fdsDataItems.dataItem>
           <@fdsDataItems.dataValues key="Comments" value=caseEvent.comments()></@fdsDataItems.dataValues>

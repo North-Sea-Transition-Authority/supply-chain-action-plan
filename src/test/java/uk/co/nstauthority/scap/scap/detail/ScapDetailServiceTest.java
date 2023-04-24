@@ -154,6 +154,12 @@ class ScapDetailServiceTest {
   }
 
   @Test
+  void findAllById_verifyCalls() {
+    scapDetailService.findAllByScapId(new ScapId(SCAP_ID));
+    verify(scapDetailRepository).findAllByScapId(SCAP_ID);
+  }
+
+  @Test
   void getById_NoneFoundThrows() {
     when(scapDetailRepository.findById(SCAP_DETAIL_ID)).thenReturn(Optional.empty());
     assertThatThrownBy(() -> scapDetailService.getById(SCAP_DETAIL_ID)).isInstanceOf(ScapEntityNotFoundException.class);

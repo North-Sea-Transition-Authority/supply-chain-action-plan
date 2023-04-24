@@ -78,6 +78,16 @@ class UpdateRequestServiceTest {
   }
 
   @Test
+  void getAllByScapId_verifyCalls() {
+    var scapIdList = List.of(new ScapDetail(1), new ScapDetail(2), new ScapDetail(3));
+    when(scapDetailService.findAllByScapId(SCAP_ID)).thenReturn(scapIdList);
+    updateRequestService.findAllByScapId(SCAP_ID);
+
+    verify(scapDetailService).findAllByScapId(SCAP_ID);
+    verify(updateRequestRepository).findByScapDetailIn(scapIdList);
+  }
+
+  @Test
   void createUpdateRequest_verifyCalls() {
     when(userDetailService.getUserDetail()).thenReturn(user);
     var argumentCaptor = ArgumentCaptor.forClass(UpdateRequest.class);

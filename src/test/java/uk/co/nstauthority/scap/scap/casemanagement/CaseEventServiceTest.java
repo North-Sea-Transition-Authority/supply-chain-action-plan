@@ -186,7 +186,7 @@ class CaseEventServiceTest {
     assertThat(actions.get(CaseEventGroups.QA.getDisplayName())).containsExactly(QA_COMMENT);
     assertThat(actions.get(CaseEventGroups.CONSULTATIONS.getDisplayName())).containsExactly(SCAP_CONSULTATION_REQUESTED, SCAP_CONSULTATION_RESPONSE);
     assertThat(actions.get(CaseEventGroups.DECISIONS.getDisplayName())).containsExactly(SCAP_APPROVED, SCAP_WITHDRAWN);
-    assertThat(actions.get(CaseEventGroups.FURTHER_INFO.getDisplayName())).containsExactly(FURTHER_INFO_RESPONSE);
+    assertThat(actions.get(CaseEventGroups.FURTHER_INFO.getDisplayName())).containsExactly(FURTHER_INFO_RESPONSE, SCAP_UPDATE_REQUESTED);
   }
 
   @Test

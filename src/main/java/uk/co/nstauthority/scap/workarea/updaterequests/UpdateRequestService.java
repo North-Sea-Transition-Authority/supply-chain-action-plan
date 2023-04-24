@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.workarea.updaterequests;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -81,5 +82,10 @@ public class UpdateRequestService {
         .findFirstByScapDetailAndResolutionDateNullAndUpdateRequestTypeOrderByCreatedTimestampDesc(scapDetail.get(), requestType);
 
     return requestActionOptional.map(t -> Optional.of(t.getDueDate())).orElse(Optional.empty());
+  }
+
+  public List<UpdateRequest> findAllByScapId(ScapId scapId) {
+    var scapDetails = scapDetailService.findAllByScapId(scapId);
+    return updateRequestRepository.findByScapDetailIn(scapDetails);
   }
 }

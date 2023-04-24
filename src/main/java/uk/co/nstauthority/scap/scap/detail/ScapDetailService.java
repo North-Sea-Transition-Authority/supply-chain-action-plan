@@ -196,6 +196,10 @@ public class ScapDetailService {
     return scapDetailRepository.findAllByScap(scap);
   }
 
+  public List<ScapDetail> findAllByScapId(ScapId scapId) {
+    return scapDetailRepository.findAllByScapId(scapId.scapId());
+  }
+
   public boolean isUpdateInProgress(ScapId scapId) {
     var optionalDraftUpdate = findLatestByScapIdAndStatus(scapId, DRAFT);
     return optionalDraftUpdate.map(scapDetail -> scapDetail.getVersionNumber() > 1).orElse(false);

@@ -9,6 +9,7 @@ public record CaseEventView(String caseEventSubject,
                             String formattedTime,
                             String userDisplayName,
                             String comments,
+                            String dateOfUpdateDeadline,
                             String dateOfResponse,
                             FileUploadSummaryView supportingDocument) {
   public boolean hasComments() {
@@ -17,6 +18,10 @@ public record CaseEventView(String caseEventSubject,
 
   public boolean hasBeenRespondedTo() {
     return (Objects.nonNull(dateOfResponse));
+  }
+
+  public boolean hasDueDate() {
+    return Objects.nonNull(dateOfUpdateDeadline);
   }
 
   public boolean hasSupportingDocument() {
