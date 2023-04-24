@@ -33,14 +33,28 @@
         <@updateStatusFilter form=form updateRequestRadios=updateRequestRadios />
       </@fdsSearch.searchFilterList>
     </@fdsSearch.searchFilter>
-    <@fdsSearch.searchPageContent twoThirdsWidth=true>
-      <#--noinspection FtlCallsInspection-->
-      <@fdsResultList.resultList resultCount=workAreaItems?size>
-        <#list workAreaItems as workAreaItem>
-          <@scapResultItem workAreaItem=workAreaItem />
-        </#list>
-      </@fdsResultList.resultList>
-    </@fdsSearch.searchPageContent>
+    <#if workAreaItems?has_content>
+      <@fdsSearch.searchPageContent twoThirdsWidth=true>
+        <#--noinspection FtlCallsInspection-->
+        <@fdsResultList.resultList resultCount=workAreaItems?size>
+          <#list workAreaItems as workAreaItem>
+            <@scapResultItem workAreaItem=workAreaItem />
+          </#list>
+        </@fdsResultList.resultList>
+      </@fdsSearch.searchPageContent>
+    <#else>
+      <@fdsSearch.searchPageContent twoThirdsWidth=true>
+        <h3 class="govuk-heading-s">There are no matching results</h3>
+        <p class="govuk-body">Improve your results by:</p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>removing filters</li>
+          <li>double-checking your spelling</li>
+          <li>using fewer keywords</li>
+          <li>searching for something less specific</li>
+        </ul>
+      </@fdsSearch.searchPageContent>
+    </#if>
+
   </@fdsSearch.searchPage>
 </@defaultPage>
 
@@ -103,7 +117,8 @@
     <@fdsSearchSelector.searchSelectorRest
       path="form.operatorId"
       restUrl=springUrl(organisationGroupSearchUrl)
-      labelText=""
+      labelText="Orgranisation group"
+      labelClass="govuk-visually-hidden"
       selectorMinInputLength=2
       preselectedItems={prefilledOperator.id(): prefilledOperator.text()}
     />
@@ -116,7 +131,8 @@
     <@fdsSearchSelector.searchSelectorRest
       path="form.fieldId"
       restUrl=springUrl(fieldSearchUrl)
-      labelText=""
+      labelText="Associated field"
+      labelClass="govuk-visually-hidden"
       selectorMinInputLength=3
       preselectedItems={prefilledField.id() : prefilledField.text()}
     />

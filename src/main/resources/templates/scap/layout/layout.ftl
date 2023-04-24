@@ -69,6 +69,7 @@
       headerNav=true
       serviceName=serviceName
       headerLogo="GOV_CREST"
+      wrapperWidth=wrapperWidth
       >
         <#if loggedInUser?has_content>
           <@fdsHeader.headerNavigation>
