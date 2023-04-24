@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
@@ -28,8 +26,6 @@ import uk.co.nstauthority.scap.scap.scap.ScapService;
 
 @Component
 public class ScapPermissionManagementHandlerInterceptor extends AbstractHandlerInterceptor {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(ScapPermissionManagementHandlerInterceptor.class);
 
   private final TeamMemberService teamMemberService;
 

@@ -211,7 +211,13 @@ public class ProjectDetailsService {
     projectDetails.setProjectName(form.getProjectName().getInputValue());
     projectDetails.setProjectSummary(form.getProjectSummary().getInputValue());
     projectDetails.setProjectCostEstimate(form.getProjectCostEstimate().getAsBigDecimal().orElse(null));
-    projectDetails.setEstimatedValueLocalContent(form.getEstimatedValueLocalContent().getAsBigDecimal().orElse(null));
+    projectDetails.setAwareOfLocalContentCommitment(form.getAwareOfLocalContentCommitment());
+    projectDetails.setExpectsToMeetLocalContentCommitment(form.getExpectsToMeetLocalContentCommitment());
+    if (Boolean.FALSE.equals(form.getExpectsToMeetLocalContentCommitment())) {
+      projectDetails.setMissLocalContentCommitmentRationale(form.getWillMissLocalContentCommitmentRationale().getInputValue());
+    } else {
+      projectDetails.setMissLocalContentCommitmentRationale(null);
+    }
     var startDate = form.getExpectedStartDate()
         .getAsLocalDate().orElse(null);
     var endDate = form.getExpectedEndDate()

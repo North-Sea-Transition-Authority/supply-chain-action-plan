@@ -165,7 +165,8 @@ class ScapSummaryViewServiceTest {
         ProjectDetailsSummaryView::projectName,
         ProjectDetailsSummaryView::projectTypes,
         ProjectDetailsSummaryView::projectCostEstimate,
-        ProjectDetailsSummaryView::estimatedValueLocalContent,
+        ProjectDetailsSummaryView::expectsToMeetLocalContentCommitment,
+        ProjectDetailsSummaryView::whyNotExpectingToMeetLocalContentCommitment,
         ProjectDetailsSummaryView::fieldNames,
         ProjectDetailsSummaryView::hasFacilities,
         ProjectDetailsSummaryView::projectFacilities,
@@ -176,7 +177,8 @@ class ScapSummaryViewServiceTest {
         projectDetails.getProjectName(),
         projectTypes.stream().toList(),
         projectDetails.getProjectCostEstimate(),
-        projectDetails.getEstimatedValueLocalContent(),
+        projectDetails.getExpectsToMeetLocalContentCommitment(),
+        projectDetails.getMissLocalContentCommitmentRationale(),
         fields,
         hasFacilitiesEnum,
         facilities,
@@ -196,7 +198,8 @@ class ScapSummaryViewServiceTest {
         ProjectDetailsSummaryView::projectName,
         ProjectDetailsSummaryView::projectTypes,
         ProjectDetailsSummaryView::projectCostEstimate,
-        ProjectDetailsSummaryView::estimatedValueLocalContent,
+        ProjectDetailsSummaryView::expectsToMeetLocalContentCommitment,
+        ProjectDetailsSummaryView::whyNotExpectingToMeetLocalContentCommitment,
         ProjectDetailsSummaryView::fieldNames,
         ProjectDetailsSummaryView::hasFacilities,
         ProjectDetailsSummaryView::projectFacilities,
@@ -206,6 +209,7 @@ class ScapSummaryViewServiceTest {
     ).containsExactly(
         null,
         Collections.emptyList(),
+        null,
         null,
         null,
         null,
@@ -575,14 +579,14 @@ class ScapSummaryViewServiceTest {
   private ProjectDetails getValidProjectDetails() {
     var projectName = "test project";
     var projectCostEstimate = BigDecimal.valueOf(12.345);
-    var estimatedValueLocalContent = BigDecimal.valueOf(54.321);
     var plannedExecutionStartDate = LocalDate.of(2023, 1, 1);
     var plannedCompletionDate = LocalDate.of(2024, 1, 1);
 
     var projectDetails = new ProjectDetails();
     projectDetails.setProjectName(projectName);
     projectDetails.setProjectCostEstimate(projectCostEstimate);
-    projectDetails.setEstimatedValueLocalContent(estimatedValueLocalContent);
+    projectDetails.setExpectsToMeetLocalContentCommitment(false);
+    projectDetails.setMissLocalContentCommitmentRationale("I don't want to");
     projectDetails.setHasFacilities(false);
     projectDetails.setPlannedExecutionStartDate(plannedExecutionStartDate);
     projectDetails.setPlannedCompletionDate(plannedCompletionDate);
@@ -599,7 +603,8 @@ class ScapSummaryViewServiceTest {
         "This is a test summary",
         List.of(ProjectType.DECOMMISSIONING_PROGRAMME),
         new BigDecimal("50000"),
-        new BigDecimal("50000"),
+        true,
+        null,
         Collections.singletonList("BRENT"),
         YesNo.NO,
         Collections.emptyList(),

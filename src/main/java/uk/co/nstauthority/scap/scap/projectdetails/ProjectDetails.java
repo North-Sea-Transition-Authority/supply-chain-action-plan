@@ -32,7 +32,11 @@ public class ProjectDetails implements ScapDetailChild {
 
   private BigDecimal projectCostEstimate;
 
-  private BigDecimal estimatedValueLocalContent;
+  private Boolean awareOfLocalContentCommitment;
+
+  private Boolean expectsToMeetLocalContentCommitment;
+
+  private String missLocalContentCommitmentRationale;
 
   private LocalDate plannedExecutionStartDate;
 
@@ -96,12 +100,28 @@ public class ProjectDetails implements ScapDetailChild {
     this.projectCostEstimate = projectCostEstimate;
   }
 
-  public BigDecimal getEstimatedValueLocalContent() {
-    return estimatedValueLocalContent;
+  public Boolean getAwareOfLocalContentCommitment() {
+    return awareOfLocalContentCommitment;
   }
 
-  public void setEstimatedValueLocalContent(BigDecimal estimatedValueLocalContent) {
-    this.estimatedValueLocalContent = estimatedValueLocalContent;
+  public void setAwareOfLocalContentCommitment(Boolean awareOfLocalContentCommitment) {
+    this.awareOfLocalContentCommitment = awareOfLocalContentCommitment;
+  }
+
+  public Boolean getExpectsToMeetLocalContentCommitment() {
+    return expectsToMeetLocalContentCommitment;
+  }
+
+  public void setExpectsToMeetLocalContentCommitment(Boolean expectsToMeetLocalContentCommitment) {
+    this.expectsToMeetLocalContentCommitment = expectsToMeetLocalContentCommitment;
+  }
+
+  public String getMissLocalContentCommitmentRationale() {
+    return missLocalContentCommitmentRationale;
+  }
+
+  public void setMissLocalContentCommitmentRationale(String missLocalContentCommitmentRationale) {
+    this.missLocalContentCommitmentRationale = missLocalContentCommitmentRationale;
   }
 
   public LocalDate getPlannedExecutionStartDate() {

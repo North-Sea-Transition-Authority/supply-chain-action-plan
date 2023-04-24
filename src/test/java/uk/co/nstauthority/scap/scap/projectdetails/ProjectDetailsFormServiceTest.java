@@ -64,7 +64,6 @@ class ProjectDetailsFormServiceTest {
     var projectName = "Test project name";
     var projectTypes = Set.of(ProjectType.DECOMMISSIONING_PROGRAMME, ProjectType.FIELD_DEVELOPMENT_PLAN);
     var projectCostEstimate = BigDecimal.valueOf(12.3);
-    var estimatedValueLocalContent = BigDecimal.valueOf(11.3);
     var fieldIds = Collections.singleton(7235);
     var startDate = LocalDate.of(2000, 12, 30);
     var endDate = LocalDate.of(2003, 8, 11);
@@ -72,7 +71,7 @@ class ProjectDetailsFormServiceTest {
     var projectDetails = new ProjectDetails();
     projectDetails.setProjectName(projectName);
     projectDetails.setProjectCostEstimate(projectCostEstimate);
-    projectDetails.setEstimatedValueLocalContent(estimatedValueLocalContent);
+    projectDetails.setExpectsToMeetLocalContentCommitment(true);
     projectDetails.setPlannedExecutionStartDate(startDate);
     projectDetails.setPlannedCompletionDate(endDate);
 
@@ -84,7 +83,8 @@ class ProjectDetailsFormServiceTest {
         extractedForm -> extractedForm.getProjectName().getInputValue(),
         ProjectDetailsForm::getProjectTypes,
         extractedForm -> extractedForm.getProjectCostEstimate().getInputValue(),
-        extractedForm -> extractedForm.getEstimatedValueLocalContent().getInputValue(),
+        ProjectDetailsForm::getExpectsToMeetLocalContentCommitment,
+        extractedForm -> extractedForm.getWillMissLocalContentCommitmentRationale().getInputValue(),
         ProjectDetailsForm::getFieldIds,
         ProjectDetailsForm::getHasPlatforms,
         extractedForm -> extractedForm.getStartDay().getInputValue(),
@@ -97,7 +97,8 @@ class ProjectDetailsFormServiceTest {
         projectName,
         projectTypes,
         projectCostEstimate.toString(),
-        estimatedValueLocalContent.toString(),
+        true,
+        null,
         fieldIds,
         null,
         String.valueOf(startDate.getDayOfMonth()),
@@ -115,7 +116,7 @@ class ProjectDetailsFormServiceTest {
     var projectDetails = new ProjectDetails();
     projectDetails.setHasFacilities(false);
     projectDetails.setProjectCostEstimate(BigDecimal.valueOf(1));
-    projectDetails.setEstimatedValueLocalContent(BigDecimal.valueOf(1));
+    projectDetails.setExpectsToMeetLocalContentCommitment(true);
     projectDetails.setPlannedExecutionStartDate(LocalDate.of(1, 1, 1));
     projectDetails.setPlannedCompletionDate(LocalDate.of(1, 1, 1));
 
@@ -129,7 +130,7 @@ class ProjectDetailsFormServiceTest {
     var projectDetails = new ProjectDetails();
     projectDetails.setHasFacilities(true);
     projectDetails.setProjectCostEstimate(BigDecimal.valueOf(1));
-    projectDetails.setEstimatedValueLocalContent(BigDecimal.valueOf(1));
+    projectDetails.setExpectsToMeetLocalContentCommitment(true);
     projectDetails.setPlannedExecutionStartDate(LocalDate.of(1, 1, 1));
     projectDetails.setPlannedCompletionDate(LocalDate.of(1, 1, 1));
     var projectFacilityIds = Set.of(1, 2, 3);

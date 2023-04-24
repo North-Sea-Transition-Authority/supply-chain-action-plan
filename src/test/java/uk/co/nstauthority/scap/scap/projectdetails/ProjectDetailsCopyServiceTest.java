@@ -47,7 +47,8 @@ class ProjectDetailsCopyServiceTest {
     var oldProjectDetails = new ProjectDetails();
     oldProjectDetails.setProjectName("Test");
     oldProjectDetails.setProjectCostEstimate(new BigDecimal(5000));
-    oldProjectDetails.setEstimatedValueLocalContent(new BigDecimal(4000));
+    oldProjectDetails.setExpectsToMeetLocalContentCommitment(false);
+    oldProjectDetails.setMissLocalContentCommitmentRationale("I don't want to");
     oldProjectDetails.setHasFacilities(true);
     oldProjectDetails.setPlannedExecutionStartDate(LocalDate.now());
     oldProjectDetails.setPlannedCompletionDate(LocalDate.now());

@@ -35,31 +35,39 @@
       suffix="million"
       inputClass="govuk-input--width-5"
     />
-    <@fdsTextInput.textInput
-      labelText="Estimated value local content"
-      path="form.estimatedValueLocalContent.inputValue"
-      prefix="£"
-      suffix="million"
-      inputClass="govuk-input--width-5"
+    <@fdsCheckbox.checkbox
+      fieldsetHeadingText="North Sea Transition Deal commitments"
+      path="form.awareOfLocalContentCommitment"
+      labelText="I confirm that I am aware of the industry voluntary commitment to achieving 50% UK content on all related new energy and decommissioning projects"
     />
-    <#assign localContentText>
-      <p>For the purposes of tracking the stated NSTD commitments, <br/>
-        the NSTA will generally use the following definition of ‘UK local content’: </p>
-      <ul>
-        <li>
-          in respect of services, those services provided by a company carrying on business in the UK; and,
-        </li>
-        <li>
-          in respect of goods, those goods which are being made, changed or improved in the UK
-          (using the same definition as goods eligible for a UK country of origin certificate).
-        </li>
-      </ul>
-      <p>For more information visit: local-content-doc-accessible.docx (live.com)</p>
-    </#assign>
-    <@fdsDetails.details
-      detailsTitle="How is 'local content' defined?"
-      detailsText=localContentText
-    />
+    <@fdsDetails.summaryDetails summaryTitle="Where can I get information on the voluntary commitment">
+      Information on the industry voluntary commitment to achieving 50% UK content on all related new energy and
+      decommissioning projects can be found in the
+        <@fdsAction.link
+          linkText="North Sea Transition Deal"
+          linkUrl="https://www.gov.uk/government/publications/north-sea-transition-deal/north-sea-transition-deal-accessible-webpage"
+        />
+      .
+    </@fdsDetails.summaryDetails>
+    <@fdsRadio.radioGroup
+      path="form.expectsToMeetLocalContentCommitment"
+      labelText="Do you anticipate that this project will meet the 50% target?"
+      hiddenContent=true
+    >
+      <@fdsRadio.radioYes
+        path="form.expectsToMeetLocalContentCommitment"
+      />
+      <@fdsRadio.radioNo
+        path="form.expectsToMeetLocalContentCommitment"
+      >
+        <@fdsTextarea.textarea
+          path="form.willMissLocalContentCommitmentRationale.inputValue"
+          labelText="Provide a rationale on why you do not expect the target will be reached"
+          nestingPath="form.expectsToMeetLocalContentCommitment"
+        />
+      </@fdsRadio.radioNo>
+
+    </@fdsRadio.radioGroup>
 
     <@fdsAddToList.addToList
       addToListId="project-details-field-selector"

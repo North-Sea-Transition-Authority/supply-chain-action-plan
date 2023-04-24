@@ -45,8 +45,8 @@ public class ProjectDetailsFormService {
   }
 
   public ProjectDetailsForm getForm(ProjectDetails projectDetails,
-                             Set<Integer> projectFacilityIds,
-                             Set<Integer> projectFieldIds) {
+                                    Set<Integer> projectFacilityIds,
+                                    Set<Integer> projectFieldIds) {
     var form = new ProjectDetailsForm();
 
     form.setProjectName(projectDetails.getProjectName());
@@ -55,7 +55,9 @@ public class ProjectDetailsFormService {
 
     form.setProjectTypes(projectTypes);
     form.setProjectCostEstimate(projectDetails.getProjectCostEstimate().toString());
-    form.setEstimatedValueLocalContent(projectDetails.getEstimatedValueLocalContent().toString());
+    form.setAwareOfLocalContentCommitment(projectDetails.getAwareOfLocalContentCommitment());
+    form.setExpectsToMeetLocalContentCommitment(projectDetails.getExpectsToMeetLocalContentCommitment());
+    form.setWillMissLocalContentCommitmentRationale(projectDetails.getMissLocalContentCommitmentRationale());
     form.setFieldIds(projectFieldIds);
 
     form.setHasPlatforms(projectDetails.getHasFacilities());

@@ -15,10 +15,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole.SCAP_CASE_OFFICER;
-import static uk.co.nstauthority.scap.scap.projectdetails.ProjectType.FIELD_DEVELOPMENT_PLAN;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getScapSummaryView;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -32,7 +30,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
-import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
@@ -52,8 +49,6 @@ import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
-import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryView;
-import uk.co.nstauthority.scap.scap.summary.plannedtender.PlannedTenderSummaryView;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequest;
 import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
@@ -285,28 +280,6 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/summary/scapSummaryOverview"));
     verify(caseEventService, never()).getEventViewByScapId(SCAP_ID);
-  }
-
-  private ScapSummaryView getSummaryView() {
-    var projectDetailsSummaryView = new ProjectDetailsSummaryView("Project Name",
-        "This is a project summary",
-        List.of(FIELD_DEVELOPMENT_PLAN),
-        new BigDecimal("5000.50"),
-        new BigDecimal("5000.50"),
-        Collections.singletonList("BRENT"),
-        YesNo.YES,
-        Collections.emptyList(),
-        "11-07-2024",
-        "11-09-2024",
-        null);
-
-    var plannedTenderSummaryView = new PlannedTenderSummaryView(false,
-        Collections.emptyList());
-
-    var actualTenderSummaryView = new ActualTenderSummaryView(false,
-        Collections.emptyList());
-
-    return getScapSummaryView();
   }
 
   private List<CaseEventView> getTimelineView() {

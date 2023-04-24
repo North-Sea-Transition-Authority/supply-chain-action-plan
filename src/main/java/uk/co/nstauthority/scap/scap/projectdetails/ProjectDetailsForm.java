@@ -15,7 +15,9 @@ public class ProjectDetailsForm {
   private final StringInput projectSummary;
   private Set<ProjectType> projectTypes;
   private final DecimalInput projectCostEstimate;
-  private final DecimalInput estimatedValueLocalContent;
+  private Boolean awareOfLocalContentCommitment;
+  private Boolean expectsToMeetLocalContentCommitment;
+  private final StringInput willMissLocalContentCommitmentRationale;
   private Integer fieldSelector;
   private Set<Integer> fieldIds;
   private Boolean hasPlatforms;
@@ -35,8 +37,10 @@ public class ProjectDetailsForm {
     this.projectName = new StringInput("projectName", "the project name");
     this.projectSummary = new StringInput("projectSummary", "the project summary");
     this.projectCostEstimate = new DecimalInput("projectCostEstimate", "the project cost estimate");
-    this.estimatedValueLocalContent = new DecimalInput(
-        "estimatedValueLocalContent", "the estimated value of local content");
+    this.willMissLocalContentCommitmentRationale = new StringInput(
+        "willMissLocalContentCommitmentRationale",
+        "rationale on why you do not expect the target will be reached"
+    );
     // TODO SCAP2022-255: Remove deprecated DFL method
     this.startDay = new IntegerInput("startDay", "start day");
     this.startMonth = new IntegerInput("startMonth", "start month");
@@ -92,12 +96,28 @@ public class ProjectDetailsForm {
     this.projectCostEstimate.setInputValue(projectCostEstimate);
   }
 
-  public DecimalInput getEstimatedValueLocalContent() {
-    return estimatedValueLocalContent;
+  public Boolean getAwareOfLocalContentCommitment() {
+    return awareOfLocalContentCommitment;
   }
 
-  public void setEstimatedValueLocalContent(String estimatedValueLocalContent) {
-    this.estimatedValueLocalContent.setInputValue(estimatedValueLocalContent);
+  public void setAwareOfLocalContentCommitment(Boolean awareOfLocalContentCommitment) {
+    this.awareOfLocalContentCommitment = awareOfLocalContentCommitment;
+  }
+
+  public Boolean getExpectsToMeetLocalContentCommitment() {
+    return expectsToMeetLocalContentCommitment;
+  }
+
+  public void setExpectsToMeetLocalContentCommitment(Boolean expectsToMeetLocalContentCommitment) {
+    this.expectsToMeetLocalContentCommitment = expectsToMeetLocalContentCommitment;
+  }
+
+  public StringInput getWillMissLocalContentCommitmentRationale() {
+    return willMissLocalContentCommitmentRationale;
+  }
+
+  public void setWillMissLocalContentCommitmentRationale(String willMissLocalContentCommitmentRationale) {
+    this.willMissLocalContentCommitmentRationale.setInputValue(willMissLocalContentCommitmentRationale);
   }
 
   public Set<Integer> getFieldIds() {

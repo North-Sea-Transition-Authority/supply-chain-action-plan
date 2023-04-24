@@ -73,7 +73,8 @@ class ProjectDetailsFormValidatorTest {
         entry("projectSummary.inputValue", Set.of("projectSummary.required")),
         entry("projectTypes", Set.of("projectTypes.required")),
         entry("projectCostEstimate.inputValue", Set.of("projectCostEstimate.required")),
-        entry("estimatedValueLocalContent.inputValue", Set.of("estimatedValueLocalContent.required")),
+        entry("awareOfLocalContentCommitment", Set.of("required")),
+        entry("expectsToMeetLocalContentCommitment", Set.of("required")),
         entry("fieldSelector", Set.of("fieldSelector.required")),
         entry("hasPlatforms", Set.of("hasPlatforms.required")),
         entry("startDay.inputValue", Set.of("startDay.required")),
@@ -88,7 +89,6 @@ class ProjectDetailsFormValidatorTest {
   @Test
   void validate_tooManyDecimalPlaces_assertHasExpectedErrors() {
     form.setProjectCostEstimate("0.1234");
-    form.setEstimatedValueLocalContent("0.1234");
 
     when(fieldService.getFieldsByIds(VALID_FIELD_IDS, ProjectDetailsFormValidator.FIELDS_REQUEST_PURPOSE))
         .thenReturn(FIELDS);
@@ -98,8 +98,7 @@ class ProjectDetailsFormValidatorTest {
     var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
 
     assertThat(extractedErrors).containsExactly(
-        entry("projectCostEstimate.inputValue", Set.of("projectCostEstimate.maxDecimalPlacesExceeded")),
-        entry("estimatedValueLocalContent.inputValue", Set.of("estimatedValueLocalContent.maxDecimalPlacesExceeded"))
+        entry("projectCostEstimate.inputValue", Set.of("projectCostEstimate.maxDecimalPlacesExceeded"))
     );
   }
 
@@ -119,7 +118,7 @@ class ProjectDetailsFormValidatorTest {
   @Test
   void validate_tooSmallInputs_assertHasExpectedErrors() {
     form.setProjectCostEstimate("0");
-    form.setEstimatedValueLocalContent("0");
+    form.setExpectsToMeetLocalContentCommitment(true);
 
     when(fieldService.getFieldsByIds(VALID_FIELD_IDS, ProjectDetailsFormValidator.FIELDS_REQUEST_PURPOSE))
         .thenReturn(FIELDS);
@@ -129,25 +128,7 @@ class ProjectDetailsFormValidatorTest {
     var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
 
     assertThat(extractedErrors).containsExactly(
-        entry("projectCostEstimate.inputValue", Set.of("projectCostEstimate.minValueNotMet")),
-        entry("estimatedValueLocalContent.inputValue", Set.of("estimatedValueLocalContent.minValueNotMet"))
-    );
-  }
-
-  @Test
-  void validate_localContentGreaterThanProjectCost_assertHasExpectedError() {
-    form.setProjectCostEstimate("12.2");
-    form.setEstimatedValueLocalContent("100");
-
-    when(fieldService.getFieldsByIds(VALID_FIELD_IDS, ProjectDetailsFormValidator.FIELDS_REQUEST_PURPOSE))
-        .thenReturn(FIELDS);
-
-    validator.validate(form, bindingResult);
-
-    var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
-
-    assertThat(extractedErrors).containsExactly(
-        entry("estimatedValueLocalContent.inputValue", Set.of("estimatedValueLocalContent.maxValueExceeded"))
+        entry("projectCostEstimate.inputValue", Set.of("projectCostEstimate.minValueNotMet"))
     );
   }
 
@@ -165,6 +146,26 @@ class ProjectDetailsFormValidatorTest {
 
     assertThat(extractedErrors).containsExactly(
         entry("fieldSelector", Set.of("fieldSelector.invalid"))
+    );
+  }
+
+  @Test
+  void validate_WillNotMeetCommitment_NoRationale_AssertError() {
+    form.setExpectsToMeetLocalContentCommitment(false);
+    form.setWillMissLocalContentCommitmentRationale(null);
+
+    when(fieldService.getFieldsByIds(VALID_FIELD_IDS, ProjectDetailsFormValidator.FIELDS_REQUEST_PURPOSE))
+        .thenReturn(FIELDS);
+
+    validator.validate(form, bindingResult);
+
+    var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
+
+    assertThat(extractedErrors).containsExactly(
+        entry(
+            "willMissLocalContentCommitmentRationale.inputValue",
+            Set.of("willMissLocalContentCommitmentRationale.required")
+        )
     );
   }
 
@@ -254,7 +255,8 @@ class ProjectDetailsFormValidatorTest {
     form.setProjectSummary("This is a test project");
     form.setProjectTypes(Set.of(ProjectType.CARBON_STORAGE_PERMIT));
     form.setProjectCostEstimate("2.2");
-    form.setEstimatedValueLocalContent("1.1");
+    form.setAwareOfLocalContentCommitment(true);
+    form.setExpectsToMeetLocalContentCommitment(true);
     form.setFieldIds(new HashSet<>(VALID_FIELD_IDS));
     form.setHasPlatforms(false);
     form.setStartDay("22");

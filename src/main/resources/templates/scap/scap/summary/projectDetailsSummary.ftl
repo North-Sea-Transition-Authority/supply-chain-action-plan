@@ -24,11 +24,18 @@
         £${projectDetailsView.projectCostEstimate()} million
       </#if>
     </@fdsSummaryList.summaryListRowNoAction>
-    <@fdsSummaryList.summaryListRowNoAction keyText="Estimated value local content">
-      <#if projectDetailsView.projectCostEstimate()?has_content>
-        £${projectDetailsView.estimatedValueLocalContent()} million
+    <@fdsSummaryList.summaryListRowNoAction keyText="Do you anticipate that this project will meet the target to achieve 50% UK content?">
+      <#if projectDetailsView.expectsToMeetLocalContentCommitment()?has_content>
+        ${projectDetailsView.expectsToMeetLocalContentCommitment()?then('Yes', 'No')}
       </#if>
     </@fdsSummaryList.summaryListRowNoAction>
+    <#if projectDetailsView.whyNotExpectingToMeetLocalContentCommitment()?has_content>
+      <@fdsSummaryList.summaryListRowNoAction keyText="Rationale on why you do not expect the target will be reached">
+        <#if projectDetailsView.expectsToMeetLocalContentCommitment()?has_content>
+          ${projectDetailsView.whyNotExpectingToMeetLocalContentCommitment()}
+        </#if>
+      </@fdsSummaryList.summaryListRowNoAction>
+    </#if>
     <#if projectDetailsView.fieldNames()?has_content>
       <#list projectDetailsView.fieldNames() as field>
         <@fdsSummaryList.summaryListRowNoAction keyText="Field name ${field_index + 1}">

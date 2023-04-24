@@ -15,10 +15,19 @@ import uk.co.fivium.formlibrary.validator.string.StringInputValidator;
 import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
 import uk.co.nstauthority.scap.util.ValidationUtil;
+import uk.co.nstauthority.scap.util.ValidatorErrorCodes;
 
 @Service
 class ProjectDetailsFormValidator implements Validator {
 
+  static final String AWARE_OF_LOCAL_CONTENT_FIELD = "awareOfLocalContentCommitment";
+  static final String NOT_AWARE_LOCAL_CONTENT_ERROR = """
+      Ensure that you are aware of the industry voluntary commitment to achieving 50% UK content on all related \
+      new energy and decommissioning projects""";
+  static final String WILL_MEET_LOCAL_CONTENT_FIELD = "expectsToMeetLocalContentCommitment";
+  static final String MISSING_WILL_MEET_LOCAL_CONTENT_ERROR = """
+      Select whether you expect to meet the industry voluntary commitment to achieving 50% UK content on all related \
+      new energy and decommissioning projects""";
   static final String INSTALLATION_SELECTOR_FIELD_NAME = "installationSelector";
   static final String INSTALLATIONS_REQUEST_PURPOSE = "Verify facilities exist for SCAP project details validation";
   static final String FIELDS_SELECTOR_FIELD_NAME = "fieldSelector";
@@ -60,14 +69,25 @@ class ProjectDetailsFormValidator implements Validator {
         .mustBeMoreThanOrEqual(BigDecimal.valueOf(0.001))
         .validate(form.getProjectCostEstimate(), errors);
 
-    var localContentValueValidatorBuilder = DecimalInputValidator.builder()
-        .mustHaveNoMoreThanDecimalPlaces(3)
-        .mustBeMoreThanOrEqual(BigDecimal.valueOf(0.001));
-    var projectCostEstimate = form.getProjectCostEstimate().getAsBigDecimal();
-    if (!form.getProjectCostEstimate().fieldHasErrors(errors) && projectCostEstimate.isPresent()) {
-      localContentValueValidatorBuilder.mustBeLessThanOrEqualTo(projectCostEstimate.get());
+    if (!Boolean.TRUE.equals(form.getAwareOfLocalContentCommitment())) {
+      errors.rejectValue(
+          AWARE_OF_LOCAL_CONTENT_FIELD,
+          ValidatorErrorCodes.REQUIRED.getErrorCode(),
+          NOT_AWARE_LOCAL_CONTENT_ERROR
+      );
     }
-    localContentValueValidatorBuilder.validate(form.getEstimatedValueLocalContent(), errors);
+
+    if (Objects.isNull(form.getExpectsToMeetLocalContentCommitment())) {
+      errors.rejectValue(
+          WILL_MEET_LOCAL_CONTENT_FIELD,
+          ValidatorErrorCodes.REQUIRED.getErrorCode(),
+          MISSING_WILL_MEET_LOCAL_CONTENT_ERROR
+      );
+    }
+
+    if (Boolean.FALSE.equals(form.getExpectsToMeetLocalContentCommitment())) {
+      StringInputValidator.builder().validate(form.getWillMissLocalContentCommitmentRationale(), errors);
+    }
 
     if (form.getFieldIds().isEmpty()) {
       errors.rejectValue(

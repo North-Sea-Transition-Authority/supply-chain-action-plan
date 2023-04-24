@@ -225,7 +225,8 @@ class ProjectDetailsServiceTest {
     assertThat(savedProjectDetails).extracting(
         ProjectDetails::getProjectName,
         ProjectDetails::getProjectCostEstimate,
-        ProjectDetails::getEstimatedValueLocalContent,
+        ProjectDetails::getExpectsToMeetLocalContentCommitment,
+        ProjectDetails::getMissLocalContentCommitmentRationale,
         ProjectDetails::getHasFacilities,
         ProjectDetails::getPlannedExecutionStartDate,
         ProjectDetails::getPlannedCompletionDate,
@@ -233,7 +234,8 @@ class ProjectDetailsServiceTest {
     ).containsExactly(
         form.getProjectName().getInputValue(),
         form.getProjectCostEstimate().getAsBigDecimal().get(),
-        form.getEstimatedValueLocalContent().getAsBigDecimal().get(),
+        form.getExpectsToMeetLocalContentCommitment(),
+        form.getWillMissLocalContentCommitmentRationale().getInputValue(),
         false,
         startDate,
         endDate,
@@ -296,7 +298,8 @@ class ProjectDetailsServiceTest {
     assertThat(savedProjectDetails).extracting(
         ProjectDetails::getProjectName,
         ProjectDetails::getProjectCostEstimate,
-        ProjectDetails::getEstimatedValueLocalContent,
+        ProjectDetails::getExpectsToMeetLocalContentCommitment,
+        ProjectDetails::getMissLocalContentCommitmentRationale,
         ProjectDetails::getHasFacilities,
         ProjectDetails::getPlannedExecutionStartDate,
         ProjectDetails::getPlannedCompletionDate,
@@ -304,7 +307,8 @@ class ProjectDetailsServiceTest {
     ).containsExactly(
         form.getProjectName().getInputValue(),
         form.getProjectCostEstimate().getAsBigDecimal().get(),
-        form.getEstimatedValueLocalContent().getAsBigDecimal().get(),
+        form.getExpectsToMeetLocalContentCommitment(),
+        form.getWillMissLocalContentCommitmentRationale().getInputValue(),
         false,
         startDate,
         endDate,
@@ -385,6 +389,58 @@ class ProjectDetailsServiceTest {
     assertThat(deletedProjectFieldsArgumentCaptor.getValue()).containsExactly(removedExistingField);
   }
 
+  @SuppressWarnings("OptionalGetWithoutIsPresent")
+  @Test
+  void saveProjectDetails_ExpectsToMeetLocalContentCommitment() {
+    var createdTimestamp = Instant.ofEpochSecond(1666778603);
+    var form = getFilledProjectDetailsForm();
+    form.setExpectsToMeetLocalContentCommitment(true);
+    var startDate = form.getExpectedStartDate().getAsLocalDate().get();
+    var endDate = form.getExpectedEndDate().getAsLocalDate().get();
+    var projectDetailsArgumentCaptor = ArgumentCaptor.forClass(ProjectDetails.class);
+    var projectDetailTypesArgumentCaptor = ArgumentCaptor.forClass(ProjectDetailType.class);
+
+    when(clock.instant()).thenReturn(createdTimestamp);
+    when(projectDetailsRepository.findByScapDetail(scapDetail)).thenReturn(Optional.empty());
+
+    projectDetailsService.saveProjectDetails(scapDetail, form);
+
+    verify(projectDetailsRepository).save(projectDetailsArgumentCaptor.capture());
+    verify(projectDetailTypeRepository, times(2)).save(projectDetailTypesArgumentCaptor.capture());
+
+    var savedProjectDetails = projectDetailsArgumentCaptor.getValue();
+    var savedProjectDetailTypes = projectDetailTypesArgumentCaptor.getAllValues();
+
+    assertThat(savedProjectDetails).extracting(
+        ProjectDetails::getProjectName,
+        ProjectDetails::getProjectCostEstimate,
+        ProjectDetails::getExpectsToMeetLocalContentCommitment,
+        ProjectDetails::getMissLocalContentCommitmentRationale,
+        ProjectDetails::getHasFacilities,
+        ProjectDetails::getPlannedExecutionStartDate,
+        ProjectDetails::getPlannedCompletionDate,
+        ProjectDetails::getCreatedTimestamp
+    ).containsExactly(
+        form.getProjectName().getInputValue(),
+        form.getProjectCostEstimate().getAsBigDecimal().get(),
+        form.getExpectsToMeetLocalContentCommitment(),
+        null,
+        false,
+        startDate,
+        endDate,
+        createdTimestamp
+    );
+
+    assertThat(savedProjectDetailTypes).extracting(
+        ProjectDetailType::getProjectDetails,
+        ProjectDetailType::getCreatedTimestamp,
+        ProjectDetailType::getProjectType
+    ).containsExactlyInAnyOrder(
+        tuple(savedProjectDetails, createdTimestamp, ProjectType.CARBON_STORAGE_PERMIT),
+        tuple(savedProjectDetails, createdTimestamp, ProjectType.FIELD_DEVELOPMENT_PLAN)
+    );
+  }
+
   private ProjectDetailsForm getFilledProjectDetailsForm() {
     var form = new ProjectDetailsForm();
     form.setProjectName("Test project name");
@@ -392,7 +448,8 @@ class ProjectDetailsServiceTest {
         ProjectType.CARBON_STORAGE_PERMIT, ProjectType.FIELD_DEVELOPMENT_PLAN
     ));
     form.setProjectCostEstimate("2.2");
-    form.setEstimatedValueLocalContent("1.1");
+    form.setExpectsToMeetLocalContentCommitment(false);
+    form.setWillMissLocalContentCommitmentRationale("I don't want to");
     form.setFieldIds(Collections.singleton(7235));
     form.setHasPlatforms(false);
     form.setStartDay("22");
