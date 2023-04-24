@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
+import uk.co.nstauthority.scap.util.SuccessBannerUtil;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @Controller
@@ -47,7 +49,8 @@ public class FeedbackController {
   @PostMapping(value = {"/{scapId}", "/"})
   ModelAndView submitFeedbackForm(@PathVariable(value = "scapId", required = false) ScapId scapId,
                                   @ModelAttribute("form") FeedbackForm form,
-                                  BindingResult bindingResult) {
+                                  BindingResult bindingResult,
+                                  RedirectAttributes redirectAttributes) {
     bindingResult = feedbackFormValidator.validate(form, bindingResult);
 
     return controllerHelperService.checkErrorsAndRedirect(
@@ -56,6 +59,7 @@ public class FeedbackController {
         form,
         () -> {
           feedbackService.saveFeedback(scapId, form, userDetailService.getUserDetail());
+          SuccessBannerUtil.add(redirectAttributes, "Your feedback has been submitted");
           return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(null));
         }
     );
