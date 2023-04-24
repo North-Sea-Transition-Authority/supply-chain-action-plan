@@ -45,7 +45,7 @@ class ScapUpdateControllerTest extends AbstractControllerTest {
   void setup() {
     scap = new Scap(SCAP_ID);
     scapDetail = new ScapDetail();
-    when(scapService.getScapById(SCAP_ID.scapId())).thenReturn(scap);
+    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
   }

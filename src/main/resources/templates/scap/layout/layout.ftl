@@ -11,6 +11,7 @@
 <#-- @ftlvariable name="contactUrl" type="String" -->
 <#-- @ftlvariable name="privacyStatementUrl" type="String" -->
 <#-- @ftlvariable name="cookiesStatementUrl" type="String" -->
+<#-- @ftlvariable name="feedbackUrl" type="String" -->
 
 <#if notificationBannerView??>
   <#assign notificationBannerContent>
@@ -22,6 +23,7 @@
   </#assign>
 </#if>
 
+<#assign serviceName = serviceBranding.name() />
 <#macro defaultPage
   htmlTitle
   pageHeading=""
@@ -35,7 +37,6 @@
   wrapperWidth=false
   topNavigation=false
 >
-  <#assign serviceName = serviceBranding.name() />
   <#assign customerMnemonic = customerBranding.mnemonic() />
   <#assign serviceHomeUrl = springUrl(serviceHomeUrl) />
 
@@ -87,6 +88,7 @@
       <@fdsFooter.footerMetaLink linkText="Contact" linkUrl=springUrl(contactUrl)/>
       <@fdsFooter.footerMetaLink linkText="Privacy" linkUrl=privacyStatementUrl/>
       <@fdsFooter.footerMetaLink linkText="Cookies" linkUrl=springUrl(cookiesStatementUrl)/>
+      <@fdsFooter.footerMetaLink linkText="Feedback" linkUrl=springUrl(feedbackUrl)/>
     </@fdsFooter.footerMeta>
   </#assign>
 

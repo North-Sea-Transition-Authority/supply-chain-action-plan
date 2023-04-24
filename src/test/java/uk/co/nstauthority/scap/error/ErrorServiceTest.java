@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.error;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import javax.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,6 +53,9 @@ class ErrorServiceTest {
   @MockBean
   private FooterService footerService;
 
+  @MockBean
+  private HttpServletRequest request;
+
   private ErrorService errorService;
 
   @BeforeEach
@@ -63,7 +67,8 @@ class ErrorServiceTest {
   void addErrorAttributesToModel_whenThrowableError_assertExpectedModelAttributes() {
     final var resultingModelMap =  errorService.addErrorAttributesToModel(
         new ModelAndView(),
-        new NullPointerException()
+        new NullPointerException(),
+        request
     ).getModelMap();
 
     assertThat(resultingModelMap).containsKeys(
@@ -84,8 +89,8 @@ class ErrorServiceTest {
   void addErrorAttributesToModel_whenNoThrowableError_assertExpectedModelAttributes() {
     final var resultingModelMap =  errorService.addErrorAttributesToModel(
         new ModelAndView(),
-        null
-    ).getModelMap();
+        null,
+        request).getModelMap();
 
     assertThat(resultingModelMap).containsKeys(
         SERVICE_HOME_URLS_ATTRIBUTE_NAME,

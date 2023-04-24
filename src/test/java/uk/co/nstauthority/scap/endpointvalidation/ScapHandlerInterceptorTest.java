@@ -1,6 +1,5 @@
 package uk.co.nstauthority.scap.endpointvalidation;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -8,7 +7,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -23,13 +21,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.HandlerMapping;
 import uk.co.nstauthority.scap.authentication.TestUserProvider;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
@@ -90,7 +86,7 @@ class ScapHandlerInterceptorTest {
     when(request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE)).thenReturn(uriVariables);
 
     doReturn(ExampleAnnotation.class).when(securityRule).supports();
-    doReturn(scap).when(scapService).getScapById(SCAP_ID.scapId());
+    doReturn(scap).when(scapService).getScapById(SCAP_ID);
     doReturn(user).when(userDetailService).getUserDetail();
     doReturn(method).when(handlerMethod).getMethod();
     doReturn(new SecurityRuleResult(false, null, null))
@@ -118,7 +114,7 @@ class ScapHandlerInterceptorTest {
     when(request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE)).thenReturn(uriVariables);
 
     doReturn(ExampleAnnotation.class).when(securityRule).supports();
-    doReturn(scap).when(scapService).getScapById(SCAP_ID.scapId());
+    doReturn(scap).when(scapService).getScapById(SCAP_ID);
     doReturn(user).when(userDetailService).getUserDetail();
     doReturn(method).when(handlerMethod).getMethod();
     doReturn(new SecurityRuleResult(false, null, redirectUrl))
@@ -146,7 +142,7 @@ class ScapHandlerInterceptorTest {
     when(request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE)).thenReturn(uriVariables);
 
     doReturn(ExampleAnnotation.class).when(securityRule).supports();
-    doReturn(scap).when(scapService).getScapById(SCAP_ID.scapId());
+    doReturn(scap).when(scapService).getScapById(SCAP_ID);
     doReturn(user).when(userDetailService).getUserDetail();
     doReturn(method).when(handlerMethod).getMethod();
     doReturn(new SecurityRuleResult(true, null, null))
@@ -173,7 +169,7 @@ class ScapHandlerInterceptorTest {
     when(request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE)).thenReturn(uriVariables);
 
     doReturn(ExampleAnnotation.class).when(securityRule).supports();
-    doReturn(scap).when(scapService).getScapById(SCAP_ID.scapId());
+    doReturn(scap).when(scapService).getScapById(SCAP_ID);
     doReturn(user).when(userDetailService).getUserDetail();
     doReturn(method).when(handlerMethod).getMethod();
     doReturn(new SecurityRuleResult(true, null, null))

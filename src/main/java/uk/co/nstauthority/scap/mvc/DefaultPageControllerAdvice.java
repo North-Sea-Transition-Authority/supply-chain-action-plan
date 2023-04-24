@@ -51,7 +51,7 @@ class DefaultPageControllerAdvice {
     addBrandingAttributes(model);
     addCommonUrls(model);
     addTechnicalSupportContactInfo(model);
-    footerService.addFooterItems(model.asMap());
+    footerService.addFooterItems(model.asMap(), request);
   }
 
   @InitBinder

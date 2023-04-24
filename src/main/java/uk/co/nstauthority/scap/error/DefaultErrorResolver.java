@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.error;
 
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
+import javax.servlet.http.HttpServletRequest;
 import org.apache.catalina.connector.ClientAbortException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,10 +17,13 @@ public class DefaultErrorResolver extends SimpleMappingExceptionResolver {
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultErrorResolver.class);
 
   private final ErrorService errorService;
+  private final HttpServletRequest request;
 
   @Autowired
-  public DefaultErrorResolver(ErrorService errorService) {
+  public DefaultErrorResolver(ErrorService errorService,
+                              HttpServletRequest request) {
     this.errorService = errorService;
+    this.request = request;
     setDefaultErrorView(ErrorView.DEFAULT_ERROR.getViewName());
     setDefaultStatusCode(SC_INTERNAL_SERVER_ERROR);
   }
@@ -36,7 +40,7 @@ public class DefaultErrorResolver extends SimpleMappingExceptionResolver {
     }
 
     var modelAndView = super.getModelAndView(viewName, ex);
-    errorService.addErrorAttributesToModel(modelAndView, ex);
+    errorService.addErrorAttributesToModel(modelAndView, ex, request);
 
     return modelAndView;
   }

@@ -2,7 +2,6 @@ package uk.co.nstauthority.scap.permissionmanagement.endpointsecurity;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,8 +34,6 @@ class ScapPermissionManagementHandlerInterceptorTest extends AbstractControllerT
 
   private static final ScapId scapId = new ScapId(10000);
 
-  private static final Integer OrgGroupId = 1000;
-
   @Test
   void preHandle_whenMethodHasNoSupportedAnnotations_thenOkResponse() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(on(TestController.class)
@@ -56,7 +53,7 @@ class ScapPermissionManagementHandlerInterceptorTest extends AbstractControllerT
 
   @Test
   void preHandle_whenMethodHasScapPermissionButScapHasNoTeam_thenNotFound() throws Exception {
-    when(scapService.getScapById(scapId.scapId())).thenReturn(getTestScap());
+    when(scapService.getScapById(scapId)).thenReturn(getTestScap());
     when(teamService.getByEnergyPortalOrgGroupId(anyInt())).thenThrow(new ScapEntityNotFoundException("TEST"));
     mockMvc.perform(get(ReverseRouter.route(on(TestController.class)
             .withManageOrganisationAndTeam(scapId)))
@@ -66,7 +63,7 @@ class ScapPermissionManagementHandlerInterceptorTest extends AbstractControllerT
 
   @Test
   void preHandle_whenMethodHasScapPermissionButUserIsNotTeamMember_thenNotFound() throws Exception {
-    when(scapService.getScapById(scapId.scapId())).thenReturn(getTestScap());
+    when(scapService.getScapById(scapId)).thenReturn(getTestScap());
     when(teamService.getByEnergyPortalOrgGroupId(anyInt())).thenReturn(TeamTestUtil.Builder().build());
     when(teamMemberService.getTeamMember(any(Team.class), any())).thenThrow(new ScapEntityNotFoundException("TEST"));
     mockMvc.perform(get(ReverseRouter.route(on(TestController.class)
@@ -77,7 +74,7 @@ class ScapPermissionManagementHandlerInterceptorTest extends AbstractControllerT
 
   @Test
   void preHandle_whenMethodHasScapPermissionButUserHasNotPermission_thenForbidden() throws Exception {
-    when(scapService.getScapById(scapId.scapId())).thenReturn(getTestScap());
+    when(scapService.getScapById(scapId)).thenReturn(getTestScap());
     when(teamService.getByEnergyPortalOrgGroupId(anyInt())).thenReturn(TeamTestUtil.Builder().build());
     when(teamMemberService.getTeamMember(any(Team.class), any())).thenReturn(TeamMemberTestUtil.Builder().build());
     mockMvc.perform(get(ReverseRouter.route(on(TestController.class)
@@ -94,7 +91,7 @@ class ScapPermissionManagementHandlerInterceptorTest extends AbstractControllerT
         .withRole(IndustryTeamRole.SCAP_SUBMITTER)
         .build();
 
-    when(scapService.getScapById(scapId.scapId())).thenReturn(getTestScap());
+    when(scapService.getScapById(scapId)).thenReturn(getTestScap());
     when(teamService.getByEnergyPortalOrgGroupId(anyInt())).thenReturn(TeamTestUtil.Builder().build());
     when(teamMemberService.getTeamMember(any(Team.class), any())).thenReturn(teamMember);
     mockMvc.perform(get(ReverseRouter.route(on(TestController.class)

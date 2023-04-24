@@ -62,6 +62,10 @@ dependencies {
 
   implementation 'io.micrometer:micrometer-registry-statsd:1.7.8'
 
+  // Feedback Management Service
+  implementation "uk.co.fivium.feedbackmanagementservice:client:2.1.1"
+  implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
+
 	runtimeOnly 'org.postgresql:postgresql:42.5.1'
   jooqGenerator 'org.postgresql:postgresql'
 

@@ -6,13 +6,11 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.fivium.energyportalapi.generated.types.User;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
-import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
 import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
@@ -21,9 +19,9 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
-import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSubmissionStage;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
+import uk.co.nstauthority.scap.util.AbsoluteReverseRouter;
 
 @Service
 public class ScapEmailService {
@@ -97,7 +95,8 @@ public class ScapEmailService {
 
     personalisations.put("action-performing user", currentUser.displayName());
     personalisations.put("SCAP reference", scap.getReference());
-    personalisations.put("SCAP case url", getScapCaseUrl(scap.getScapId()));
+    personalisations.put("SCAP case url",
+        AbsoluteReverseRouter.route(on(ScapSummaryController.class).getScapSummary(scap.getScapId())));
   }
 
   private List<User> getScapCaseOfficerRecipients() {
@@ -123,11 +122,5 @@ public class ScapEmailService {
       emailProperties.getEmailPersonalisations().put("recipient name", recipient.getForename());
       notifyEmailService.sendEmail(emailProperties, recipient.getPrimaryEmailAddress());
     });
-  }
-
-  private String getScapCaseUrl(ScapId scapId) {
-    var baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
-    var scapSummaryUrl = ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(scapId));
-    return "%s%s".formatted(baseUrl, scapSummaryUrl);
   }
 }

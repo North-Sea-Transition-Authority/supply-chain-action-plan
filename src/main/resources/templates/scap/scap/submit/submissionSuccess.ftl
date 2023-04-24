@@ -19,10 +19,14 @@
     <h2 class="govuk-heading-m">What happens next</h2>
     <p class="govuk-body">We've sent your application to the ${customerBranding.name()} (${customerBranding.mnemonic()})</p>
     <p class="govuk-body">They will contact you either to confirm if approved, or to ask for more information.</p>
+    <p class="govuk-body">
+      <@fdsAction.link linkText="What did you think of this service?" linkUrl=springUrl(feedbackUrl)/> (takes 30 seconds)
+    </p>
 
     <@fdsAction.link
       linkText="Back to work area"
       linkUrl=springUrl(workAreaUrl)
+      linkClass="govuk-link govuk-body"
     />
   </@fdsForm.htmlForm>
 </@defaultPage>

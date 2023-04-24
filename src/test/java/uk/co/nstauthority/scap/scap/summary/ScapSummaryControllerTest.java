@@ -103,7 +103,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
         .build();
 
     when(userDetailService.getUserDetail()).thenReturn(testUser);
-    when(scapService.getScapById(SCAP_ID.scapId())).thenReturn(scap);
+    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(scapDetailService.getActionableScapDetail(SCAP_ID, testUser)).thenReturn(scapDetail);
     when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
     when(scapSummaryViewService.getScapSummaryView(scapDetail)).thenReturn(getScapSummaryView());

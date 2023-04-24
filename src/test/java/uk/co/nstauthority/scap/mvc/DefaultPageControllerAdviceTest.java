@@ -56,7 +56,8 @@ class DefaultPageControllerAdviceTest extends AbstractControllerTest {
         "accessibilityStatementUrl",
         "contactUrl",
         "privacyStatementUrl",
-        "cookiesStatementUrl"
+        "cookiesStatementUrl",
+        "feedbackUrl"
     );
 
     assertThat((CustomerConfigurationProperties) modelMap.get("customerBranding")).hasNoNullFieldsOrProperties();

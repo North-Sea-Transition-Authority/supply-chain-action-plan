@@ -88,6 +88,6 @@ public class ScapHandlerInterceptor implements HandlerInterceptor {
     var pathVariables = (Map<String, String>) httpServletRequest
         .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
-    return scapService.getScapById(Integer.valueOf(pathVariables.get(scapIdParameter.get().getName())));
+    return scapService.getScapById(ScapId.valueOf(pathVariables.get(scapIdParameter.get().getName())));
   }
 }

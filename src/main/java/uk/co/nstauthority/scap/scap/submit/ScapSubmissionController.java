@@ -16,6 +16,7 @@ import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.error.exception.ScapBadRequestException;
+import uk.co.nstauthority.scap.feedback.FeedbackController;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.notify.ScapEmailService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
@@ -94,7 +95,9 @@ class ScapSubmissionController {
 
     return new ModelAndView("scap/scap/submit/submissionSuccess")
         .addObject("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)))
-        .addObject("scapReference", scap.getReference());
+        .addObject("scapReference", scap.getReference())
+        .addObject("feedbackUrl",
+            ReverseRouter.route(on(FeedbackController.class).renderFeedbackForm(scapId, null)));
 
   }
 

@@ -1,7 +1,6 @@
 package uk.co.nstauthority.scap.scap.casemanagement.consultationRequest;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -88,7 +87,7 @@ class ConsultationRequestControllerTest extends AbstractControllerTest {
         .thenReturn(new FileUploadTemplate("TEST", "TEST", "TEST", "100", ".xml"));
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
-    when(scapService.getScapById(anyInt())).thenReturn(new Scap());
+    when(scapService.getScapById(SCAP_ID)).thenReturn(new Scap());
     when(scapDetailService.getActionableScapDetail(SCAP_ID, testUser)).thenReturn(SCAP_DETAIL);
     when(scapDetailService.getLatestByScap(any(Scap.class))).thenReturn(SCAP_DETAIL);
     when(organisationGroupService.getOrganisationGroupById(ORG_GROUP_ID, PURPOSE)).thenReturn(Optional.of(getOrgGroup()));

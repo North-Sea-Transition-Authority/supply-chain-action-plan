@@ -1,4 +1,11 @@
 {
+  "groups": [
+    {
+      "name": "fms",
+      "sourceType": "uk.co.nstauthority.scap.configuration.FeedbackConfigurationProperties",
+      "type": "uk.co.nstauthority.scap.configuration.FeedbackConfigurationProperties"
+    }
+  ],
   "properties": [
     {
       "name": "branding.service.name",

@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.error;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -36,7 +37,9 @@ public class ErrorService {
     return RandomStringUtils.random(9, SAFE_CHARACTERS.toUpperCase());
   }
 
-  public ModelAndView addErrorAttributesToModel(ModelAndView modelAndView, Throwable throwable) {
+  public ModelAndView addErrorAttributesToModel(ModelAndView modelAndView,
+                                                Throwable throwable,
+                                                HttpServletRequest request) {
     if (throwable != null) {
       addStackTraceToModel(modelAndView, throwable);
       addErrorReference(modelAndView, throwable);
@@ -45,7 +48,7 @@ public class ErrorService {
     addBrandingConfigs(modelAndView);
     addTechnicalSupportConfigs(modelAndView);
     addTopNavigation(modelAndView);
-    footerService.addFooterItems(modelAndView.getModel());
+    footerService.addFooterItems(modelAndView.getModel(), request);
     return modelAndView;
   }
 

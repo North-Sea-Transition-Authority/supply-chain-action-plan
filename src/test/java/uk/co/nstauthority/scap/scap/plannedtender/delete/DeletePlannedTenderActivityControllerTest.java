@@ -100,7 +100,7 @@ class DeletePlannedTenderActivityControllerTest extends AbstractScapSubmitterCon
 
   @Test
   void deletePlannedTenderDetail_scapDoesNotExist_expectNotFound() throws Exception {
-    when(scapService.getScapById(SCAP_ID.scapId()))
+    when(scapService.getScapById(SCAP_ID))
         .thenThrow(new ScapEntityNotFoundException("Could not find SCAP with ID %S".formatted(SCAP_ID.scapId())));
 
     mockMvc.perform(post(
