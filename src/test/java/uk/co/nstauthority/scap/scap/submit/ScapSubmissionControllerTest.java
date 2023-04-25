@@ -181,6 +181,7 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
   @Test
   void renderScapSubmissionSuccess() throws Exception {
     scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
+    when(scapDetailService.getActionableScapDetail(SCAP_ID, testUser)).thenReturn(scapDetail);
     when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
 
     mockMvc.perform(get(

@@ -51,6 +51,7 @@ public abstract class AbstractScapSubmitterControllerTest extends AbstractContro
 
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(scapService.getScapById(SCAP_ID.scapId())).thenReturn(scap);
+    when(scapDetailService.getActionableScapDetail(SCAP_ID, testUser)).thenReturn(scapDetail);
     when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
     when(teamService.getByEnergyPortalOrgGroupId(anyInt())).thenReturn(team);
     when(userDetailService.getUserDetail()).thenReturn(testUser);
@@ -77,7 +78,7 @@ public abstract class AbstractScapSubmitterControllerTest extends AbstractContro
   }
 
   private Scap getScap() {
-    var scap = new Scap(1111);
+    var scap = new Scap(SCAP_ID.scapId());
     scap.setReference("Test Scap");
     scap.setOrganisationGroupId(1000);
     return scap;

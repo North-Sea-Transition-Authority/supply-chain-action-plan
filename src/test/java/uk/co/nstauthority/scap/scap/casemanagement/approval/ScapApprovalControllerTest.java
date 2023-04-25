@@ -26,7 +26,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.validation.BindingResult;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
-import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.file.FileUploadForm;
 import uk.co.nstauthority.scap.file.FileUploadTemplate;
@@ -42,13 +42,12 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.scap.Scap;
-import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 
 @ExtendWith(MockitoExtension.class)
 @WithMockUser
 @ContextConfiguration(classes = ScapApprovalController.class)
-class ScapApprovalControllerTest extends AbstractControllerTest {
+class ScapApprovalControllerTest extends AbstractScapSubmitterControllerTest {
 
   @MockBean
   private CaseEventService caseEventService;
@@ -68,8 +67,6 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
   @MockBean
   private ScapEmailService scapEmailService;
 
-  private static final ScapId SCAP_ID = new ScapId(1111);
-
   private static final Integer ORG_GROUP_ID = 1000;
 
   private static final String TEST_STRING = "This is a test comment";
@@ -86,7 +83,6 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
-    when(scapService.getScapById(SCAP_ID)).thenReturn(new Scap());
     when(scapDetailService.getActionableScapDetail(SCAP_ID, testUser)).thenReturn(scapDetail);
     when(scapDetailService.getLatestByScap(any(Scap.class))).thenReturn(scapDetail);
     when(organisationGroupService.getOrganisationGroupById(eq(ORG_GROUP_ID), any())).thenReturn(Optional.of(getOrgGroup()));
@@ -198,7 +194,7 @@ class ScapApprovalControllerTest extends AbstractControllerTest {
   }
 
   private ScapDetail getScapDetail() {
-    var scapDetail = new ScapDetail();
+    var scapDetail = new ScapDetail(SCAP_ID);
     scapDetail.setVersionNumber(1);
     scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
 

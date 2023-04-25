@@ -47,7 +47,7 @@ public class ScapHasStatusRule implements ScapSecurityRule {
                                   ServiceUserDetail userDetail,
                                   Scap scap) {
     var permittedStatuses = ((ScapHasStatus) annotation).permittedStatuses();
-    var scapDetail = scapDetailService.getLatestByScap(scap);
+    var scapDetail = scapDetailService.getActionableScapDetail(scap.getScapId(), userDetail);
     var scapStatus = scapDetail.getStatus();
 
     var inPermittedStatus = Arrays.asList(permittedStatuses).contains(scapStatus);

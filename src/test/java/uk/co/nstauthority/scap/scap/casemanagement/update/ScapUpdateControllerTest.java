@@ -20,23 +20,19 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
-import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.Scap;
-import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @ExtendWith(MockitoExtension.class)
 @WithMockUser
 @ContextConfiguration(classes = ScapUpdateController.class)
-class ScapUpdateControllerTest extends AbstractControllerTest {
-
-  private static final ScapId SCAP_ID = new ScapId(1000);
-
+class ScapUpdateControllerTest extends AbstractScapSubmitterControllerTest {
   private ScapDetail scapDetail;
 
   private Scap scap;
@@ -73,7 +69,7 @@ class ScapUpdateControllerTest extends AbstractControllerTest {
       mode = EnumSource.Mode.EXCLUDE)
   void updateScap_NotInState_Throws(ScapDetailStatus status) throws Exception {
     scapDetail.setStatus(status);
-    when(scapDetailService.getLatestByScap(scap)).thenReturn(scapDetail);
+    when(scapDetailService.getActionableScapDetail(SCAP_ID, testUser)).thenReturn(scapDetail);
 
     mockMvc.perform(post(ReverseRouter.route(on(ScapUpdateController.class)
             .startScapUpdate(

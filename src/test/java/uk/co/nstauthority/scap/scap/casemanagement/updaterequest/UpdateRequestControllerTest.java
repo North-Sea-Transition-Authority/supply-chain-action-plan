@@ -26,7 +26,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.validation.BindingResult;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
-import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
@@ -47,7 +47,7 @@ import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
 @ExtendWith(MockitoExtension.class)
 @WithMockUser
 @ContextConfiguration(classes = UpdateRequestController.class)
-class UpdateRequestControllerTest extends AbstractControllerTest {
+class UpdateRequestControllerTest extends AbstractScapSubmitterControllerTest {
 
   @MockBean
   private CaseEventService caseEventService;
@@ -90,7 +90,6 @@ class UpdateRequestControllerTest extends AbstractControllerTest {
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.values()));
-    when(scapService.getScapById(SCAP_ID)).thenReturn(new Scap());
     when(scapDetailService.getActionableScapDetail(SCAP_ID, testUser)).thenReturn(SCAP_DETAIL);
     when(scapDetailService.getLatestByScap(any(Scap.class))).thenReturn(SCAP_DETAIL);
     when(organisationGroupService.getOrganisationGroupById(eq(ORG_GROUP_ID), any())).thenReturn(Optional.of(ORG_GROUP));

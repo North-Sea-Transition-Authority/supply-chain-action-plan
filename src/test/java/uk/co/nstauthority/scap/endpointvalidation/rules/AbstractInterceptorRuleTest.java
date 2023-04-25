@@ -27,8 +27,7 @@ abstract class AbstractInterceptorRuleTest {
   @Mock
   protected HttpServletResponse response;
 
-  @Mock
-  protected Scap scap;
+  protected Scap scap = new Scap(SCAP_ID);
 
   @Mock
   protected ScapDetail scapDetail;

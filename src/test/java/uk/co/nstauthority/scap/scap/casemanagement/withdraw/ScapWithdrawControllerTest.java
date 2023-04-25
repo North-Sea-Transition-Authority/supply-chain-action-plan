@@ -26,7 +26,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.validation.BindingResult;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
-import uk.co.nstauthority.scap.AbstractControllerTest;
+import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.file.FileUploadTemplate;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
@@ -40,13 +40,12 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.scap.Scap;
-import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 
 @ExtendWith(MockitoExtension.class)
 @WithMockUser
 @ContextConfiguration(classes = ScapWithdrawController.class)
-class ScapWithdrawControllerTest extends AbstractControllerTest {
+class ScapWithdrawControllerTest extends AbstractScapSubmitterControllerTest {
 
   @MockBean
   private CaseEventService caseEventService;
@@ -69,16 +68,12 @@ class ScapWithdrawControllerTest extends AbstractControllerTest {
   @MockBean
   private ScapEmailService scapEmailService;
 
-  private static final ScapId SCAP_ID = new ScapId(1111);
-
   private static final ScapDetail SCAP_DETAIL = getScapDetail();
   private static final Integer ORG_GROUP_ID = 1000;
   private static final String TEST_STRING = "This is a test comment";
 
   @BeforeEach
   void setup() {
-    var scap = new Scap();
-
     when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.APPROVAL_DOCUMENT)))

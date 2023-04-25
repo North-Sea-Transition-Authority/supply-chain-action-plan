@@ -36,7 +36,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
   @Test
   @DisplayName("Test rule passes when status is DRAFT")
   void validate_scapIsDraft_IsOK() throws NoSuchMethodException {
-    doReturn(scapDetail).when(scapDetailService).getLatestByScap(scap);
+    when(scapDetailService.getActionableScapDetail(SCAP_ID, userDetail)).thenReturn(scapDetail);
     when(scapDetail.getStatus()).thenReturn(ScapDetailStatus.DRAFT);
 
     var annotation = getAnnotation(
@@ -58,8 +58,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
   @Test
   @DisplayName("Assert redirection when status is SUBMITTED")
   void validate_WhenScapSubmitted() throws NoSuchMethodException {
-    when(scap.getScapId()).thenReturn(SCAP_ID);
-    doReturn(scapDetail).when(scapDetailService).getLatestByScap(scap);
+    when(scapDetailService.getActionableScapDetail(SCAP_ID, userDetail)).thenReturn(scapDetail);
     when(scapDetail.getStatus()).thenReturn(ScapDetailStatus.SUBMITTED);
 
     var annotation = getAnnotation(
@@ -82,7 +81,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
   @Test
   @DisplayName("Assert 400 when status is null")
   void validate_WhenScapStatusNull() throws NoSuchMethodException {
-    doReturn(scapDetail).when(scapDetailService).getLatestByScap(scap);
+    doReturn(scapDetail).when(scapDetailService).getActionableScapDetail(SCAP_ID, userDetail);
     when(scapDetail.getStatus()).thenReturn(null);
 
     var annotation = getAnnotation(
@@ -104,7 +103,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
   @Test
   @DisplayName("Assert that annotation works at class level")
   void validate_WhenScapIsDraft() {
-    doReturn(scapDetail).when(scapDetailService).getLatestByScap(scap);
+    doReturn(scapDetail).when(scapDetailService).getActionableScapDetail(SCAP_ID, userDetail);
     when(scapDetail.getStatus()).thenReturn(ScapDetailStatus.SUBMITTED);
 
     var annotation = getAnnotation(
