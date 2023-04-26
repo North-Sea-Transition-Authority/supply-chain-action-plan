@@ -20,7 +20,7 @@ import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerBodyLine;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
@@ -56,7 +56,7 @@ public class UpdateRequestController {
 
   private final CaseEventDocumentService caseEventDocumentService;
 
-  private final TeamService teamService;
+  private final TeamMemberService teamMemberService;
 
   private final UserDetailService userDetailService;
 
@@ -70,7 +70,7 @@ public class UpdateRequestController {
                                  OrganisationGroupService organisationGroupService,
                                  UpdateRequestFormValidator updateRequestFormValidator,
                                  CaseEventDocumentService caseEventDocumentService,
-                                 TeamService teamService,
+                                 TeamMemberService teamMemberService,
                                  UserDetailService userDetailService,
                                  UpdateRequestService updateRequestService) {
     this.caseEventService = caseEventService;
@@ -80,7 +80,7 @@ public class UpdateRequestController {
     this.organisationGroupService = organisationGroupService;
     this.updateRequestFormValidator = updateRequestFormValidator;
     this.caseEventDocumentService = caseEventDocumentService;
-    this.teamService = teamService;
+    this.teamMemberService = teamMemberService;
     this.userDetailService = userDetailService;
     this.updateRequestService = updateRequestService;
   }
@@ -107,7 +107,9 @@ public class UpdateRequestController {
         .withCaseEventTimeline(caseEventService.getEventViewByScapId(scapId))
         .withUpdateRequestForm(updateRequestForm)
         .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
-        .withUpdatePermission(teamService.userIsMemberOfRegulatorTeam(userDetailService.getUserDetail()))
+        .withIsUpdateable(
+            teamMemberService.getAllPermissionsForUser(userDetailService.getUserDetail().wuaId()),
+            scapDetail.getStatus())
         .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);
 

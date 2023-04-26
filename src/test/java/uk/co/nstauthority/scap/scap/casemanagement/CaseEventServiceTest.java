@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTHER_INFO_REQUESTED;
-import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.FURTHER_INFO_RESPONSE;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.QA_COMMENT;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_APPROVED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_CONSULTATION_REQUESTED;
@@ -17,14 +16,12 @@ import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_WITHDRAWN;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -47,7 +44,6 @@ import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.util.DateUtil;
 import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
 import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
-import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestType;
 
 @ExtendWith(MockitoExtension.class)
 class CaseEventServiceTest {
@@ -136,12 +132,12 @@ class CaseEventServiceTest {
 
 
   @Test
-  void getApplicableActions_isRegulator() {
+  void getApplicableActions_isRegulatorSubmitted() {
     var user = ServiceUserDetailTestUtil.Builder().build();
     when(userDetailService.getUserDetail()).thenReturn(user);
     when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(true);
     when(scapDetailService.getActionableScapDetail(SCAP_ID, user)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
-        .withStatus(ScapDetailStatus.APPROVED)
+        .withStatus(ScapDetailStatus.SUBMITTED)
         .withScap(ScapEntityTestUtil.scapBuilder().withScapId(SCAP_ID).build())
         .build());
 
@@ -150,7 +146,7 @@ class CaseEventServiceTest {
     assertThat(actions.get(CaseEventGroups.QA.getDisplayName())).containsExactly(QA_COMMENT);
     assertThat(actions.get(CaseEventGroups.CONSULTATIONS.getDisplayName())).containsExactly(SCAP_CONSULTATION_REQUESTED, SCAP_CONSULTATION_RESPONSE);
     assertThat(actions.get(CaseEventGroups.DECISIONS.getDisplayName())).containsExactly(SCAP_APPROVED, SCAP_WITHDRAWN);
-    assertThat(actions.get(CaseEventGroups.FURTHER_INFO.getDisplayName())).containsExactly(FURTHER_INFO_REQUESTED, SCAP_UPDATE_REQUESTED);
+    assertThat(actions.get(CaseEventGroups.FURTHER_INFO.getDisplayName())).containsExactly(FURTHER_INFO_REQUESTED);
   }
 
   @Test
@@ -169,10 +165,7 @@ class CaseEventServiceTest {
   }
 
   @Test
-  void getApplicableActions_isRegulatorOutstandingResponse() {
-    when(updateRequestService.getUpdateDueDate(SCAP_ID, UpdateRequestType.FURTHER_INFORMATION)).thenReturn(
-        Optional.of(LocalDate.now()));
-
+  void getApplicableActions_isRegulatorApproved() {
     var user = ServiceUserDetailTestUtil.Builder().build();
     when(userDetailService.getUserDetail()).thenReturn(user);
     when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(true);
@@ -183,10 +176,10 @@ class CaseEventServiceTest {
 
     var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
 
-    assertThat(actions.get(CaseEventGroups.QA.getDisplayName())).containsExactly(QA_COMMENT);
-    assertThat(actions.get(CaseEventGroups.CONSULTATIONS.getDisplayName())).containsExactly(SCAP_CONSULTATION_REQUESTED, SCAP_CONSULTATION_RESPONSE);
-    assertThat(actions.get(CaseEventGroups.DECISIONS.getDisplayName())).containsExactly(SCAP_APPROVED, SCAP_WITHDRAWN);
-    assertThat(actions.get(CaseEventGroups.FURTHER_INFO.getDisplayName())).containsExactly(FURTHER_INFO_RESPONSE, SCAP_UPDATE_REQUESTED);
+    assertThat(actions.get(CaseEventGroups.QA.getDisplayName())).isEmpty();
+    assertThat(actions.get(CaseEventGroups.CONSULTATIONS.getDisplayName())).isEmpty();
+    assertThat(actions.get(CaseEventGroups.DECISIONS.getDisplayName())).containsExactly(SCAP_APPROVED);
+    assertThat(actions.get(CaseEventGroups.FURTHER_INFO.getDisplayName())).containsExactly(SCAP_UPDATE_REQUESTED);
   }
 
   @Test
@@ -198,41 +191,7 @@ class CaseEventServiceTest {
         .withStatus(ScapDetailStatus.APPROVED)
         .build());
 
-    var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
-
-    assertThat(actions.get(CaseEventGroups.CONSULTATIONS.getDisplayName())).containsExactly(SCAP_CONSULTATION_RESPONSE);
-    assertThat(actions.get(CaseEventGroups.FURTHER_INFO.getDisplayName())).isEmpty();
-  }
-
-  @Test
-  void getApplicableActions_isClosedIndustry() {
-    var user = ServiceUserDetailTestUtil.Builder().build();
-    when(userDetailService.getUserDetail()).thenReturn(user);
-    when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(false);
-    when(scapDetailService.getActionableScapDetail(SCAP_ID, user)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
-        .withStatus(ScapDetailStatus.CLOSED_OUT)
-        .build());
-
-    var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
-    assertThat(actions).isEmpty();
-  }
-
-  @Test
-  void getApplicableActions_isIndustryRequestOutstanding() {
-    when(updateRequestService.getUpdateDueDate(SCAP_ID, UpdateRequestType.FURTHER_INFORMATION))
-        .thenReturn(Optional.of(LocalDate.now()));
-
-    var user = ServiceUserDetailTestUtil.Builder().build();
-    when(userDetailService.getUserDetail()).thenReturn(user);
-    when(teamService.userIsMemberOfRegulatorTeam(user)).thenReturn(false);
-    when(scapDetailService.getActionableScapDetail(SCAP_ID, user)).thenReturn(ScapDetailEntityTestUtil.scapDetailBuilder()
-        .withStatus(ScapDetailStatus.APPROVED)
-        .build());
-
-    var actions = caseEventService.getApplicableActionsForScap(SCAP_ID);
-
-    assertThat(actions.get(CaseEventGroups.CONSULTATIONS.getDisplayName())).containsExactly(SCAP_CONSULTATION_RESPONSE);
-    assertThat(actions.get(CaseEventGroups.FURTHER_INFO.getDisplayName())).containsExactly(FURTHER_INFO_RESPONSE);
+    assertThat(caseEventService.getApplicableActionsForScap(SCAP_ID)).isEmpty();
   }
 
   private List<CaseEvent> getTimelineEvents() {

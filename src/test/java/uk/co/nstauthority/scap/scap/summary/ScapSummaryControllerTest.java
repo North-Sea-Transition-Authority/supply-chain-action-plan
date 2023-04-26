@@ -231,6 +231,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(false);
+    when(teamMemberService.getAllPermissionsForUser(testUser.wuaId())).thenReturn(List.of(RolePermission.SUBMIT_SCAP));
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
     when(caseEventService.getEventViewByScapId(SCAP_ID)).thenReturn(getTimelineView());
     when(updateRequestService.findNextDueUpdate(SCAP_ID)).thenReturn(Optional.of(getUpdateRequest()));
@@ -241,7 +242,8 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
             .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/summary/scapSummaryOverview"))
-        .andExpect(model().attribute("updateText", "TEST"));
+        .andExpect(model().attribute("updateText", "TEST"))
+        .andExpect(model().attribute("isUpdateable", true));
     verify(caseEventService, never()).getEventViewByScapId(SCAP_ID);
   }
 

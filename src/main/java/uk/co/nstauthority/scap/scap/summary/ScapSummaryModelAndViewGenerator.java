@@ -16,6 +16,7 @@ import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.error.exception.IllegalUtilClassInstantiationException;
 import uk.co.nstauthority.scap.file.FileUploadForm;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
@@ -41,6 +42,7 @@ import uk.co.nstauthority.scap.scap.casemanagement.withdraw.ScapWithdrawControll
 import uk.co.nstauthority.scap.scap.casemanagement.withdraw.ScapWithdrawalForm;
 import uk.co.nstauthority.scap.scap.delete.ScapDeletionController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.util.DateUtil;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
@@ -62,7 +64,7 @@ public class ScapSummaryModelAndViewGenerator {
     private Map<String, List<CaseEventSubject>> applicableActions = new LinkedHashMap<>();
     private OrganisationGroup orgGroup;
     private boolean updateInProgress = false;
-    private boolean updatePermission = false;
+    private boolean isUpdateable = false;
     private String updateRequestText = null;
     private final CaseEventDocumentService caseEventDocumentService;
     private ScapSubmissionStage scapStatus = ScapSubmissionStage.DRAFT;
@@ -110,8 +112,15 @@ public class ScapSummaryModelAndViewGenerator {
       return this;
     }
 
-    public Generator withUpdatePermission(boolean updatePermission) {
-      this.updatePermission = updatePermission;
+    public Generator withIsUpdateable(List<RolePermission> permissions, ScapDetailStatus status) {
+      var hasUpdatePermission = permissions.contains(RolePermission.SUBMIT_SCAP);
+      var updateableStatus = List.of(
+          ScapDetailStatus.APPROVED,
+          ScapDetailStatus.SUBMITTED,
+          ScapDetailStatus.DRAFT
+      ).contains(status);
+
+      this.isUpdateable = hasUpdatePermission && updateableStatus;
       return this;
     }
 
@@ -206,7 +215,7 @@ public class ScapSummaryModelAndViewGenerator {
               on(ScapUpdateController.class).startScapUpdate(scapDetail.getScap().getScapId(), CaseEventAction.UPDATE_SUBMITTED)))
           .addObject("applicableActions", applicableActions)
           .addObject("updateInProgress", updateInProgress)
-          .addObject("updatePermission", updatePermission)
+          .addObject("isUpdateable", isUpdateable)
           .addObject("updateText", updateRequestText)
           .addObject("deleteScapUrl", ReverseRouter.route(
               on(ScapDeletionController.class).renderScapDeletionConfirmation(scapDetail.getScap().getScapId())))

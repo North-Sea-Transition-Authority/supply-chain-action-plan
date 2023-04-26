@@ -19,7 +19,7 @@ import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermissi
 import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerBodyLine;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
@@ -53,7 +53,7 @@ public class QaCommentController {
 
   private final CaseEventDocumentService caseEventDocumentService;
 
-  private final TeamService teamService;
+  private final TeamMemberService teamMemberService;
 
   private final UserDetailService userDetailService;
 
@@ -65,7 +65,7 @@ public class QaCommentController {
                              OrganisationGroupService organisationGroupService,
                              QaCommentFormValidator qaCommentFormValidator,
                              CaseEventDocumentService caseEventDocumentService,
-                             TeamService teamService,
+                             TeamMemberService teamMemberService,
                              UserDetailService userDetailService) {
     this.caseEventService = caseEventService;
     this.controllerHelperService = controllerHelperService;
@@ -74,7 +74,7 @@ public class QaCommentController {
     this.organisationGroupService = organisationGroupService;
     this.qaCommentFormValidator = qaCommentFormValidator;
     this.caseEventDocumentService = caseEventDocumentService;
-    this.teamService = teamService;
+    this.teamMemberService = teamMemberService;
     this.userDetailService = userDetailService;
   }
 
@@ -101,7 +101,9 @@ public class QaCommentController {
         .withQaCommentForm(qaCommentForm)
         .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
         .withScapVersions(scapDetailService.getAllVersionsForUser(scapDetail.getScap()))
-        .withUpdatePermission(teamService.userIsMemberOfRegulatorTeam(userDetailService.getUserDetail()))
+        .withIsUpdateable(
+            teamMemberService.getAllPermissionsForUser(userDetailService.getUserDetail().wuaId()),
+            scapDetail.getStatus())
         .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);
 

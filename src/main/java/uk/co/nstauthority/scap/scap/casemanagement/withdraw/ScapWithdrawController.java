@@ -20,7 +20,7 @@ import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermissi
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.notify.ScapEmailService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
@@ -51,8 +51,7 @@ public class ScapWithdrawController {
   private final ScapWithdrawalFormValidator scapWithdrawalFormValidator;
   private final CaseEventDocumentService caseEventDocumentService;
   private final ScapEmailService scapEmailService;
-
-  private final TeamService teamService;
+  private final TeamMemberService teamMemberService;
   private final UserDetailService userDetailService;
 
   @Autowired
@@ -64,7 +63,7 @@ public class ScapWithdrawController {
                                 ScapWithdrawalFormValidator scapWithdrawalFormValidator,
                                 CaseEventDocumentService caseEventDocumentService,
                                 ScapEmailService scapEmailService,
-                                TeamService teamService,
+                                TeamMemberService teamMemberService,
                                 UserDetailService userDetailService) {
     this.caseEventService = caseEventService;
     this.controllerHelperService = controllerHelperService;
@@ -74,7 +73,7 @@ public class ScapWithdrawController {
     this.scapWithdrawalFormValidator = scapWithdrawalFormValidator;
     this.caseEventDocumentService = caseEventDocumentService;
     this.scapEmailService = scapEmailService;
-    this.teamService = teamService;
+    this.teamMemberService = teamMemberService;
     this.userDetailService = userDetailService;
   }
 
@@ -101,7 +100,9 @@ public class ScapWithdrawController {
             .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
             .withScapVersions(scapDetailService.getAllVersionsForUser(scapDetail.getScap()))
             .withScapWithdrawalForm(scapWithdrawalForm)
-            .withUpdatePermission(teamService.userIsMemberOfRegulatorTeam(userDetailService.getUserDetail()))
+            .withIsUpdateable(
+                teamMemberService.getAllPermissionsForUser(userDetailService.getUserDetail().wuaId()),
+                scapDetail.getStatus())
             .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);
 

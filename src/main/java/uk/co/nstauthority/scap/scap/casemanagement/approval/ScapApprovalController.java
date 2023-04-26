@@ -23,7 +23,7 @@ import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerBodyLine
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.notify.ScapEmailService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
@@ -57,7 +57,7 @@ public class ScapApprovalController {
   private final CaseEventDocumentService caseEventDocumentService;
   private final ScapEmailService scapEmailService;
 
-  private final TeamService teamService;
+  private final TeamMemberService teamMemberService;
 
   private final UserDetailService userDetailService;
 
@@ -69,7 +69,8 @@ public class ScapApprovalController {
                                 OrganisationGroupService organisationGroupService,
                                 ScapApprovalFormValidator scapApprovalFormValidator,
                                 CaseEventDocumentService caseEventDocumentService,
-                                ScapEmailService scapEmailService, TeamService teamService,
+                                ScapEmailService scapEmailService,
+                                TeamMemberService teamMemberService,
                                 UserDetailService userDetailService) {
     this.caseEventService = caseEventService;
     this.controllerHelperService = controllerHelperService;
@@ -79,7 +80,7 @@ public class ScapApprovalController {
     this.scapApprovalFormValidator = scapApprovalFormValidator;
     this.caseEventDocumentService = caseEventDocumentService;
     this.scapEmailService = scapEmailService;
-    this.teamService = teamService;
+    this.teamMemberService = teamMemberService;
     this.userDetailService = userDetailService;
   }
 
@@ -107,7 +108,9 @@ public class ScapApprovalController {
             .withScapApprovalForm(scapApprovalForm)
             .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
             .withScapVersions(scapDetailService.getAllVersionsForUser(scapDetail.getScap()))
-            .withUpdatePermission(teamService.userIsMemberOfRegulatorTeam(userDetailService.getUserDetail()))
+            .withIsUpdateable(
+                teamMemberService.getAllPermissionsForUser(userDetailService.getUserDetail().wuaId()),
+                scapDetail.getStatus())
             .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);
 

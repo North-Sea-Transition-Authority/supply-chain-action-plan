@@ -4,7 +4,6 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -60,7 +59,8 @@ public class CaseEventService {
 
   private static final Set<ScapDetailStatus> TERMINAL_DETAIL_STATUS = Set.of(
       ScapDetailStatus.CLOSED_OUT,
-      ScapDetailStatus.WITHDRAWN);
+      ScapDetailStatus.WITHDRAWN,
+      ScapDetailStatus.DELETED);
 
   @Autowired
   public CaseEventService(UserDetailService userDetailService,
@@ -177,52 +177,35 @@ public class CaseEventService {
     var actionMap = new LinkedHashMap<String, List<CaseEventSubject>>();
     if (teamService.userIsMemberOfRegulatorTeam(user)) {
       actionMap.putAll(getRegulatorTeamActions(scapDetail));
-    } else {
-      if (TERMINAL_DETAIL_STATUS.contains(scapDetail.getStatus())) {
-        return Collections.emptyMap();
-      }
-      var furtherInfo = new ArrayList<CaseEventSubject>();
-      var consultations = new ArrayList<CaseEventSubject>();
-      if (updateRequestService.getUpdateDueDate(scapId, UpdateRequestType.FURTHER_INFORMATION).isPresent()) {
-        furtherInfo.add(CaseEventSubject.FURTHER_INFO_RESPONSE);
-      }
-      consultations.add(CaseEventSubject.SCAP_CONSULTATION_RESPONSE);
-      actionMap.put(CaseEventGroups.FURTHER_INFO.getDisplayName(), furtherInfo);
-      actionMap.put(CaseEventGroups.CONSULTATIONS.getDisplayName(), consultations);
-      actionMap.put(CaseEventGroups.UPDATE_SCAP.getDisplayName(), Collections.emptyList());
     }
     return actionMap;
   }
 
   private Map<String, List<CaseEventSubject>> getRegulatorTeamActions(ScapDetail scapDetail) {
-    if (TERMINAL_DETAIL_STATUS.contains(scapDetail.getStatus())) {
-      var regulatorMap = new HashMap<String, List<CaseEventSubject>>();
-      var descisions = new ArrayList<CaseEventSubject>();
-      descisions.add(CaseEventSubject.SCAP_REINSTATED);
-      regulatorMap.put(CaseEventGroups.DECISIONS.getDisplayName(), descisions);
-      return regulatorMap;
-    }
+
     var regulatorMap = new HashMap<String, List<CaseEventSubject>>();
     var qa = new ArrayList<CaseEventSubject>();
-    qa.add(CaseEventSubject.QA_COMMENT);
-
     var consultations = new ArrayList<CaseEventSubject>();
-    consultations.add(CaseEventSubject.SCAP_CONSULTATION_REQUESTED);
-    consultations.add(CaseEventSubject.SCAP_CONSULTATION_RESPONSE);
-
     var descisions = new ArrayList<CaseEventSubject>();
-    descisions.add(CaseEventSubject.SCAP_APPROVED);
-    descisions.add(CaseEventSubject.SCAP_WITHDRAWN);
-
     var furtherInfo = new ArrayList<CaseEventSubject>();
-    if (updateRequestService.getUpdateDueDate(scapDetail.getScap().getScapId(),
-        UpdateRequestType.FURTHER_INFORMATION).isPresent()) {
-      furtherInfo.add(CaseEventSubject.FURTHER_INFO_RESPONSE);
-    } else {
-      furtherInfo.add(CaseEventSubject.FURTHER_INFO_REQUESTED);
-    }
-    if (ScapDetailStatus.APPROVED.equals(scapDetail.getStatus())) {
+
+    if (ScapDetailStatus.SUBMITTED.equals(scapDetail.getStatus())) {
+      qa.add(CaseEventSubject.QA_COMMENT);
+      consultations.add(CaseEventSubject.SCAP_CONSULTATION_REQUESTED);
+      consultations.add(CaseEventSubject.SCAP_CONSULTATION_RESPONSE);
+      descisions.add(CaseEventSubject.SCAP_APPROVED);
+      descisions.add(CaseEventSubject.SCAP_WITHDRAWN);
+      if (updateRequestService.getUpdateDueDate(scapDetail.getScap().getScapId(),
+          UpdateRequestType.FURTHER_INFORMATION).isPresent()) {
+        furtherInfo.add(CaseEventSubject.FURTHER_INFO_RESPONSE);
+      } else {
+        furtherInfo.add(CaseEventSubject.FURTHER_INFO_REQUESTED);
+      }
+    } else if (ScapDetailStatus.APPROVED.equals(scapDetail.getStatus())) {
       furtherInfo.add(CaseEventSubject.SCAP_UPDATE_REQUESTED);
+      descisions.add(CaseEventSubject.SCAP_APPROVED);
+    } else if (TERMINAL_DETAIL_STATUS.contains(scapDetail.getStatus())) {
+      descisions.add(CaseEventSubject.SCAP_REINSTATED);
     }
     regulatorMap.put(CaseEventGroups.QA.getDisplayName(), qa);
     regulatorMap.put(CaseEventGroups.DECISIONS.getDisplayName(), descisions);

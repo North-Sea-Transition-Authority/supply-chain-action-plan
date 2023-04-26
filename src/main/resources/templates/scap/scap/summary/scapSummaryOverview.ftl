@@ -47,6 +47,7 @@
 <#-- @ftlvariable name="caseEvents" type="java.util.List<uk.co.nstauthority.scap.scap.casemanagement.CaseEventView>" -->
 <#-- @ftlvariable name="applicableActions" type="java.util.Map<uk.co.nstauthority.scap.scap.casemanagement.CaseEventGroups, uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject>" -->
 <#-- @ftlvariable name="updateInProgress" type="java.lang.Boolean" -->
+<#-- @ftlvariable name="isUpdateable" type="java.lang.Boolean" -->
 
 <@defaultPage
 htmlTitle=pageTitle
@@ -70,7 +71,7 @@ backLinkUrl=springUrl(backLinkUrl)
   </#if>
   <@fdsAction.buttonGroup>
     <@fdsForm.htmlForm springUrl(updateScapUrl)>
-      <#if applicableActions["Update SCAP"]??>
+      <#if isUpdateable>
         <#if updateInProgress>
           <@fdsAction.button buttonText="Resume SCAP update"/>
           <@fdsAction.link linkText="Delete draft update" linkUrl=springUrl(deleteScapUrl) linkClass="govuk-button govuk-button--secondary" role=true />

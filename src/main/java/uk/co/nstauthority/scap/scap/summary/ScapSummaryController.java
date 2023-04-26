@@ -115,7 +115,9 @@ public class ScapSummaryController {
         .withScapStatus(scapSummaryViewService.inferSubmissionStatusFromSummary(scapSummary))
         .withCaseEventTimeline(getCaseEventView(scapId))
         .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
-        .withUpdatePermission(teamService.userIsMemberOfRegulatorTeam(userDetailService.getUserDetail()))
+        .withIsUpdateable(
+            teamMemberService.getAllPermissionsForUser(userDetailService.getUserDetail().wuaId()),
+            versionedDetail.getStatus())
         .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId))
         .withScapVersions(scapDetailService.getAllVersionsForUser(versionedDetail.getScap()))
         .withCurrentVersion(versionedDetail.getVersionNumber());

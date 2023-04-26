@@ -19,7 +19,7 @@ import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermission;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
@@ -52,7 +52,7 @@ public class ScapReinstateController {
   private final CaseEventDocumentService caseEventDocumentService;
   private final ScapService scapService;
 
-  private final TeamService teamService;
+  private final TeamMemberService teamMemberService;
 
   private final UserDetailService userDetailService;
 
@@ -65,7 +65,7 @@ public class ScapReinstateController {
                                  ScapReinstateFormValidator scapReinstateFormValidator,
                                  CaseEventDocumentService caseEventDocumentService,
                                  ScapService scapService,
-                                 TeamService teamService,
+                                 TeamMemberService teamMemberService,
                                  UserDetailService userDetailService) {
     this.caseEventService = caseEventService;
     this.controllerHelperService = controllerHelperService;
@@ -75,7 +75,7 @@ public class ScapReinstateController {
     this.scapReinstateFormValidator = scapReinstateFormValidator;
     this.caseEventDocumentService = caseEventDocumentService;
     this.scapService = scapService;
-    this.teamService = teamService;
+    this.teamMemberService = teamMemberService;
     this.userDetailService = userDetailService;
   }
 
@@ -102,7 +102,9 @@ public class ScapReinstateController {
             .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
             .withScapReinstateForm(scapReinstateForm)
             .withScapVersions(scapDetailService.getAllVersionsForUser(scapDetail.getScap()))
-            .withUpdatePermission(teamService.userIsMemberOfRegulatorTeam(userDetailService.getUserDetail()))
+            .withIsUpdateable(
+                teamMemberService.getAllPermissionsForUser(userDetailService.getUserDetail().wuaId()),
+                scapDetail.getStatus())
             .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId));
     orgGroup.ifPresent(generator::withOrgGroup);
 
