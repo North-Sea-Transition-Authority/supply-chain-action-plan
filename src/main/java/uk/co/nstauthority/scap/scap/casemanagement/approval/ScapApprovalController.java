@@ -39,7 +39,7 @@ import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 @Controller
 @RequestMapping("{scapId}/")
 @UserHasAnyPermission(permissions = RolePermission.REVIEW_SCAP)
-@ScapHasStatus(permittedStatuses = ScapDetailStatus.SUBMITTED)
+@ScapHasStatus(permittedStatuses = {ScapDetailStatus.SUBMITTED, ScapDetailStatus.APPROVED})
 public class ScapApprovalController {
 
   private final CaseEventService caseEventService;
