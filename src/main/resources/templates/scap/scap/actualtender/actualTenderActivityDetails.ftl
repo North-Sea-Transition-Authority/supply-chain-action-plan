@@ -18,9 +18,13 @@ backLinkUrl=springUrl(backLinkUrl)
       inputClass="govuk-!-width-two-thirds"
       maxCharacterLength=scopeTitleMaxLength
     />
-
     <@fdsTextarea.textarea path="form.scopeDescription.inputValue" labelText="Scope description"/>
-
+    <@fdsDetails.summaryDetails summaryTitle="What if my activity is a single source contract?">
+      <p class="govuk-body">
+        Add the contractor as an "Invitation to Tender recipient" and
+        add text detailing the "award rationale" as single source.
+      </p>
+    </@fdsDetails.summaryDetails>
     <@fdsRadio.radioGroup path="form.remunerationModel" labelText="Remuneration model" hiddenContent=true>
       <#assign firstItem=true/>
       <#list remunerationModels as key, value>
