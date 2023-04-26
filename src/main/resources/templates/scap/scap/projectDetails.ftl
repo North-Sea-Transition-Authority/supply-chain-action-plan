@@ -35,6 +35,11 @@
       suffix="million"
       inputClass="govuk-input--width-5"
     />
+    <@fdsDetails.summaryDetails summaryTitle="What costs should be included in my estimates?">
+      The project cost estimate should apply only to the Capital Expenditure
+      (CapEx) project phase of FDP / FDPa / Carbon Storage projects,
+      or the Abandonment and Decommissioning Expenditure (AbEx) for the decommissioning of assets.
+    </@fdsDetails.summaryDetails>
     <@fdsCheckbox.checkbox
       fieldsetHeadingText="North Sea Transition Deal commitments"
       path="form.awareOfLocalContentCommitment"
