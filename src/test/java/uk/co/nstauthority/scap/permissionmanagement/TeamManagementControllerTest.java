@@ -163,7 +163,10 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
     var form = new NewTeamForm();
     form.setOrganisationGroupId("10000");
 
+    var uuid = UUID.randomUUID();
+
     when(teamService.validate(any(), any())).thenReturn(emptyBindingResult());
+    when(teamService.createTeam("Royal Dutch Shell", 10000)).thenReturn(new Team(uuid));
     when(organisationGroupService.getOrganisationGroupById(any(), any())).thenReturn(Optional.of(orgGroup));when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(userDetailService.getUserDetail()).thenReturn(testUser);
 
@@ -172,8 +175,8 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
                 .flashAttr("form", form)
                 .with(csrf())
                 .with(authenticatedScapUser()))
-        .andExpect(status().isOk())
-        .andExpect(view().name("scap/permissionmanagement/teamList"));
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/permission-management/industry/" + uuid));
   }
 
   @Test

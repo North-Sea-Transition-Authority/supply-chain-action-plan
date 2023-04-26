@@ -137,10 +137,11 @@ public class TeamManagementController {
         organisationGroupService.getOrganisationGroupById(Integer.valueOf(groupId), "To Add Group to SCAP teams");
 
     if (orgGroup.isPresent()) {
-      teamService.createTeam(orgGroup.get().getName(),
+      var team = teamService.createTeam(orgGroup.get().getName(),
           Integer.valueOf(groupId));
 
-      var view = renderTeamList();
+      var view = ReverseRouter.redirect(on(
+          IndustryTeamMemberController.class).renderMemberList(new TeamId(team.getUuid())));
       NotificationBannerUtils.successBanner(
           "Successfully added new organisation group team",
           new NotificationBannerBodyLine(
