@@ -241,7 +241,7 @@ public class ScapDetailService {
 
   @Transactional
   public void closeOutScap(ScapDetail scapDetail) {
-    if (!scapDetail.getStatus().equals(SUBMITTED)) {
+    if (!canBeWithdrawn.contains(scapDetail.getStatus())) {
       throw new ScapBadRequestException("Cannot approve SCAP reference: %s that has not been submitted"
           .formatted(scapDetail.getScap().getReference()));
     }
