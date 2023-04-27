@@ -21,8 +21,7 @@
           <td class="govuk-table__cell">
             <ul class="govuk-list govuk-!-margin-bottom-0">
               <#if member.contactEmail()?has_content>
-                <li>
-                </li>
+                <li>${member.contactEmail()}</li>
               </#if>
               <#if member.contactNumber()?has_content>
                 <li>${member.contactNumber()}</li>

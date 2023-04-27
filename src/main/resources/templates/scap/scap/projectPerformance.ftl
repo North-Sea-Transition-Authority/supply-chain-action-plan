@@ -44,8 +44,8 @@
     <@fdsRadio.radioGroup
       path="form.projectCompleted"
       labelText="Has the full project been completed?"
-      fieldsetHeadingClass="govuk-heading-xl"
-
+      fieldsetHeadingClass="govuk-fieldset__legend--xl"
+      fieldsetHeadingSize="h1"
       hintText="For example, fully commissioned or fully decommissioned"
       hiddenContent=true
     >
