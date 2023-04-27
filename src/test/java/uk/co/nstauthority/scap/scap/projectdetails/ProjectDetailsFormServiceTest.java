@@ -87,12 +87,12 @@ class ProjectDetailsFormServiceTest {
         extractedForm -> extractedForm.getWillMissLocalContentCommitmentRationale().getInputValue(),
         ProjectDetailsForm::getFieldIds,
         ProjectDetailsForm::getHasPlatforms,
-        extractedForm -> extractedForm.getStartDay().getInputValue(),
-        extractedForm -> extractedForm.getStartMonth().getInputValue(),
-        extractedForm -> extractedForm.getStartYear().getInputValue(),
-        extractedForm -> extractedForm.getEndDay().getInputValue(),
-        extractedForm -> extractedForm.getEndMonth().getInputValue(),
-        extractedForm -> extractedForm.getEndYear().getInputValue()
+        extractedForm -> extractedForm.getExpectedStartDate().getDayInput().getInputValue(),
+        extractedForm -> extractedForm.getExpectedStartDate().getMonthInput().getInputValue(),
+        extractedForm -> extractedForm.getExpectedStartDate().getYearInput().getInputValue(),
+        extractedForm -> extractedForm.getExpectedEndDate().getDayInput().getInputValue(),
+        extractedForm -> extractedForm.getExpectedEndDate().getMonthInput().getInputValue(),
+        extractedForm -> extractedForm.getExpectedEndDate().getYearInput().getInputValue()
     ).containsExactly(
         projectName,
         projectTypes,

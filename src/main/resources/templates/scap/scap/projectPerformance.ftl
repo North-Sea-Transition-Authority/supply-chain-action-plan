@@ -6,18 +6,18 @@
 <#assign yesContent>
   <@fdsDateInput.dateInput
     formId="startDate"
-    dayPath="form.startDay.inputValue"
-    monthPath="form.startMonth.inputValue"
-    yearPath="form.startYear.inputValue"
+    dayPath="form.startDate.dayInput.inputValue"
+    monthPath="form.startDate.monthInput.inputValue"
+    yearPath="form.startDate.yearInput.inputValue"
     labelText="Actual execution start date"
     hintText="For example, 31 3 2023"
     nestingPath="form.projectCompleted"
   />
   <@fdsDateInput.dateInput
     formId="endDate"
-    dayPath="form.completionDay.inputValue"
-    monthPath="form.completionMonth.inputValue"
-    yearPath="form.completionYear.inputValue"
+    dayPath="form.completionDate.dayInput.inputValue"
+    monthPath="form.completionDate.monthInput.inputValue"
+    yearPath="form.completionDate.yearInput.inputValue"
     labelText="Actual commissioning or completion date"
     hintText="For example, 31 3 2024"
     nestingPath="form.projectCompleted"

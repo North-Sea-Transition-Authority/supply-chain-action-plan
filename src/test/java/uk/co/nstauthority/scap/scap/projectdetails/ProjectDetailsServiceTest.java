@@ -452,12 +452,8 @@ class ProjectDetailsServiceTest {
     form.setWillMissLocalContentCommitmentRationale("I don't want to");
     form.setFieldIds(Collections.singleton(7235));
     form.setHasPlatforms(false);
-    form.setStartDay("22");
-    form.setStartMonth("1");
-    form.setStartYear("2022");
-    form.setEndDay("27");
-    form.setEndMonth("12");
-    form.setEndYear("2023");
+    form.setExpectedStartDate(LocalDate.of(2022, 1, 22));
+    form.setExpectedEndDate(LocalDate.of(2023, 12, 27));
     return form;
   }
 }

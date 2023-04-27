@@ -1,10 +1,10 @@
 package uk.co.nstauthority.scap.scap.projectdetails;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import uk.co.fivium.formlibrary.input.DecimalInput;
-import uk.co.fivium.formlibrary.input.IntegerInput;
 import uk.co.fivium.formlibrary.input.StringInput;
 import uk.co.fivium.formlibrary.input.ThreeFieldDateInput;
 import uk.co.nstauthority.scap.file.FileUploadForm;
@@ -23,12 +23,6 @@ public class ProjectDetailsForm {
   private Boolean hasPlatforms;
   private Set<Integer> installationIds;
   private Integer installationSelector;
-  private final IntegerInput startDay;
-  private final IntegerInput startMonth;
-  private final IntegerInput startYear;
-  private final IntegerInput endDay;
-  private final IntegerInput endMonth;
-  private final IntegerInput endYear;
   private final ThreeFieldDateInput expectedStartDate;
   private final ThreeFieldDateInput expectedEndDate;
   private List<FileUploadForm> supportingDocuments = new ArrayList<>();
@@ -41,26 +35,13 @@ public class ProjectDetailsForm {
         "willMissLocalContentCommitmentRationale",
         "rationale on why you do not expect the target will be reached"
     );
-    // TODO SCAP2022-255: Remove deprecated DFL method
-    this.startDay = new IntegerInput("startDay", "start day");
-    this.startMonth = new IntegerInput("startMonth", "start month");
-    this.startYear = new IntegerInput("startYear", "start year");
-    this.endDay = new IntegerInput("endDay", "snd day");
-    this.endMonth = new IntegerInput("endMonth", "end month");
-    this.endYear = new IntegerInput("endYear", "end year");
     this.expectedStartDate = new ThreeFieldDateInput(
-        "startDate",
-        "indicative planned execution start date",
-        this.startDay,
-        this.startMonth,
-        this.startYear
+        "expectedStartDate",
+        "indicative planned execution start date"
     );
     this.expectedEndDate = new ThreeFieldDateInput(
-        "endDate",
-        "indicative planned execution end date",
-        this.endDay,
-        this.endMonth,
-        this.endYear
+        "expectedEndDate",
+        "indicative planned execution end date"
     );
   }
 
@@ -164,56 +145,16 @@ public class ProjectDetailsForm {
     return expectedStartDate;
   }
 
+  public void setExpectedStartDate(LocalDate localDate) {
+    expectedStartDate.setDate(localDate);
+  }
+
   public ThreeFieldDateInput getExpectedEndDate() {
     return expectedEndDate;
   }
 
-  public IntegerInput getStartDay() {
-    return startDay;
-  }
-
-  public IntegerInput getStartMonth() {
-    return startMonth;
-  }
-
-  public IntegerInput getStartYear() {
-    return startYear;
-  }
-
-  public IntegerInput getEndDay() {
-    return endDay;
-  }
-
-  public IntegerInput getEndMonth() {
-    return endMonth;
-  }
-
-  public IntegerInput getEndYear() {
-    return endYear;
-  }
-
-  public void setStartDay(String startDay) {
-    this.startDay.setInputValue(startDay);
-  }
-
-  public void setStartMonth(String startMonth) {
-    this.startMonth.setInputValue(startMonth);
-  }
-
-  public void setStartYear(String startYear) {
-    this.startYear.setInputValue(startYear);
-  }
-
-  public void setEndDay(String endDay) {
-    this.endDay.setInputValue(endDay);
-  }
-
-  public void setEndMonth(String endMonth) {
-    this.endMonth.setInputValue(endMonth);
-  }
-
-  public void setEndYear(String endYear) {
-    this.endYear.setInputValue(endYear);
+  public void setExpectedEndDate(LocalDate localDate) {
+    expectedEndDate.setDate(localDate);
   }
 
   public List<FileUploadForm> getSupportingDocuments() {

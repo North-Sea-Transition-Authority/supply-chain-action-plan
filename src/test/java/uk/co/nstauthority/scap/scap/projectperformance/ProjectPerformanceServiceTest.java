@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,12 +54,8 @@ class ProjectPerformanceServiceTest {
     var projectPerformance = new ProjectPerformance(48);
     var form = new ProjectPerformanceForm();
     form.setProjectCompleted(true);
-    form.setStartDay("30");
-    form.setStartMonth("12");
-    form.setStartYear("1999");
-    form.setCompletionDay("1");
-    form.setCompletionMonth("1");
-    form.setCompletionYear("2000");
+    form.setStartDate(LocalDate.of(1999,12,30));
+    form.setCompletionDate(LocalDate.of(2000,1,1));
     form.setOutturnCost("3.14");
 
     projectPerformanceService.updateProjectPerformance(projectPerformance, form);
@@ -86,12 +83,8 @@ class ProjectPerformanceServiceTest {
     var projectPerformance = new ProjectPerformance(48);
     var form = new ProjectPerformanceForm();
     form.setProjectCompleted(false);
-    form.setStartDay("30");
-    form.setStartMonth("12");
-    form.setStartYear("1999");
-    form.setCompletionDay("1");
-    form.setCompletionMonth("1");
-    form.setCompletionYear("2000");
+    form.setStartDate(LocalDate.of(1999,12,30));
+    form.setCompletionDate(LocalDate.of(2000,1,1));
     form.setOutturnCost("3.14");
 
     projectPerformanceService.updateProjectPerformance(projectPerformance, form);
@@ -110,51 +103,12 @@ class ProjectPerformanceServiceTest {
   }
 
   @Test
-  void saveProjectPerformance_InvalidStartDate_AssertThrows() {
-    var projectPerformance = new ProjectPerformance(48);
-    var form = new ProjectPerformanceForm();
-    form.setProjectCompleted(true);
-    form.setStartDay("NaN");
-    form.setStartMonth("12");
-    form.setStartYear("1999");
-    form.setOutturnCost("3.14");
-
-    assertThatThrownBy(() -> projectPerformanceService.updateProjectPerformance(projectPerformance, form))
-        .isInstanceOf(ClassCastException.class);
-
-    verify(projectPerformanceRepository, never()).save(any());
-  }
-
-  @Test
-  void saveProjectPerformance_InvalidCompletionDate_AssertThrows() {
-    var projectPerformance = new ProjectPerformance(48);
-    var form = new ProjectPerformanceForm();
-    form.setProjectCompleted(true);
-    form.setStartDay("30");
-    form.setStartMonth("12");
-    form.setStartYear("1999");
-    form.setCompletionDay("NaN");
-    form.setCompletionMonth("1");
-    form.setCompletionYear("2000");
-    form.setOutturnCost("3.14");
-
-    assertThatThrownBy(() -> projectPerformanceService.updateProjectPerformance(projectPerformance, form))
-        .isInstanceOf(ClassCastException.class);
-
-    verify(projectPerformanceRepository, never()).save(any());
-  }
-
-  @Test
   void saveProjectPerformance_InvalidOutturnCost_AssertThrows() {
     var projectPerformance = new ProjectPerformance(48);
     var form = new ProjectPerformanceForm();
     form.setProjectCompleted(true);
-    form.setStartDay("30");
-    form.setStartMonth("12");
-    form.setStartYear("1999");
-    form.setCompletionDay("1");
-    form.setCompletionMonth("1");
-    form.setCompletionYear("2000");
+    form.setStartDate(LocalDate.of(1999,12,30));
+    form.setCompletionDate(LocalDate.of(2000,1,1));
     form.setOutturnCost("NaN");
 
     assertThatThrownBy(() -> projectPerformanceService.updateProjectPerformance(projectPerformance, form))
@@ -169,12 +123,8 @@ class ProjectPerformanceServiceTest {
     var scapDetail = new ScapDetail();
     var form = new ProjectPerformanceForm();
     form.setProjectCompleted(true);
-    form.setStartDay("30");
-    form.setStartMonth("12");
-    form.setStartYear("1999");
-    form.setCompletionDay("1");
-    form.setCompletionMonth("1");
-    form.setCompletionYear("2000");
+    form.setStartDate(LocalDate.of(1999,12,30));
+    form.setCompletionDate(LocalDate.of(2000,1,1));
     form.setOutturnCost("3.14");
 
     projectPerformanceService.createProjectPerformance(scapDetail, form);

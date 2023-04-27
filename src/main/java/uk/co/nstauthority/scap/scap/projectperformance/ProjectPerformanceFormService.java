@@ -21,14 +21,8 @@ public class ProjectPerformanceFormService {
     var form = new ProjectPerformanceForm();
     form.setProjectCompleted(projectPerformance.getProjectCompleted());
     if (Boolean.TRUE.equals(form.getProjectCompleted())) {
-      var startDate = projectPerformance.getStartDate();
-      form.setStartDay(String.valueOf(startDate.getDayOfMonth()));
-      form.setStartMonth(String.valueOf(startDate.getMonthValue()));
-      form.setStartYear(String.valueOf(startDate.getYear()));
-      var endDate = projectPerformance.getCompletionDate();
-      form.setCompletionDay(String.valueOf(endDate.getDayOfMonth()));
-      form.setCompletionMonth(String.valueOf(endDate.getMonthValue()));
-      form.setCompletionYear(String.valueOf(endDate.getYear()));
+      form.setStartDate(projectPerformance.getStartDate());
+      form.setCompletionDate(projectPerformance.getCompletionDate());
       form.setOutturnCost(projectPerformance.getOutturnCost().toPlainString());
     }
     return form;

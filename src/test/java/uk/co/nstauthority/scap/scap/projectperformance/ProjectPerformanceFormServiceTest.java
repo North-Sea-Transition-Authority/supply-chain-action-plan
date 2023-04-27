@@ -45,12 +45,12 @@ class ProjectPerformanceFormServiceTest {
 
     assertThat(form).extracting(
         ProjectPerformanceForm::getProjectCompleted,
-        form1 -> form1.getStartDay().getInputValue(),
-        form1 -> form1.getStartMonth().getInputValue(),
-        form1 -> form1.getStartYear().getInputValue(),
-        form1 -> form1.getCompletionDay().getInputValue(),
-        form1 -> form1.getCompletionMonth().getInputValue(),
-        form1 -> form1.getCompletionYear().getInputValue(),
+        form1 -> form1.getStartDate().getDayInput().getInputValue(),
+        form1 -> form1.getStartDate().getMonthInput().getInputValue(),
+        form1 -> form1.getStartDate().getYearInput().getInputValue(),
+        form1 -> form1.getCompletionDate().getDayInput().getInputValue(),
+        form1 -> form1.getCompletionDate().getMonthInput().getInputValue(),
+        form1 -> form1.getCompletionDate().getYearInput().getInputValue(),
         form1 -> form1.getOutturnCost().getInputValue()
     ).containsExactly(
         false,

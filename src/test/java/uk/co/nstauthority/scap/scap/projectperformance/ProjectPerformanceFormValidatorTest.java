@@ -9,6 +9,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -75,12 +76,12 @@ class ProjectPerformanceFormValidatorTest {
     var extractedErrors = ValidatorTestingUtil.extractErrors(errors);
 
     assertThat(extractedErrors).containsExactly(
-        entry("startDay.inputValue", Set.of("startDay.required")),
-        entry("startMonth.inputValue", Set.of("startMonth.required")),
-        entry("startYear.inputValue", Set.of("startYear.required")),
-        entry("completionDay.inputValue", Set.of("completionDay.required")),
-        entry("completionMonth.inputValue", Set.of("completionMonth.required")),
-        entry("completionYear.inputValue", Set.of("completionYear.required")),
+        entry("startDate.dayInput.inputValue", Set.of("startDate.dayInput.required")),
+        entry("startDate.monthInput.inputValue", Set.of("startDate.monthInput.required")),
+        entry("startDate.yearInput.inputValue", Set.of("startDate.yearInput.required")),
+        entry("completionDate.dayInput.inputValue", Set.of("completionDate.dayInput.required")),
+        entry("completionDate.monthInput.inputValue", Set.of("completionDate.monthInput.required")),
+        entry("completionDate.yearInput.inputValue", Set.of("completionDate.yearInput.required")),
         entry("outturnCost.inputValue", Set.of("outturnCost.required"))
     );
   }
@@ -90,12 +91,8 @@ class ProjectPerformanceFormValidatorTest {
     var currentInstant = clock.instant();
     var currentDate = LocalDate.ofInstant(currentInstant, clock.getZone());
     form.setProjectCompleted(true);
-    form.setStartDay(String.valueOf(currentDate.getDayOfMonth() + 1));
-    form.setStartMonth(String.valueOf(currentDate.getMonthValue()));
-    form.setStartYear(String.valueOf(currentDate.getYear()));
-    form.setCompletionDay(String.valueOf(currentDate.getDayOfMonth() + 1));
-    form.setCompletionMonth(String.valueOf(currentDate.getMonthValue()));
-    form.setCompletionYear(String.valueOf(currentDate.getYear() + 1));
+    form.setStartDate(currentDate.plus(1, ChronoUnit.DAYS));
+    form.setCompletionDate(currentDate.plus(2, ChronoUnit.DAYS));
     form.setOutturnCost("1");
 
     projectPerformanceFormValidator.validate(form, errors);
@@ -103,12 +100,12 @@ class ProjectPerformanceFormValidatorTest {
     var extractedErrors = ValidatorTestingUtil.extractErrors(errors);
 
     assertThat(extractedErrors).containsExactly(
-        entry("startDay.inputValue", Set.of("startDay.maxDateExclusiveExceeded")),
-        entry("startMonth.inputValue", Set.of("startMonth.maxDateExclusiveExceeded")),
-        entry("startYear.inputValue", Set.of("startYear.maxDateExclusiveExceeded")),
-        entry("completionDay.inputValue", Set.of("completionDay.maxDateExclusiveExceeded")),
-        entry("completionMonth.inputValue", Set.of("completionMonth.maxDateExclusiveExceeded")),
-        entry("completionYear.inputValue", Set.of("completionYear.maxDateExclusiveExceeded"))
+        entry("startDate.dayInput.inputValue", Set.of("startDate.dayInput.maxDateExclusiveExceeded")),
+        entry("startDate.monthInput.inputValue", Set.of("startDate.monthInput.maxDateExclusiveExceeded")),
+        entry("startDate.yearInput.inputValue", Set.of("startDate.yearInput.maxDateExclusiveExceeded")),
+        entry("completionDate.dayInput.inputValue", Set.of("completionDate.dayInput.maxDateExclusiveExceeded")),
+        entry("completionDate.monthInput.inputValue", Set.of("completionDate.monthInput.maxDateExclusiveExceeded")),
+        entry("completionDate.yearInput.inputValue", Set.of("completionDate.yearInput.maxDateExclusiveExceeded"))
     );
   }
 
@@ -117,12 +114,8 @@ class ProjectPerformanceFormValidatorTest {
     var currentInstant = clock.instant();
     var currentDate = LocalDate.ofInstant(currentInstant, clock.getZone());
     form.setProjectCompleted(true);
-    form.setStartDay(String.valueOf(currentDate.getDayOfMonth() - 1));
-    form.setStartMonth(String.valueOf(currentDate.getMonthValue()));
-    form.setStartYear(String.valueOf(currentDate.getYear()));
-    form.setCompletionDay(String.valueOf(currentDate.getDayOfMonth() - 1));
-    form.setCompletionMonth(String.valueOf(currentDate.getMonthValue()));
-    form.setCompletionYear(String.valueOf(currentDate.getYear() - 1));
+    form.setStartDate(currentDate.minus(1, ChronoUnit.MONTHS));
+    form.setCompletionDate(currentDate.minus(1, ChronoUnit.YEARS));
     form.setOutturnCost("1");
 
     projectPerformanceFormValidator.validate(form, errors);
@@ -130,9 +123,9 @@ class ProjectPerformanceFormValidatorTest {
     var extractedErrors = ValidatorTestingUtil.extractErrors(errors);
 
     assertThat(extractedErrors).containsExactly(
-        entry("completionDay.inputValue", Set.of("completionDay.minDateExclusiveNotMet")),
-        entry("completionMonth.inputValue", Set.of("completionMonth.minDateExclusiveNotMet")),
-        entry("completionYear.inputValue", Set.of("completionYear.minDateExclusiveNotMet"))
+        entry("completionDate.dayInput.inputValue", Set.of("completionDate.dayInput.minDateExclusiveNotMet")),
+        entry("completionDate.monthInput.inputValue", Set.of("completionDate.monthInput.minDateExclusiveNotMet")),
+        entry("completionDate.yearInput.inputValue", Set.of("completionDate.yearInput.minDateExclusiveNotMet"))
     );
   }
 
@@ -141,12 +134,8 @@ class ProjectPerformanceFormValidatorTest {
     var currentInstant = clock.instant();
     var currentDate = LocalDate.ofInstant(currentInstant, clock.getZone());
     form.setProjectCompleted(true);
-    form.setStartDay(String.valueOf(currentDate.getDayOfMonth() - 1));
-    form.setStartMonth(String.valueOf(currentDate.getMonthValue()));
-    form.setStartYear(String.valueOf(currentDate.getYear() - 1));
-    form.setCompletionDay(String.valueOf(currentDate.getDayOfMonth() - 1));
-    form.setCompletionMonth(String.valueOf(currentDate.getMonthValue()));
-    form.setCompletionYear(String.valueOf(currentDate.getYear()));
+    form.setStartDate(currentDate.minus(1, ChronoUnit.YEARS));
+    form.setCompletionDate(currentDate.minus(1, ChronoUnit.DAYS));
     form.setOutturnCost("1");
 
     projectPerformanceFormValidator.validate(form, errors);

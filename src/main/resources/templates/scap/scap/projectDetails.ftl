@@ -110,18 +110,18 @@
     </@fdsRadio.radioGroup>
 
     <@fdsDateInput.dateInput
-      formId="startDate"
-      dayPath="form.startDay.inputValue"
-      monthPath="form.startMonth.inputValue"
-      yearPath="form.startYear.inputValue"
+      formId="expectedStartDate"
+      dayPath="form.expectedStartDate.dayInput.inputValue"
+      monthPath="form.expectedStartDate.monthInput.inputValue"
+      yearPath="form.expectedStartDate.yearInput.inputValue"
       labelText="Indicative planned execution start date"
       hintText="For example, 31 3 2023"
     />
     <@fdsDateInput.dateInput
-      formId="endDate"
-      dayPath="form.endDay.inputValue"
-      monthPath="form.endMonth.inputValue"
-      yearPath="form.endYear.inputValue"
+      formId="expectedEndDate"
+      dayPath="form.expectedEndDate.dayInput.inputValue"
+      monthPath="form.expectedEndDate.monthInput.inputValue"
+      yearPath="form.expectedEndDate.yearInput.inputValue"
       labelText="Indicative planned commissioning or completion date"
       hintText="For example, 31 3 2024"
       />

@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -77,12 +79,12 @@ class ProjectDetailsFormValidatorTest {
         entry("expectsToMeetLocalContentCommitment", Set.of("required")),
         entry("fieldSelector", Set.of("fieldSelector.required")),
         entry("hasPlatforms", Set.of("hasPlatforms.required")),
-        entry("startDay.inputValue", Set.of("startDay.required")),
-        entry("startMonth.inputValue", Set.of("startMonth.required")),
-        entry("startYear.inputValue", Set.of("startYear.required")),
-        entry("endDay.inputValue", Set.of("endDay.required")),
-        entry("endMonth.inputValue", Set.of("endMonth.required")),
-        entry("endYear.inputValue", Set.of("endYear.required"))
+        entry("expectedStartDate.dayInput.inputValue", Set.of("expectedStartDate.dayInput.required")),
+        entry("expectedStartDate.monthInput.inputValue", Set.of("expectedStartDate.monthInput.required")),
+        entry("expectedStartDate.yearInput.inputValue", Set.of("expectedStartDate.yearInput.required")),
+        entry("expectedEndDate.dayInput.inputValue", Set.of("expectedEndDate.dayInput.required")),
+        entry("expectedEndDate.monthInput.inputValue", Set.of("expectedEndDate.monthInput.required")),
+        entry("expectedEndDate.yearInput.inputValue", Set.of("expectedEndDate.yearInput.required"))
     );
   }
 
@@ -171,8 +173,8 @@ class ProjectDetailsFormValidatorTest {
 
   @Test
   void validate_startDateAfterEndDate_assertHasExpectedError() {
-    form.setStartYear("2023");
-    form.setEndYear("2022");
+    form.setExpectedStartDate(LocalDate.now());
+    form.setExpectedEndDate(LocalDate.now().minus(1, ChronoUnit.YEARS));
 
     when(fieldService.getFieldsByIds(VALID_FIELD_IDS, ProjectDetailsFormValidator.FIELDS_REQUEST_PURPOSE))
         .thenReturn(FIELDS);
@@ -182,9 +184,9 @@ class ProjectDetailsFormValidatorTest {
     var extractedErrors = ValidatorTestingUtil.extractErrors(bindingResult);
 
     assertThat(extractedErrors).containsExactly(
-        entry("endDay.inputValue", Set.of("endDay.minDateExclusiveNotMet")),
-        entry("endMonth.inputValue", Set.of("endMonth.minDateExclusiveNotMet")),
-        entry("endYear.inputValue", Set.of("endYear.minDateExclusiveNotMet"))
+        entry("expectedEndDate.dayInput.inputValue", Set.of("expectedEndDate.dayInput.minDateExclusiveNotMet")),
+        entry("expectedEndDate.monthInput.inputValue", Set.of("expectedEndDate.monthInput.minDateExclusiveNotMet")),
+        entry("expectedEndDate.yearInput.inputValue", Set.of("expectedEndDate.yearInput.minDateExclusiveNotMet"))
     );
   }
 
@@ -259,12 +261,8 @@ class ProjectDetailsFormValidatorTest {
     form.setExpectsToMeetLocalContentCommitment(true);
     form.setFieldIds(new HashSet<>(VALID_FIELD_IDS));
     form.setHasPlatforms(false);
-    form.setStartDay("22");
-    form.setStartMonth("1");
-    form.setStartYear("2022");
-    form.setEndDay("27");
-    form.setEndMonth("12");
-    form.setEndYear("2023");
+    form.setExpectedStartDate(LocalDate.of(2022, 1, 22));
+    form.setExpectedEndDate(LocalDate.of(2023, 12, 27));
     return form;
   }
 }

@@ -63,15 +63,8 @@ public class ProjectDetailsFormService {
     form.setHasPlatforms(projectDetails.getHasFacilities());
     form.setInstallationIds(projectFacilityIds);
 
-    var startDate = projectDetails.getPlannedExecutionStartDate();
-    form.setStartDay(String.valueOf(startDate.getDayOfMonth()));
-    form.setStartMonth(String.valueOf(startDate.getMonthValue()));
-    form.setStartYear(String.valueOf(startDate.getYear()));
-
-    var endDate = projectDetails.getPlannedCompletionDate();
-    form.setEndDay(String.valueOf(endDate.getDayOfMonth()));
-    form.setEndMonth(String.valueOf(endDate.getMonthValue()));
-    form.setEndYear(String.valueOf(endDate.getYear()));
+    form.setExpectedStartDate(projectDetails.getPlannedExecutionStartDate());
+    form.setExpectedEndDate(projectDetails.getPlannedCompletionDate());
 
     var fileUploadForms = supportingDocumentService.getFileUploadFormListForScapDetailAndType(
         projectDetails.getScapDetail(), SupportingDocumentType.ADDITIONAL_DOCUMENT);

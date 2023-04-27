@@ -5,6 +5,7 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Service
@@ -39,15 +40,9 @@ public class ProjectPerformanceService {
     projectPerformance.setProjectCompleted(Boolean.TRUE.equals(form.getProjectCompleted()));
     if (Boolean.TRUE.equals(projectPerformance.getProjectCompleted())) {
       var startDate = form.getStartDate().getAsLocalDate()
-          .orElseThrow(() -> new ClassCastException("Could not get %s/%s/%s as LocalDate".formatted(
-              form.getStartDay().getInputValue(),
-              form.getStartMonth().getInputValue(),
-              form.getStartYear().getInputValue())));
+          .orElseThrow(() -> new ScapEntityNotFoundException("Could not get start date"));
       var completionDate = form.getCompletionDate().getAsLocalDate()
-          .orElseThrow(() -> new ClassCastException("Could not get %s/%s/%s as LocalDate".formatted(
-              form.getCompletionDay().getInputValue(),
-              form.getCompletionMonth().getInputValue(),
-              form.getCompletionYear().getInputValue())));
+          .orElseThrow(() -> new ScapEntityNotFoundException("Could not get completed date"));
       var outturnCost = form.getOutturnCost().getAsBigDecimal()
               .orElseThrow(() -> new ClassCastException("Could not get %s as BigDecimal".formatted(
                   form.getOutturnCost().getInputValue())));
