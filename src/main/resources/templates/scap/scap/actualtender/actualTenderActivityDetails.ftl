@@ -47,6 +47,7 @@ backLinkUrl=springUrl(backLinkUrl)
       pathForSelector="form.ittParticipantsSelector"
       alreadyAdded=preselectedIttParticipants![]
       restUrl=springUrl(organisationUnitSearchUrl)
+      selectorHintText="To add a new company, type the full company name in the search box and press enter"
       itemName="Invitation to tender recipient"
       selectorLabelText="Enter the invitation to tender recipients"
     />
