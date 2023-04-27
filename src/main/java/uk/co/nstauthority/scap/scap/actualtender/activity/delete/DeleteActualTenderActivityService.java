@@ -29,7 +29,7 @@ class DeleteActualTenderActivityService {
   }
 
   @Transactional
-  void deleteActualTenderActivity(ActualTenderActivity actualTenderActivity) {
+  public void deleteActualTenderActivity(ActualTenderActivity actualTenderActivity) {
     contractingPerformanceService.deleteByActualTenderActivity(actualTenderActivity);
     awardedContractService.deleteByActualTenderActivity(actualTenderActivity);
     invitationToTenderParticipantService.deleteAllByActualTenderActivity(actualTenderActivity);

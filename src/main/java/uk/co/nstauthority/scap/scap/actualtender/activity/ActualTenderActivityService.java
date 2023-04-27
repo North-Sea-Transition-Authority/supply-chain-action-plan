@@ -49,14 +49,14 @@ public class ActualTenderActivityService {
   }
 
   @Transactional
-  ActualTenderActivity createActualTenderActivity(ActualTender actualTender, ActualTenderActivityForm form) {
+  public ActualTenderActivity createActualTenderActivity(ActualTender actualTender, ActualTenderActivityForm form) {
     var actualTenderActivity = new ActualTenderActivity(actualTender, clock.instant());
     saveActualTenderActivity(actualTenderActivity, form);
     return actualTenderActivity;
   }
 
   @Transactional
-  void saveActualTenderActivity(ActualTenderActivity actualTenderActivity, ActualTenderActivityForm form) {
+  public void saveActualTenderActivity(ActualTenderActivity actualTenderActivity, ActualTenderActivityForm form) {
     actualTenderActivity.setScopeTitle(form.getScopeTitle().getInputValue());
     actualTenderActivity.setScopeDescription(form.getScopeDescription().getInputValue());
     actualTenderActivity.setRemunerationModel(form.getRemunerationModel());

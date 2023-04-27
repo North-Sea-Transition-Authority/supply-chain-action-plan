@@ -22,7 +22,7 @@ class ScapOperatorService {
   }
 
   @Transactional
-  Scap createScap(OrganisationGroupForm form) {
+  public Scap createScap(OrganisationGroupForm form) {
     var scap = scapService.createScap(form.getOrganisationGroupId());
     var scapDetail = scapDetailService.createDraftScapDetail(scap);
     updateScapOperator(scap, scapDetail, form);
@@ -30,7 +30,7 @@ class ScapOperatorService {
   }
 
   @Transactional
-  void updateScapOperator(Scap scap, ScapDetail scapDetail, OrganisationGroupForm form) {
+  public void updateScapOperator(Scap scap, ScapDetail scapDetail, OrganisationGroupForm form) {
     scapService.updateScapOrganisationGroup(scap, form.getOrganisationGroupId());
     var parentScap = getParentScap(form);
     scapDetailService.setTierOneContractor(scapDetail, parentScap, form);

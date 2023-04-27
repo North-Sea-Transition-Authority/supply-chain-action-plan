@@ -27,7 +27,7 @@ public class AwardedContractService {
   }
 
   @Transactional
-  void saveAwardedContract(ActualTenderActivity actualTenderActivity, AwardedContractForm form,
+  public void saveAwardedContract(ActualTenderActivity actualTenderActivity, AwardedContractForm form,
                            List<InvitationToTenderParticipant> bidParticipants) {
     var awardedContract = getByActualTenderActivity(actualTenderActivity)
         .orElse(new AwardedContract(actualTenderActivity, clock.instant()));

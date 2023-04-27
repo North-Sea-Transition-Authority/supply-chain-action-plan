@@ -25,7 +25,7 @@ class UploadedFilePersistenceService {
   }
 
   @Transactional
-  UploadedFile createUploadedFile(VirtualFolder virtualFolder, long fileSize, String filename,
+  public UploadedFile createUploadedFile(VirtualFolder virtualFolder, long fileSize, String filename,
                                                  String contentType) {
     var s3Key = createS3KeyWithPath(virtualFolder);
 
@@ -49,7 +49,7 @@ class UploadedFilePersistenceService {
   }
 
   @Transactional
-  void deleteFile(UploadedFile uploadedFile) {
+  public void deleteFile(UploadedFile uploadedFile) {
     uploadedFileRepository.delete(uploadedFile);
   }
 
@@ -58,7 +58,7 @@ class UploadedFilePersistenceService {
   }
 
   @Transactional
-  void updateFileDescription(UploadedFile uploadedFile, String uploadedFileDescription) {
+  public void updateFileDescription(UploadedFile uploadedFile, String uploadedFileDescription) {
     uploadedFile.setDescription(uploadedFileDescription);
     uploadedFileRepository.save(uploadedFile);
   }

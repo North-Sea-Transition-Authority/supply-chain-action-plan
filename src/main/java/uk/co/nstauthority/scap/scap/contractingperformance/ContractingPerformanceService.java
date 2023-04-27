@@ -44,14 +44,14 @@ public class ContractingPerformanceService {
   }
 
   @Transactional
-  void createContractingPerformance(ContractingPerformanceOverview contractingPerformanceOverview,
+  public void createContractingPerformance(ContractingPerformanceOverview contractingPerformanceOverview,
                                     ContractingPerformanceForm form) {
     var contractingPerformance = new ContractingPerformance(contractingPerformanceOverview, clock.instant());
     saveContractingPerformance(contractingPerformance, form);
   }
 
   @Transactional
-  void saveContractingPerformance(ContractingPerformance contractingPerformance,
+  public void saveContractingPerformance(ContractingPerformance contractingPerformance,
                                   ContractingPerformanceForm form) {
     var actualTenderActivity = actualTenderActivityService.getById(form.getActualTenderActivityId());
     contractingPerformance.setActualTenderActivity(actualTenderActivity);

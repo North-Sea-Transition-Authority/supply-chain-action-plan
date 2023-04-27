@@ -42,7 +42,7 @@ public class NotifyCallbackService {
   }
 
   @Transactional
-  void handleNotifyCallback(NotifyCallback notifyCallback) {
+  public void handleNotifyCallback(NotifyCallback notifyCallback) {
     if (!FAILURE_STATUSES.contains(notifyCallback.getStatus())) {
       return;
     }

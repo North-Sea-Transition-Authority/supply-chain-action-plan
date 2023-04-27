@@ -27,7 +27,7 @@ class UpdateActualTenderActivityService {
   }
 
   @Transactional
-  void updateActualTenderActivity(ActualTenderActivity actualTenderActivity, ActualTenderActivityForm form) {
+  public void updateActualTenderActivity(ActualTenderActivity actualTenderActivity, ActualTenderActivityForm form) {
     if (ContractStage.CONTRACT_AWARDED.equals(actualTenderActivity.getContractStage())
         && !ContractStage.CONTRACT_AWARDED.equals(form.getContractStage())) {
       contractingPerformanceService.deleteByActualTenderActivity(actualTenderActivity);

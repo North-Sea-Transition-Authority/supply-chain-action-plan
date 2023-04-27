@@ -74,7 +74,7 @@ public class ProjectDetailsService {
   }
 
   @Transactional
-  void saveProjectDetails(ScapDetail scapDetail, ProjectDetailsForm form) {
+  public void saveProjectDetails(ScapDetail scapDetail, ProjectDetailsForm form) {
     var createdTimestamp = clock.instant();
     var projectDetails = projectDetailsRepository.findByScapDetail(scapDetail)
         .orElse(new ProjectDetails(scapDetail, createdTimestamp));
