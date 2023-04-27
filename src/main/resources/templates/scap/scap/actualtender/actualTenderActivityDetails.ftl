@@ -25,10 +25,16 @@ backLinkUrl=springUrl(backLinkUrl)
         add text detailing the "award rationale" as single source.
       </p>
     </@fdsDetails.summaryDetails>
-    <@fdsRadio.radioGroup path="form.remunerationModel" labelText="Remuneration model" hiddenContent=true>
+    <@fdsRadio.radioGroup
+      path="form.remunerationModel"
+      labelText="Remuneration model"
+      hiddenContent=true
+      hintText="If multiple apply, pick 'Other' and specify in description">
       <#assign firstItem=true/>
       <#list remunerationModels as key, value>
-        <@fdsRadio.radioItem path="form.remunerationModel" itemMap={key : value} isFirstItem=firstItem>
+        <@fdsRadio.radioItem
+          path="form.remunerationModel"
+          itemMap={key : value} isFirstItem=firstItem>
           <#if key == "OTHER">
             <@fdsTextarea.textarea
               path="form.remunerationModelName.inputValue"

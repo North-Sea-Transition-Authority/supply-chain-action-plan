@@ -23,7 +23,11 @@
       inputClass="govuk-input--width-7"
     />
 
-      <@fdsRadio.radioGroup path="form.remunerationModel" labelText="Remuneration model" hiddenContent=true>
+      <@fdsRadio.radioGroup
+        path="form.remunerationModel"
+        labelText="Remuneration model"
+        hiddenContent=true
+        hintText="If multiple apply, pick 'Other' and specify in description">
         <#assign firstItem=true/>
         <#list remunerationModels as key, value>
           <@fdsRadio.radioItem path="form.remunerationModel" itemMap={key : value} isFirstItem=firstItem>
