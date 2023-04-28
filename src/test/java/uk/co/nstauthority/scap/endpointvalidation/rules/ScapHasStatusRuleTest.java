@@ -48,7 +48,8 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
         request,
         response,
         userDetail,
-        scap
+        scap,
+        null
     );
 
     assertTrue(interceptorResult.hasRulePassed());
@@ -70,7 +71,8 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
         request,
         response,
         userDetail,
-        scap
+        scap,
+        null
     );
     var redirectUrl = ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID));
 
@@ -93,7 +95,8 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
         request,
         response,
         userDetail,
-        scap
+        scap,
+        null
     );
 
     assertFalse(interceptorResult.hasRulePassed());
@@ -115,7 +118,8 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
         request,
         response,
         userDetail,
-        scap
+        scap,
+        null
     );
 
     assertTrue(interceptorResult.hasRulePassed());

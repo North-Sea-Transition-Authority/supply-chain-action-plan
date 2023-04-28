@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.IsMemberOfTeam;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.enumutil.DisplayableEnumOptionUtil;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
@@ -21,7 +22,6 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRolesForm;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberView;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRoleUtil;
-import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.IsMemberOfTeamOrRegulator;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForTeam;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRoleService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
@@ -29,7 +29,7 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 
 @Controller
-@IsMemberOfTeamOrRegulator
+@IsMemberOfTeam(allowRegulatorAccess = true)
 @RequestMapping("/permission-management/industry/{teamId}/edit/{wuaId}")
 @PermissionsRequiredForTeam(permissions = RolePermission.MANAGE_ORGANISATIONS)
 public class IndustryEditMemberController {

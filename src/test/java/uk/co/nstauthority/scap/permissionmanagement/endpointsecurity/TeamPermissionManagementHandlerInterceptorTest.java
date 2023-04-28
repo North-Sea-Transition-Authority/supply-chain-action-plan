@@ -1,6 +1,5 @@
 package uk.co.nstauthority.scap.permissionmanagement.endpointsecurity;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -19,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.IsMemberOfTeam;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
@@ -172,7 +172,7 @@ class TeamPermissionManagementHandlerInterceptorTest extends AbstractControllerT
     }
 
     @GetMapping("/permission-management/has-other-annotation/{teamId}")
-    @IsMemberOfTeamOrRegulator
+    @IsMemberOfTeam(allowRegulatorAccess = true)
     ModelAndView hasOtherAnnotations(@PathVariable TeamId teamId) {
       return new ModelAndView(VIEW_NAME);
     }

@@ -11,15 +11,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.IsMemberOfTeam;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
-import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.IsMemberOfTeamOrRegulator;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 @Controller
-@IsMemberOfTeamOrRegulator
+@IsMemberOfTeam
 @RequestMapping("/permission-management/regulator")
 public class RegulatorTeamMemberController {
 
@@ -56,7 +56,6 @@ public class RegulatorTeamMemberController {
   }
 
   @GetMapping("/{teamId}")
-  @IsMemberOfTeamOrRegulator
   public ModelAndView renderMemberList(@PathVariable("teamId") TeamId teamId) {
 
     var team = teamService.getTeam(teamId);

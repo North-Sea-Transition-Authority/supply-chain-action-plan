@@ -15,6 +15,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
+import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
@@ -53,6 +54,7 @@ public class ScapHandlerInterceptor implements HandlerInterceptor {
     }
 
     var scap = extractScapFromRequest(request, handlerMethod);
+    var teamId = extractTeamIdFromRequest(request, handlerMethod);
     var userDetail = userDetailService.getUserDetail();
 
     for (var securityRule : securityRules) {
@@ -65,7 +67,8 @@ public class ScapHandlerInterceptor implements HandlerInterceptor {
           request,
           response,
           userDetail,
-          scap
+          scap,
+          teamId
       );
 
       var hasRulePassed = HandlerInterceptorUtil.processRedirectsAndReturnResult(result, response);
@@ -77,9 +80,7 @@ public class ScapHandlerInterceptor implements HandlerInterceptor {
   }
 
   private Scap extractScapFromRequest(HttpServletRequest httpServletRequest, HandlerMethod handlerMethod) {
-
     var scapIdParameter = getPathVariableByClass(handlerMethod, ScapId.class);
-
     if (scapIdParameter.isEmpty()) {
       return null;
     }
@@ -89,5 +90,18 @@ public class ScapHandlerInterceptor implements HandlerInterceptor {
         .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
     return scapService.getScapById(ScapId.valueOf(pathVariables.get(scapIdParameter.get().getName())));
+  }
+
+  public static TeamId extractTeamIdFromRequest(HttpServletRequest httpServletRequest, HandlerMethod handlerMethod) {
+    var teamIdParameter = getPathVariableByClass(handlerMethod, TeamId.class);
+    if (teamIdParameter.isEmpty()) {
+      return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    var pathVariables = (Map<String, String>) httpServletRequest
+        .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+
+    return TeamId.valueOf(pathVariables.get(teamIdParameter.get().getName()));
   }
 }

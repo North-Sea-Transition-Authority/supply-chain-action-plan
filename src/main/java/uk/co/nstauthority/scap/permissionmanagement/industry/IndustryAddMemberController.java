@@ -15,19 +15,19 @@ import uk.co.fivium.digital.energyportalteamaccesslibrary.team.EnergyPortalAcces
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.configuration.SamlProperties;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.IsMemberOfTeam;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.AddTeamMemberForm;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
-import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.IsMemberOfTeamOrRegulator;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForTeam;
 import uk.co.nstauthority.scap.permissionmanagement.teams.AddMemberController;
 import uk.co.nstauthority.scap.permissionmanagement.teams.AddTeamMemberValidator;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 
 @Controller
-@IsMemberOfTeamOrRegulator
+@IsMemberOfTeam(allowRegulatorAccess = true)
 @RequestMapping("/permission-management/industry/{teamId}")
 @PermissionsRequiredForTeam(permissions = RolePermission.MANAGE_ORGANISATIONS)
 class IndustryAddMemberController extends AddMemberController {

@@ -7,9 +7,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
-
 import java.util.List;
-import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -49,7 +47,8 @@ class UserHasPermissionRuleTest extends AbstractInterceptorRuleTest {
         request,
         response,
         userDetail,
-        scap
+        scap,
+        null
     );
 
     assertTrue(interceptorResult.hasRulePassed());
@@ -69,7 +68,8 @@ class UserHasPermissionRuleTest extends AbstractInterceptorRuleTest {
         request,
         response,
         userDetail,
-        scap
+        scap,
+        null
     );
 
     var redirectUrl = ReverseRouter.route(on(TeamManagementController.class).renderTeamList());

@@ -1,33 +1,36 @@
 package uk.co.nstauthority.scap.endpointvalidation.rules;
 
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.endpointvalidation.ScapSecurityRule;
 import uk.co.nstauthority.scap.endpointvalidation.SecurityRuleResult;
-import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermission;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.IsMemberOfTeam;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 
-public class UserHasAnyPermissionRule implements ScapSecurityRule {
-  private static final Logger LOGGER = LoggerFactory.getLogger(UserHasAnyPermissionRule.class);
+@Component
+public class MemberOfTeamRule implements ScapSecurityRule {
+
+  private final TeamService teamService;
+
   private final TeamMemberService teamMemberService;
 
   @Autowired
-  public UserHasAnyPermissionRule(TeamMemberService teamMemberService) {
+  public MemberOfTeamRule(TeamService teamService, TeamMemberService teamMemberService) {
+    this.teamService = teamService;
     this.teamMemberService = teamMemberService;
   }
 
   @Override
   public Class<? extends Annotation> supports() {
-    return UserHasAnyPermission.class;
+    return IsMemberOfTeam.class;
   }
 
   @Override
@@ -37,15 +40,13 @@ public class UserHasAnyPermissionRule implements ScapSecurityRule {
                                   ServiceUserDetail userDetail,
                                   Scap scap,
                                   TeamId teamId) {
-    var userPermissions = teamMemberService.getAllPermissionsForUser(userDetail);
-    var requiredPermissions = (UserHasAnyPermission) annotation;
-    var hasPermission = Arrays.stream(requiredPermissions.permissions())
-        .anyMatch(userPermissions::contains);
 
-    if (hasPermission) {
+    if (((IsMemberOfTeam) annotation).allowRegulatorAccess() && teamService.userIsMemberOfRegulatorTeam(userDetail)) {
       return SecurityRuleResult.continueAsNormal();
     }
-    LOGGER.warn("User with ID: %s does not have the required permissions.".formatted(userDetail.wuaId()));
+    if (teamMemberService.isMemberOfTeam(teamId, userDetail)) {
+      return SecurityRuleResult.continueAsNormal();
+    }
     return SecurityRuleResult.checkFailedWithStatus(HttpStatus.FORBIDDEN);
   }
 }

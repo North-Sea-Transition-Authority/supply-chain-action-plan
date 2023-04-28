@@ -18,6 +18,7 @@ import uk.co.nstauthority.scap.endpointvalidation.ScapSecurityRule;
 import uk.co.nstauthority.scap.endpointvalidation.SecurityRuleResult;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.Scap;
@@ -45,7 +46,8 @@ public class ScapHasStatusRule implements ScapSecurityRule {
                                   HttpServletRequest request,
                                   HttpServletResponse response,
                                   ServiceUserDetail userDetail,
-                                  Scap scap) {
+                                  Scap scap,
+                                  TeamId teamId) {
     var permittedStatuses = ((ScapHasStatus) annotation).permittedStatuses();
     var scapDetail = scapDetailService.getActionableScapDetail(scap.getScapId(), userDetail);
     var scapStatus = scapDetail.getStatus();

@@ -13,7 +13,6 @@ import org.springframework.web.servlet.resource.VersionResourceResolver;
 import uk.co.nstauthority.scap.endpointvalidation.ScapHandlerInterceptor;
 import uk.co.nstauthority.scap.mvc.ResponseBufferSizeHandlerInterceptor;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.ScapPermissionManagementHandlerInterceptor;
-import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.TeamManagementHandlerInterceptor;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.TeamPermissionManagementHandlerInterceptor;
 
 @Configuration
@@ -26,7 +25,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
   private static final String ERROR_EXCLUSION_PATH = "/error/**";
 
   private final TeamPermissionManagementHandlerInterceptor teamPermissionManagementHandlerInterceptor;
-  private final TeamManagementHandlerInterceptor teamManagementHandlerInterceptor;
 
 
   private final ScapPermissionManagementHandlerInterceptor scapPermissionManagementHandlerInterceptor;
@@ -34,11 +32,9 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
   @Autowired
   WebMvcConfiguration(TeamPermissionManagementHandlerInterceptor teamPermissionManagementHandlerInterceptor,
-                      TeamManagementHandlerInterceptor teamManagementHandlerInterceptor,
                       ScapPermissionManagementHandlerInterceptor scapPermissionManagementHandlerInterceptor,
                       ScapHandlerInterceptor scapHandlerInterceptor) {
     this.teamPermissionManagementHandlerInterceptor = teamPermissionManagementHandlerInterceptor;
-    this.teamManagementHandlerInterceptor = teamManagementHandlerInterceptor;
     this.scapPermissionManagementHandlerInterceptor = scapPermissionManagementHandlerInterceptor;
     this.scapHandlerInterceptor = scapHandlerInterceptor;
   }
@@ -63,8 +59,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         .excludePathPatterns(LOGOUT_EXCLUSION_PATH, ERROR_EXCLUSION_PATH);
     registry.addInterceptor(scapHandlerInterceptor)
         .excludePathPatterns(ASSET_EXCLUSION_PATH, ERROR_EXCLUSION_PATH);
-    registry.addInterceptor(teamManagementHandlerInterceptor)
-        .addPathPatterns("/permission-management/**");
     // TODO SCAP2022-203: Condense interceptors to just teamHandlerInterceptor and scapHandlerInterceptor
   }
 

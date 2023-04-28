@@ -19,6 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.IsMemberOfTeam;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
@@ -64,24 +65,37 @@ class TeamManagementHandlerInterceptorTest extends AbstractControllerTest {
   }
 
   @Test
-  void preHandle_whenMethodHasAnnotationButParameterEmpty_BadRequest() throws Exception {
+  void preHandle_whenMethodHasAnnotationButParameterEmpty_Forbidden() throws Exception {
     when(userDetailService.getUserDetail()).thenReturn(user);
 
     mockMvc.perform(get(ReverseRouter.route(on(TeamManagementHandlerInterceptorTest.TestController.class)
             .emptyAnnotation()))
             .with(user(user)))
-        .andExpect(status().isBadRequest());
+        .andExpect(status().isForbidden());
   }
 
   @Test
   void preHandle_whenMethodHasAnnotationB_isOk() throws Exception {
+    var teamId = new TeamId(UUID.randomUUID());
     when(userDetailService.getUserDetail()).thenReturn(user);
-    when(teamService.getTeamsThatUserBelongsTo(user)).thenReturn(List.of(TeamTestUtil.Builder().build()));
+    when(teamMemberService.isMemberOfTeam(teamId, user)).thenReturn(true);
 
     mockMvc.perform(get(ReverseRouter.route(on(TeamManagementHandlerInterceptorTest.TestController.class)
-            .isMemberOfTeam(new TeamId(UUID.randomUUID()))))
+            .isMemberOfTeam(teamId)))
             .with(user(user)))
         .andExpect(status().isOk());
+  }
+
+  @Test
+  void preHandle_whenMethodIsForbidden_isForbidden() throws Exception {
+    var teamId = new TeamId(UUID.randomUUID());
+    when(userDetailService.getUserDetail()).thenReturn(user);
+    when(teamMemberService.isMemberOfTeam(teamId, user)).thenReturn(false);
+
+    mockMvc.perform(get(ReverseRouter.route(on(TeamManagementHandlerInterceptorTest.TestController.class)
+            .isMemberOfTeam(teamId)))
+            .with(user(user)))
+        .andExpect(status().isForbidden());
   }
 
 
@@ -102,13 +116,13 @@ class TeamManagementHandlerInterceptorTest extends AbstractControllerTest {
     }
 
     @GetMapping("/permission-management/empty/member-of-team")
-    @IsMemberOfTeamOrRegulator
+    @IsMemberOfTeam(allowRegulatorAccess = true)
     ModelAndView emptyAnnotation() {
       return new ModelAndView(VIEW_NAME);
     }
 
     @GetMapping("/permission-management/with-is-member-of-team/${teamId}")
-    @IsMemberOfTeamOrRegulator
+    @IsMemberOfTeam
     ModelAndView isMemberOfTeam(@PathVariable TeamId teamId) {
       return new ModelAndView(VIEW_NAME);
     }

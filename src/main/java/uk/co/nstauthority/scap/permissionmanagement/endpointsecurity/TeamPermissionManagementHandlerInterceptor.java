@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.permissionmanagement.endpointsecurity;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -10,10 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerMapping;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.error.exception.InvalidAuthenticationException;
+import uk.co.nstauthority.scap.error.exception.ScapBadRequestException;
 import uk.co.nstauthority.scap.mvc.AbstractHandlerInterceptor;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
@@ -47,7 +50,7 @@ public class TeamPermissionManagementHandlerInterceptor extends AbstractHandlerI
                            @NonNull Object handler) {
 
     if (handler instanceof HandlerMethod handlerMethod && hasAnnotation(handlerMethod, PermissionsRequiredForTeam.class)) {
-      var teamId = TeamManagementHandlerInterceptor.extractTeamIdFromRequest(request, handlerMethod);
+      var teamId = extractTeamIdFromRequest(request, handlerMethod);
       var user = userDetailService.getUserDetail();
       checkIsMemberOfTeamWithRole(
           teamId,
@@ -118,5 +121,18 @@ public class TeamPermissionManagementHandlerInterceptor extends AbstractHandlerI
       throw new InvalidAuthenticationException(errorMessage);
     }
     return false;
+  }
+
+  public static TeamId extractTeamIdFromRequest(HttpServletRequest httpServletRequest, HandlerMethod handlerMethod) {
+    var teamIdParameter = getPathVariableByClass(handlerMethod, TeamId.class);
+    if (teamIdParameter.isEmpty()) {
+      throw new ScapBadRequestException("TeamId is not included in parameters");
+    }
+
+    @SuppressWarnings("unchecked")
+    var pathVariables = (Map<String, String>) httpServletRequest
+        .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+
+    return TeamId.valueOf(pathVariables.get(teamIdParameter.get().getName()));
   }
 }
