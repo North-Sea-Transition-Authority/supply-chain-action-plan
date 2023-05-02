@@ -9,6 +9,8 @@ import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -25,6 +27,8 @@ import uk.co.nstauthority.scap.util.HandlerInterceptorUtil;
 
 @Component
 public class ScapHandlerInterceptor implements HandlerInterceptor {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ScapHandlerInterceptor.class);
 
   private final ScapDetailService scapDetailService;
 
@@ -48,6 +52,10 @@ public class ScapHandlerInterceptor implements HandlerInterceptor {
   public boolean preHandle(@NotNull HttpServletRequest request,
                            @NotNull HttpServletResponse response,
                            @NotNull Object handler) throws IOException {
+    if (!(handler instanceof HandlerMethod)) {
+      LOGGER.warn("No handler annotations detected for this endpoint");
+      return true;
+    }
     var handlerMethod = (HandlerMethod) handler;
 
     // Check if any ScapSecurityRule-based annotations are applied to the requested endpoint.

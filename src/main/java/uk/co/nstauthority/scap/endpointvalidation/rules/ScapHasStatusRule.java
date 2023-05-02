@@ -58,6 +58,7 @@ public class ScapHasStatusRule implements ScapSecurityRule {
       return SecurityRuleResult.continueAsNormal();
     }
 
+    LOGGER.error("Cannot perform this action on a SCAP with status: %s".formatted(scapDetail.getStatus()));
     if (ScapDetailStatus.SUBMITTED.equals(scapStatus)) {
       var scapId = scapDetail.getScap().getScapId();
       var loggerMsg = "SCAP with ID [%s] has status %s. Redirecting user with ID [%d] to SCAP summary page.".formatted(

@@ -46,7 +46,7 @@ public class UserHasAnyPermissionRule implements ScapSecurityRule {
     if (hasPermission) {
       return SecurityRuleResult.continueAsNormal();
     }
-    LOGGER.warn("User with ID: %s does not have the required permissions.".formatted(userDetail.wuaId()));
+    LOGGER.error("User with ID: %s does not have the required permissions.".formatted(userDetail.wuaId()));
     return SecurityRuleResult.checkFailedWithStatus(HttpStatus.FORBIDDEN);
   }
 }

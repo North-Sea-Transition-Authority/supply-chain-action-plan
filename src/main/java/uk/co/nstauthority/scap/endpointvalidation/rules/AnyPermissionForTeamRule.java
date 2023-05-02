@@ -49,7 +49,7 @@ public class AnyPermissionForTeamRule implements ScapSecurityRule {
   public SecurityRuleResult check(Object annotation, HttpServletRequest request, HttpServletResponse response,
                                   ServiceUserDetail userDetail, ScapDetail scapDetail, Team team) {
     if (team == null) {
-      LOGGER.warn("Could not find Team based on URL: %s".formatted(request.getRequestURI()));
+      LOGGER.error("Could not find Team based on URL: %s".formatted(request.getRequestURI()));
       return SecurityRuleResult.checkFailedWithStatus(HttpStatus.BAD_REQUEST);
     }
 
@@ -78,6 +78,8 @@ public class AnyPermissionForTeamRule implements ScapSecurityRule {
     if (hasPermission) {
       return SecurityRuleResult.continueAsNormal();
     } else {
+      LOGGER.error("User does not have permission to interact with team: %s"
+          .formatted(team.getDisplayName()));
       return SecurityRuleResult.checkFailedWithStatus(HttpStatus.FORBIDDEN);
     }
   }

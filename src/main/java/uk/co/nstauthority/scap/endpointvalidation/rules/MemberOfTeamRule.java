@@ -3,6 +3,8 @@ package uk.co.nstauthority.scap.endpointvalidation.rules;
 import java.lang.annotation.Annotation;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -18,6 +20,8 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Component
 public class MemberOfTeamRule implements ScapSecurityRule {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(MemberOfTeamRule.class);
 
   private final TeamService teamService;
 
@@ -46,11 +50,14 @@ public class MemberOfTeamRule implements ScapSecurityRule {
       return SecurityRuleResult.continueAsNormal();
     }
     if (team == null) {
+      LOGGER.error("Could not find Team based on URL: %s".formatted(request.getRequestURI()));
       return SecurityRuleResult.checkFailedWithStatus(HttpStatus.BAD_REQUEST);
     }
     if (teamMemberService.isMemberOfTeam(new TeamId(team.getUuid()), userDetail)) {
       return SecurityRuleResult.continueAsNormal();
     }
+    LOGGER.error("User is not part of team: %s"
+        .formatted(team.getDisplayName()));
     return SecurityRuleResult.checkFailedWithStatus(HttpStatus.FORBIDDEN);
   }
 }
