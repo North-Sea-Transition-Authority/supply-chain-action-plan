@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.HasAnyPermissionForTeam;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.IsMemberOfTeam;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
@@ -24,14 +25,13 @@ import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRolesForm;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRole;
-import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForTeam;
 import uk.co.nstauthority.scap.permissionmanagement.teams.AddRolesController;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 
 @Controller
 @IsMemberOfTeam
 @RequestMapping("/permission-management/regulator/{teamId}")
-@PermissionsRequiredForTeam(permissions = RolePermission.GRANT_ROLES)
+@HasAnyPermissionForTeam(permissions = RolePermission.GRANT_ROLES)
 class RegulatorAddRolesController extends AddRolesController {
 
   private final EnergyPortalUserService energyPortalUserService;

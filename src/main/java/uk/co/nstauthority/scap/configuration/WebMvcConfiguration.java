@@ -11,26 +11,21 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.ResourceUrlEncodingFilter;
 import org.springframework.web.servlet.resource.VersionResourceResolver;
 import uk.co.nstauthority.scap.endpointvalidation.ScapHandlerInterceptor;
+import uk.co.nstauthority.scap.endpointvalidation.rules.AnyPermissionForTeamRule;
 import uk.co.nstauthority.scap.mvc.ResponseBufferSizeHandlerInterceptor;
-import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.TeamPermissionManagementHandlerInterceptor;
 
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
 
   private static final String ASSET_EXCLUSION_PATH = "/assets/**";
 
-  private static final String LOGOUT_EXCLUSION_PATH = "/api/v1/logout/*";
-
   private static final String ERROR_EXCLUSION_PATH = "/error/**";
-
-  private final TeamPermissionManagementHandlerInterceptor teamPermissionManagementHandlerInterceptor;
 
   private final ScapHandlerInterceptor scapHandlerInterceptor;
 
   @Autowired
-  WebMvcConfiguration(TeamPermissionManagementHandlerInterceptor teamPermissionManagementHandlerInterceptor,
+  WebMvcConfiguration(AnyPermissionForTeamRule permissionForTeamRule,
                       ScapHandlerInterceptor scapHandlerInterceptor) {
-    this.teamPermissionManagementHandlerInterceptor = teamPermissionManagementHandlerInterceptor;
     this.scapHandlerInterceptor = scapHandlerInterceptor;
   }
 
@@ -47,12 +42,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addInterceptor(new ResponseBufferSizeHandlerInterceptor())
         .excludePathPatterns(ASSET_EXCLUSION_PATH, ERROR_EXCLUSION_PATH);
-    registry.addInterceptor(teamPermissionManagementHandlerInterceptor)
-        .addPathPatterns("/permission-management/**")
-        .excludePathPatterns(LOGOUT_EXCLUSION_PATH, ERROR_EXCLUSION_PATH);
     registry.addInterceptor(scapHandlerInterceptor)
         .excludePathPatterns(ASSET_EXCLUSION_PATH, ERROR_EXCLUSION_PATH);
-    // TODO SCAP2022-203: Condense interceptors to just teamHandlerInterceptor and scapHandlerInterceptor
   }
 
   @Bean

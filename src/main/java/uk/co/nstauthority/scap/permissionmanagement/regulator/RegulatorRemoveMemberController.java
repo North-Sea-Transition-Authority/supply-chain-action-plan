@@ -13,13 +13,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.EnergyPortalAccessService;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.HasAnyPermissionForTeam;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.IsMemberOfTeam;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
-import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForTeam;
 import uk.co.nstauthority.scap.permissionmanagement.teams.RemoveMemberController;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRemovalService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
@@ -28,7 +28,7 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 @Controller
 @IsMemberOfTeam
 @RequestMapping("/permission-management/regulator/{teamId}/remove")
-@PermissionsRequiredForTeam(permissions = RolePermission.GRANT_ROLES)
+@HasAnyPermissionForTeam(permissions = RolePermission.GRANT_ROLES)
 public class RegulatorRemoveMemberController extends RemoveMemberController {
 
   @Autowired

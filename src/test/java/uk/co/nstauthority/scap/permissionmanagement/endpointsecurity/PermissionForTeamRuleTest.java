@@ -18,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.HasAnyPermissionForTeam;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.IsMemberOfTeam;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
@@ -29,8 +30,8 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 
-@ContextConfiguration(classes = TeamPermissionManagementHandlerInterceptorTest.TestController.class)
-class TeamPermissionManagementHandlerInterceptorTest extends AbstractControllerTest {
+@ContextConfiguration(classes = PermissionForTeamRuleTest.TestController.class)
+class PermissionForTeamRuleTest extends AbstractControllerTest {
   private static final ServiceUserDetail USER = ServiceUserDetailTestUtil.Builder().build();
 
   private static final TeamId teamId = new TeamId(UUID.randomUUID());
@@ -71,7 +72,7 @@ class TeamPermissionManagementHandlerInterceptorTest extends AbstractControllerT
   void whenMethodHasPermissionRequired_whenRegulatorWithoutPermission_thenForbidden() throws Exception {
     var team = TeamTestUtil.Builder().build();
     var teamMember = TeamMemberTestUtil.Builder().build();
-    when(teamService.findTeam(teamId)).thenReturn(Optional.of(TeamTestUtil.Builder().build()));
+    when(teamService.getTeam(teamId)).thenReturn(TeamTestUtil.Builder().build());
     when(userDetailService.getUserDetail()).thenReturn(USER);
     when(teamService.getTeamsOfTypeThatUserBelongsTo(USER, TeamType.REGULATOR))
         .thenReturn(List.of(team));
@@ -91,7 +92,7 @@ class TeamPermissionManagementHandlerInterceptorTest extends AbstractControllerT
     var teamMember = TeamMemberTestUtil
         .Builder()
         .withRole(RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER).build();
-    when(teamService.findTeam(teamId)).thenReturn(Optional.of(TeamTestUtil.Builder().build()));
+    when(teamService.getTeam(teamId)).thenReturn(TeamTestUtil.Builder().build());
     when(userDetailService.getUserDetail()).thenReturn(USER);
     when(teamService.getTeamsOfTypeThatUserBelongsTo(USER, TeamType.REGULATOR))
         .thenReturn(List.of(team));
@@ -111,10 +112,8 @@ class TeamPermissionManagementHandlerInterceptorTest extends AbstractControllerT
     var teamMember = TeamMemberTestUtil
         .Builder()
         .withRole(RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER).build();
-    when(teamService.findTeam(teamId)).thenReturn(Optional.of(TeamTestUtil.Builder().build()));
+    when(teamService.getTeam(teamId)).thenReturn(team);
     when(userDetailService.getUserDetail()).thenReturn(USER);
-    when(teamService.getTeamsOfTypeThatUserBelongsTo(USER, TeamType.REGULATOR))
-        .thenReturn(List.of(team));
     when(teamMemberService.findTeamMember(team, new WebUserAccountId(USER.wuaId())))
         .thenReturn(Optional.of(teamMember));
 
@@ -131,7 +130,7 @@ class TeamPermissionManagementHandlerInterceptorTest extends AbstractControllerT
     var teamMember = TeamMemberTestUtil
         .Builder()
         .withRole(RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER).build();
-    when(teamService.findTeam(teamId)).thenReturn(Optional.of(team));
+    when(teamService.getTeam(teamId)).thenReturn(team);
     when(userDetailService.getUserDetail()).thenReturn(USER);
     when(teamService.getTeam(teamId)).thenReturn(team).thenReturn(team);
     when(teamMemberService.findTeamMember(team, new WebUserAccountId(USER.wuaId())))
@@ -150,7 +149,7 @@ class TeamPermissionManagementHandlerInterceptorTest extends AbstractControllerT
     var teamMember = TeamMemberTestUtil
         .Builder()
         .withRole(RegulatorTeamRole.SCAP_VIEWER).build();
-    when(teamService.findTeam(teamId)).thenReturn(Optional.of(team));
+    when(teamService.getTeam(teamId)).thenReturn(team);
     when(userDetailService.getUserDetail()).thenReturn(USER);
     when(teamService.getTeam(teamId)).thenReturn(team).thenReturn(team);
     when(teamMemberService.findTeamMember(team, new WebUserAccountId(USER.wuaId())))
@@ -180,13 +179,13 @@ class TeamPermissionManagementHandlerInterceptorTest extends AbstractControllerT
     }
 
     @GetMapping("/permission-management/with-permission-manage-organisation")
-    @PermissionsRequiredForTeam(permissions = RolePermission.MANAGE_ORGANISATIONS)
+    @HasAnyPermissionForTeam(permissions = RolePermission.MANAGE_ORGANISATIONS)
     ModelAndView withManageOrganisation() {
       return new ModelAndView(VIEW_NAME);
     }
 
     @GetMapping("/permission-management/with-permission-manage-organisation/${teamId}")
-    @PermissionsRequiredForTeam(permissions = RolePermission.MANAGE_ORGANISATIONS)
+    @HasAnyPermissionForTeam(permissions = RolePermission.MANAGE_ORGANISATIONS)
     ModelAndView withManageOrganisationAndTeam(@PathVariable TeamId teamId) {
       return new ModelAndView(VIEW_NAME);
     }

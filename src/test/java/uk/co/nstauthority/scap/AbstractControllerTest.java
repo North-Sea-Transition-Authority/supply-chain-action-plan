@@ -34,15 +34,15 @@ import uk.co.nstauthority.scap.configuration.WebMvcConfiguration;
 import uk.co.nstauthority.scap.configuration.WebSecurityConfiguration;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.ScapHandlerInterceptor;
+import uk.co.nstauthority.scap.endpointvalidation.rules.AnyPermissionForScapRule;
+import uk.co.nstauthority.scap.endpointvalidation.rules.AnyPermissionForTeamRule;
 import uk.co.nstauthority.scap.endpointvalidation.rules.MemberOfTeamRule;
-import uk.co.nstauthority.scap.endpointvalidation.rules.PermissionForScapRule;
 import uk.co.nstauthority.scap.endpointvalidation.rules.ScapHasStatusRule;
 import uk.co.nstauthority.scap.endpointvalidation.rules.UserHasAnyPermissionRule;
 import uk.co.nstauthority.scap.error.FooterService;
 import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
 import uk.co.nstauthority.scap.mvc.WithDefaultPageControllerAdvice;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
-import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.TeamPermissionManagementHandlerInterceptor;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
@@ -64,9 +64,9 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
     // Interceptor rules
     MemberOfTeamRule.class,
     ScapHasStatusRule.class,
-    PermissionForScapRule.class,
+    AnyPermissionForScapRule.class,
     UserHasAnyPermissionRule.class,
-    TeamPermissionManagementHandlerInterceptor.class,
+    AnyPermissionForTeamRule.class,
     ScapHandlerInterceptor.class
 })
 @WithDefaultPageControllerAdvice

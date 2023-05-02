@@ -10,12 +10,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.endpointvalidation.ScapSecurityRule;
 import uk.co.nstauthority.scap.endpointvalidation.SecurityRuleResult;
-import uk.co.nstauthority.scap.endpointvalidation.annotations.HasAnyPermissionForScap;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.HasAnyPermissionForTeam;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRole;
@@ -24,47 +25,44 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Component
-public class PermissionForScapRule implements ScapSecurityRule {
+public class AnyPermissionForTeamRule implements ScapSecurityRule {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(PermissionForScapRule.class);
-
-  private final TeamService teamService;
+  private static final Logger LOGGER = LoggerFactory.getLogger(AnyPermissionForTeamRule.class);
 
   private final TeamMemberService teamMemberService;
 
-  public PermissionForScapRule(TeamService teamService, TeamMemberService teamMemberService) {
-    this.teamService = teamService;
+  private final TeamService teamService;
+
+  @Autowired
+  public AnyPermissionForTeamRule(TeamMemberService teamMemberService,
+                                  TeamService teamService) {
     this.teamMemberService = teamMemberService;
+    this.teamService = teamService;
   }
 
   @Override
   public Class<? extends Annotation> supports() {
-    return HasAnyPermissionForScap.class;
+    return HasAnyPermissionForTeam.class;
   }
 
   @Override
-  public SecurityRuleResult check(Object annotation,
-                                  HttpServletRequest request,
-                                  HttpServletResponse response,
-                                  ServiceUserDetail userDetail,
-                                  ScapDetail scapDetail,
-                                  Team team) {
-    if (scapDetail == null) {
-      LOGGER.warn("Could not find SCAP based on URL: %s".formatted(request.getRequestURI()));
+  public SecurityRuleResult check(Object annotation, HttpServletRequest request, HttpServletResponse response,
+                                  ServiceUserDetail userDetail, ScapDetail scapDetail, Team team) {
+    if (team == null) {
+      LOGGER.warn("Could not find Team based on URL: %s".formatted(request.getRequestURI()));
       return SecurityRuleResult.checkFailedWithStatus(HttpStatus.BAD_REQUEST);
     }
 
-    var requiredPermissions = List.of(((HasAnyPermissionForScap) annotation).permissions());
-    team = teamService.getByEnergyPortalOrgGroupId(scapDetail.getScap().getOrganisationGroupId());
+    var requiredPermissions = List.of(((HasAnyPermissionForTeam) annotation).permissions());
     var teamMemberRoles = teamMemberService.findTeamMember(team, userDetail.getWebUserAccountId())
         .map(TeamMember::roles)
         .orElse(Collections.emptySet());
 
 
-    if (((HasAnyPermissionForScap) annotation).allowRegulatorAccess()) {
+    if (((HasAnyPermissionForTeam) annotation).allowRegulatorAccess()) {
       var regulatorTeamMemberRoles = teamMemberService.findTeamMember(
-          teamService.getRegulatorTeam(),
-          userDetail.getWebUserAccountId())
+              teamService.getRegulatorTeam(),
+              userDetail.getWebUserAccountId())
           .map(TeamMember::roles)
           .orElse(Collections.emptySet());
       teamMemberRoles = Stream.concat(teamMemberRoles.stream(), regulatorTeamMemberRoles.stream())

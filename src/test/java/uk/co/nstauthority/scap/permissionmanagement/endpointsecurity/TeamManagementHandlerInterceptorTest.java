@@ -19,6 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.HasAnyPermissionForTeam;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.IsMemberOfTeam;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
@@ -118,7 +119,7 @@ class TeamManagementHandlerInterceptorTest extends AbstractControllerTest {
     }
 
     @GetMapping("/permission-management/other-annotation/{teamId}")
-    @PermissionsRequiredForTeam(permissions = {RolePermission.GRANT_ROLES})
+    @HasAnyPermissionForTeam(permissions = {RolePermission.GRANT_ROLES})
     ModelAndView otherAnnotations(@PathVariable TeamId teamId) {
       return new ModelAndView(VIEW_NAME);
     }
