@@ -12,19 +12,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermission;
 import uk.co.nstauthority.scap.file.FileDeleteResult;
 import uk.co.nstauthority.scap.file.FileUploadResult;
 import uk.co.nstauthority.scap.file.FileUploadService;
 import uk.co.nstauthority.scap.file.FileUploadUtils;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
-import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @RestController
 @RequestMapping("/{scapId}/case-events/")
-@PermissionsRequiredForScap(permissions = {RolePermission.SUBMIT_SCAP, RolePermission.REVIEW_SCAP})
+@UserHasAnyPermission(permissions = RolePermission.REVIEW_SCAP)
 public class CaseEventsDocumentController {
 
   private final CaseEventDocumentService caseEventDocumentService;

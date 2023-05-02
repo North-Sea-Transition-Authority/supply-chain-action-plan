@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.HasAnyPermissionForScap;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
-import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
@@ -26,7 +26,7 @@ import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @Controller
 @RequestMapping("{scapId}/delete")
-@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
+@HasAnyPermissionForScap(permissions = RolePermission.SUBMIT_SCAP)
 @ScapHasStatus(permittedStatuses = ScapDetailStatus.DRAFT)
 public class ScapDeletionController {
 

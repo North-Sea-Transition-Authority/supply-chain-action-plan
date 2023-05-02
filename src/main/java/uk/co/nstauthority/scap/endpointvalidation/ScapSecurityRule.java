@@ -4,8 +4,8 @@ import java.lang.annotation.Annotation;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
-import uk.co.nstauthority.scap.permissionmanagement.TeamId;
-import uk.co.nstauthority.scap.scap.scap.Scap;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
+import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 public interface ScapSecurityRule {
 
@@ -15,6 +15,6 @@ public interface ScapSecurityRule {
                            HttpServletRequest request,
                            HttpServletResponse response,
                            ServiceUserDetail userDetail,
-                           Scap scap,
-                           TeamId teamId);
+                           ScapDetail scapDetail,
+                           Team team);
 }

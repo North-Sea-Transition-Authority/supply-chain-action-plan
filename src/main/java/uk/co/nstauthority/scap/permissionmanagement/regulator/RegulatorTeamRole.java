@@ -24,7 +24,7 @@ public enum RegulatorTeamRole implements TeamRole {
       "Case officer",
       "Can process SCAP applications",
       30,
-      EnumSet.of(RolePermission.REVIEW_SCAP)
+      EnumSet.of(RolePermission.REVIEW_SCAP, RolePermission.VIEW_SCAP)
   ),
   SCAP_VIEWER(
       "SCAP viewer",

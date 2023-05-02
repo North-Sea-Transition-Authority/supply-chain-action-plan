@@ -29,8 +29,7 @@ abstract class AbstractInterceptorRuleTest {
 
   protected Scap scap = new Scap(SCAP_ID);
 
-  @Mock
-  protected ScapDetail scapDetail;
+  protected ScapDetail scapDetail = getScapDetail();
 
   protected ServiceUserDetail userDetail = TestUserProvider.getUser();
 
@@ -44,6 +43,13 @@ abstract class AbstractInterceptorRuleTest {
     var annotation = AnnotationUtils.findAnnotation(method, annotationClass);
     assertThat(annotation).isPresent();
     return annotation.get();
+  }
+
+  private ScapDetail getScapDetail() {
+    var scapDetail = new ScapDetail();
+    scapDetail.setScap(scap);
+
+    return scapDetail;
   }
 
 }

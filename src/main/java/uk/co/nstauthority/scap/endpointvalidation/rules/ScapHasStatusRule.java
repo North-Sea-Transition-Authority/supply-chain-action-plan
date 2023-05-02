@@ -18,10 +18,10 @@ import uk.co.nstauthority.scap.endpointvalidation.ScapSecurityRule;
 import uk.co.nstauthority.scap.endpointvalidation.SecurityRuleResult;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
-import uk.co.nstauthority.scap.permissionmanagement.TeamId;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
+import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
-import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 
 @Component
@@ -46,10 +46,10 @@ public class ScapHasStatusRule implements ScapSecurityRule {
                                   HttpServletRequest request,
                                   HttpServletResponse response,
                                   ServiceUserDetail userDetail,
-                                  Scap scap,
-                                  TeamId teamId) {
+                                  ScapDetail scapDetail,
+                                  Team team) {
+
     var permittedStatuses = ((ScapHasStatus) annotation).permittedStatuses();
-    var scapDetail = scapDetailService.getActionableScapDetail(scap.getScapId(), userDetail);
     var scapStatus = scapDetail.getStatus();
 
     var inPermittedStatus = Arrays.asList(permittedStatuses).contains(scapStatus);
@@ -59,9 +59,9 @@ public class ScapHasStatusRule implements ScapSecurityRule {
     }
 
     if (ScapDetailStatus.SUBMITTED.equals(scapStatus)) {
-      var scapId = scap.getScapId();
-      var loggerMsg = "SCAP with ID [%d] has status %s. Redirecting user with ID [%d] to SCAP summary page.".formatted(
-          scapId.scapId(),
+      var scapId = scapDetail.getScap().getScapId();
+      var loggerMsg = "SCAP with ID [%s] has status %s. Redirecting user with ID [%d] to SCAP summary page.".formatted(
+          scapDetail.getScap().getScapId(),
           scapStatus.getEnumName(),
           userDetail.wuaId()
       );

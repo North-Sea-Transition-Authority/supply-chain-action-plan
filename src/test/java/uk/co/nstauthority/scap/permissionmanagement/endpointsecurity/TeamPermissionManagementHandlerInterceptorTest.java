@@ -22,6 +22,7 @@ import uk.co.nstauthority.scap.endpointvalidation.annotations.IsMemberOfTeam;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
@@ -48,6 +49,7 @@ class TeamPermissionManagementHandlerInterceptorTest extends AbstractControllerT
   void preHandle_whenMethodHasOtherAnnotation_thenOkResponse() throws Exception {
     when(userDetailService.getUserDetail()).thenReturn(USER);
     when(teamMemberService.isMemberOfTeam(teamId, USER)).thenReturn(true);
+    when(teamService.getTeam(teamId)).thenReturn(new Team(teamId.uuid()));
 
     mockMvc.perform(get(ReverseRouter.route(on(TestController.class)
             .hasOtherAnnotations(teamId)

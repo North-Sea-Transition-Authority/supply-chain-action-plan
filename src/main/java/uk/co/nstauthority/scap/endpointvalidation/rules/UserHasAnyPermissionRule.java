@@ -12,9 +12,9 @@ import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.endpointvalidation.ScapSecurityRule;
 import uk.co.nstauthority.scap.endpointvalidation.SecurityRuleResult;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermission;
-import uk.co.nstauthority.scap.permissionmanagement.TeamId;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
-import uk.co.nstauthority.scap.scap.scap.Scap;
+import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 public class UserHasAnyPermissionRule implements ScapSecurityRule {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserHasAnyPermissionRule.class);
@@ -35,8 +35,9 @@ public class UserHasAnyPermissionRule implements ScapSecurityRule {
                                   HttpServletRequest request,
                                   HttpServletResponse response,
                                   ServiceUserDetail userDetail,
-                                  Scap scap,
-                                  TeamId teamId) {
+                                  ScapDetail scapDetail,
+                                  Team team) {
+
     var userPermissions = teamMemberService.getAllPermissionsForUser(userDetail);
     var requiredPermissions = (UserHasAnyPermission) annotation;
     var hasPermission = Arrays.stream(requiredPermissions.permissions())

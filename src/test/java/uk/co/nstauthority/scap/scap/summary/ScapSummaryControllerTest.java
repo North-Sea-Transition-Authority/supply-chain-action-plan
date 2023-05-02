@@ -35,6 +35,7 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
+import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamView;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEvent;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
@@ -109,8 +110,9 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.FURTHER_INFORMATION)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(teamService.getByEnergyPortalOrgGroupId(anyInt())).thenReturn(new Team());
-    when(teamMemberService.getTeamMember(any(Team.class), eq(testUser.getWebUserAccountId())))
-        .thenReturn(new TeamMember(testUser.getWebUserAccountId(), new TeamView(null, null, null), Set.of(SCAP_CASE_OFFICER)));
+    when(teamMemberService.findTeamMember(any(Team.class), eq(testUser.getWebUserAccountId())))
+        .thenReturn(Optional.of(
+            new TeamMember(testUser.getWebUserAccountId(), new TeamView(null, null, null), Set.of(SCAP_CASE_OFFICER))));
   }
 
   @Test
@@ -195,10 +197,17 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
 
   @Test
   void renderSummary_RegulatorUser_CaseEventEmpty() throws Exception {
+    var regulatorTeam = new Team();
     when(caseEventDocumentService.buildFileUploadTemplate(any(), eq(SupportingDocumentType.CONSULTATION_REPORT)))
         .thenReturn(new FileUploadTemplate("blank", "blank", "blank", "250", "txt"));
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(teamService.userIsMemberOfRegulatorTeam(testUser)).thenReturn(true);
+    when(teamService.getRegulatorTeam()).thenReturn(regulatorTeam);
+    when(teamMemberService.getTeamMember(regulatorTeam, testUser.getWebUserAccountId())).thenReturn(
+        TeamMemberTestUtil.Builder()
+            .withRole(SCAP_CASE_OFFICER)
+            .build()
+    );
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
     when(caseEventService.getEventViewByScapId(SCAP_ID)).thenReturn(getTimelineView());
 

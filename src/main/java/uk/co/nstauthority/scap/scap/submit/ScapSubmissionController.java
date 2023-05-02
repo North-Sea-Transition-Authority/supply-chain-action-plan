@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.HasAnyPermissionForScap;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.error.exception.ScapBadRequestException;
@@ -20,7 +21,6 @@ import uk.co.nstauthority.scap.feedback.FeedbackController;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.notify.ScapEmailService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
-import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
@@ -34,7 +34,7 @@ import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
 
 @Controller
 @RequestMapping("{scapId}/submit")
-@PermissionsRequiredForScap(permissions = RolePermission.SUBMIT_SCAP)
+@HasAnyPermissionForScap(permissions = RolePermission.SUBMIT_SCAP)
 @ScapHasStatus(permittedStatuses = ScapDetailStatus.DRAFT)
 class ScapSubmissionController {
 

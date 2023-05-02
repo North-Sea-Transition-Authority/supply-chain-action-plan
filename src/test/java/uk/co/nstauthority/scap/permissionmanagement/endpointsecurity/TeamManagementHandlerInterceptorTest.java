@@ -9,7 +9,7 @@ import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.stereotype.Controller;
 import org.springframework.test.context.ContextConfiguration;
@@ -22,6 +22,7 @@ import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.IsMemberOfTeam;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
@@ -31,6 +32,15 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 class TeamManagementHandlerInterceptorTest extends AbstractControllerTest {
 
   private static final ServiceUserDetail user = ServiceUserDetailTestUtil.Builder().build();
+
+  private final Team team = TeamTestUtil.Builder().build();
+
+  private final TeamId teamId = new TeamId(team.getUuid());
+
+  @BeforeEach
+  void setup() {
+    when(teamService.getTeam(teamId)).thenReturn(team);
+  }
 
   @Test
   void preHandle_whenMethodHasNoSupportedAnnotations_thenOkResponse() throws Exception {
@@ -43,13 +53,13 @@ class TeamManagementHandlerInterceptorTest extends AbstractControllerTest {
   @Test
   void preHandle_whenMethodHasOtherAnnotations_thenOkResponse() throws Exception {
     when(teamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.REGULATOR))
-        .thenReturn(List.of(TeamTestUtil.Builder().build()));
+        .thenReturn(List.of(team));
     when(userDetailService.getUserDetail()).thenReturn(user);
     when(teamMemberService.findTeamMember(any(), any()))
         .thenReturn(Optional.of(TeamMemberTestUtil.Builder().build()));
 
     mockMvc.perform(get(ReverseRouter.route(on(TeamManagementHandlerInterceptorTest.TestController.class)
-            .otherAnnotations(new TeamId(UUID.randomUUID()))))
+            .otherAnnotations(teamId)))
             .with(user(user)))
         .andExpect(status().isOk());
   }
@@ -59,24 +69,23 @@ class TeamManagementHandlerInterceptorTest extends AbstractControllerTest {
     when(userDetailService.getUserDetail()).thenReturn(user);
 
     mockMvc.perform(get(ReverseRouter.route(on(TeamManagementHandlerInterceptorTest.TestController.class)
-            .isMemberOfTeam(new TeamId(UUID.randomUUID()))))
+            .isMemberOfTeam(teamId)))
             .with(user(user)))
         .andExpect(status().isForbidden());
   }
 
   @Test
-  void preHandle_whenMethodHasAnnotationButParameterEmpty_Forbidden() throws Exception {
+  void preHandle_whenMethodHasAnnotationButParameterEmpty_BadRequest() throws Exception {
     when(userDetailService.getUserDetail()).thenReturn(user);
 
     mockMvc.perform(get(ReverseRouter.route(on(TeamManagementHandlerInterceptorTest.TestController.class)
             .emptyAnnotation()))
             .with(user(user)))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isBadRequest());
   }
 
   @Test
   void preHandle_whenMethodHasAnnotationB_isOk() throws Exception {
-    var teamId = new TeamId(UUID.randomUUID());
     when(userDetailService.getUserDetail()).thenReturn(user);
     when(teamMemberService.isMemberOfTeam(teamId, user)).thenReturn(true);
 
@@ -88,7 +97,6 @@ class TeamManagementHandlerInterceptorTest extends AbstractControllerTest {
 
   @Test
   void preHandle_whenMethodIsForbidden_isForbidden() throws Exception {
-    var teamId = new TeamId(UUID.randomUUID());
     when(userDetailService.getUserDetail()).thenReturn(user);
     when(teamMemberService.isMemberOfTeam(teamId, user)).thenReturn(false);
 

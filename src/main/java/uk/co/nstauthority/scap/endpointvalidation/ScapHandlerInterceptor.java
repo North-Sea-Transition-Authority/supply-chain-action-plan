@@ -15,25 +15,31 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
-import uk.co.nstauthority.scap.scap.scap.Scap;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
-import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.util.HandlerInterceptorUtil;
 
 @Component
 public class ScapHandlerInterceptor implements HandlerInterceptor {
 
-  private final ScapService scapService;
+  private final ScapDetailService scapDetailService;
+
+  private final TeamService teamService;
 
   private final UserDetailService userDetailService;
   private final List<ScapSecurityRule> securityRules;
 
   @Autowired
-  ScapHandlerInterceptor(ScapService scapService,
+  ScapHandlerInterceptor(ScapDetailService scapDetailService,
+                         TeamService teamService,
                          UserDetailService userDetailService,
                          List<ScapSecurityRule> securityRules) {
-    this.scapService = scapService;
+    this.scapDetailService = scapDetailService;
+    this.teamService = teamService;
     this.userDetailService = userDetailService;
     this.securityRules = securityRules;
   }
@@ -53,8 +59,8 @@ public class ScapHandlerInterceptor implements HandlerInterceptor {
       return true;
     }
 
-    var scap = extractScapFromRequest(request, handlerMethod);
-    var teamId = extractTeamIdFromRequest(request, handlerMethod);
+    var scapDetail = extractScapDetailFromRequest(request, handlerMethod);
+    var team = extractTeamFromRequest(request, handlerMethod);
     var userDetail = userDetailService.getUserDetail();
 
     for (var securityRule : securityRules) {
@@ -67,8 +73,8 @@ public class ScapHandlerInterceptor implements HandlerInterceptor {
           request,
           response,
           userDetail,
-          scap,
-          teamId
+          scapDetail,
+          team
       );
 
       var hasRulePassed = HandlerInterceptorUtil.processRedirectsAndReturnResult(result, response);
@@ -79,7 +85,7 @@ public class ScapHandlerInterceptor implements HandlerInterceptor {
     return true;
   }
 
-  private Scap extractScapFromRequest(HttpServletRequest httpServletRequest, HandlerMethod handlerMethod) {
+  private ScapDetail extractScapDetailFromRequest(HttpServletRequest httpServletRequest, HandlerMethod handlerMethod) {
     var scapIdParameter = getPathVariableByClass(handlerMethod, ScapId.class);
     if (scapIdParameter.isEmpty()) {
       return null;
@@ -89,10 +95,12 @@ public class ScapHandlerInterceptor implements HandlerInterceptor {
     var pathVariables = (Map<String, String>) httpServletRequest
         .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
-    return scapService.getScapById(ScapId.valueOf(pathVariables.get(scapIdParameter.get().getName())));
+    return scapDetailService.getActionableScapDetail(
+        ScapId.valueOf(pathVariables.get(scapIdParameter.get().getName())),
+        userDetailService.getUserDetail());
   }
 
-  public static TeamId extractTeamIdFromRequest(HttpServletRequest httpServletRequest, HandlerMethod handlerMethod) {
+  public Team extractTeamFromRequest(HttpServletRequest httpServletRequest, HandlerMethod handlerMethod) {
     var teamIdParameter = getPathVariableByClass(handlerMethod, TeamId.class);
     if (teamIdParameter.isEmpty()) {
       return null;
@@ -102,6 +110,6 @@ public class ScapHandlerInterceptor implements HandlerInterceptor {
     var pathVariables = (Map<String, String>) httpServletRequest
         .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
-    return TeamId.valueOf(pathVariables.get(teamIdParameter.get().getName()));
+    return teamService.getTeam(TeamId.valueOf(pathVariables.get(teamIdParameter.get().getName())));
   }
 }

@@ -29,6 +29,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerMapping;
 import uk.co.nstauthority.scap.authentication.TestUserProvider;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
@@ -46,6 +47,9 @@ class ScapHandlerInterceptorTest {
 
   @Mock
   UserDetailService userDetailService;
+
+  @Mock
+  TeamService teamService;
 
   @Mock
   HttpServletRequest request;
@@ -70,7 +74,7 @@ class ScapHandlerInterceptorTest {
     uriVariables = new HashMap<>();
 
     scapHandlerInterceptor = new ScapHandlerInterceptor(
-        scapService, userDetailService, Collections.singletonList(securityRule)
+        scapDetailService, teamService, userDetailService, Collections.singletonList(securityRule)
     );
   }
 
@@ -86,11 +90,11 @@ class ScapHandlerInterceptorTest {
     when(request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE)).thenReturn(uriVariables);
 
     doReturn(ExampleAnnotation.class).when(securityRule).supports();
-    doReturn(scap).when(scapService).getScapById(SCAP_ID);
+    doReturn(scapDetail).when(scapDetailService).getActionableScapDetail(SCAP_ID, user);
     doReturn(user).when(userDetailService).getUserDetail();
     doReturn(method).when(handlerMethod).getMethod();
     doReturn(new SecurityRuleResult(false, null, null))
-        .when(securityRule).check(any(), eq(request), eq(response), eq(user), eq(scap), eq(null));
+        .when(securityRule).check(any(), eq(request), eq(response), eq(user), eq(scapDetail), eq(null));
 
     var interceptorResult = scapHandlerInterceptor.preHandle(
         request,
@@ -114,11 +118,11 @@ class ScapHandlerInterceptorTest {
     when(request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE)).thenReturn(uriVariables);
 
     doReturn(ExampleAnnotation.class).when(securityRule).supports();
-    doReturn(scap).when(scapService).getScapById(SCAP_ID);
+    doReturn(scapDetail).when(scapDetailService).getActionableScapDetail(SCAP_ID, user);
     doReturn(user).when(userDetailService).getUserDetail();
     doReturn(method).when(handlerMethod).getMethod();
     doReturn(new SecurityRuleResult(false, null, redirectUrl))
-        .when(securityRule).check(any(), eq(request), eq(response), eq(user), eq(scap), eq(null));
+        .when(securityRule).check(any(), eq(request), eq(response), eq(user), eq(scapDetail), eq(null));
 
     var interceptorResult = scapHandlerInterceptor.preHandle(
         request,
@@ -142,11 +146,9 @@ class ScapHandlerInterceptorTest {
     when(request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE)).thenReturn(uriVariables);
 
     doReturn(ExampleAnnotation.class).when(securityRule).supports();
-    doReturn(scap).when(scapService).getScapById(SCAP_ID);
-    doReturn(user).when(userDetailService).getUserDetail();
     doReturn(method).when(handlerMethod).getMethod();
     doReturn(new SecurityRuleResult(true, null, null))
-        .when(securityRule).check(any(), eq(request), eq(response), eq(user), eq(scap), eq(null));
+        .when(securityRule).check(any(), eq(request), eq(response), eq(null), eq(null), eq(null));
 
     var interceptorResult = scapHandlerInterceptor.preHandle(
         request,
@@ -169,11 +171,11 @@ class ScapHandlerInterceptorTest {
     when(request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE)).thenReturn(uriVariables);
 
     doReturn(ExampleAnnotation.class).when(securityRule).supports();
-    doReturn(scap).when(scapService).getScapById(SCAP_ID);
+    doReturn(scapDetail).when(scapDetailService).getActionableScapDetail(SCAP_ID, user);
     doReturn(user).when(userDetailService).getUserDetail();
     doReturn(method).when(handlerMethod).getMethod();
     doReturn(new SecurityRuleResult(true, null, null))
-        .when(securityRule).check(any(), eq(request), eq(response), eq(user), eq(scap), eq(null));
+        .when(securityRule).check(any(), eq(request), eq(response), eq(user), eq(scapDetail), eq(null));
 
     var interceptorResult = scapHandlerInterceptor.preHandle(
         request,

@@ -3,9 +3,7 @@ package uk.co.nstauthority.scap.endpointvalidation.rules;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import org.junit.jupiter.api.DisplayName;
@@ -36,8 +34,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
   @Test
   @DisplayName("Test rule passes when status is DRAFT")
   void validate_scapIsDraft_IsOK() throws NoSuchMethodException {
-    when(scapDetailService.getActionableScapDetail(SCAP_ID, userDetail)).thenReturn(scapDetail);
-    when(scapDetail.getStatus()).thenReturn(ScapDetailStatus.DRAFT);
+    scapDetail.setStatus(ScapDetailStatus.DRAFT);
 
     var annotation = getAnnotation(
         TestController.class.getDeclaredMethod("get"),
@@ -48,7 +45,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
         request,
         response,
         userDetail,
-        scap,
+        scapDetail,
         null
     );
 
@@ -59,8 +56,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
   @Test
   @DisplayName("Assert redirection when status is SUBMITTED")
   void validate_WhenScapSubmitted() throws NoSuchMethodException {
-    when(scapDetailService.getActionableScapDetail(SCAP_ID, userDetail)).thenReturn(scapDetail);
-    when(scapDetail.getStatus()).thenReturn(ScapDetailStatus.SUBMITTED);
+    scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
 
     var annotation = getAnnotation(
         TestController.class.getDeclaredMethod("get"),
@@ -71,7 +67,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
         request,
         response,
         userDetail,
-        scap,
+        scapDetail,
         null
     );
     var redirectUrl = ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID));
@@ -83,8 +79,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
   @Test
   @DisplayName("Assert 400 when status is null")
   void validate_WhenScapStatusNull() throws NoSuchMethodException {
-    doReturn(scapDetail).when(scapDetailService).getActionableScapDetail(SCAP_ID, userDetail);
-    when(scapDetail.getStatus()).thenReturn(null);
+    scapDetail.setStatus(null);
 
     var annotation = getAnnotation(
         TestController.class.getDeclaredMethod("get"),
@@ -95,7 +90,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
         request,
         response,
         userDetail,
-        scap,
+        scapDetail,
         null
     );
 
@@ -106,8 +101,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
   @Test
   @DisplayName("Assert that annotation works at class level")
   void validate_WhenScapIsDraft() {
-    doReturn(scapDetail).when(scapDetailService).getActionableScapDetail(SCAP_ID, userDetail);
-    when(scapDetail.getStatus()).thenReturn(ScapDetailStatus.SUBMITTED);
+    scapDetail.setStatus(ScapDetailStatus.SUBMITTED);
 
     var annotation = getAnnotation(
         TestController.class,
@@ -118,7 +112,7 @@ class ScapHasStatusRuleTest extends AbstractInterceptorRuleTest {
         request,
         response,
         userDetail,
-        scap,
+        scapDetail,
         null
     );
 

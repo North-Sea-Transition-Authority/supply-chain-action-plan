@@ -12,7 +12,6 @@ import org.springframework.web.servlet.resource.ResourceUrlEncodingFilter;
 import org.springframework.web.servlet.resource.VersionResourceResolver;
 import uk.co.nstauthority.scap.endpointvalidation.ScapHandlerInterceptor;
 import uk.co.nstauthority.scap.mvc.ResponseBufferSizeHandlerInterceptor;
-import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.ScapPermissionManagementHandlerInterceptor;
 import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.TeamPermissionManagementHandlerInterceptor;
 
 @Configuration
@@ -26,16 +25,12 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
   private final TeamPermissionManagementHandlerInterceptor teamPermissionManagementHandlerInterceptor;
 
-
-  private final ScapPermissionManagementHandlerInterceptor scapPermissionManagementHandlerInterceptor;
   private final ScapHandlerInterceptor scapHandlerInterceptor;
 
   @Autowired
   WebMvcConfiguration(TeamPermissionManagementHandlerInterceptor teamPermissionManagementHandlerInterceptor,
-                      ScapPermissionManagementHandlerInterceptor scapPermissionManagementHandlerInterceptor,
                       ScapHandlerInterceptor scapHandlerInterceptor) {
     this.teamPermissionManagementHandlerInterceptor = teamPermissionManagementHandlerInterceptor;
-    this.scapPermissionManagementHandlerInterceptor = scapPermissionManagementHandlerInterceptor;
     this.scapHandlerInterceptor = scapHandlerInterceptor;
   }
 
@@ -51,8 +46,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addInterceptor(new ResponseBufferSizeHandlerInterceptor())
-        .excludePathPatterns(ASSET_EXCLUSION_PATH, ERROR_EXCLUSION_PATH);
-    registry.addInterceptor(scapPermissionManagementHandlerInterceptor)
         .excludePathPatterns(ASSET_EXCLUSION_PATH, ERROR_EXCLUSION_PATH);
     registry.addInterceptor(teamPermissionManagementHandlerInterceptor)
         .addPathPatterns("/permission-management/**")

@@ -10,10 +10,11 @@ import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.endpointvalidation.ScapSecurityRule;
 import uk.co.nstauthority.scap.endpointvalidation.SecurityRuleResult;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.IsMemberOfTeam;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
-import uk.co.nstauthority.scap.scap.scap.Scap;
+import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Component
 public class MemberOfTeamRule implements ScapSecurityRule {
@@ -38,13 +39,16 @@ public class MemberOfTeamRule implements ScapSecurityRule {
                                   HttpServletRequest request,
                                   HttpServletResponse response,
                                   ServiceUserDetail userDetail,
-                                  Scap scap,
-                                  TeamId teamId) {
+                                  ScapDetail scapDetail,
+                                  Team team) {
 
     if (((IsMemberOfTeam) annotation).allowRegulatorAccess() && teamService.userIsMemberOfRegulatorTeam(userDetail)) {
       return SecurityRuleResult.continueAsNormal();
     }
-    if (teamMemberService.isMemberOfTeam(teamId, userDetail)) {
+    if (team == null) {
+      return SecurityRuleResult.checkFailedWithStatus(HttpStatus.BAD_REQUEST);
+    }
+    if (teamMemberService.isMemberOfTeam(new TeamId(team.getUuid()), userDetail)) {
       return SecurityRuleResult.continueAsNormal();
     }
     return SecurityRuleResult.checkFailedWithStatus(HttpStatus.FORBIDDEN);

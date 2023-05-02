@@ -47,7 +47,7 @@ class UserHasPermissionRuleTest extends AbstractInterceptorRuleTest {
         request,
         response,
         userDetail,
-        scap,
+        scapDetail,
         null
     );
 
@@ -68,7 +68,7 @@ class UserHasPermissionRuleTest extends AbstractInterceptorRuleTest {
         request,
         response,
         userDetail,
-        scap,
+        scapDetail,
         null
     );
 

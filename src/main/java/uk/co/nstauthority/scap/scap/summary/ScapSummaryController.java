@@ -2,7 +2,6 @@ package uk.co.nstauthority.scap.scap.summary;
 
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-import static uk.co.nstauthority.scap.permissionmanagement.RolePermission.REVIEW_SCAP;
 import static uk.co.nstauthority.scap.permissionmanagement.RolePermission.SUBMIT_SCAP;
 import static uk.co.nstauthority.scap.permissionmanagement.RolePermission.VIEW_SCAP;
 
@@ -16,9 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.HasAnyPermissionForScap;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
-import uk.co.nstauthority.scap.permissionmanagement.endpointsecurity.PermissionsRequiredForScap;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
@@ -33,7 +32,7 @@ import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
 
 @Controller
 @RequestMapping("{scapId}")
-@PermissionsRequiredForScap(permissions = {SUBMIT_SCAP, REVIEW_SCAP, VIEW_SCAP})
+@HasAnyPermissionForScap(allowRegulatorAccess = true, permissions = {SUBMIT_SCAP, VIEW_SCAP})
 public class ScapSummaryController {
 
   private final ScapDetailService scapDetailService;
