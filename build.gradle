@@ -1,6 +1,6 @@
 plugins {
-	id 'org.springframework.boot' version '2.7.6'
-	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id 'org.springframework.boot' version '2.7.11'
+	id 'io.spring.dependency-management' version '1.1.0'
 	id 'java'
 	id "org.sonarqube" version "3.3"
 	id 'checkstyle'
@@ -24,55 +24,48 @@ repositories {
 }
 
 dependencies {
-  implementation 'com.google.guava:guava:31.1-jre'
-
-  implementation 'org.apache.commons:commons-lang3:3.12.0'
   implementation 'commons-validator:commons-validator:1.7'
 
-  implementation "org.opensaml:opensaml-core:4.2.0"
-  implementation "org.opensaml:opensaml-saml-api:4.2.0"
-  implementation "org.opensaml:opensaml-saml-impl:4.2.0"
+  implementation 'com.amazonaws:aws-java-sdk-s3:1.12.351'
+  implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+  implementation 'com.google.guava:guava:31.1-jre'
 
+  implementation 'fi.solita.clamav:clamav-client:1.0.1'
+
+  implementation 'io.micrometer:micrometer-registry-statsd:1.7.8'
+
+  implementation 'org.apache.commons:commons-lang3:3.12.0'
   implementation 'org.flywaydb:flyway-core'
-
+  implementation 'org.jooq:jooq-codegen'
+  implementation 'org.jooq:jooq-meta'
+  implementation 'org.hibernate:hibernate-envers'
+  implementation 'org.opensaml:opensaml-core:4.2.0'
+  implementation 'org.opensaml:opensaml-saml-api:4.2.0'
+  implementation 'org.opensaml:opensaml-saml-impl:4.2.0'
   implementation 'org.springframework.boot:spring-boot-starter-freemarker'
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
   implementation 'org.springframework.boot:spring-boot-starter-validation'
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'org.springframework.boot:spring-boot-starter-security'
+  implementation 'org.springframework.boot:spring-boot-starter-quartz'
+  implementation 'org.springframework.boot:spring-boot-starter-jooq'
   implementation 'org.springframework.security:spring-security-saml2-service-provider'
   implementation 'org.springframework.session:spring-session-core'
-  implementation "org.springframework.session:spring-session-jdbc"
-  implementation 'org.springframework.boot:spring-boot-starter-quartz'
-
-  implementation 'org.springframework.boot:spring-boot-starter-jooq'
-  implementation 'org.jooq:jooq-codegen'
-  implementation 'org.jooq:jooq-meta'
+  implementation 'org.springframework.session:spring-session-jdbc'
 
   implementation 'uk.co.fivium.digital.energyportalteamaccesslibrary:energy-portal-team-access-libray:develop-SNAPSHOT'
   implementation 'uk.co.fivium.digitalformlibrary:digital-form-library:v2.1.1'
   implementation 'uk.co.fivium.energyportalapi:client:v3.1.0'
   implementation 'uk.co.fivium:fivium-notify-spring-boot-starter:3.17.2-4.2-SNAPSHOT'
+  implementation 'uk.co.fivium.feedbackmanagementservice:client:v2.2.0'
 
-  implementation 'com.amazonaws:aws-java-sdk-s3:1.12.351'
-  implementation 'fi.solita.clamav:clamav-client:1.0.1'
-
-  implementation "org.hibernate:hibernate-envers"
-
-  implementation 'io.micrometer:micrometer-registry-statsd:1.7.8'
-
-  // Feedback Management Service
-  implementation "uk.co.fivium.feedbackmanagementservice:client:2.1.1"
-  implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
-
-	runtimeOnly 'org.postgresql:postgresql:42.5.1'
+  runtimeOnly 'org.postgresql:postgresql:42.5.1'
   jooqGenerator 'org.postgresql:postgresql'
 
   annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	// Using H2 for the tests as a temporary measure until a final decision is made on which database is being used.
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'org.testcontainers:postgresql:1.17.6'
   testImplementation 'org.springframework.security:spring-security-test'
 

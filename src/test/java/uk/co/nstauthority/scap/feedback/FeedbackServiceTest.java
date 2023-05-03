@@ -130,7 +130,7 @@ class FeedbackServiceTest {
         form.getSatisfactionRating().getEnumName(),
         form.getComments().getInputValue(),
         CURRENT_INSTANT,
-        SCAP_DETAIL.getScap().getId(),
+        String.valueOf(SCAP_DETAIL.getScap().getId()),
         SCAP_DETAIL.getScap().getReference(),
         SCAP_URL
     );

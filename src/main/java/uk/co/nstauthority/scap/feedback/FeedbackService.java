@@ -45,7 +45,7 @@ class FeedbackService {
       builder.transactionReference(scapDetail.getScap().getReference());
       builder.transactionLink(
           AbsoluteReverseRouter.route(on(ScapSummaryController.class).getScapSummary(scapId)));
-      builder.transactionId(scapId.scapId());
+      builder.transactionId(String.valueOf(scapId.scapId()));
     }
 
     submitFeedback(builder.build());

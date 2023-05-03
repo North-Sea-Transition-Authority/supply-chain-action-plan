@@ -11,7 +11,7 @@ public class Feedback implements FeedbackManagementServiceFeedback {
   private final String serviceRating;
   private final String comment;
   private final Instant timestamp;
-  private final Integer transactionId;
+  private final String transactionId;
   private final String transactionReference;
   private final String transactionLink;
 
@@ -20,7 +20,7 @@ public class Feedback implements FeedbackManagementServiceFeedback {
                    String serviceRating,
                    String comment,
                    Instant timestamp,
-                   Integer transactionId,
+                   String transactionId,
                    String transactionReference,
                    String transactionLink) {
     this.submitterName = submitterName;
@@ -63,7 +63,7 @@ public class Feedback implements FeedbackManagementServiceFeedback {
   }
 
   @Override
-  public Integer getTransactionId() {
+  public String getTransactionId() {
     return transactionId;
   }
 
@@ -98,7 +98,7 @@ public class Feedback implements FeedbackManagementServiceFeedback {
     private String serviceRating;
     private String comment;
     private Instant timestamp;
-    private Integer transactionId;
+    private String transactionId;
     private String transactionReference;
     private String transactionLink;
 
@@ -127,7 +127,7 @@ public class Feedback implements FeedbackManagementServiceFeedback {
       return this;
     }
 
-    public Builder transactionId(Integer transactionId) {
+    public Builder transactionId(String transactionId) {
       this.transactionId = transactionId;
       return this;
     }
