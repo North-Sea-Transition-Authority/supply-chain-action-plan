@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -56,7 +58,6 @@ import uk.co.nstauthority.scap.utils.ValidatorTestingUtil;
 @ExtendWith(MockitoExtension.class)
 class ScapFormTaskListSectionServiceTest {
 
-
   @Mock
   private ProjectDetailsService projectDetailsService;
 
@@ -105,6 +106,8 @@ class ScapFormTaskListSectionServiceTest {
 
   @Test
   void getSection() {
+    SCAP_DETAIL.setTierOneContractor(false);
+
     var testTaskListItem = new TaskListItem("test", TaskListLabel.COMPLETED, "#");
     doReturn(testTaskListItem).when(scapFormTaskListSectionService)
         .getScapOperatorTaskListItem(SCAP_ID, SCAP_DETAIL);
@@ -132,6 +135,39 @@ class ScapFormTaskListSectionServiceTest {
         ScapFormTaskListSectionService.DISPLAY_ORDER
     );
     assertThat(section.get().items()).hasSize(7);
+  }
+
+  @Test
+  void getSection_WhenTierOneContractor_AssertNoPathfinderSection() {
+    SCAP_DETAIL.setTierOneContractor(true);
+
+    var testTaskListItem = new TaskListItem("test", TaskListLabel.COMPLETED, "#");
+    doReturn(testTaskListItem).when(scapFormTaskListSectionService)
+        .getScapOperatorTaskListItem(SCAP_ID, SCAP_DETAIL);
+    doReturn(testTaskListItem).when(scapFormTaskListSectionService)
+        .getProjectDetailsTaskListItem(SCAP_ID, SCAP_DETAIL);
+    doReturn(testTaskListItem).when(scapFormTaskListSectionService)
+        .getPlannedTenderTaskListItem(SCAP_ID, SCAP_DETAIL);
+    doReturn(testTaskListItem).when(scapFormTaskListSectionService)
+        .getActualTenderTaskListItem(SCAP_ID, SCAP_DETAIL);
+    doReturn(testTaskListItem).when(scapFormTaskListSectionService)
+        .getContractingPerformanceTaskListItem(SCAP_ID, SCAP_DETAIL);
+    doReturn(testTaskListItem).when(scapFormTaskListSectionService)
+        .getProjectPerformanceTaskListItem(SCAP_ID, SCAP_DETAIL);
+
+    var section = scapFormTaskListSectionService.getSection(SCAP_DETAIL);
+
+    verify(scapFormTaskListSectionService, never()).getPathfinderTaskListItem(any(), any());
+
+    assertThat(section).isNotEmpty();
+    assertThat(section.get()).extracting(
+        TaskListSection::displayName,
+        TaskListSection::displayOrder
+    ).containsExactly(
+        ScapFormTaskListSectionService.DISPLAY_NAME,
+        ScapFormTaskListSectionService.DISPLAY_ORDER
+    );
+    assertThat(section.get().items()).hasSize(6);
   }
 
   @Test

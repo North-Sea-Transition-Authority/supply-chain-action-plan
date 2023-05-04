@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.scap.scap;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.util.TaskListItemUtil.getBindingResultForForm;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -88,15 +89,18 @@ public class ScapFormTaskListSectionService implements TaskListSectionService {
   public Optional<TaskListSection> getSection(ScapDetail scapDetail) {
     var scap = scapDetail.getScap();
     var scapId = scap.getScapId();
-    var taskListItems = List.of(
+    var taskListItems = new ArrayList<>(List.of(
         getScapOperatorTaskListItem(scapId, scapDetail),
         getProjectDetailsTaskListItem(scapId, scapDetail),
         getPlannedTenderTaskListItem(scapId, scapDetail),
-        getPathfinderTaskListItem(scapId, scapDetail),
         getActualTenderTaskListItem(scapId, scapDetail),
         getContractingPerformanceTaskListItem(scapId, scapDetail),
         getProjectPerformanceTaskListItem(scapId, scapDetail)
-    );
+    ));
+
+    if (!Boolean.TRUE.equals(scapDetail.isTierOneContractor())) {
+      taskListItems.add(3, getPathfinderTaskListItem(scapId, scapDetail));
+    }
 
     return Optional.of(new TaskListSection(DISPLAY_NAME, DISPLAY_ORDER, taskListItems));
   }
