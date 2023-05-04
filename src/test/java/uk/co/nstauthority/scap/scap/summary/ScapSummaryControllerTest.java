@@ -428,7 +428,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     caseEvent.setComments("TEST");
 
     return new UpdateRequest(
-        scapDetail,
+        scap,
         UpdateRequestType.UPDATE,
         LocalDate.now(),
         caseEvent);

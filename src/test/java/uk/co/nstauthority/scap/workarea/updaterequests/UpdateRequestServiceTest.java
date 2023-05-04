@@ -30,7 +30,9 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailEntityTestUtil;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
+import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
+import uk.co.nstauthority.scap.scap.scap.ScapService;
 
 @ExtendWith(MockitoExtension.class)
 class UpdateRequestServiceTest {
@@ -44,6 +46,9 @@ class UpdateRequestServiceTest {
   @Mock
   ScapDetailService scapDetailService;
 
+  @Mock
+  ScapService scapService;
+
   private Clock clock =  Clock.fixed(Instant.ofEpochSecond(1667576106), ZoneId.systemDefault());
 
   @InjectMocks
@@ -55,6 +60,8 @@ class UpdateRequestServiceTest {
 
   private ScapDetail scapDetail;
 
+  private Scap scap;
+
   private ServiceUserDetail user;
 
   @Captor
@@ -63,7 +70,7 @@ class UpdateRequestServiceTest {
   @BeforeEach
   void setup() {
     updateRequestService = new UpdateRequestService(updateRequestRepository,
-        scapDetailService,
+        scapService, scapDetailService,
         userDetailService,
         clock);
 
@@ -71,20 +78,20 @@ class UpdateRequestServiceTest {
         .withWuaId(Long.valueOf(USER_ID))
         .build();
 
+    scap = new Scap(1111);
 
     scapDetail = ScapDetailEntityTestUtil.scapDetailBuilder()
+        .withScap(scap)
         .withScapDetailId(1000)
         .build();
   }
 
   @Test
   void getAllByScapId_verifyCalls() {
-    var scapIdList = List.of(new ScapDetail(1), new ScapDetail(2), new ScapDetail(3));
-    when(scapDetailService.findAllByScapId(SCAP_ID)).thenReturn(scapIdList);
+    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     updateRequestService.findAllByScapId(SCAP_ID);
 
-    verify(scapDetailService).findAllByScapId(SCAP_ID);
-    verify(updateRequestRepository).findByScapDetailIn(scapIdList);
+    verify(updateRequestRepository).findAllByScap(scap);
   }
 
   @Test
@@ -100,13 +107,13 @@ class UpdateRequestServiceTest {
         .extracting(UpdateRequest::getUpdateRequestType,
             UpdateRequest::getDueDate,
             UpdateRequest::getCreatedTimestamp,
-            UpdateRequest::getScapDetail,
+            UpdateRequest::getScap,
             UpdateRequest::getCreatedByUserId)
         .contains(
             UpdateRequestType.FURTHER_INFORMATION,
             localDate,
             localDate,
-            scapDetail,
+            scap,
             USER_ID);
   }
 
@@ -115,7 +122,7 @@ class UpdateRequestServiceTest {
     when(userDetailService.getUserDetail()).thenReturn(user);
     updateRequestService.resolveUpdateRequest(scapDetail, CaseEventSubject.SCAP_CONSULTATION_RESPONSE);
     verify(updateRequestRepository)
-        .findByScapDetailAndUpdateRequestTypeInAndResolutionDateNull(scapDetail, Collections.emptyList());
+        .findByScapAndUpdateRequestTypeInAndResolutionDateNull(scap, Collections.emptyList());
     verify(updateRequestRepository)
         .saveAll(Collections.emptyList());
   }
@@ -125,25 +132,25 @@ class UpdateRequestServiceTest {
     when(userDetailService.getUserDetail()).thenReturn(user);
     var updateRequest = new UpdateRequest(UUID.randomUUID());
     updateRequest.setUpdateRequestType(UpdateRequestType.FURTHER_INFORMATION);
-    updateRequest.setScapDetail(scapDetail);
-    when(updateRequestRepository.findByScapDetailAndUpdateRequestTypeInAndResolutionDateNull(scapDetail,
+    updateRequest.setScap(scap);
+    when(updateRequestRepository.findByScapAndUpdateRequestTypeInAndResolutionDateNull(scap,
         List.of( UpdateRequestType.FURTHER_INFORMATION, UpdateRequestType.UPDATE)))
         .thenReturn(List.of(updateRequest));
 
     updateRequestService.resolveUpdateRequest(scapDetail, CaseEventSubject.SCAP_SUBMITTED);
     verify(updateRequestRepository)
-        .findByScapDetailAndUpdateRequestTypeInAndResolutionDateNull(scapDetail,
+        .findByScapAndUpdateRequestTypeInAndResolutionDateNull(scap,
             List.of(UpdateRequestType.FURTHER_INFORMATION, UpdateRequestType.UPDATE));
 
     verify(updateRequestRepository)
         .saveAll(updateRequestCaptor.capture());
     assertThat(updateRequestCaptor.getValue())
         .extracting(UpdateRequest::getUpdateRequestType,
-            UpdateRequest::getScapDetail,
+            UpdateRequest::getScap,
             UpdateRequest::getResolvedByUserId)
         .contains(tuple(
             UpdateRequestType.FURTHER_INFORMATION,
-            scapDetail,
+            scap,
             USER_ID));
     assertThat(updateRequestCaptor.getValue().get(0).getResolutionDate()).isNotNull();
   }
@@ -158,12 +165,12 @@ class UpdateRequestServiceTest {
     var dueDate = LocalDate.now().plusDays(5);
     var updateRequest = new UpdateRequest(UUID.randomUUID());
     updateRequest.setUpdateRequestType(UpdateRequestType.FURTHER_INFORMATION);
-    updateRequest.setScapDetail(scapDetail);
+    updateRequest.setScap(scap);
     updateRequest.setDueDate(dueDate);
 
     when(scapDetailService.findLatestSubmitted(SCAP_ID)).thenReturn(Optional.ofNullable(scapDetail));
     when(updateRequestRepository
-        .findFirstByScapDetailAndResolutionDateNullAndUpdateRequestTypeOrderByCreatedTimestampDesc(scapDetail, UpdateRequestType.FURTHER_INFORMATION))
+        .findFirstByScapAndResolutionDateNullAndUpdateRequestTypeOrderByCreatedTimestampDesc(scap, UpdateRequestType.FURTHER_INFORMATION))
         .thenReturn(Optional.of(updateRequest));
     assertThat(updateRequestService.getUpdateDueDate(SCAP_ID, UpdateRequestType.FURTHER_INFORMATION)).contains(dueDate);
   }
@@ -179,11 +186,11 @@ class UpdateRequestServiceTest {
     var newCaseEvent = new CaseEvent();
     updateRequest.setCaseEvent(newCaseEvent);
     updateRequest.setUpdateRequestType(UpdateRequestType.FURTHER_INFORMATION);
-    updateRequest.setScapDetail(scapDetail);
+    updateRequest.setScap(scap);
 
     when(scapDetailService.findLatestByScapIdAndStatus(SCAP_ID, ScapDetailStatus.SUBMITTED)).thenReturn(Optional.ofNullable(scapDetail));
     when(updateRequestRepository
-        .findFirstByScapDetailAndResolutionDateNullOrderByCreatedTimestampDesc(scapDetail))
+        .findFirstByScapAndResolutionDateNullOrderByCreatedTimestampDesc(scap))
         .thenReturn(Optional.of(updateRequest));
     assertThat(updateRequestService.findNextDueUpdate(SCAP_ID)).contains(updateRequest);
   }

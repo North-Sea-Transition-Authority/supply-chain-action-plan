@@ -15,11 +15,14 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
+import uk.co.nstauthority.scap.scap.scap.ScapService;
 
 @Service
 public class UpdateRequestService {
 
   private final UpdateRequestRepository updateRequestRepository;
+
+  private final ScapService scapService;
 
   private final ScapDetailService scapDetailService;
 
@@ -29,10 +32,11 @@ public class UpdateRequestService {
 
   @Autowired
   public UpdateRequestService(UpdateRequestRepository updateRequestRepository,
-                              ScapDetailService scapDetailService,
+                              ScapService scapService, ScapDetailService scapDetailService,
                               UserDetailService userDetailService,
                               Clock clock) {
     this.updateRequestRepository = updateRequestRepository;
+    this.scapService = scapService;
     this.scapDetailService = scapDetailService;
     this.userDetailService = userDetailService;
     this.clock = clock;
@@ -42,7 +46,8 @@ public class UpdateRequestService {
                                            UpdateRequestType requestType,
                                            LocalDate dueDate,
                                            CaseEvent caseEvent) {
-    var updateRequest = new UpdateRequest(scapDetail, requestType, dueDate, caseEvent);
+    var updateRequest = new UpdateRequest(scapDetail.getScap(), requestType, dueDate, caseEvent);
+    updateRequest.setCreatedTimestamp(LocalDate.now());
     updateRequest.setCreatedByUserId(userDetailService.getUserDetail().getWebUserAccountId().toInt());
     return updateRequestRepository.save(updateRequest);
   }
@@ -54,7 +59,7 @@ public class UpdateRequestService {
         .toList();
 
     var resolvedRequests = updateRequestRepository
-        .findByScapDetailAndUpdateRequestTypeInAndResolutionDateNull(scapDetail, updateRequestsResolvedByAction);
+        .findByScapAndUpdateRequestTypeInAndResolutionDateNull(scapDetail.getScap(), updateRequestsResolvedByAction);
 
     var userId = userDetailService.getUserDetail().getWebUserAccountId().toInt();
 
@@ -70,8 +75,8 @@ public class UpdateRequestService {
     if (scapDetail.isEmpty()) {
       return Optional.empty();
     }
-    return updateRequestRepository.findFirstByScapDetailAndResolutionDateNullOrderByCreatedTimestampDesc(
-        scapDetail.get());
+    return updateRequestRepository.findFirstByScapAndResolutionDateNullOrderByCreatedTimestampDesc(
+        scapDetail.get().getScap());
   }
 
   public Optional<LocalDate> getUpdateDueDate(ScapId scapId, UpdateRequestType requestType) {
@@ -81,13 +86,15 @@ public class UpdateRequestService {
     }
 
     var requestActionOptional = updateRequestRepository
-        .findFirstByScapDetailAndResolutionDateNullAndUpdateRequestTypeOrderByCreatedTimestampDesc(scapDetail.get(), requestType);
+        .findFirstByScapAndResolutionDateNullAndUpdateRequestTypeOrderByCreatedTimestampDesc(
+            scapDetail.get().getScap(),
+            requestType);
 
     return requestActionOptional.map(t -> Optional.of(t.getDueDate())).orElse(Optional.empty());
   }
 
   public List<UpdateRequest> findAllByScapId(ScapId scapId) {
-    var scapDetails = scapDetailService.findAllByScapId(scapId);
-    return updateRequestRepository.findByScapDetailIn(scapDetails);
+    var scap = scapService.getScapById(scapId);
+    return updateRequestRepository.findAllByScap(scap);
   }
 }

@@ -14,7 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEvent;
-import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.scap.Scap;
 
 @Entity
 @Table(name = "scap_update_requests")
@@ -24,8 +24,8 @@ public class UpdateRequest {
   private UUID id;
 
   @ManyToOne
-  @JoinColumn(name = "scap_detail_id")
-  private ScapDetail scapDetail;
+  @JoinColumn(name = "scap_id")
+  private Scap scap;
 
   @OneToOne
   @JoinColumn(name = "case_event_id")
@@ -53,11 +53,11 @@ public class UpdateRequest {
   public UpdateRequest() {
   }
 
-  public UpdateRequest(ScapDetail scapDetail,
+  public UpdateRequest(Scap scap,
                        UpdateRequestType updateRequestType,
                        LocalDate dueDate,
                        CaseEvent caseEvent) {
-    this.scapDetail = scapDetail;
+    this.scap = scap;
     this.updateRequestType = updateRequestType;
     this.dueDate = dueDate;
     this.caseEvent = caseEvent;
@@ -67,12 +67,12 @@ public class UpdateRequest {
     return id;
   }
 
-  public ScapDetail getScapDetail() {
-    return scapDetail;
+  public Scap getScap() {
+    return scap;
   }
 
-  public void setScapDetail(ScapDetail scapDetail) {
-    this.scapDetail = scapDetail;
+  public void setScap(Scap scap) {
+    this.scap = scap;
   }
 
   public UpdateRequestType getUpdateRequestType() {
@@ -89,6 +89,10 @@ public class UpdateRequest {
 
   public void setCaseEvent(CaseEvent caseEvent) {
     this.caseEvent = caseEvent;
+  }
+
+  public void setCreatedTimestamp(LocalDate createdTimestamp) {
+    this.createdTimestamp = createdTimestamp;
   }
 
   public LocalDate getCreatedTimestamp() {

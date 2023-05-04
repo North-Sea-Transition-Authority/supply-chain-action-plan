@@ -198,7 +198,7 @@ class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
     caseEvent.setComments("TEST");
 
     return new UpdateRequest(
-        scapDetail,
+        scap,
         UpdateRequestType.UPDATE,
         LocalDate.now(),
         caseEvent);

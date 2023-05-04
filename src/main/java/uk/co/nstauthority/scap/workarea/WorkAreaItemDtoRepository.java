@@ -50,7 +50,7 @@ class WorkAreaItemDtoRepository {
         .distinctOn(SCAPS.SCAP_ID)
         .from(SCAPS)
         .join(SCAP_DETAILS).onKey(SCAP_DETAILS.SCAP_ID)
-        .leftJoin(SCAP_UPDATE_REQUESTS).onKey(SCAP_UPDATE_REQUESTS.SCAP_DETAIL_ID)
+        .leftJoin(SCAP_UPDATE_REQUESTS).onKey(SCAP_UPDATE_REQUESTS.SCAP_ID)
         .where(displayConditions)
         .orderBy(SCAPS.SCAP_ID, SCAP_DETAILS.VERSION_NUMBER.desc());
 

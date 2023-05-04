@@ -3,18 +3,18 @@ package uk.co.nstauthority.scap.workarea.updaterequests;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
-import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.scap.Scap;
 
 public interface UpdateRequestRepository extends CrudRepository<UpdateRequest, Integer> {
-  Optional<UpdateRequest> findFirstByScapDetailAndResolutionDateNullOrderByCreatedTimestampDesc(ScapDetail scapDetail);
+  Optional<UpdateRequest> findFirstByScapAndResolutionDateNullOrderByCreatedTimestampDesc(Scap scap);
 
-  List<UpdateRequest> findByScapDetailIn(List<ScapDetail> scapDetails);
+  List<UpdateRequest> findAllByScap(Scap scap);
 
-  List<UpdateRequest> findByScapDetailAndUpdateRequestTypeInAndResolutionDateNull(
-      ScapDetail scapDetail,
+  List<UpdateRequest> findByScapAndUpdateRequestTypeInAndResolutionDateNull(
+      Scap scap,
       List<UpdateRequestType> updateRequestTypes);
 
-  Optional<UpdateRequest> findFirstByScapDetailAndResolutionDateNullAndUpdateRequestTypeOrderByCreatedTimestampDesc(
-      ScapDetail scapDetail,
+  Optional<UpdateRequest> findFirstByScapAndResolutionDateNullAndUpdateRequestTypeOrderByCreatedTimestampDesc(
+      Scap scap,
       UpdateRequestType updateRequestType);
 }
