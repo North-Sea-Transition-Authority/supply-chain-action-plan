@@ -8,6 +8,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +30,12 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailEntityTestUtil;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupController;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupForm;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupFormService;
+import uk.co.nstauthority.scap.scap.pathfinder.PathfinderController;
+import uk.co.nstauthority.scap.scap.pathfinder.PathfinderForm;
+import uk.co.nstauthority.scap.scap.pathfinder.PathfinderFormValidator;
+import uk.co.nstauthority.scap.scap.pathfinder.PathfinderProject;
+import uk.co.nstauthority.scap.scap.pathfinder.PathfinderProjectsOverview;
+import uk.co.nstauthority.scap.scap.pathfinder.PathfinderService;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderTaskListItemService;
 import uk.co.nstauthority.scap.scap.plannedtender.hasplannedtender.HasPlannedTenderController;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetails;
@@ -74,6 +81,12 @@ class ScapFormTaskListSectionServiceTest {
   @Mock
   private OrganisationGroupFormService organisationGroupFormService;
 
+  @Mock
+  private PathfinderService pathfinderService;
+
+  @Mock
+  private PathfinderFormValidator pathfinderFormValidator;
+
   @InjectMocks
   private ScapFormTaskListSectionService scapFormTaskListSectionService;
 
@@ -105,6 +118,8 @@ class ScapFormTaskListSectionServiceTest {
         .getContractingPerformanceTaskListItem(SCAP_ID, SCAP_DETAIL);
     doReturn(testTaskListItem).when(scapFormTaskListSectionService)
         .getProjectPerformanceTaskListItem(SCAP_ID, SCAP_DETAIL);
+    doReturn(testTaskListItem).when(scapFormTaskListSectionService)
+        .getPathfinderTaskListItem(SCAP_ID, SCAP_DETAIL);
 
     var section = scapFormTaskListSectionService.getSection(SCAP_DETAIL);
 
@@ -116,7 +131,7 @@ class ScapFormTaskListSectionServiceTest {
         ScapFormTaskListSectionService.DISPLAY_NAME,
         ScapFormTaskListSectionService.DISPLAY_ORDER
     );
-    assertThat(section.get().items()).hasSize(6);
+    assertThat(section.get().items()).hasSize(7);
   }
 
   @Test
@@ -344,6 +359,53 @@ class ScapFormTaskListSectionServiceTest {
         TaskListLabel.COMPLETED,
         ScapFormTaskListSectionService.PROJECT_PERFORMANCE_DISPLAY_NAME,
         ReverseRouter.route(on(ProjectPerformanceController.class).renderProjectPerformanceForm(SCAP_ID))
+    );
+  }
+
+  @Test
+  void getPathfinderTaskListItem_SectionNotFilledOut_AssertNotCompleted() {
+    when(pathfinderService.findPathfinderProjectsOverview(SCAP_DETAIL)).thenReturn(Optional.empty());
+    when(pathfinderFormValidator.validate(any(PathfinderForm.class)))
+        .thenReturn(ValidatorTestingUtil.bindingResultWithErrors(new PathfinderForm()));
+
+    var taskListItem = scapFormTaskListSectionService.getPathfinderTaskListItem(SCAP_ID, SCAP_DETAIL);
+
+    assertThat(taskListItem).extracting(
+        TaskListItem::displayName,
+        TaskListItem::label,
+        TaskListItem::actionUrl
+    ).containsExactly(
+        ScapFormTaskListSectionService.PATHFINDER_DISPLAY_NAME,
+        TaskListLabel.NOT_COMPLETED,
+        ReverseRouter.route(on(PathfinderController.class).renderPathfinderProjectsForm(SCAP_ID))
+    );
+  }
+
+  @Test
+  void getPathfinderTaskListItem_SectionComplete_AssertCompleted() {
+    var pathfinderProjectsOverview = new PathfinderProjectsOverview(SCAP_DETAIL, Instant.now());
+    pathfinderProjectsOverview.setHasRelatedPathfinderProjects(true);
+    var pathfinderProjects = Collections.singleton(
+        new PathfinderProject(pathfinderProjectsOverview, 743, "Some Pathfinder project title", Instant.now())
+    );
+
+    when(pathfinderService.findPathfinderProjectsOverview(SCAP_DETAIL))
+        .thenReturn(Optional.of(pathfinderProjectsOverview));
+    when(pathfinderService.findAllByPathfinderProjectsOverview(pathfinderProjectsOverview))
+        .thenReturn(pathfinderProjects);
+    when(pathfinderFormValidator.validate(any(PathfinderForm.class)))
+        .thenReturn(ValidatorTestingUtil.bindingResultWithoutErrors(new PathfinderForm()));
+
+    var taskListItem = scapFormTaskListSectionService.getPathfinderTaskListItem(SCAP_ID, SCAP_DETAIL);
+
+    assertThat(taskListItem).extracting(
+        TaskListItem::displayName,
+        TaskListItem::label,
+        TaskListItem::actionUrl
+    ).containsExactly(
+        ScapFormTaskListSectionService.PATHFINDER_DISPLAY_NAME,
+        TaskListLabel.COMPLETED,
+        ReverseRouter.route(on(PathfinderController.class).renderPathfinderProjectsForm(SCAP_ID))
     );
   }
 }

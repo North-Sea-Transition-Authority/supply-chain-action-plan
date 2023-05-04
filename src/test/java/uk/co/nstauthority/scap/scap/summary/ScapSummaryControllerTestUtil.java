@@ -15,6 +15,8 @@ public class ScapSummaryControllerTestUtil {
       null,
       null
   );
+  private static final RelatedPathfinderProjectsSummaryView PATHFINDER_PROJECTS_SUMMARY_VIEW =
+      RelatedPathfinderProjectsSummaryView.empty();
   private static final ActualTenderSummaryView ACTUAL_TENDER_SUMMARY_VIEW = new ActualTenderSummaryView(
       null, null
   );
@@ -26,6 +28,7 @@ public class ScapSummaryControllerTestUtil {
   private static final ScapSummaryView SCAP_SUMMARY_VIEW = new ScapSummaryView(
       PROJECT_DETAILS_SUMMARY_VIEW,
       PLANNED_TENDER_SUMMARY_VIEW,
+      PATHFINDER_PROJECTS_SUMMARY_VIEW,
       ACTUAL_TENDER_SUMMARY_VIEW,
       CONTRACTING_PERFORMANCE_OVERVIEW_SUMMARY_VIEW,
       PROJECT_PERFORMANCE_SUMMARY_VIEW
@@ -37,6 +40,10 @@ public class ScapSummaryControllerTestUtil {
 
   public static PlannedTenderSummaryView getPlannedTenderSummaryView() {
     return PLANNED_TENDER_SUMMARY_VIEW;
+  }
+
+  public static RelatedPathfinderProjectsSummaryView getPathfinderProjectsSummaryView() {
+    return PATHFINDER_PROJECTS_SUMMARY_VIEW;
   }
 
   public static ActualTenderSummaryView getActualTenderSummaryView() {

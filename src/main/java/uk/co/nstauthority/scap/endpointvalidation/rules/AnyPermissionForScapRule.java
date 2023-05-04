@@ -50,7 +50,7 @@ public class AnyPermissionForScapRule implements ScapSecurityRule {
                                   ScapDetail scapDetail,
                                   Team team) {
     if (scapDetail == null) {
-      LOGGER.error("Could not find SCAP based on URL: %s".formatted(request.getRequestURI()));
+      LOGGER.error("Could not find SCAP based on URL: {}", request.getRequestURI());
       return SecurityRuleResult.checkFailedWithStatus(HttpStatus.BAD_REQUEST);
     }
 
@@ -80,9 +80,11 @@ public class AnyPermissionForScapRule implements ScapSecurityRule {
     if (hasPermission) {
       return SecurityRuleResult.continueAsNormal();
     } else {
-      LOGGER.error("User does not have permission to interact with SCAP: %s associated with Org Group: %s"
-          .formatted(scapDetail.getScap().getReference(),
-              scapDetail.getScap().getOrganisationGroupId()));
+      LOGGER.error(
+          "User does not have permission to interact with SCAP: {} associated with Org Group: {}",
+          scapDetail.getScap().getReference(),
+          scapDetail.getScap().getOrganisationGroupId()
+      );
       return SecurityRuleResult.checkFailedWithStatus(HttpStatus.FORBIDDEN);
     }
   }

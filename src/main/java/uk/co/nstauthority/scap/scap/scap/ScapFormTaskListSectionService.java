@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.scap.scap;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.util.TaskListItemUtil.getBindingResultForForm;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,6 +17,10 @@ import uk.co.nstauthority.scap.scap.contractingperformance.hascontractingperform
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupController;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupFormService;
+import uk.co.nstauthority.scap.scap.pathfinder.PathfinderController;
+import uk.co.nstauthority.scap.scap.pathfinder.PathfinderForm;
+import uk.co.nstauthority.scap.scap.pathfinder.PathfinderFormValidator;
+import uk.co.nstauthority.scap.scap.pathfinder.PathfinderService;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderTaskListItemService;
 import uk.co.nstauthority.scap.scap.plannedtender.hasplannedtender.HasPlannedTenderController;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsController;
@@ -40,6 +45,7 @@ public class ScapFormTaskListSectionService implements TaskListSectionService {
   static final String OPERATOR_DISPLAY_NAME = "SCAP operator";
   static final String PROJECT_DETAILS_DISPLAY_NAME = "Project details";
   static final String PLANNED_TENDER_DISPLAY_NAME = "Planned tender activity";
+  static final String PATHFINDER_DISPLAY_NAME = "Related Pathfinder projects";
   static final String ACTUAL_TENDER_DISPLAY_NAME = "Actual tender activity";
   static final String CONTRACTING_PERFORMANCE_DISPLAY_NAME = "Contracting performance";
   static final String PROJECT_PERFORMANCE_DISPLAY_NAME = "Project performance and close-out";
@@ -52,6 +58,8 @@ public class ScapFormTaskListSectionService implements TaskListSectionService {
   private final ProjectPerformanceService projectPerformanceService;
   private final ProjectPerformanceFormService projectPerformanceFormService;
   private final OrganisationGroupFormService organisationGroupFormService;
+  private final PathfinderService pathfinderService;
+  private final PathfinderFormValidator pathfinderFormValidator;
 
   @Autowired
   public ScapFormTaskListSectionService(ProjectDetailsService projectDetailsService,
@@ -61,7 +69,9 @@ public class ScapFormTaskListSectionService implements TaskListSectionService {
                                         ContractingPerformanceTaskListItemService contractingPerformanceTaskListItemService,
                                         ProjectPerformanceService projectPerformanceService,
                                         ProjectPerformanceFormService projectPerformanceFormService,
-                                        OrganisationGroupFormService organisationGroupFormService) {
+                                        OrganisationGroupFormService organisationGroupFormService,
+                                        PathfinderService pathfinderService,
+                                        PathfinderFormValidator pathfinderFormValidator) {
     this.projectDetailsService = projectDetailsService;
     this.projectDetailsFormService = projectDetailsFormService;
     this.plannedTenderTaskListItemService = plannedTenderTaskListItemService;
@@ -70,6 +80,8 @@ public class ScapFormTaskListSectionService implements TaskListSectionService {
     this.projectPerformanceService = projectPerformanceService;
     this.projectPerformanceFormService = projectPerformanceFormService;
     this.organisationGroupFormService = organisationGroupFormService;
+    this.pathfinderService = pathfinderService;
+    this.pathfinderFormValidator = pathfinderFormValidator;
   }
 
   @Override
@@ -80,6 +92,7 @@ public class ScapFormTaskListSectionService implements TaskListSectionService {
         getScapOperatorTaskListItem(scapId, scapDetail),
         getProjectDetailsTaskListItem(scapId, scapDetail),
         getPlannedTenderTaskListItem(scapId, scapDetail),
+        getPathfinderTaskListItem(scapId, scapDetail),
         getActualTenderTaskListItem(scapId, scapDetail),
         getContractingPerformanceTaskListItem(scapId, scapDetail),
         getProjectPerformanceTaskListItem(scapId, scapDetail)
@@ -179,6 +192,25 @@ public class ScapFormTaskListSectionService implements TaskListSectionService {
 
     return new TaskListItem(
         PROJECT_PERFORMANCE_DISPLAY_NAME,
+        TaskListLabel.from(isValid),
+        actionUrl
+    );
+  }
+
+  /* Related pathfinder projects */
+  TaskListItem getPathfinderTaskListItem(ScapId scapId, ScapDetail scapDetail) {
+    var actionUrl = ReverseRouter.route(on(PathfinderController.class).renderPathfinderProjectsForm(scapId));
+    var pathfinderOverviewOptional = pathfinderService.findPathfinderProjectsOverview(scapDetail);
+    var pathfinderProjects = pathfinderOverviewOptional
+        .map(pathfinderService::findAllByPathfinderProjectsOverview)
+        .orElse(Collections.emptySet());
+    var form = pathfinderOverviewOptional
+        .map(pathfinderProjectsOverview -> PathfinderForm.from(pathfinderProjectsOverview, pathfinderProjects))
+        .orElse(new PathfinderForm());
+    var isValid = !pathfinderFormValidator.validate(form).hasErrors();
+
+    return new TaskListItem(
+        PATHFINDER_DISPLAY_NAME,
         TaskListLabel.from(isValid),
         actionUrl
     );

@@ -4,6 +4,7 @@
 <#import 'actualTenderSummary.ftl' as actualTenderSummary>
 <#import 'contractingPerformance.ftl' as contractingPerformance>
 <#import 'projectPerformanceSummary.ftl' as projectPerformanceSummary>
+<#import 'relatedPathfinderProjectsSummary.ftl' as relatedPathfinderProjectsSummary>
 
 
 <#macro summary scapSummaryView>
@@ -14,6 +15,11 @@
     </@fdsAccordion.accordionSection>
     <@fdsAccordion.accordionSection sectionHeading="Planned tender activities">
       <@plannedTenderSummary.plannedTenderSummary plannedTenderSummaryView=scapSummaryView.plannedTenderSummaryView() />
+    </@fdsAccordion.accordionSection>
+    <@fdsAccordion.accordionSection sectionHeading="Related Pathfinder projects">
+      <@relatedPathfinderProjectsSummary.relatedPathfinderProjectsSummary
+        relatedPathfinderProjectsSummaryView=scapSummaryView.pathfinderProjectsSummaryView()
+      />
     </@fdsAccordion.accordionSection>
     <@fdsAccordion.accordionSection sectionHeading="Actual tender activities">
       <@actualTenderSummary.actualTenderSummary actualTenderSummaryView=scapSummaryView.actualTenderSummaryView() />

@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getActualTenderSummaryView;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getContractingPerformanceOverviewSummaryView;
+import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getPathfinderProjectsSummaryView;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getPlannedTenderSummaryView;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getProjectDetailsSummaryView;
 import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil.getProjectPerformanceSummaryView;
@@ -22,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,6 +44,9 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivitySe
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverview;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverviewService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.pathfinder.PathfinderProject;
+import uk.co.nstauthority.scap.scap.pathfinder.PathfinderProjectsOverview;
+import uk.co.nstauthority.scap.scap.pathfinder.PathfinderService;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTender;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderService;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivity;
@@ -74,6 +79,9 @@ class ScapSummaryViewServiceTest {
 
   @Mock
   PlannedTenderActivityService plannedTenderActivityService;
+
+  @Mock
+  PathfinderService pathfinderService;
 
   @Mock
   ActualTenderService actualTenderService;
@@ -115,6 +123,7 @@ class ScapSummaryViewServiceTest {
 
     doReturn(getProjectDetailsSummaryView()).when(scapSummaryViewService).getProjectDetailsSummaryView(scapDetail);
     doReturn(getPlannedTenderSummaryView()).when(scapSummaryViewService).getPlannedTenderSummaryView(scapDetail);
+    doReturn(getPathfinderProjectsSummaryView()).when(scapSummaryViewService).getPathfinderProjectsSummaryView(scapDetail);
     doReturn(getActualTenderSummaryView()).when(scapSummaryViewService).getActualTenderSummaryView(scapDetail);
     doReturn(getContractingPerformanceOverviewSummaryView()).when(scapSummaryViewService)
         .getContractingPerformanceOverviewSummaryView(scapDetail);
@@ -124,6 +133,7 @@ class ScapSummaryViewServiceTest {
 
     verify(scapSummaryViewService).getProjectDetailsSummaryView(scapDetail);
     verify(scapSummaryViewService).getPlannedTenderSummaryView(scapDetail);
+    verify(scapSummaryViewService).getPathfinderProjectsSummaryView(scapDetail);
     verify(scapSummaryViewService).getActualTenderSummaryView(scapDetail);
     verify(scapSummaryViewService).getContractingPerformanceOverviewSummaryView(scapDetail);
     verify(scapSummaryViewService).getProjectPerformanceSummaryView(scapDetail);
@@ -283,6 +293,66 @@ class ScapSummaryViewServiceTest {
             plannedTenderActivity.getRemunerationModelName(),
             plannedTenderActivity.getScopeDescription()
         )
+    );
+  }
+
+  @Test
+  void getPathfinderProjectsSummaryView_WhenNotFilledOut() {
+    when(pathfinderService.findPathfinderProjectsOverview(scapDetail)).thenReturn(Optional.empty());
+
+    var pathfinderSummary = scapSummaryViewService.getPathfinderProjectsSummaryView(scapDetail);
+
+    assertThat(pathfinderSummary).extracting(
+        RelatedPathfinderProjectsSummaryView::hasPathfinderProjects,
+        RelatedPathfinderProjectsSummaryView::noPathfinderProjectsRationale,
+        RelatedPathfinderProjectsSummaryView::pathfinderProjectNames
+    ).containsOnlyNulls();
+  }
+
+  @Test
+  void getPathfinderProjectsSummaryView_WhenNoPathfinderProjects() {
+    var pathfinderProjectsOverview = new PathfinderProjectsOverview(UUID.randomUUID());
+    pathfinderProjectsOverview.setHasRelatedPathfinderProjects(false);
+    pathfinderProjectsOverview.setNoPathfinderProjectsRationale("some rationale");
+
+    when(pathfinderService.findPathfinderProjectsOverview(scapDetail))
+        .thenReturn(Optional.of(pathfinderProjectsOverview));
+
+    var pathfinderSummary = scapSummaryViewService.getPathfinderProjectsSummaryView(scapDetail);
+
+    assertThat(pathfinderSummary).extracting(
+        RelatedPathfinderProjectsSummaryView::hasPathfinderProjects,
+        RelatedPathfinderProjectsSummaryView::noPathfinderProjectsRationale,
+        RelatedPathfinderProjectsSummaryView::pathfinderProjectNames
+    ).containsExactly(
+        pathfinderProjectsOverview.getHasRelatedPathfinderProjects(),
+        pathfinderProjectsOverview.getNoPathfinderProjectsRationale(),
+        null
+    );
+  }
+
+  @Test
+  void getPathfinderProjectsSummaryView_WhenHasPathfinderProjects() {
+    var pathfinderProjectsOverview = new PathfinderProjectsOverview(UUID.randomUUID());
+    pathfinderProjectsOverview.setHasRelatedPathfinderProjects(true);
+    var pathfinderProject = new PathfinderProject(UUID.randomUUID());
+    pathfinderProject.setPathfinderProjectName("Some pathfinder project name");
+
+    when(pathfinderService.findPathfinderProjectsOverview(scapDetail))
+        .thenReturn(Optional.of(pathfinderProjectsOverview));
+    when(pathfinderService.findAllByPathfinderProjectsOverview(pathfinderProjectsOverview))
+        .thenReturn(Collections.singleton(pathfinderProject));
+
+    var pathfinderSummary = scapSummaryViewService.getPathfinderProjectsSummaryView(scapDetail);
+
+    assertThat(pathfinderSummary).extracting(
+        RelatedPathfinderProjectsSummaryView::hasPathfinderProjects,
+        RelatedPathfinderProjectsSummaryView::noPathfinderProjectsRationale,
+        RelatedPathfinderProjectsSummaryView::pathfinderProjectNames
+    ).containsExactly(
+        pathfinderProjectsOverview.getHasRelatedPathfinderProjects(),
+        pathfinderProjectsOverview.getNoPathfinderProjectsRationale(),
+        Collections.singletonList(pathfinderProject.getPathfinderProjectName())
     );
   }
 
@@ -464,6 +534,7 @@ class ScapSummaryViewServiceTest {
 
     var scapSummary = new ScapSummaryView(getMockedProjectDetailsView(),
         plannedTenderSummaryView,
+        RelatedPathfinderProjectsSummaryView.empty(),
         actualTenderSummaryView,
         contractingPerformanceSummaryView,
         projectPerformanceSummaryView);
@@ -486,6 +557,7 @@ class ScapSummaryViewServiceTest {
 
     var scapSummary = new ScapSummaryView(getMockedProjectDetailsView(),
         plannedTenderSummaryView,
+        RelatedPathfinderProjectsSummaryView.empty(),
         actualTenderSummaryView,
         contractingPerformanceSummaryView,
         projectPerformanceSummaryView);
@@ -507,6 +579,7 @@ class ScapSummaryViewServiceTest {
 
     var scapSummary = new ScapSummaryView(getMockedProjectDetailsView(),
         plannedTenderSummaryView,
+        RelatedPathfinderProjectsSummaryView.empty(),
         actualTenderSummaryView,
         contractingPerformanceSummaryView,
         projectPerformanceSummaryView);
@@ -528,6 +601,7 @@ class ScapSummaryViewServiceTest {
 
     var scapSummary = new ScapSummaryView(getMockedProjectDetailsView(),
         plannedTenderSummaryView,
+        RelatedPathfinderProjectsSummaryView.empty(),
         actualTenderSummaryView,
         contractingPerformanceSummaryView,
         projectPerformanceSummaryView);
@@ -549,7 +623,8 @@ class ScapSummaryViewServiceTest {
 
     var scapSummary = new ScapSummaryView(getMockedProjectDetailsView(),
         plannedTenderSummaryView,
-        actualTenderSummaryView,
+        RelatedPathfinderProjectsSummaryView.empty(),
+          actualTenderSummaryView,
         contractingPerformanceSummaryView,
         projectPerformanceSummaryView);
 

@@ -11,6 +11,7 @@ import uk.co.fivium.energyportalapi.client.countries.CountryApi;
 import uk.co.fivium.energyportalapi.client.facility.FacilityApi;
 import uk.co.fivium.energyportalapi.client.field.FieldApi;
 import uk.co.fivium.energyportalapi.client.organisation.OrganisationApi;
+import uk.co.fivium.energyportalapi.client.pathfinder.PathfinderApi;
 import uk.co.fivium.energyportalapi.client.user.UserApi;
 
 @Configuration
@@ -58,6 +59,11 @@ public class EnergyPortalApiConfiguration {
   @Bean
   public FacilityApi facilityApi(EnergyPortal energyPortal) {
     return new FacilityApi(energyPortal);
+  }
+
+  @Bean
+  public PathfinderApi pathfinderApi(EnergyPortal energyPortal) {
+    return new PathfinderApi(energyPortal);
   }
 
   public String getUrl() {

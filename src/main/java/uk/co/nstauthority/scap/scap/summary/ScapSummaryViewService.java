@@ -8,15 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.fivium.formlibrary.validator.date.DateUtils;
 import uk.co.nstauthority.scap.enumutil.YesNo;
-import uk.co.nstauthority.scap.file.FileUploadService;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivityService;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverviewService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.pathfinder.PathfinderProject;
+import uk.co.nstauthority.scap.scap.pathfinder.PathfinderService;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTenderService;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivityService;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailsService;
-import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentService;
 import uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments.SupportingDocumentType;
 import uk.co.nstauthority.scap.scap.projectperformance.ProjectPerformanceService;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryView;
@@ -33,6 +33,7 @@ public class ScapSummaryViewService {
   private final ProjectDetailsService projectDetailsService;
   private final PlannedTenderService plannedTenderService;
   private final PlannedTenderActivityService plannedTenderActivityService;
+  private final PathfinderService pathfinderService;
   private final ActualTenderSummaryViewService actualTenderSummaryViewService;
   private final ActualTenderService actualTenderService;
   private final ActualTenderActivityService actualTenderActivityService;
@@ -45,17 +46,18 @@ public class ScapSummaryViewService {
   ScapSummaryViewService(ProjectDetailsService projectDetailsService,
                          PlannedTenderService plannedTenderService,
                          PlannedTenderActivityService plannedTenderActivityService,
+                         PathfinderService pathfinderService,
                          ActualTenderSummaryViewService actualTenderSummaryViewService,
                          ActualTenderService actualTenderService,
                          ActualTenderActivityService actualTenderActivityService,
                          ContractingPerformanceOverviewService contractingPerformanceOverviewService,
                          ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService,
-                         ProjectPerformanceService projectPerformanceService, FileUploadService fileUploadService,
-                         SupportingDocumentService supportingDocumentService,
+                         ProjectPerformanceService projectPerformanceService,
                          FileUploadSummaryViewService fileUploadSummaryViewService) {
     this.projectDetailsService = projectDetailsService;
     this.plannedTenderService = plannedTenderService;
     this.plannedTenderActivityService = plannedTenderActivityService;
+    this.pathfinderService = pathfinderService;
     this.actualTenderSummaryViewService = actualTenderSummaryViewService;
     this.actualTenderService = actualTenderService;
     this.actualTenderActivityService = actualTenderActivityService;
@@ -69,13 +71,18 @@ public class ScapSummaryViewService {
   public ScapSummaryView getScapSummaryView(ScapDetail scapDetail) {
     var projectDetailsSummaryView = getProjectDetailsSummaryView(scapDetail);
     var plannedTenderSummaryView = getPlannedTenderSummaryView(scapDetail);
+    var pathfinderProjectsSummaryView = getPathfinderProjectsSummaryView(scapDetail);
     var actualTenderSummaryView = getActualTenderSummaryView(scapDetail);
     var contractingPerformanceOverviewSummaryView = getContractingPerformanceOverviewSummaryView(scapDetail);
     var projectPerformanceSummaryView = getProjectPerformanceSummaryView(scapDetail);
 
     return new ScapSummaryView(
-        projectDetailsSummaryView, plannedTenderSummaryView, actualTenderSummaryView,
-        contractingPerformanceOverviewSummaryView, projectPerformanceSummaryView
+        projectDetailsSummaryView,
+        plannedTenderSummaryView,
+        pathfinderProjectsSummaryView,
+        actualTenderSummaryView,
+        contractingPerformanceOverviewSummaryView,
+        projectPerformanceSummaryView
     );
   }
 
@@ -127,6 +134,30 @@ public class ScapSummaryViewService {
           return new PlannedTenderSummaryView(plannedTender.getHasPlannedTenders(), plannedTenderActivitySummaryViews);
         }
     ).orElse(new PlannedTenderSummaryView(null, null));
+  }
+
+  @VisibleForTesting
+  public RelatedPathfinderProjectsSummaryView getPathfinderProjectsSummaryView(ScapDetail scapDetail) {
+    var pathfinderProjectsOverviewOpt = pathfinderService.findPathfinderProjectsOverview(scapDetail);
+
+    if (pathfinderProjectsOverviewOpt.isEmpty()) {
+      return RelatedPathfinderProjectsSummaryView.empty();
+    }
+
+    var pathfinderProjectsOverview = pathfinderProjectsOverviewOpt.get();
+
+    if (Boolean.FALSE.equals(pathfinderProjectsOverview.getHasRelatedPathfinderProjects())) {
+      return RelatedPathfinderProjectsSummaryView.noRelatedProjects(
+          pathfinderProjectsOverview.getNoPathfinderProjectsRationale()
+      );
+    }
+
+    var pathfinderProjectNames = pathfinderService.findAllByPathfinderProjectsOverview(pathfinderProjectsOverview)
+        .stream()
+        .map(PathfinderProject::getPathfinderProjectName)
+        .toList();
+
+    return RelatedPathfinderProjectsSummaryView.relatedProjects(pathfinderProjectNames);
   }
 
   @VisibleForTesting

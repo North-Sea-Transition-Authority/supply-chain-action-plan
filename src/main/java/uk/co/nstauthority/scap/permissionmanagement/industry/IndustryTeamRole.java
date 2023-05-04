@@ -18,7 +18,7 @@ public enum IndustryTeamRole implements TeamRole {
       "SCAP submitter",
       "Can create or update scaps",
       30,
-      EnumSet.of(RolePermission.SUBMIT_SCAP)
+      EnumSet.of(RolePermission.SUBMIT_SCAP, RolePermission.VIEW_SCAP)
   ),
   SCAP_VIEWER(
       "SCAP viewer",
