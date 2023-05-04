@@ -1,5 +1,7 @@
 package uk.co.nstauthority.scap.scap.summary;
 
+import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
@@ -20,14 +22,20 @@ import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.web.servlet.ResultMatcher;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.file.FileUploadTemplate;
@@ -36,6 +44,9 @@ import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
+import uk.co.nstauthority.scap.permissionmanagement.TeamRole;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
+import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamView;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEvent;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventDocumentService;
@@ -137,7 +148,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
   void renderSummary_IsFirstDraft_UserIsSumbitter() throws Exception {
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
     when(teamMemberService.getAllPermissionsForUser(testUser))
-        .thenReturn(Collections.singletonList(RolePermission.SUBMIT_SCAP));
+        .thenReturn(singletonList(RolePermission.SUBMIT_SCAP));
     scapDetail = ScapDetailEntityTestUtil.scapDetailBuilder()
         .withScap(scap)
         .withStatus(ScapDetailStatus.DRAFT)
@@ -291,6 +302,68 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/summary/scapSummaryOverview"));
     verify(caseEventService, never()).getEventViewByScapId(SCAP_ID);
+  }
+
+  @ParameterizedTest
+  @MethodSource("permissionAnnotationCheck")
+  void summaryController_securityAnnotations(Set<TeamRole> role, ResultMatcher status) throws Exception {
+    when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
+    when(teamMemberService.findTeamMember(any(Team.class), eq(testUser.getWebUserAccountId())))
+        .thenReturn(Optional.of(
+            new TeamMember(testUser.getWebUserAccountId(), new TeamView(null, null, null), role)));
+    mockMvc.perform(get(
+            ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
+            .with(authenticatedScapUser()))
+        .andExpect(status);
+  }
+
+  public static Stream<Arguments> permissionAnnotationCheck() {
+    var permittedPermissions = List.of(RolePermission.SUBMIT_SCAP, RolePermission.VIEW_SCAP);
+
+    return Stream.concat(Stream.of(RegulatorTeamRole.values()), Stream.of(IndustryTeamRole.values()))
+        .map(role -> Arguments.of(singleton(role),
+            Collections.disjoint(((TeamRole) role).getRolePermissions(), permittedPermissions)
+                ? status().isForbidden()
+                : status().isOk()));
+  }
+
+  @ParameterizedTest
+  @MethodSource("summaryStatusCheck")
+  void summaryControllerRenderSummary_statusAnnotations(ScapDetailStatus detailStatus, ResultMatcher status) throws Exception {
+    scapDetail.setStatus(detailStatus);
+    when(scapDetailService.getActionableScapDetail(SCAP_ID, testUser)).thenReturn(scapDetail);
+    when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
+    mockMvc.perform(get(
+            ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID)))
+            .with(authenticatedScapUser()))
+        .andExpect(status);
+  }
+
+  @ParameterizedTest
+  @MethodSource("summaryStatusCheck")
+  void summaryControllerRenderVersionSummary_statusAnnotations(ScapDetailStatus detailStatus, ResultMatcher status) throws Exception {
+    scapDetail.setStatus(detailStatus);
+    when(scapDetailService.getByScapIdAndVersionNumber(SCAP_ID, 4)).thenReturn(scapDetail);
+    when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
+    mockMvc.perform(get(
+            ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID, 4)))
+            .with(authenticatedScapUser()))
+        .andExpect(status);
+  }
+
+  public static Stream<Arguments> summaryStatusCheck() {
+    var permittedStatuses = List.of(
+        ScapDetailStatus.DRAFT,
+        ScapDetailStatus.SUBMITTED,
+        ScapDetailStatus.APPROVED,
+        ScapDetailStatus.CLOSED_OUT,
+        ScapDetailStatus.WITHDRAWN);
+
+    return Arrays.stream(ScapDetailStatus.values())
+        .map(status -> Arguments.of(status,
+            permittedStatuses.contains(status)
+                ? status().isOk()
+                : status().isBadRequest()));
   }
 
   private List<CaseEventView> getTimelineView() {

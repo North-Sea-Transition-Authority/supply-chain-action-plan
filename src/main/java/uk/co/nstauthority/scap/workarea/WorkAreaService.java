@@ -66,9 +66,9 @@ class WorkAreaService {
   }
 
   private List<WorkAreaItem> getRegulatorWorkAreaItems(ArrayList<Condition> conditions) {
-    conditions.add(SCAP_DETAILS.STATUS.notEqual(ScapDetailStatus.DRAFT.getEnumName()));
-    var workAreaItemDtoList = workAreaItemDtoRepository.performQuery(conditions);
-
+    var workAreaItemDtoList = workAreaItemDtoRepository.performQuery(
+        conditions,
+        SCAP_DETAILS.STATUS.notEqual(ScapDetailStatus.DRAFT.getEnumName()));
     return getItemsFromDtoList(workAreaItemDtoList);
   }
 
@@ -77,8 +77,9 @@ class WorkAreaService {
     if (organisationGroupIds.isEmpty()) {
       return Collections.emptyList();
     }
-    conditions.add(SCAPS.ORGANISATION_GROUP_ID.in(organisationGroupIds));
-    var workAreaItemDtoList = workAreaItemDtoRepository.performQuery(conditions);
+    var workAreaItemDtoList = workAreaItemDtoRepository.performQuery(
+        conditions,
+        SCAPS.ORGANISATION_GROUP_ID.in(organisationGroupIds));
     return getItemsFromDtoList(workAreaItemDtoList);
   }
 

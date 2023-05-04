@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
@@ -46,6 +47,7 @@ public class UpdateRequestService {
     return updateRequestRepository.save(updateRequest);
   }
 
+  @Transactional
   public void resolveUpdateRequest(ScapDetail scapDetail, CaseEventSubject resolvingAction) {
     var updateRequestsResolvedByAction = Arrays.stream(UpdateRequestType.values())
         .filter(type -> type.getResolvedBy().contains(resolvingAction))

@@ -71,6 +71,9 @@ class WorkAreaServiceTest {
   @Captor
   ArgumentCaptor<List<Condition>> conditionsArgumentCaptor;
 
+  @Captor
+  ArgumentCaptor<Condition> conditionArgumentCaptor;
+
   @BeforeEach
   void setup() {
     userDetail = new ServiceUserDetail(1L, 1L, "John" , "Smith", "john.smith@example.com");
@@ -99,7 +102,7 @@ class WorkAreaServiceTest {
 
     when(updateRequestService.getUpdateDueDate(new ScapId(1), UpdateRequestType.FURTHER_INFORMATION))
         .thenReturn(Optional.empty());
-    when(workAreaItemDtoRepository.performQuery(any())).thenReturn(List.of(workAreaItemDto));
+    when(workAreaItemDtoRepository.performQuery(any(), any())).thenReturn(List.of(workAreaItemDto));
     when(organisationGroupService.getOrganisationGroupsByIds(
         List.of(workAreaItemDto.organisationGroupId()), WorkAreaService.ORGANISATION_GROUPS_REQUEST_PURPOSE))
         .thenReturn(List.of(organisationGroup));
@@ -128,9 +131,9 @@ class WorkAreaServiceTest {
     );
     verify(workAreaItemDtoRepository, never()).getAllByOrganisationGroups(any());
     verify(workAreaFilterService).getConditions(filter);
-    verify(workAreaItemDtoRepository).performQuery(conditionsArgumentCaptor.capture());
+    verify(workAreaItemDtoRepository).performQuery(conditionsArgumentCaptor.capture(), conditionArgumentCaptor.capture());
 
-    assertThat(conditionsArgumentCaptor.getValue()).containsExactly(
+    assertThat(conditionArgumentCaptor.getValue()).isEqualTo(
         SCAP_DETAILS.STATUS.notEqual(ScapDetailStatus.DRAFT.getEnumName())
     );
   }
@@ -157,7 +160,7 @@ class WorkAreaServiceTest {
 
     when(updateRequestService.getUpdateDueDate(new ScapId(1), UpdateRequestType.FURTHER_INFORMATION))
         .thenReturn(Optional.empty());
-    when(workAreaItemDtoRepository.performQuery(any()))
+    when(workAreaItemDtoRepository.performQuery(any(), any()))
         .thenReturn(List.of(workAreaItemDto));
     when(organisationGroupService.getOrganisationGroupsByIds(
         List.of(workAreaItemDto.organisationGroupId()), WorkAreaService.ORGANISATION_GROUPS_REQUEST_PURPOSE))
@@ -225,7 +228,7 @@ class WorkAreaServiceTest {
 
     when(updateRequestService.getUpdateDueDate(new ScapId(4), UpdateRequestType.FURTHER_INFORMATION))
         .thenReturn(Optional.empty());
-    when(workAreaItemDtoRepository.performQuery(any())).thenReturn(workAreaItemDtoList);
+    when(workAreaItemDtoRepository.performQuery(any(), any())).thenReturn(workAreaItemDtoList);
     when(organisationGroupService.getOrganisationGroupsByIds(
         List.of(orgGrpId, orgGrpId, orgGrpId, orgGrpId),
         WorkAreaService.ORGANISATION_GROUPS_REQUEST_PURPOSE))

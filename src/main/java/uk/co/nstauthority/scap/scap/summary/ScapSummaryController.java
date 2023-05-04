@@ -72,7 +72,6 @@ public class ScapSummaryController {
     this.caseEventDocumentService = caseEventDocumentService;
   }
 
-  //TODO:SCAP2022-232 - Smoke test all statuses against this method
   @GetMapping
   @ScapHasStatus(permittedStatuses = {ScapDetailStatus.DRAFT,
       ScapDetailStatus.SUBMITTED,

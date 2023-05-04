@@ -87,6 +87,7 @@ public class CaseEventService {
     return recordNewEvent(subject, scapDetail, scapVersion, comments, null);
   }
 
+  @Transactional
   public CaseEvent recordNewEvent(CaseEventSubject subject,
                                   ScapDetail scapDetail,
                                   Integer scapVersion,

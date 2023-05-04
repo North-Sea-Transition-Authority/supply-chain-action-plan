@@ -33,16 +33,16 @@ class WorkAreaItemDtoRepository {
   List<WorkAreaItemDto> getAllByScapStatusNotIn(ScapDetailStatus... statuses) {
     var statusStrings = Arrays.stream(statuses).map(ScapDetailStatus::getEnumName).toList();
     var condition = SCAP_DETAILS.STATUS.notIn(statusStrings);
-    return performQuery(Collections.singletonList(condition));
+    return performQuery(Collections.singletonList(condition), null);
   }
 
   // Using in to get the results for the given organisation groups
   List<WorkAreaItemDto> getAllByOrganisationGroups(List<Integer> organisationGroupIds) {
     var condition = SCAPS.ORGANISATION_GROUP_ID.in(organisationGroupIds);
-    return performQuery(Collections.singletonList(condition));
+    return performQuery(Collections.singletonList(condition), null);
   }
 
-  List<WorkAreaItemDto> performQuery(List<Condition> conditions) {
+  List<WorkAreaItemDto> performQuery(List<Condition> filterConditions, Condition displayConditions) {
     //Generates sub query to return SCAP Detail ID's that are applicable for work area, based on conditions.
     //Only allows one SCAP Detail ID per SCAP
 
@@ -51,7 +51,7 @@ class WorkAreaItemDtoRepository {
         .from(SCAPS)
         .join(SCAP_DETAILS).onKey(SCAP_DETAILS.SCAP_ID)
         .leftJoin(SCAP_UPDATE_REQUESTS).onKey(SCAP_UPDATE_REQUESTS.SCAP_DETAIL_ID)
-        .where(conditions)
+        .where(displayConditions)
         .orderBy(SCAPS.SCAP_ID, SCAP_DETAILS.VERSION_NUMBER.desc());
 
     return context.select(
@@ -75,7 +75,8 @@ class WorkAreaItemDtoRepository {
         .leftJoin(CONTRACTING_PERFORMANCE_OVERVIEWS).onKey(CONTRACTING_PERFORMANCE_OVERVIEWS.SCAP_DETAIL_ID)
         .leftJoin(ACTUAL_TENDERS).onKey(ACTUAL_TENDERS.SCAP_DETAIL_ID)
         .leftJoin(PLANNED_TENDERS).onKey(PLANNED_TENDERS.SCAP_DETAIL_ID)
-        .where(SCAP_DETAILS.ID.in(detailsSubQuery))
+        .where(filterConditions)
+        .and(SCAP_DETAILS.ID.in(detailsSubQuery))
 
         .fetchInto(WorkAreaItemDto.class);
   }
