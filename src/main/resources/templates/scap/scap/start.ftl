@@ -14,8 +14,12 @@ backLinkUrl=springUrl(backLinkUrl)
     their Field Development Plan (FDP) or Decommissioning Programme (DP).</p>
   <p class="govuk-body">
     The ${customerBranding.mnemonic()} updated its SCAP guidance in August 2022 to ensure alignment with its Strategy and the North Sea Transition
-    Deal. The full guidance document can be found at
-      <@fdsAction.link linkText=scapGuidanceDocumentUrl linkUrl=scapGuidanceDocumentUrl/>
+    Deal.
+  </p>
+  <p class="govuk-body">
+    Read
+      <@fdsAction.link linkText='SCAPs' linkUrl=scapGuidanceDocumentUrl/>
+    for more information
   </p>
   <@fdsAction.link
   linkText="Start now"
