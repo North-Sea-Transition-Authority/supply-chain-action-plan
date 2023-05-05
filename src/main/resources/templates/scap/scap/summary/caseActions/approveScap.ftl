@@ -9,7 +9,7 @@
             <@fdsRadio.radioItem itemMap={"NO":"No"} path="scapApprovalForm.projectClosedOut"/>
         </@fdsRadio.radioGroup>
         <@fdsFieldset.fieldset
-        legendHeading="Supporting Approval documents"
+        legendHeading="Supporting Approval document"
         legendHeadingSize="h2"
         legendHeadingClass="govuk-fieldset__legend--m"
         optionalLabel=true
@@ -28,6 +28,6 @@
           multiFile=false
           />
         </@fdsFieldset.fieldset>
-        <@fdsAction.button buttonText="Update SCAP" buttonName="APPROVED"/>
+        <@fdsAction.button buttonText="Approve SCAP" buttonName="APPROVED"/>
     </@fdsForm.htmlForm>
 </@fdsSlideOutPanel.slideOutPanel>

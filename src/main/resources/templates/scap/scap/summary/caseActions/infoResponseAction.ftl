@@ -2,10 +2,10 @@
     <@fdsForm.htmlForm actionUrl=springUrl(infoResponseSubmitUrl) >
         <@fdsTextarea.textarea
         path="infoResponseForm.infoResponse.inputValue"
-        labelText=""
+        labelText="What additional information have you recieved?"
         hintText=""/>
         <@fdsFieldset.fieldset
-        legendHeading="Supporting Response documents"
+        legendHeading="Supporting Response document"
         legendHeadingSize="h2"
         legendHeadingClass="govuk-fieldset__legend--m"
         optionalLabel=true
@@ -24,6 +24,6 @@
           multiFile=false
           />
         </@fdsFieldset.fieldset>
-        <@fdsAction.button buttonText="Update SCAP" buttonName="INFO_RESPONSE"/>
+        <@fdsAction.button buttonText="Update case" buttonName="INFO_RESPONSE"/>
     </@fdsForm.htmlForm>
 </@fdsSlideOutPanel.slideOutPanel>

@@ -28,7 +28,7 @@ public class PlannedTenderActivityForm {
 
   public PlannedTenderActivityForm() {
     this.scopeDescription = new StringInput("scopeDescription", "the scope description");
-    this.estimatedValue = new DecimalInput("estimatedValue", "the estimated value");
+    this.estimatedValue = new DecimalInput("estimatedValue", "estimated value");
     this.remunerationModelName = new StringInput("remunerationModelName", "the remuneration model");
     this.awardRationale = new StringInput("awardRationale", "the award rationale");
     this.indicativeActualTenderStartDate = new ThreeFieldDateInput(

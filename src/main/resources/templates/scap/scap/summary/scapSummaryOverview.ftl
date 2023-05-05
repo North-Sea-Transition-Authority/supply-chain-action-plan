@@ -108,6 +108,7 @@ backLinkUrl=springUrl(backLinkUrl)
     </@fdsTabs.tabContent>
       <#if caseEvents?has_content>
         <@fdsTabs.tabContent tabAnchor="events-tab">
+          <h2 class="govuk-heading-l">Case event timeline</h2>
           <@timeline.timeline caseEvents=caseEvents/>
         </@fdsTabs.tabContent>
       </#if>

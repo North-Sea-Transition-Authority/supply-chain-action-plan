@@ -5,6 +5,6 @@
         optionalLabel=true
         labelText="QA comments"/>
 
-        <@fdsAction.button buttonText="Update SCAP" buttonName="QA"/>
+        <@fdsAction.button buttonText="Update case" buttonName="QA"/>
     </@fdsForm.htmlForm>
 </@fdsSlideOutPanel.slideOutPanel>

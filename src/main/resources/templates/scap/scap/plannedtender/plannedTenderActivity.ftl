@@ -24,7 +24,7 @@
 
   <@fdsSummaryList.summaryListCard
     summaryListId=listId
-    headingText="Planned tender activity"
+    headingText="Planned tender activity ${listId+1}"
     cardActionsContent=cardActionsContent
   >
     <@plannedTenderActivityRows plannedTenderActivity=listItem/>

@@ -31,7 +31,7 @@ backLinkUrl=springUrl(backLinkUrl)
     <@fdsSearchSelector.searchSelectorRest
       path="form.preferredBidderCountryId"
       restUrl=springUrl(countrySearchRestUrl)
-      labelText="Location of preferred bidder"
+      labelText="Country of preferred bidder"
       selectorMinInputLength=2
       preselectedItems=preselectedCountry!{}
     />

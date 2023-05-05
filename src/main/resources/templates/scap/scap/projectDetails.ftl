@@ -104,6 +104,7 @@
             selectorMinInputLength=2
             selectorInputClass="govuk-!-width-two-thirds"
             noItemText="There are no selected installations"
+            selectorLabelText="What installations or subsea infrastructure are related to this project?"
           />
         </@fdsRadio.radioYes>
         <@fdsRadio.radioNo path="form.hasPlatforms"/>

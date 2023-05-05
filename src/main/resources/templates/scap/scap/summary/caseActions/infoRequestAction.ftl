@@ -2,9 +2,9 @@
     <@fdsForm.htmlForm actionUrl=springUrl(infoRequestSubmitUrl) >
         <@fdsTextarea.textarea
         path="infoRequestForm.infoRequest.inputValue"
-        labelText=""
+        labelText="What information needs to be expanded upon?"
         hintText=""/>
 
-        <@fdsAction.button buttonText="Update SCAP" buttonName="INFO_REQUESTED"/>
+        <@fdsAction.button buttonText="Update case" buttonName="INFO_REQUESTED"/>
     </@fdsForm.htmlForm>
 </@fdsSlideOutPanel.slideOutPanel>

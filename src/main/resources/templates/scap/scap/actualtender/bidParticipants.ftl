@@ -14,6 +14,7 @@ backLinkUrl=springUrl(backLinkUrl)
     <@fdsCheckbox.checkboxes
       path="form.selectedBidParticipantIds"
       fieldsetHeadingClass="govuk-fieldset__legend--xl"
+      fieldsetHeadingSize="h1"
       checkboxes=bidParticipantCheckboxes
       fieldsetHeadingText=pageTitle
     />

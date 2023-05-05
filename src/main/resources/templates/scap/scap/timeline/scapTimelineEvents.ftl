@@ -6,15 +6,19 @@
   <@fdsTimeline.timeline>
     <@fdsTimeline.timelineSection>
       <#list caseEvents as caseEvent>
-        <@timelineEventCards caseEvent=caseEvent/>
+        <@timelineEventCards caseEvent=caseEvent isLast=caseEvent?is_last />
       </#list>
-      <@fdsTimeline.timelineTimeStamp timeStampHeading="" nodeNumber=""></@fdsTimeline.timelineTimeStamp>
     </@fdsTimeline.timelineSection>
   </@fdsTimeline.timeline>
 </#macro>
 
-<#macro timelineEventCards caseEvent>
-  <@fdsTimeline.timelineTimeStamp timeStampHeading=caseEvent.caseEventSubject() nodeNumber="">
+<#macro timelineEventCards caseEvent isLast>
+  <#assign timestampClass>
+      <#if isLast>
+        fds-timeline__time-stamp--no-border
+      </#if>
+  </#assign>
+  <@fdsTimeline.timelineTimeStamp timeStampHeading=caseEvent.caseEventSubject() timeStampClass=timestampClass nodeNumber="">
     <@fdsTimeline.timelineEvent>
       <@fdsDataItems.dataItem>
         <@fdsDataItems.dataValues key="Event date" value=caseEvent.formattedTime()></@fdsDataItems.dataValues>

@@ -6,7 +6,7 @@
   <@fdsForm.htmlForm actionUrl=springUrl(WithdrawScapUrl)>
       <@fdsTextarea.textarea
       path="scapWithdrawForm.withdrawComments.inputValue"
-      labelText="Withdraw comments"/>
+      labelText="Reasons for withdrawal"/>
       <@fdsAction.button buttonText="Withdraw SCAP" buttonName="WITHDRAWN" buttonClass="govuk-button govuk-button--warning"/>
   </@fdsForm.htmlForm>
 </@fdsSlideOutPanel.slideOutPanel>

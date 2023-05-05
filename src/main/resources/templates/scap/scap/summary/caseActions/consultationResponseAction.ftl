@@ -3,10 +3,10 @@
         <@fdsTextarea.textarea
         path="consultationResponseForm.responseComments.inputValue"
         optionalLabel=false
-        labelText="Comments"/>
+        labelText="What information did you get from the consultation?"/>
 
         <@fdsFieldset.fieldset
-        legendHeading="Supporting SCAP documents"
+        legendHeading="Consultation Report"
         legendHeadingSize="h2"
         legendHeadingClass="govuk-fieldset__legend--m"
         optionalLabel=true
@@ -26,6 +26,6 @@
             />
         </@fdsFieldset.fieldset>
 
-        <@fdsAction.button buttonText="Update SCAP" buttonName="CONSULTATION_RESPONSE"/>
+        <@fdsAction.button buttonText="Update case" buttonName="CONSULTATION_RESPONSE"/>
     </@fdsForm.htmlForm>
 </@fdsSlideOutPanel.slideOutPanel>

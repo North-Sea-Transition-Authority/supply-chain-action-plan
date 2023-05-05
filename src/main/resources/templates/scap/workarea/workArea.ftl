@@ -117,7 +117,7 @@
     <@fdsSearchSelector.searchSelectorRest
       path="form.operatorId"
       restUrl=springUrl(organisationGroupSearchUrl)
-      labelText="Orgranisation group"
+      labelText="Operator name"
       labelClass="govuk-visually-hidden"
       selectorMinInputLength=2
       preselectedItems={prefilledOperator.id(): prefilledOperator.text()}

@@ -143,7 +143,7 @@ public class ScapApprovalController {
           NotificationBannerUtils.successBannerRedirect(
               "Success",
               new NotificationBannerBodyLine(
-                  "Approved %s".formatted(scapDetail.getScap().getReference()), "govuk-!-font-weight-bold"
+                  "SCAP: %s has been approved".formatted(scapDetail.getScap().getReference()), "govuk-!-font-weight-bold"
               ), redirectAttributes);
           return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
         });
