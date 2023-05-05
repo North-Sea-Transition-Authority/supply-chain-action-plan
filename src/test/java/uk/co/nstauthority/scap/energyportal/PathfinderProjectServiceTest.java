@@ -2,7 +2,6 @@ package uk.co.nstauthority.scap.energyportal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -17,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.fivium.energyportalapi.client.RequestPurpose;
 import uk.co.fivium.energyportalapi.client.pathfinder.PathfinderApi;
 import uk.co.fivium.energyportalapi.generated.types.PathfinderProject;
+import uk.co.fivium.energyportalapi.generated.types.PathfinderProjectType;
 import uk.co.nstauthority.scap.fds.addtolist.AddToListItem;
 import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
 
@@ -43,20 +43,24 @@ class PathfinderProjectServiceTest {
 
     doReturn(Collections.singletonList(PATHFINDER_PROJECT))
         .when(pathfinderApi)
-        .searchPublishedInfrastructureProjects(
+        .searchProjects(
+            eq(null),
             eq(null),
             eq(searchTerm),
             eq(operatorId),
+            eq(PathfinderProjectType.INFRASTRUCTURE),
             eq(PathfinderProjectService.PATHFINDER_PROJECTS_PROJECTION_ROOT),
-            any(RequestPurpose.class)
+            requestPurposeCaptor.capture()
         );
 
     var restSearchResult = pathfinderProjectService.searchProjects(searchTerm, searchPurpose, operatorId);
 
-    verify(pathfinderApi).searchPublishedInfrastructureProjects(
+    verify(pathfinderApi).searchProjects(
+        eq(null),
         eq(null),
         eq(searchTerm),
         eq(operatorId),
+        eq(PathfinderProjectType.INFRASTRUCTURE),
         eq(PathfinderProjectService.PATHFINDER_PROJECTS_PROJECTION_ROOT),
         requestPurposeCaptor.capture()
     );
@@ -79,10 +83,8 @@ class PathfinderProjectServiceTest {
 
     doReturn(Collections.singletonList(PATHFINDER_PROJECT))
         .when(pathfinderApi)
-        .searchPublishedInfrastructureProjects(
+        .getProjectsByIds(
             requestedProjectIds,
-            null,
-            null,
             PathfinderProjectService.PATHFINDER_PROJECTS_PROJECTION_ROOT,
             PathfinderProjectService.FIND_ALL_BY_IDS_REQUEST_PURPOSE
         );
@@ -105,10 +107,8 @@ class PathfinderProjectServiceTest {
 
     doReturn(Collections.singletonList(PATHFINDER_PROJECT))
         .when(pathfinderApi)
-        .searchPublishedInfrastructureProjects(
+        .getProjectsByIds(
             requestedProjectIds,
-            null,
-            null,
             PathfinderProjectService.PATHFINDER_PROJECTS_PROJECTION_ROOT,
             PathfinderProjectService.FIND_ALL_BY_IDS_REQUEST_PURPOSE
         );

@@ -8,6 +8,7 @@ import uk.co.fivium.energyportalapi.client.RequestPurpose;
 import uk.co.fivium.energyportalapi.client.pathfinder.PathfinderApi;
 import uk.co.fivium.energyportalapi.generated.client.PathfinderProjectsProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.types.PathfinderProject;
+import uk.co.fivium.energyportalapi.generated.types.PathfinderProjectType;
 import uk.co.nstauthority.scap.fds.addtolist.AddToListItem;
 import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
 import uk.co.nstauthority.scap.fds.searchselector.RestSearchResult;
@@ -30,10 +31,12 @@ public class PathfinderProjectService {
   }
 
   public RestSearchResult searchProjects(String term, String searchPurpose, Integer operatorOrganisationGroupId) {
-    var results = pathfinderApi.searchPublishedInfrastructureProjects(
+    var results = pathfinderApi.searchProjects(
+        null,
         null,
         term,
         operatorOrganisationGroupId,
+        PathfinderProjectType.INFRASTRUCTURE,
         PATHFINDER_PROJECTS_PROJECTION_ROOT,
         new RequestPurpose(searchPurpose)
     );
@@ -51,10 +54,8 @@ public class PathfinderProjectService {
       return Collections.emptyList();
     }
 
-    return pathfinderApi.searchPublishedInfrastructureProjects(
+    return pathfinderApi.getProjectsByIds(
         pathfinderProjectIds,
-        null,
-        null,
         PATHFINDER_PROJECTS_PROJECTION_ROOT,
         FIND_ALL_BY_IDS_REQUEST_PURPOSE
     );
