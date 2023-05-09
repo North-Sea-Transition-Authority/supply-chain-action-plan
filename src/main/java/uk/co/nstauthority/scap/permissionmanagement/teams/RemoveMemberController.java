@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.permissionmanagement.teams;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
@@ -20,7 +21,7 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamMemberController;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamMemberController;
-import uk.co.nstauthority.scap.util.SuccessBannerUtil;
+import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 
 public abstract class RemoveMemberController {
 
@@ -106,9 +107,10 @@ public abstract class RemoveMemberController {
           .addObject("singleErrorMessage", TeamMemberRemovalService.LAST_ACCESS_MANAGER_ERROR_MESSAGE);
     }
     var userView = teamMemberViewService.getTeamMemberView(teamMember);
-
-    SuccessBannerUtil.add(redirectAttributes,
-        "%s has been removed from the team".formatted(userView.getDisplayName()));
+    NotificationBannerUtils.successBannerRedirect(
+        "%s has been removed from the team".formatted(userView.getDisplayName()),
+        Collections.emptyList(),
+        redirectAttributes);
     return successUrl;
   }
 

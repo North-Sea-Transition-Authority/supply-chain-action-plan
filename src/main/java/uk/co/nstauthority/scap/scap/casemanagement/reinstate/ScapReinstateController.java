@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.scap.casemanagement.reinstate;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_REINSTATED;
 
+import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -31,7 +32,7 @@ import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
-import uk.co.nstauthority.scap.util.SuccessBannerUtil;
+import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 
 @Controller
 @RequestMapping("{scapId}/")
@@ -119,9 +120,10 @@ public class ScapReinstateController {
               scapDetail,
               scapDetail.getVersionNumber(),
               scapReinstateForm.getReinstateComments().getInputValue());
-          SuccessBannerUtil.add(
-              redirectAttributes,
-              "%s has been reinstated".formatted(scapDetail.getScap().getReference())
+          NotificationBannerUtils.successBannerRedirect(
+              "%s has been reinstated".formatted(scapDetail.getScap().getReference()),
+              Collections.emptyList(),
+              redirectAttributes
           );
           return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
         });

@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.plannedtender.activity.delete;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +25,7 @@ import uk.co.nstauthority.scap.scap.plannedtender.hasplannedtender.HasPlannedTen
 import uk.co.nstauthority.scap.scap.plannedtender.list.PlannedTenderActivityListItem;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
-import uk.co.nstauthority.scap.util.SuccessBannerUtil;
+import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 
 @Controller
 @RequestMapping("{scapId}/planned-tender/{plannedTenderDetailId}/delete")
@@ -65,7 +66,11 @@ public class DeletePlannedTenderActivityController {
     var plannedTenderDetail = plannedTenderActivityService.getPlannedTenderDetailById(plannedTenderDetailId);
     plannedTenderActivityService.deletePlannedTenderDetail(plannedTenderDetail);
 
-    SuccessBannerUtil.add(redirectAttributes, "Planned tender activity deleted successfully");
+    NotificationBannerUtils.successBannerRedirect(
+        "Planned tender activity deleted successfully",
+        Collections.emptyList(),
+        redirectAttributes
+    );
 
     if (plannedTenderActivityService.hasExistingTenderDetails(plannedTender)) {
       return ReverseRouter.redirect(on(PlannedTenderController.class).renderPlannedTenderActivities(scapId));

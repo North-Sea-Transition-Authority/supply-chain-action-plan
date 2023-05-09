@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.casemanagement.consultationrequest;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -16,7 +17,6 @@ import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermission;
-import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerBodyLine;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
@@ -117,10 +117,9 @@ public class ConsultationRequestController {
               scapDetail.getVersionNumber(),
               consultationRequestForm.getRequestComments().getInputValue());
           NotificationBannerUtils.successBannerRedirect(
-              "Success",
-              new NotificationBannerBodyLine(
-                  "Consultation requested on %s".formatted(scapDetail.getScap().getReference()), "govuk-!-font-weight-bold"
-              ), redirectAttributes);
+              "Consultation requested on %s".formatted(scapDetail.getScap().getReference()),
+              Collections.emptyList(),
+              redirectAttributes);
           return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
         });
   }

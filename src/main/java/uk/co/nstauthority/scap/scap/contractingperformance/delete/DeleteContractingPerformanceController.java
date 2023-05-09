@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.contractingperformance.delete;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +25,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryViewService;
-import uk.co.nstauthority.scap.util.SuccessBannerUtil;
+import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 
 @Controller
 @RequestMapping("{scapId}/contracting-performance/{contractingPerformanceId}/delete")
@@ -79,10 +80,12 @@ public class DeleteContractingPerformanceController {
 
     var contractingPerformance = contractingPerformanceService.getById(contractingPerformanceId);
     contractingPerformanceService.deleteContractingPerformance(contractingPerformance);
-    SuccessBannerUtil.add(redirectAttributes,
+    NotificationBannerUtils.successBannerRedirect(
         "Deleted contracting performance for \"%s\" successfully"
-            .formatted(contractingPerformance.getActualTenderActivity().getScopeTitle()));
-
+            .formatted(contractingPerformance.getActualTenderActivity().getScopeTitle()),
+        Collections.emptyList(),
+        redirectAttributes
+    );
     if (contractingPerformanceService.hasContractingPerformance(contractingPerformanceOverview)) {
       return ReverseRouter.redirect(on(ContractingPerformanceSummaryController.class)
           .renderContractingPerformanceSummary(scapId));

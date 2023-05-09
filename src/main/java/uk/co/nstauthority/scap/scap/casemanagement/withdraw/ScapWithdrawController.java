@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.scap.casemanagement.withdraw;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_WITHDRAWN;
 
+import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -31,7 +32,7 @@ import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryModelAndViewGenerator;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
-import uk.co.nstauthority.scap.util.SuccessBannerUtil;
+import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 
 @Controller
 @RequestMapping("{scapId}/")
@@ -118,10 +119,10 @@ public class ScapWithdrawController {
               scapDetail,
               scapDetail.getVersionNumber(),
               scapWithdrawalForm.getWithdrawComments().getInputValue());
-          SuccessBannerUtil.add(
-              redirectAttributes,
-              "%s has been withdrawn".formatted(scapDetail.getScap().getReference())
-          );
+          NotificationBannerUtils.successBannerRedirect(
+              "%s has been withdrawn".formatted(scapDetail.getScap().getReference()),
+              Collections.emptyList(),
+              redirectAttributes);
           return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
         });
   }

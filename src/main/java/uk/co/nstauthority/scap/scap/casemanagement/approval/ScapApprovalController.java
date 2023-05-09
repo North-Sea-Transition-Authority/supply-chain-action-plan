@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.scap.casemanagement.approval;
 
+import static java.util.Collections.emptyList;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_APPROVED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject.SCAP_CLOSED_OUT;
@@ -19,7 +20,6 @@ import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermission;
 import uk.co.nstauthority.scap.enumutil.YesNo;
-import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerBodyLine;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.notify.ScapEmailService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
@@ -141,10 +141,9 @@ public class ScapApprovalController {
               projectClosedOut
           );
           NotificationBannerUtils.successBannerRedirect(
-              "Success",
-              new NotificationBannerBodyLine(
-                  "SCAP: %s has been approved".formatted(scapDetail.getScap().getReference()), "govuk-!-font-weight-bold"
-              ), redirectAttributes);
+              "SCAP: %s has been approved".formatted(scapDetail.getScap().getReference()),
+              emptyList(),
+              redirectAttributes);
           return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
         });
   }

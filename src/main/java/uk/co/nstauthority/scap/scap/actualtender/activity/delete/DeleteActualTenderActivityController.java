@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.actualtender.activity.delete;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +26,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.actualtender.ActualTenderSummaryViewService;
-import uk.co.nstauthority.scap.util.SuccessBannerUtil;
+import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 
 @Controller
 @RequestMapping("{scapId}/actual-tender/activity/{activityId}/delete")
@@ -90,10 +91,10 @@ public class DeleteActualTenderActivityController {
     var actualTenderActivity = actualTenderActivityService.getById(activityId);
     deleteActualTenderActivityService.deleteActualTenderActivity(actualTenderActivity);
 
-    SuccessBannerUtil.add(
-        redirectAttributes,
-        "%s has been removed from this SCAP".formatted(actualTenderActivity.getScopeTitle())
-    );
+    NotificationBannerUtils.successBannerRedirect(
+        "%s has been removed from this SCAP".formatted(actualTenderActivity.getScopeTitle()),
+        Collections.emptyList(),
+        redirectAttributes);
 
     var hasRemainingActualTenderActivities = actualTenderActivityService.hasActualTenderActivity(actualTender);
 

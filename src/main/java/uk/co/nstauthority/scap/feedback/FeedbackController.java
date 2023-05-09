@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.feedback;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -17,7 +18,7 @@ import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
-import uk.co.nstauthority.scap.util.SuccessBannerUtil;
+import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @Controller
@@ -59,7 +60,10 @@ public class FeedbackController {
         form,
         () -> {
           feedbackService.saveFeedback(scapId, form, userDetailService.getUserDetail());
-          SuccessBannerUtil.add(redirectAttributes, "Your feedback has been submitted");
+          NotificationBannerUtils.successBannerRedirect(
+              "Your feedback has been submitted",
+              Collections.emptyList(),
+              redirectAttributes);
           return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(null));
         }
     );

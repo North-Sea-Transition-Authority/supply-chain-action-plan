@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.scap.delete;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +22,7 @@ import uk.co.nstauthority.scap.scap.scap.ScapService;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryController;
 import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
-import uk.co.nstauthority.scap.util.SuccessBannerUtil;
+import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
 
 @Controller
@@ -62,8 +63,10 @@ public class ScapDeletionController {
     var scapDetail = scapDetailService.getLatestByScapId(scapId);
     scapDetailService.deleteScapDetail(scapDetail);
 
-    var successMessage = "%s deleted successfully".formatted(reference);
-    SuccessBannerUtil.add(redirectAttributes, successMessage);
+    NotificationBannerUtils.successBannerRedirect(
+        "%s deleted successfully".formatted(reference),
+        Collections.emptyList(),
+        redirectAttributes);
     if (scapDetail.getVersionNumber() > 1) {
       return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));
     }

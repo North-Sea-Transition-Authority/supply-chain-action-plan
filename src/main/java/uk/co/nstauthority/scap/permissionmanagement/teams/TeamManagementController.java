@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.permissionmanagement.teams;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.Collections;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -27,7 +28,6 @@ import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupRestController;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.util.NotificationBannerUtils;
-import uk.co.nstauthority.scap.util.SuccessBannerUtil;
 
 @Controller
 @RequestMapping("/permission-management")
@@ -104,8 +104,10 @@ public class TeamManagementController {
     var team = teamService.getTeam(teamId);
     teamService.archiveTeam(team);
 
-    var successMessage = "%s has been successfully deleted".formatted(team.getDisplayName());
-    SuccessBannerUtil.add(redirectAttributes, successMessage);
+    NotificationBannerUtils.successBannerRedirect(
+        "%s has been successfully deleted".formatted(team.getDisplayName()),
+        Collections.emptyList(),
+        redirectAttributes);
 
     return ReverseRouter.redirect(on(TeamManagementController.class).renderTeamList());
   }
@@ -144,11 +146,10 @@ public class TeamManagementController {
           IndustryTeamMemberController.class).renderMemberList(new TeamId(team.getUuid())));
       NotificationBannerUtils.successBanner(
           "Successfully added new organisation group team",
-          new NotificationBannerBodyLine(
+          List.of(new NotificationBannerBodyLine(
               "Team for organisation group %s has been created".formatted(orgGroup.get().getName()),
-              "govuk-!-font-weight-bold"),
-          view
-      );
+              "govuk-!-font-weight-bold")),
+          view);
       return view;
     }
     return renderNewIndustryTeamForm(form);

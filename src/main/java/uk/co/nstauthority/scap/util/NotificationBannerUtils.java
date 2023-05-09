@@ -16,27 +16,23 @@ public class NotificationBannerUtils {
     throw new IllegalUtilClassInstantiationException(NotificationBannerUtils.class);
   }
 
-  public static void successBanner(String title, List<NotificationBannerBodyLine> bodyLines, ModelAndView modelAndView) {
-    var notificationBannerView = new NotificationBannerView.BannerBuilder(title, NotificationBannerType.SUCCESS)
+  public static void successBanner(String header,
+                                   List<NotificationBannerBodyLine> bodyLines,
+                                   ModelAndView modelAndView) {
+    var notificationBannerView = new NotificationBannerView.BannerBuilder("Success", NotificationBannerType.SUCCESS)
+        .withHeading(header)
         .addBodyLines(bodyLines)
         .build();
     modelAndView.addObject(NOTIFICATION_BANNER_OBJECT_NAME, notificationBannerView);
   }
 
-  public static void successBanner(String title, NotificationBannerBodyLine bodyLine, ModelAndView modelAndView) {
-    var notificationBannerView = new NotificationBannerView.BannerBuilder(title, NotificationBannerType.SUCCESS)
-        .addBodyLine(bodyLine)
-        .build();
-    modelAndView.addObject(NOTIFICATION_BANNER_OBJECT_NAME, notificationBannerView);
-  }
-
-  public static void successBannerRedirect(String title,
-                                           NotificationBannerBodyLine bodyLine,
+  public static void successBannerRedirect(String header,
+                                           List<NotificationBannerBodyLine> bodyLine,
                                            RedirectAttributes redirectAttributes) {
-    var notificationBannerView = new NotificationBannerView.BannerBuilder(title, NotificationBannerType.SUCCESS)
-        .addBodyLine(bodyLine)
+    var notificationBannerView = new NotificationBannerView.BannerBuilder("Success", NotificationBannerType.SUCCESS)
+        .withHeading(header)
+        .addBodyLines(bodyLine)
         .build();
     redirectAttributes.addFlashAttribute(NOTIFICATION_BANNER_OBJECT_NAME, notificationBannerView);
   }
-
 }
