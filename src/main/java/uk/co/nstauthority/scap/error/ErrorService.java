@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.nstauthority.scap.configuration.AnalyticsProperties;
 import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.workarea.WorkAreaController;
@@ -19,6 +20,8 @@ public class ErrorService {
 
   private final ErrorConfiguration errorConfiguration;
   private final FooterService footerService;
+  private final AnalyticsProperties analyticsProperties;
+
   private static final Logger LOGGER = LoggerFactory.getLogger(ErrorService.class);
   private static final String SAFE_CHARACTERS = "BCDFGHJKMPQRTVWXY346789";
 
@@ -27,9 +30,11 @@ public class ErrorService {
   @Autowired
   public ErrorService(ErrorConfiguration errorConfiguration,
                       FooterService footerService,
+                      AnalyticsProperties analyticsProperties,
                       TopNavigationService topNavigationService) {
     this.errorConfiguration = errorConfiguration;
     this.footerService = footerService;
+    this.analyticsProperties = analyticsProperties;
     this.topNavigationService = topNavigationService;
   }
 
@@ -48,6 +53,7 @@ public class ErrorService {
     addBrandingConfigs(modelAndView);
     addTechnicalSupportConfigs(modelAndView);
     addTopNavigation(modelAndView);
+    addAnalytics(modelAndView);
     footerService.addFooterItems(modelAndView.getModel(), request);
     return modelAndView;
   }
@@ -91,5 +97,9 @@ public class ErrorService {
   private void addTopNavigation(ModelAndView modelAndView) {
     modelAndView.addObject("navigationItems", topNavigationService.getTopNavigationItems());
     modelAndView.addObject("currentEndPoint", "#");
+  }
+
+  private void addAnalytics(ModelAndView modelAndView) {
+    modelAndView.addObject("analytics", analyticsProperties);
   }
 }

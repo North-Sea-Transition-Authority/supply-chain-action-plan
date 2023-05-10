@@ -49,10 +49,16 @@ public class WebSecurityConfiguration {
 
     httpSecurity
         .csrf()
-          .ignoringAntMatchers("/notify/callback", "/api/v1/logout/*")
+          .ignoringAntMatchers(
+              "/notify/callback",
+              "/api/v1/logout/*")
         .and()
         .authorizeHttpRequests()
-          .mvcMatchers("/assets/**", "/notify/callback", "/api/v1/logout/*", "/actuator/health")
+          .mvcMatchers(
+              "/assets/**",
+              "/notify/callback",
+              "/api/v1/logout/*",
+              "/actuator/health")
             .permitAll()
           .mvcMatchers("/*")
             .hasAuthority(SCAP_ACCESS_PERMISSION)

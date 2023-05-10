@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.branding.ServiceBrandingConfigurationProperties;
+import uk.co.nstauthority.scap.configuration.AnalyticsProperties;
 import uk.co.nstauthority.scap.error.FooterService;
 import uk.co.nstauthority.scap.error.exception.InvalidAuthenticationException;
 import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
@@ -30,18 +31,21 @@ class DefaultPageControllerAdvice {
   private final TopNavigationService topNavigationService;
   private final UserDetailService userDetailService;
   private final FooterService footerService;
+  private final AnalyticsProperties analyticsProperties;
 
   @Autowired
   DefaultPageControllerAdvice(ServiceBrandingConfigurationProperties serviceBrandingConfigurationProperties,
                               TechnicalSupportConfiguration technicalSupportConfiguration,
                               TopNavigationService topNavigationService,
                               UserDetailService userDetailService,
-                              FooterService footerService) {
+                              FooterService footerService,
+                              AnalyticsProperties analyticsProperties) {
     this.serviceBrandingConfigurationProperties = serviceBrandingConfigurationProperties;
     this.technicalSupportConfiguration = technicalSupportConfiguration;
     this.topNavigationService = topNavigationService;
     this.userDetailService = userDetailService;
     this.footerService = footerService;
+    this.analyticsProperties = analyticsProperties;
   }
 
   @ModelAttribute
@@ -51,6 +55,7 @@ class DefaultPageControllerAdvice {
     addBrandingAttributes(model);
     addCommonUrls(model);
     addTechnicalSupportContactInfo(model);
+    addAnalyticsProperties(model);
     footerService.addFooterItems(model.asMap(), request);
   }
 
@@ -71,6 +76,10 @@ class DefaultPageControllerAdvice {
 
   private void addTechnicalSupportContactInfo(Model model) {
     model.addAttribute("technicalSupport", technicalSupportConfiguration.getTechnicalSupportConfigurationProperties());
+  }
+
+  private void addAnalyticsProperties(Model model) {
+    model.addAttribute("analytics", analyticsProperties);
   }
 
   private void addUser(Model model) {

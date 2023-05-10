@@ -12,6 +12,7 @@
 <#-- @ftlvariable name="privacyStatementUrl" type="String" -->
 <#-- @ftlvariable name="cookiesStatementUrl" type="String" -->
 <#-- @ftlvariable name="feedbackUrl" type="String" -->
+<#-- @ftlvariable name="analytics" type=" uk.co.nstauthority.scap.configuration.AnalyticsProperties" -->
 
 <#if notificationBannerView??>
   <#assign notificationBannerContent>
@@ -96,6 +97,9 @@
   <#assign footerContent>
     <@fdsFooter.footer metaLinks=true footerMetaContent=footerMetaContent wrapperWidth=wrapperWidth/>
   </#assign>
+  <#assign analyticsScript>
+    <script src="<@spring.url'/assets/javascript/googleAnalyticsEventTracking.js'/>"></script>
+  </#assign>
 
   <@fdsCookieBanner.analyticsCookieBanner
     serviceName=serviceBranding.name()
@@ -128,7 +132,10 @@
     singleErrorMessage=singleErrorMessage
     wrapperWidth=wrapperWidth
     footerContent=footerContent
+    customScriptContent=analyticsScript
   >
+    <@fdsGoogleAnalytics.googleAnalytics measurementId=analytics.appTag />
+    <@fdsGoogleAnalytics.googleAnalytics measurementId=analytics.globalTag />
     <#nested />
   </@fdsDefaultPageTemplate>
 </#macro>

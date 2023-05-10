@@ -29,6 +29,7 @@ import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.branding.IncludeBusinessSupportConfiguration;
 import uk.co.nstauthority.scap.branding.IncludeServiceBrandingConfigurationProperties;
+import uk.co.nstauthority.scap.configuration.AnalyticsProperties;
 import uk.co.nstauthority.scap.configuration.SamlProperties;
 import uk.co.nstauthority.scap.configuration.WebMvcConfiguration;
 import uk.co.nstauthority.scap.configuration.WebSecurityConfiguration;
@@ -60,6 +61,7 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
     WebMvcConfiguration.class,
     SamlResponseParser.class,
     ServiceLogoutSuccessHandler.class,
+    AnalyticsProperties.class,
 
     // Interceptor rules
     MemberOfTeamRule.class,

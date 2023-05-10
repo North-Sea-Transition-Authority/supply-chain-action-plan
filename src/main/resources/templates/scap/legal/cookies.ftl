@@ -51,10 +51,9 @@
         </tr>
         <tr class="govuk-table__row">
           <td class="govuk-table__cell">
-<#--             TODO: SCAP2022-254 add Google analytics cookies-->
-<#--            _ga_${analytics.appTag?replace("G-", "")}-->
-<#--            <br/>-->
-<#--            _ga_${analytics.globalTag?replace("G-", "")}-->
+            _ga_${analytics.appTag?replace("G-", "")}
+            <br/>
+            _ga_${analytics.globalTag?replace("G-", "")}
           </td>
           <td class="govuk-table__cell govuk-!-width-one-half">
             Stores information about how you use this service. This helps us improve the service for other people.
@@ -62,13 +61,6 @@
           <td class="govuk-table__cell">
             2 years
           </td>
-        </tr>
-        <tr class="govuk-table__row">
-<#--          <td class="govuk-table__cell">${analyticsClientIdCookieName}</td>-->
-          <td class="govuk-table__cell govuk-!-width-one-half">
-            Stores information about how you use this service. This helps us improve the service for other people.
-          </td>
-          <td class="govuk-table__cell">When you close your browser</td>
         </tr>
         </tbody>
       </table>

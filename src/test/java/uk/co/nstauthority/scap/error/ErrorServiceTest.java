@@ -16,6 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
 import uk.co.nstauthority.scap.branding.ServiceBrandingConfigurationProperties;
 import uk.co.nstauthority.scap.branding.ServiceConfigurationProperties;
+import uk.co.nstauthority.scap.configuration.AnalyticsProperties;
 import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
 import uk.co.nstauthority.scap.technicalsupport.TechnicalSupportConfigurationProperties;
 
@@ -39,6 +40,8 @@ class ErrorServiceTest {
 
   private static final String CUSTOMER_BRANDING_ATTRIBUTE = "customerBranding";
 
+  private static final String ANALYTICS_ATTRIBUTE = "analytics";
+
   private static final String TECHNICAL_SUPPORT_ATTRIBUTE = "technicalSupport";
 
   @Autowired
@@ -51,6 +54,9 @@ class ErrorServiceTest {
   private TopNavigationService topNavigationService;
 
   @MockBean
+  private AnalyticsProperties analyticsProperties;
+
+  @MockBean
   private FooterService footerService;
 
   @MockBean
@@ -60,7 +66,7 @@ class ErrorServiceTest {
 
   @BeforeEach
   public void setup() {
-    errorService = new ErrorService(errorConfiguration, footerService, topNavigationService);
+    errorService = new ErrorService(errorConfiguration, footerService, analyticsProperties, topNavigationService);
   }
 
   @Test
@@ -77,7 +83,8 @@ class ErrorServiceTest {
         STACK_TRACE_ATTRIBUTE,
         SERVICE_BRANDING_ATTRIBUTE,
         CUSTOMER_BRANDING_ATTRIBUTE,
-        TECHNICAL_SUPPORT_ATTRIBUTE
+        TECHNICAL_SUPPORT_ATTRIBUTE,
+        ANALYTICS_ATTRIBUTE
     );
     Object errorRef = resultingModelMap.get(ERROR_REF_ATTRIBUTE_NAME);
     assertThat(errorRef).isNotNull();
@@ -96,7 +103,8 @@ class ErrorServiceTest {
         SERVICE_HOME_URLS_ATTRIBUTE_NAME,
         TECHNICAL_SUPPORT_ATTRIBUTE,
         SERVICE_BRANDING_ATTRIBUTE,
-        CUSTOMER_BRANDING_ATTRIBUTE
+        CUSTOMER_BRANDING_ATTRIBUTE,
+        ANALYTICS_ATTRIBUTE
     );
   }
 }
