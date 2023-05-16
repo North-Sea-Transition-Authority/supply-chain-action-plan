@@ -29,7 +29,6 @@ import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailEntityTestUtil;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
@@ -168,7 +167,7 @@ class UpdateRequestServiceTest {
     updateRequest.setScap(scap);
     updateRequest.setDueDate(dueDate);
 
-    when(scapDetailService.findLatestSubmitted(SCAP_ID)).thenReturn(Optional.ofNullable(scapDetail));
+    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(updateRequestRepository
         .findFirstByScapAndResolutionDateNullAndUpdateRequestTypeOrderByCreatedTimestampDesc(scap, UpdateRequestType.FURTHER_INFORMATION))
         .thenReturn(Optional.of(updateRequest));
@@ -188,7 +187,7 @@ class UpdateRequestServiceTest {
     updateRequest.setUpdateRequestType(UpdateRequestType.FURTHER_INFORMATION);
     updateRequest.setScap(scap);
 
-    when(scapDetailService.findLatestByScapIdAndStatus(SCAP_ID, ScapDetailStatus.SUBMITTED)).thenReturn(Optional.ofNullable(scapDetail));
+    when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(updateRequestRepository
         .findFirstByScapAndResolutionDateNullOrderByCreatedTimestampDesc(scap))
         .thenReturn(Optional.of(updateRequest));

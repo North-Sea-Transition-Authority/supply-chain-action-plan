@@ -13,7 +13,6 @@ import uk.co.nstauthority.scap.scap.casemanagement.CaseEvent;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 
@@ -71,23 +70,14 @@ public class UpdateRequestService {
   }
 
   public Optional<UpdateRequest> findNextDueUpdate(ScapId scapId) {
-    var scapDetail = scapDetailService.findLatestByScapIdAndStatus(scapId, ScapDetailStatus.SUBMITTED);
-    if (scapDetail.isEmpty()) {
-      return Optional.empty();
-    }
     return updateRequestRepository.findFirstByScapAndResolutionDateNullOrderByCreatedTimestampDesc(
-        scapDetail.get().getScap());
+        scapService.getScapById(scapId));
   }
 
   public Optional<LocalDate> getUpdateDueDate(ScapId scapId, UpdateRequestType requestType) {
-    var scapDetail = scapDetailService.findLatestSubmitted(scapId);
-    if (scapDetail.isEmpty()) {
-      return Optional.empty();
-    }
-
     var requestActionOptional = updateRequestRepository
         .findFirstByScapAndResolutionDateNullAndUpdateRequestTypeOrderByCreatedTimestampDesc(
-            scapDetail.get().getScap(),
+            scapService.getScapById(scapId),
             requestType);
 
     return requestActionOptional.map(t -> Optional.of(t.getDueDate())).orElse(Optional.empty());
