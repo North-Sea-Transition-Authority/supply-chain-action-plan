@@ -7,6 +7,8 @@ import static org.mockito.Mockito.verify;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTender;
 import uk.co.nstauthority.scap.scap.contractingperformance.ContractingPerformanceOverview;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailEntityTestUtil;
+import uk.co.nstauthority.scap.scap.pathfinder.PathfinderProject;
+import uk.co.nstauthority.scap.scap.pathfinder.PathfinderProjectsOverview;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTender;
 import uk.co.nstauthority.scap.scap.plannedtender.activity.PlannedTenderActivity;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetailType;
@@ -41,6 +45,9 @@ class EntityCopyServiceTest {
 
   @Captor
   ArgumentCaptor<PlannedTenderChild> plannedTenderChildCaptor;
+
+  @Captor
+  ArgumentCaptor<PathfinderChild> pathfinderChildCaptor;
 
   @Mock
   EntityManager entityManager;
@@ -130,6 +137,60 @@ class EntityCopyServiceTest {
         Arguments.of(new ProjectFacility(oldProjectDetail, Instant.now(), 7)),
         Arguments.of(new ProjectField(oldProjectDetail, 7, Instant.now()))
     );
+  }
+
+  @Test
+  void copyChild_PathfinderChild() {
+    var oldProjectOverview = new PathfinderProjectsOverview();
+    var newProjectOverview = new PathfinderProjectsOverview();
+
+    var oldUuid = UUID.randomUUID();
+    var oldPathfinderProject = new PathfinderProject(oldUuid);
+    oldPathfinderProject.setPathfinderProjectName("TEST");
+    oldPathfinderProject.setPathfinderProjectsOverview(oldProjectOverview);
+
+    entityCopyService.copyChild(newProjectOverview, oldPathfinderProject);
+    verify(entityManager).persist(pathfinderChildCaptor.capture());
+
+    assertThat(pathfinderChildCaptor.getValue())
+        .extracting(
+            PathfinderChild::getId,
+            PathfinderChild::getPathfinderProjectsOverview)
+        .containsExactly(
+            null,
+            newProjectOverview
+        );
+  }
+
+  @Test
+  void copyChildren_PathfinderChild() {
+    var oldProjectOverview = new PathfinderProjectsOverview();
+    var newProjectOverview = new PathfinderProjectsOverview();
+
+    var oldPathfinderProject = new PathfinderProject();
+    oldPathfinderProject.setPathfinderProjectName("TEST");
+    oldPathfinderProject.setPathfinderProjectsOverview(oldProjectOverview);
+
+    var oldPathfinderProject2 = new PathfinderProject();
+    oldPathfinderProject2.setPathfinderProjectName("TEST");
+    oldPathfinderProject2.setPathfinderProjectsOverview(oldProjectOverview);
+
+    var oldPathfinderProject3 = new PathfinderProject();
+    oldPathfinderProject3.setPathfinderProjectName("TEST");
+    oldPathfinderProject3.setPathfinderProjectsOverview(oldProjectOverview);
+
+    entityCopyService.copyChildren(newProjectOverview, Set.of(oldPathfinderProject, oldPathfinderProject2, oldPathfinderProject3));
+    verify(entityManager, times(3)).persist(pathfinderChildCaptor.capture());
+
+    assertThat(pathfinderChildCaptor.getAllValues())
+        .extracting(
+            PathfinderChild::getId,
+            PathfinderChild::getPathfinderProjectsOverview)
+        .containsExactly(
+            tuple(null, newProjectOverview),
+            tuple(null, newProjectOverview),
+            tuple(null, newProjectOverview)
+        );
   }
 
   @ParameterizedTest

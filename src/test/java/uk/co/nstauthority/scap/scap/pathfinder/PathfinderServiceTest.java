@@ -114,7 +114,7 @@ class PathfinderServiceTest {
     assertThat(pathfinderProjectsArgumentCaptor.getValue()).extracting(
         PathfinderProject::getPathfinderProjectId,
         PathfinderProject::getPathfinderProjectName,
-        PathfinderProject::getRelatedPathfinderProjectsOverview,
+        PathfinderProject::getPathfinderProjectsOverview,
         PathfinderProject::getCreatedTimestamp
     ).containsExactly(
         tuple(

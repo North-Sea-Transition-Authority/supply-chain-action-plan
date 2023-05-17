@@ -1,11 +1,13 @@
 package uk.co.nstauthority.scap.scap.copy;
 
 import java.util.List;
+import java.util.Set;
 import javax.persistence.EntityManager;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.pathfinder.PathfinderProjectsOverview;
 import uk.co.nstauthority.scap.scap.plannedtender.PlannedTender;
 import uk.co.nstauthority.scap.scap.projectdetails.ProjectDetails;
 
@@ -46,6 +48,14 @@ public class EntityCopyService {
     return child;
   }
 
+  public PathfinderChild copyChild(PathfinderProjectsOverview newPathfinderProjectOverview, PathfinderChild child) {
+    entityManager.detach(child);
+    child.setId(null);
+    child.setPathfinderProjectsOverview(newPathfinderProjectOverview);
+    entityManager.persist(child);
+    return child;
+  }
+
   public List<ProjectDetailsChild> copyChildren(ProjectDetails newProjectDetails,
                                                           List<? extends ProjectDetailsChild> children) {
     return children.stream()
@@ -57,6 +67,13 @@ public class EntityCopyService {
                                                          List<? extends PlannedTenderChild> children) {
     return children.stream()
         .map(child -> copyChild(newPlannedTender, child))
+        .toList();
+  }
+
+  public List<PathfinderChild> copyChildren(PathfinderProjectsOverview newPathfinderProjectOverview,
+                                               Set<? extends PathfinderChild> children) {
+    return children.stream()
+        .map(child -> copyChild(newPathfinderProjectOverview, child))
         .toList();
   }
 }

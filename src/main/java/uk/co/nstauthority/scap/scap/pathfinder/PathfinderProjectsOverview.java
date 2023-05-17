@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
 import java.util.UUID;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -15,6 +16,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 public class PathfinderProjectsOverview {
 
   @Id
+  @GeneratedValue(generator = "uuid")
   private UUID id;
 
   @OneToOne
@@ -54,8 +56,16 @@ public class PathfinderProjectsOverview {
     return id;
   }
 
+  public void setId(UUID id) {
+    this.id = id;
+  }
+
   public ScapDetail getScapDetail() {
     return scapDetail;
+  }
+
+  public void setScapDetail(ScapDetail scapDetail) {
+    this.scapDetail = scapDetail;
   }
 
   public Boolean getHasRelatedPathfinderProjects() {
@@ -72,6 +82,10 @@ public class PathfinderProjectsOverview {
 
   public void setNoPathfinderProjectsRationale(String noPathfinderProjectsRationale) {
     this.noPathfinderProjectsRationale = noPathfinderProjectsRationale;
+  }
+
+  public void setCreatedTimestamp(Instant createdTimestamp) {
+    this.createdTimestamp = createdTimestamp;
   }
 
   public Instant getCreatedTimestamp() {

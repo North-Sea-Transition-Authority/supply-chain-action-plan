@@ -4,16 +4,19 @@ import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
 import java.util.UUID;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import uk.co.nstauthority.scap.scap.copy.PathfinderChild;
 
 @Entity
 @Table(name = "pathfinder_projects")
-public class PathfinderProject {
+public class PathfinderProject implements PathfinderChild {
 
   @Id
+  @GeneratedValue(generator = "uuid")
   private UUID id;
 
   @ManyToOne
@@ -45,16 +48,29 @@ public class PathfinderProject {
     this.createdTimestamp = createdTimestamp;
   }
 
+  @Override
   public UUID getId() {
     return id;
   }
 
-  public String getPathfinderProjectName() {
-    return pathfinderProjectName;
+  @Override
+  public void setId(UUID id) {
+    this.id = id;
   }
 
-  public PathfinderProjectsOverview getRelatedPathfinderProjectsOverview() {
+  @Override
+  public PathfinderProjectsOverview getPathfinderProjectsOverview() {
     return pathfinderProjectsOverview;
+  }
+
+  @Override
+  public void setPathfinderProjectsOverview(
+      PathfinderProjectsOverview pathfinderProjectsOverview) {
+    this.pathfinderProjectsOverview = pathfinderProjectsOverview;
+  }
+
+  public String getPathfinderProjectName() {
+    return pathfinderProjectName;
   }
 
   public Integer getPathfinderProjectId() {
