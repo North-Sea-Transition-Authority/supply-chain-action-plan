@@ -115,6 +115,7 @@
     logoProductText=customerMnemonic
     topNavigation=topNavigation
     phaseBanner=phaseBanner
+    phaseBannerLink=springUrl(feedbackUrl)
     serviceUrl=serviceHomeUrl
     homePageUrl=serviceHomeUrl
     fullWidthColumn=fullWidthColumn
