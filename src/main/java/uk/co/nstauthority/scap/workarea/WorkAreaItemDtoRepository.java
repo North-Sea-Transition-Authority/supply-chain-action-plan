@@ -68,6 +68,7 @@ class WorkAreaItemDtoRepository {
             SCAP_DETAILS.CREATED_TIMESTAMP,
             SCAP_DETAILS.SUBMITTED_TIMESTAMP
         )
+        .distinctOn(SCAPS.SCAP_ID)
         .from(SCAPS)
         .join(SCAP_DETAILS).onKey(SCAP_DETAILS.SCAP_ID)
         .leftJoin(SCAP_UPDATE_REQUESTS).onKey(SCAP_UPDATE_REQUESTS.SCAP_ID)
