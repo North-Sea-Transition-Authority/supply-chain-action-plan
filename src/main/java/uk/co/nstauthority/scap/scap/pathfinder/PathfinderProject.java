@@ -41,7 +41,6 @@ public class PathfinderProject implements PathfinderChild {
                            Integer pathfinderProjectId,
                            String pathfinderProjectName,
                            Instant createdTimestamp) {
-    this(UUID.randomUUID());
     this.pathfinderProjectsOverview = pathfinderProjectsOverview;
     this.pathfinderProjectId = pathfinderProjectId;
     this.pathfinderProjectName = pathfinderProjectName;

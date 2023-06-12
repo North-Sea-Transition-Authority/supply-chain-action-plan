@@ -38,7 +38,6 @@ public class PathfinderProjectsOverview {
   }
 
   public PathfinderProjectsOverview(ScapDetail scapDetail, Instant createdTimestamp) {
-    this(UUID.randomUUID());
     this.scapDetail = scapDetail;
     this.createdTimestamp = createdTimestamp;
   }
