@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -28,6 +30,8 @@ import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
+import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.start.ScapStartController;
@@ -68,6 +72,7 @@ class WorkAreaControllerTest extends AbstractControllerTest {
     when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(workAreaService.getWorkAreaItems(any(WorkAreaFilter.class), anyBoolean(), anyList())).thenReturn(workAreaItems);
     when(workAreaFormService.getPreselectedField(null)).thenReturn(WorkAreaFormService.EMPTY_PREFILLED_ITEM);
+    when(workAreaFormService.getPreselectedOrganisation(null)).thenReturn(WorkAreaFormService.EMPTY_PREFILLED_ITEM);
   }
 
   @Test
@@ -102,6 +107,41 @@ class WorkAreaControllerTest extends AbstractControllerTest {
         UpdateRequestStatusRadioOptions.ALL
     );
 
+  }
+
+  @Test
+  void getWorkArea_verifyItemCalls_industryUser() throws Exception {
+    var industryTeam = new Team();
+    industryTeam.setTeamType(TeamType.INDUSTRY);
+    when(teamService.getTeamsThatUserBelongsTo(testUser)).thenReturn(List.of(industryTeam));
+    mockMvc.perform(
+        get(ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)))
+            .with(authenticatedScapUser()));
+    verify(workAreaService).getWorkAreaItems(any(), eq(false), any());
+  }
+
+  @Test
+  void getWorkArea_verifyItemCalls_regulatorUser() throws Exception {
+    var regulatorTeam = new Team();
+    regulatorTeam.setTeamType(TeamType.REGULATOR);
+    when(teamService.getTeamsThatUserBelongsTo(testUser)).thenReturn(List.of(regulatorTeam));
+    mockMvc.perform(
+        get(ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)))
+            .with(authenticatedScapUser()));
+    verify(workAreaService).getWorkAreaItems(any(), eq(true), any());
+  }
+
+  @Test
+  void getWorkArea_verifyItemCalls_hybridUser() throws Exception {
+    var regulatorTeam = new Team();
+    regulatorTeam.setTeamType(TeamType.REGULATOR);
+    var industryTeam = new Team();
+    industryTeam.setTeamType(TeamType.INDUSTRY);
+    when(teamService.getTeamsThatUserBelongsTo(testUser)).thenReturn(List.of(regulatorTeam, industryTeam));
+    mockMvc.perform(
+        get(ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)))
+            .with(authenticatedScapUser()));
+    verify(workAreaService).getWorkAreaItems(any(), eq(false), any());
   }
 
   @Test

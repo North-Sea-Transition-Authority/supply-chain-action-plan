@@ -299,14 +299,20 @@ public class ScapDetailService {
    * @return the scap detail applicable to that user.
    */
   public ScapDetail getActionableScapDetail(ScapId scapId, ServiceUserDetail user) {
+    var scapOrgGroup = getLatestByScapId(scapId).getScap().getOrganisationGroupId();
     var isRegulator = teamMemberService.isMemberOfTeam(
         new TeamId(teamService.getRegulatorTeam().getUuid()),
         user);
-    if (isRegulator) {
-      return getLatestByScapIdAndStatusNotIn(scapId, List.of(DRAFT, DELETED));
-    } else {
+    if (teamService.userIsMemberOfOrganisationGroupTeam(scapOrgGroup, user)) {
       return getLatestByScapIdAndStatusNotIn(scapId, singletonList(DELETED));
+    } else if (isRegulator) {
+      return getLatestByScapIdAndStatusNotIn(scapId, List.of(DRAFT, DELETED));
     }
+    throw new ScapEntityNotFoundException("Could not find SCAP ID: %s associated with User ID: %s"
+        .formatted(
+            scapId,
+            user.getWebUserAccountId()
+        ));
   }
 
   public void setTierOneContractor(ScapDetail scapDetail,

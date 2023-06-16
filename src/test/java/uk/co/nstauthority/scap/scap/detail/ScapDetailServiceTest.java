@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -86,6 +87,7 @@ class ScapDetailServiceTest {
   @BeforeEach
   void setup() {
     scap = new Scap(SCAP_ID);
+    scap.setOrganisationGroupId(1000);
   }
 
   @Test
@@ -631,6 +633,8 @@ class ScapDetailServiceTest {
     var team = TeamTestUtil.Builder().build();
     when(teamService.getRegulatorTeam()).thenReturn(team);
     when(teamMemberService.isMemberOfTeam(new TeamId(team.getUuid()), user)).thenReturn(true);
+    when(scapDetailRepository.findAllByScapId((scap.getScapId().scapId())))
+        .thenReturn(getListScapDetail());
     when(scapDetailRepository.findFirstByScapIdAndStatusNotInOrderByVersionNumberDesc(scap.getScapId().scapId(), List.of(DRAFT, DELETED)))
         .thenReturn(Optional.of(getListScapDetail().get(0)));
 
@@ -643,11 +647,27 @@ class ScapDetailServiceTest {
     var team = TeamTestUtil.Builder().build();
     when(teamService.getRegulatorTeam()).thenReturn(team);
     when(teamMemberService.isMemberOfTeam(new TeamId(team.getUuid()), getUserDetail())).thenReturn(false);
+    when(teamService.userIsMemberOfOrganisationGroupTeam(scap.getOrganisationGroupId(), getUserDetail())).thenReturn(true);
+    when(scapDetailRepository.findAllByScapId((scap.getScapId().scapId())))
+        .thenReturn(getListScapDetail());
     when(scapDetailRepository.findFirstByScapIdAndStatusNotInOrderByVersionNumberDesc(scap.getScapId().scapId(), List.of(DELETED)))
         .thenReturn(Optional.of(getListScapDetail().get(0)));
 
     scapDetailService.getActionableScapDetail(scap.getScapId(), getUserDetail());
     verify(scapDetailRepository).findFirstByScapIdAndStatusNotInOrderByVersionNumberDesc(scap.getScapId().scapId(), List.of(DELETED));
+  }
+
+  @Test
+  void getActionableDetail_isNotRegNotTeam() {
+    var team = TeamTestUtil.Builder().build();
+    when(teamService.getRegulatorTeam()).thenReturn(team);
+    when(teamMemberService.isMemberOfTeam(new TeamId(team.getUuid()), getUserDetail())).thenReturn(false);
+    when(teamService.userIsMemberOfOrganisationGroupTeam(scap.getOrganisationGroupId(), getUserDetail())).thenReturn(false);
+    when(scapDetailRepository.findAllByScapId((scap.getScapId().scapId())))
+        .thenReturn(getListScapDetail());
+
+    assertThrowsExactly(ScapEntityNotFoundException.class,
+        () -> scapDetailService.getActionableScapDetail(scap.getScapId(), getUserDetail()));
   }
 
   @Test

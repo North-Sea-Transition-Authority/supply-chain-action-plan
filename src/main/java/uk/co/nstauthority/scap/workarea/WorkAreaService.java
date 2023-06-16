@@ -58,6 +58,7 @@ class WorkAreaService {
                                              List<Team> teams) {
     var conditions = workAreaFilterService.getConditions(filter);
 
+
     if (isRegulator) {
       return getRegulatorWorkAreaItems(conditions);
     }

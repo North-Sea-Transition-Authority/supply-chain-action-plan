@@ -58,10 +58,13 @@ public class WorkAreaController {
     var user = userDetailService.getUserDetail();
     var userPermissions = teamMemberService.getAllPermissionsForUser(user);
     var teams = teamService.getTeamsThatUserBelongsTo(user);
+
+    var isIndustry = teams.stream()
+        .anyMatch(team -> TeamType.INDUSTRY.equals(team.getTeamType()));
     var isRegulator = teams.stream()
         .anyMatch(team -> TeamType.REGULATOR.equals(team.getTeamType()));
 
-    var workAreaItems = workAreaService.getWorkAreaItems(filter, isRegulator, teams);
+    var workAreaItems = workAreaService.getWorkAreaItems(filter, (!isIndustry && isRegulator), teams);
 
     var form = WorkAreaForm.from(filter);
     var statusCheckboxes = ScapDetailStatus.getRadioOptions();
