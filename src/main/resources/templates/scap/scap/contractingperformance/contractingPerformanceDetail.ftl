@@ -39,7 +39,6 @@ backLinkUrl=springUrl(backLinkUrl)
     <@fdsTextarea.textarea
       path="form.outturnRationale.inputValue"
       labelText="Provide a brief rationale if the outturn was greater than the award value"
-      optionalLabel=true
     />
 
     <@fdsAction.button buttonText="Save and continue"/>
