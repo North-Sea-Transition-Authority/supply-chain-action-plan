@@ -11,8 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.nstauthority.scap.scap.casemanagement.furtherinfo.FurtherInfoRequestForm;
-import uk.co.nstauthority.scap.scap.casemanagement.withdraw.ScapWithdrawalForm;
-import uk.co.nstauthority.scap.scap.casemanagement.withdraw.ScapWithdrawalFormValidator;
 
 @ExtendWith(MockitoExtension.class)
 class ScapReinstateFormValidatorTest {
@@ -67,6 +65,6 @@ class ScapReinstateFormValidatorTest {
     validator.validate(form, bindingResult);
     assertTrue(bindingResult.hasFieldErrors());
     assertThat(bindingResult.getFieldError("reinstateComments.inputValue").getDefaultMessage())
-        .isEqualTo("reasons for reinstatement must be 4000 characters or less");
+        .isEqualTo("Reasons for reinstatement must be 4000 characters or less");
   }
 }

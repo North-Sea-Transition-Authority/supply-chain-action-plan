@@ -66,7 +66,7 @@ class ProjectDetailsFormValidator implements Validator {
 
     DecimalInputValidator.builder()
         .mustHaveNoMoreThanDecimalPlaces(3)
-        .mustBeMoreThanOrEqual(BigDecimal.valueOf(0.001))
+        .mustBeMoreThanOrEqualTo(BigDecimal.valueOf(0.001))
         .validate(form.getProjectCostEstimate(), errors);
 
     if (!Boolean.TRUE.equals(form.getAwareOfLocalContentCommitment())) {

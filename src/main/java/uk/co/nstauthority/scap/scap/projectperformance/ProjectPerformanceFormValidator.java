@@ -55,7 +55,7 @@ class ProjectPerformanceFormValidator implements Validator {
       form.getStartDate().getAsLocalDate().ifPresent(endDateValidator::mustBeAfterDate);
 
       var outturnCostValidator = DecimalInputValidator.builder()
-          .mustBeMoreThanOrEqual(BigDecimal.valueOf(0.001))
+          .mustBeMoreThanOrEqualTo(BigDecimal.valueOf(0.001))
           .mustHaveNoMoreThanDecimalPlaces(3);
 
       startDateValidator.validate(form.getStartDate(), errors);

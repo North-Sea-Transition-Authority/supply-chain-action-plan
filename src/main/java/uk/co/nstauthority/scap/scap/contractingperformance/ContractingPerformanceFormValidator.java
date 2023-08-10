@@ -53,7 +53,7 @@ class ContractingPerformanceFormValidator implements SmartValidator {
     }
 
     DecimalInputValidator.builder()
-        .mustBeMoreThanOrEqual(BigDecimal.valueOf(0.001))
+        .mustBeMoreThanOrEqualTo(BigDecimal.valueOf(0.001))
         .mustHaveNoMoreThanDecimalPlaces(3)
         .validate(form.getOutturnCost(), errors);
 

@@ -29,7 +29,7 @@ public class PlannedTenderActivityFormValidator implements Validator {
 
     DecimalInputValidator.builder()
         .mustHaveNoMoreThanDecimalPlaces(3)
-        .mustBeMoreThanOrEqual(BigDecimal.valueOf(0.001))
+        .mustBeMoreThanOrEqualTo(BigDecimal.valueOf(0.001))
         .validate(form.getEstimatedValue(), errors);
 
     ValidationUtils.rejectIfEmpty(

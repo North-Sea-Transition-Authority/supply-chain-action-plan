@@ -72,7 +72,7 @@ class AwardedContractFormValidator implements SmartValidator {
     }
 
     DecimalInputValidator.builder()
-        .mustBeMoreThanOrEqual(BigDecimal.valueOf(0.001))
+        .mustBeMoreThanOrEqualTo(BigDecimal.valueOf(0.001))
         .mustHaveNoMoreThanDecimalPlaces(3)
         .validate(form.getAwardValue(), errors);
 
@@ -108,7 +108,7 @@ class AwardedContractFormValidator implements SmartValidator {
 
     if (PaymentTermsRadio.OTHER.equals(form.getPaymentTermsRadio())) {
       IntegerInputValidator.builder()
-          .mustBeMoreThanOrEqual(0)
+          .mustBeMoreThanOrEqualTo(0)
           .validate(form.getOtherPaymentTerm(), errors);
     }
 

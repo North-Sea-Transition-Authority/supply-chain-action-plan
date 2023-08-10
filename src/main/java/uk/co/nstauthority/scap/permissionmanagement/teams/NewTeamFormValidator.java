@@ -33,7 +33,7 @@ public class NewTeamFormValidator implements Validator {
     var purpose = "Check organisation group exists when creating new SCAP team";
 
     DecimalInputValidator.builder()
-        .mustBeMoreThanOrEqual(BigDecimal.valueOf(0))
+        .mustBeMoreThanOrEqualTo(BigDecimal.valueOf(0))
         .mustBeLessThanOrEqualTo(BigDecimal.valueOf(2147483647))
         .mustHaveNoMoreThanDecimalPlaces(0)
         .validate(form.getOrganisationGroupId(), errors);
