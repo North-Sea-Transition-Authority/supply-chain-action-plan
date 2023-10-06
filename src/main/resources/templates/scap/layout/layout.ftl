@@ -95,7 +95,7 @@
   </#assign>
 
   <#assign footerContent>
-    <@fdsFooter.footer metaLinks=true footerMetaContent=footerMetaContent wrapperWidth=wrapperWidth/>
+    <@fdsNstaFooter.nstaFooter metaLinks=true footerMetaContent=footerMetaContent wrapperWidth=wrapperWidth/>
   </#assign>
   <#assign analyticsScript>
     <script src="<@spring.url'/assets/javascript/googleAnalyticsEventTracking.js'/>"></script>
