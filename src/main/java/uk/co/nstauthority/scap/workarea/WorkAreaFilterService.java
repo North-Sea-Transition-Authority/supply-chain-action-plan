@@ -62,7 +62,7 @@ class WorkAreaFilterService {
     if (Objects.nonNull(filter.getUpdateRequestStatusRadioOptions())) {
       var updateRequestFilterOption = filter.getUpdateRequestStatusRadioOptions();
       if (UPDATE_OVERDUE.equals(updateRequestFilterOption)) {
-        conditions.add(SCAP_UPDATE_REQUESTS.DUE_DATE.le(LocalDateTime.now(clock)));
+        conditions.add(SCAP_UPDATE_REQUESTS.DUE_DATE.cast(LocalDateTime.class).le(LocalDateTime.now(clock)));
         conditions.add(SCAP_UPDATE_REQUESTS.RESOLUTION_DATE.isNull());
       } else if (UPDATE_REQUESTED.equals(updateRequestFilterOption)) {
         conditions.add(SCAP_UPDATE_REQUESTS.DUE_DATE.isNotNull());

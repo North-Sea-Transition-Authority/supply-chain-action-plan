@@ -171,7 +171,7 @@ class WorkAreaFilterServiceTest {
 
     var conditions = workAreaFilterService.getConditions(filter);
     assertThat(conditions).containsExactly(
-        SCAP_UPDATE_REQUESTS.DUE_DATE.le(LocalDateTime.now(clock)),
+        SCAP_UPDATE_REQUESTS.DUE_DATE.cast(LocalDateTime.class).le(LocalDateTime.now(clock)),
         SCAP_UPDATE_REQUESTS.RESOLUTION_DATE.isNull());
   }
 }
