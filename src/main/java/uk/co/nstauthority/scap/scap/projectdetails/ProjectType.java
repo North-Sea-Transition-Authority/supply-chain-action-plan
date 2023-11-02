@@ -8,7 +8,8 @@ public enum ProjectType implements Displayable {
   FIELD_DEVELOPMENT_PLAN("Field development plan", 10),
   FIELD_DEVELOPMENT_PLAN_ADDENDUM("Field development plan addendum", 20),
   DECOMMISSIONING_PROGRAMME("Decommissioning programme", 30),
-  CARBON_STORAGE_PERMIT("Carbon storage permit", 40);
+  CARBON_STORAGE_PERMIT("Carbon storage permit", 40),
+  EMISSIONS_REDUCTION_PLAN("Emissions reduction action plan", 50);
 
   private final String displayName;
   private final Integer displayOrder;
