@@ -65,7 +65,7 @@
   <h2 class="govuk-heading-m" id="non-accessible-content">Non-accessible content</h2>
   <p class="govuk-body">The content listed below is non-accessible for the following reasons.</p>
 
-  <h3 class="govuk-heading-s">Non-compliance with the accessibility regulations TBC</h3>
+  <h3 class="govuk-heading-s">Non-compliance with the accessibility regulations 4 August 2023</h3>
   <ul class="govuk-list govuk-list--bullet">
     <li>
       users are not always notified when conditionally revealed content associated with a radio button or checkbox is
@@ -86,11 +86,11 @@
     This statement was prepared on 9 March 2023. It was last reviewed on 9 March 2023.
   </p>
   <p class="govuk-body">
-    This website was last tested on TBC. The test was carried out by Fivium Ltd.
+    This website was last tested on 4 August 2023. The test was carried out by Fivium Ltd.
   </p>
   <p class="govuk-body">
     The ${serviceBranding.name()} service has been developed using the Energy Portal Design System. The Design System was last
-    accessibility tested on TBC. All features on ${serviceBranding.name()} were accessibility tested using automated
+    accessibility tested on 4 August 2023. All features on ${serviceBranding.name()} were accessibility tested using automated
     tools as part of the quality assurance process.
   </p>
 </@defaultPage>
