@@ -68,4 +68,12 @@
   <@fdsSummaryList.summaryListRowNoAction keyText="Award rationale" >
     ${plannedTenderActivitySummaryView.awardRationale()!""}
   </@fdsSummaryList.summaryListRowNoAction>
+
+    <@fdsSummaryList.summaryListRowNoAction keyText="Indicative actual tender start date">
+        ${plannedTenderActivitySummaryView.indicativeStartDate()!""}
+    </@fdsSummaryList.summaryListRowNoAction>
+
+    <@fdsSummaryList.summaryListRowNoAction keyText="Indicative contract award date">
+        ${plannedTenderActivitySummaryView.indicativeAwardDate()!""}
+    </@fdsSummaryList.summaryListRowNoAction>
 </#macro>

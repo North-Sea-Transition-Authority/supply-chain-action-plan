@@ -648,6 +648,8 @@ class ScapSummaryViewServiceTest {
     plannedTenderActivity.setScopeDescription("test scope description");
     plannedTenderActivity.setRemunerationModel(RemunerationModel.OTHER);
     plannedTenderActivity.setRemunerationModelName("test remuneration model");
+    plannedTenderActivity.setExpectedActualTenderStartDate(LocalDate.now());
+    plannedTenderActivity.setExpectedContractAwardDate(LocalDate.now());
     return plannedTenderActivity;
   }
 
