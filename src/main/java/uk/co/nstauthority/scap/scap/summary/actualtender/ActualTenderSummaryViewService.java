@@ -120,11 +120,14 @@ public class ActualTenderSummaryViewService {
   }
 
   private Map<String, Boolean> getParticipantsAndEpaStatus(List<InvitationToTenderParticipant> participants) {
-    return participants.stream()
+    return participants
+        .stream()
+        .distinct()
         .collect(Collectors.toMap(
             InvitationToTenderParticipant::getCompanyName,
-            participant -> Objects.isNull(participant.getOrganisationUnitId())
-        ));
+            participant -> Objects.isNull(participant.getOrganisationUnitId()),
+            (participant1, participant2) -> participant1 && participant2)
+        );
   }
 
   private List<Integer> getCountryIds(List<AwardedContract> awardedContracts) {

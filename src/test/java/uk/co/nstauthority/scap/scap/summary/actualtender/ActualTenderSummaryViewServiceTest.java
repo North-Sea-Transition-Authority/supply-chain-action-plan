@@ -104,6 +104,47 @@ class ActualTenderSummaryViewServiceTest {
   }
 
   @Test
+  void getDuplicateParticipantByActualTenderActivity() {
+    var scapId = new ScapId(173);
+
+    var actualTenderActivity = new ActualTenderActivity(10);
+    actualTenderActivity.setScopeTitle("test scope title 1");
+    actualTenderActivity.setScopeDescription("test scope description 1");
+    actualTenderActivity.setRemunerationModel(RemunerationModel.LUMP_SUM);
+    actualTenderActivity.setContractStage(ContractStage.CONTRACT_AWARDED);
+    var participant = new InvitationToTenderParticipant(210);
+    participant.setCompanyName("company name 1");
+    participant.setActualTenderActivity(actualTenderActivity);
+    participant.setBidParticipant(true);
+    var participant2 = new InvitationToTenderParticipant(211);
+    participant2.setCompanyName("company name 1");
+    participant2.setActualTenderActivity(actualTenderActivity);
+    participant2.setBidParticipant(true);
+    var participants = List.of(participant, participant2);
+    var awardedContract = AwardedContractBuilder.newBuilder()
+        .withPreferredBidder(null)
+        .withActualTenderActivity(actualTenderActivity)
+        .build();
+
+    when(invitationToTenderParticipantService
+        .getInvitationToTenderParticipantsForActivities(List.of(actualTenderActivity)))
+        .thenReturn(participants);
+    when(awardedContractService.getByActualTenderActivityIn(Collections.singletonList(actualTenderActivity)))
+        .thenReturn(Collections.singletonList(awardedContract));
+
+    var view = actualTenderSummaryViewService.getSingleViewByActualTenderActivity(actualTenderActivity, scapId);
+
+    assertThat(view).extracting(
+
+        ActualTenderActivitySummaryView::ittParticipants,
+        ActualTenderActivitySummaryView::bidParticipants
+    ).containsExactly(
+        Map.of(participant.getCompanyName(), true),
+        Map.of(participant.getCompanyName(), true)
+    );
+  }
+
+  @Test
   void getByActualTenderActivities() {
     var scapId = new ScapId(11);
 
