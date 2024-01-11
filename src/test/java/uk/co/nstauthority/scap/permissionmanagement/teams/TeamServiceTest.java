@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -23,16 +24,24 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
+import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
+import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRepository;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 
 @ExtendWith(MockitoExtension.class)
 class TeamServiceTest {
+
+  private static final Long WUA_ID = ServiceUserDetailTestUtil.Builder()
+      .build()
+      .wuaId();
 
   @Mock
   private TeamRepository teamRepository;
@@ -300,5 +309,126 @@ class TeamServiceTest {
     var returnedTeam = teamService.getRegulatorTeam();
 
     assertThat(returnedTeam).isEqualTo(regTeam);
+  }
+
+  @Test
+  void getPermissionsForUserInOrganisationGroup_whenUserIsInTeam_AndHasNoRoles_thenEmptyList() {
+    var team = TeamTestUtil.Builder()
+        .withOrgGroupId(1)
+        .withTeamType(TeamType.INDUSTRY)
+        .build();
+
+    when(teamRepository.findByEnergyPortalOrgGroupId(team.getEnergyPortalOrgGroupId())).thenReturn(Optional.of(team));
+    when(teamMemberService.findTeamMember(team, new WebUserAccountId(WUA_ID)))
+        .thenReturn(Optional.empty());
+
+    var resultingPermissions = teamService.findAllPermissionsForUserInOrganisationGroup(WUA_ID, team.getEnergyPortalOrgGroupId());
+    assertThat(resultingPermissions).isEmpty();
+  }
+
+  @Test
+  void getPermissionsForUserInOrganisationGroup_whenUserIsInNoTeam_thenEmptyList() {
+    var orgId = 1;
+    when(teamRepository.findByEnergyPortalOrgGroupId(orgId)).thenReturn(Optional.empty());
+
+    var resultingPermissions = teamService.findAllPermissionsForUserInOrganisationGroup(WUA_ID, orgId);
+    assertThat(resultingPermissions).isEmpty();
+    verify(teamMemberService, never()).findTeamMember(any(), any());
+  }
+
+  @Test
+  void getPermissionsForUserInOrganisationGroup_whenUserIsInTeam_AndHasRoles_thenPopulatedList() {
+    var team = TeamTestUtil.Builder()
+        .withOrgGroupId(1)
+        .withTeamType(TeamType.INDUSTRY)
+        .build();
+    var teamMember = TeamMemberTestUtil.Builder()
+        .withTeamType(TeamType.INDUSTRY)
+        .withRole(IndustryTeamRole.SCAP_SUBMITTER)
+        .build();
+
+    when(teamRepository.findByEnergyPortalOrgGroupId(team.getEnergyPortalOrgGroupId())).thenReturn(Optional.of(team));
+    when(teamMemberService.findTeamMember(team, new WebUserAccountId(WUA_ID)))
+        .thenReturn(Optional.of(teamMember));
+
+    var resultingPermissions = teamService.findAllPermissionsForUserInOrganisationGroup(WUA_ID, team.getEnergyPortalOrgGroupId());
+    assertThat(resultingPermissions)
+        .containsExactly(IndustryTeamRole.SCAP_SUBMITTER.getRolePermissions().toArray(RolePermission[]::new));
+  }
+
+  @Test
+  void getTeamsForUserBasedOnPermission_whenUserIsNotInTeam_thenEmptyList() {
+    when(teamRepository.findAllTeamsThatUserIsMemberOf(WUA_ID)).thenReturn(List.of());
+    var resultingTeams =  teamService.findAllTeamsForUserBasedOnPermission(List.of(IndustryTeamRole.SCAP_SUBMITTER), WUA_ID);
+    assertThat(resultingTeams).isEmpty();
+  }
+
+  @Test
+  void getPermissionsForUserInOrganisationGroup_whenNoPermissionsMatch_thenEmptyList() {
+    var team = TeamTestUtil.Builder()
+        .withTeamType(TeamType.INDUSTRY)
+        .build();
+
+    var teamMemberRole = TeamMemberRoleTestUtil.Builder()
+        .withRole("SCAP_VIEWER")
+        .withTeam(team)
+        .build();
+
+    when(teamRepository.findAllTeamsThatUserIsMemberOf(WUA_ID)).thenReturn(List.of(team));
+    when(teamMemberService.findAllRolesByUser(List.of(team), new WebUserAccountId(WUA_ID)))
+        .thenReturn(List.of(teamMemberRole));
+
+    var resultingTeams =  teamService.findAllTeamsForUserBasedOnPermission(List.of(IndustryTeamRole.SCAP_SUBMITTER), WUA_ID);
+    assertThat(resultingTeams).isEmpty();
+  }
+
+  @Test
+  void getTeamsForUserBasedOnPermission_whenPermissionMatches_thenPopulatedList() {
+    var team = TeamTestUtil.Builder()
+        .withTeamType(TeamType.INDUSTRY)
+        .build();
+
+    var teamMemberRole = TeamMemberRoleTestUtil.Builder()
+        .withRole("SCAP_SUBMITTER")
+        .withTeam(team)
+        .build();
+
+    when(teamRepository.findAllTeamsThatUserIsMemberOf(WUA_ID)).thenReturn(List.of(team));
+    when(teamMemberService.findAllRolesByUser(List.of(team), new WebUserAccountId(WUA_ID)))
+        .thenReturn(List.of(teamMemberRole));
+
+    var resultingTeams =  teamService.findAllTeamsForUserBasedOnPermission(List.of(IndustryTeamRole.SCAP_SUBMITTER), WUA_ID);
+    assertThat(resultingTeams).containsExactly(team);
+  }
+
+  @Test
+  void getTeamsForUserBasedOnPermission_whenUserIsMemberOfMultipleTeams_onlyReturnTeamWithCorrectPermission() {
+    var industryTeam = TeamTestUtil.Builder()
+        .withTeamType(TeamType.INDUSTRY)
+        .build();
+
+    var industryTeamMemberRole = TeamMemberRoleTestUtil.Builder()
+        .withRole("SCAP_SUBMITTER")
+        .withTeam(industryTeam)
+        .build();
+
+    var regulatorTeam = TeamTestUtil.Builder()
+        .withTeamType(TeamType.REGULATOR)
+        .build();
+
+    var regulatorTeamMemberRole = TeamMemberRoleTestUtil.Builder()
+        .withRole("SCAP_VIEWER")
+        .withTeam(regulatorTeam)
+        .build();
+
+    when(teamRepository.findAllTeamsThatUserIsMemberOf(WUA_ID)).thenReturn(List.of(industryTeam, regulatorTeam));
+    when(teamMemberService.findAllRolesByUser(List.of(industryTeam, regulatorTeam), new WebUserAccountId(WUA_ID)))
+        .thenReturn(List.of(regulatorTeamMemberRole, industryTeamMemberRole));
+
+    var resultingTeams =  teamService.findAllTeamsForUserBasedOnPermission(
+        List.of(IndustryTeamRole.SCAP_SUBMITTER),
+        WUA_ID
+    );
+    assertThat(resultingTeams).containsExactly(industryTeam);
   }
 }

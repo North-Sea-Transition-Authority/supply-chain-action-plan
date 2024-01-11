@@ -14,7 +14,7 @@ import uk.co.nstauthority.scap.permissionmanagement.Team;
 
 @Entity
 @Table(name = "team_member_roles")
-class TeamMemberRole {
+public class TeamMemberRole {
 
   @Id
   @GeneratedValue(generator = "uuid")

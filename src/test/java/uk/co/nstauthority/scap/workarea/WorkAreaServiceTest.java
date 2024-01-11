@@ -2,11 +2,13 @@ package uk.co.nstauthority.scap.workarea;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAPS;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAP_DETAILS;
 
 import java.time.Instant;
@@ -25,8 +27,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
+import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRoleTestUtil;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
@@ -60,6 +66,12 @@ class WorkAreaServiceTest {
 
   @Mock
   WorkAreaFilterService workAreaFilterService;
+
+  @Mock
+  TeamMemberService teamMemberService;
+
+  @Mock
+  UserDetailService userDetailService;
 
   @InjectMocks
   WorkAreaService workAreaService;
@@ -140,6 +152,12 @@ class WorkAreaServiceTest {
 
   @Test
   void getWorkAreaItems_WhenNotRegulator_VerifyGetAllByOrganisationGroups() {
+    when(userDetailService.getUserDetail()).thenReturn(userDetail);
+
+    var teamMemberRole = TeamMemberRoleTestUtil.Builder()
+        .withRole(IndustryTeamRole.SCAP_SUBMITTER.name())
+        .build();
+
     var team = new Team();
     team.setTeamType(TeamType.INDUSTRY);
     team.setEnergyPortalOrgGroupId(organisationGroup.getOrganisationGroupId());
@@ -157,6 +175,9 @@ class WorkAreaServiceTest {
         Instant.now(),
         Instant.now()
     );
+
+    when(teamMemberService.findAllRolesByUser(List.of(team), userDetail.getWebUserAccountId()))
+        .thenReturn(List.of(teamMemberRole));
 
     when(updateRequestService.getUpdateDueDate(new ScapId(1), UpdateRequestType.FURTHER_INFORMATION))
         .thenReturn(Optional.empty());
@@ -195,6 +216,12 @@ class WorkAreaServiceTest {
 
   @Test
   void getWorkAreaItems_WhenMultipleDraftAndSubmitted_AssertSortedBySubmittedLatestThenDraftCreatedLatest() {
+    when(userDetailService.getUserDetail()).thenReturn(userDetail);
+
+    var teamMemberRole = TeamMemberRoleTestUtil.Builder()
+        .withRole(IndustryTeamRole.SCAP_SUBMITTER.name())
+        .build();
+
     var orgGrpId = organisationGroup.getOrganisationGroupId();
     var team = new Team();
     team.setTeamType(TeamType.INDUSTRY);
@@ -226,6 +253,9 @@ class WorkAreaServiceTest {
         oldDraftScapDto, newDraftScapDto, oldSubmittedScapDto, newSubmittedScapDto
     );
 
+    when(teamMemberService.findAllRolesByUser(List.of(team), userDetail.getWebUserAccountId()))
+        .thenReturn(List.of(teamMemberRole));
+
     when(updateRequestService.getUpdateDueDate(new ScapId(4), UpdateRequestType.FURTHER_INFORMATION))
         .thenReturn(Optional.empty());
     when(workAreaItemDtoRepository.performQuery(any(), any())).thenReturn(workAreaItemDtoList);
@@ -251,6 +281,8 @@ class WorkAreaServiceTest {
 
   @Test
   void getWorkAreaItems_WhenNoTeam_VerifyNeverCallsRepository() {
+    when(userDetailService.getUserDetail()).thenReturn(userDetail);
+
     var views = workAreaService.getWorkAreaItems(new WorkAreaFilter(), false, Collections.emptyList());
 
     assertThat(views).isEmpty();
@@ -259,6 +291,91 @@ class WorkAreaServiceTest {
     verify(workAreaItemDtoRepository, never()).getAllByOrganisationGroups(any());
     verify(organisationGroupService, never()).getOrganisationGroupsByIds(any(), any());
     verify(scapDetailService, never()).isUpdateInProgress(any());
+  }
+
+  @Test
+  void getWorkAreaItems_whenUserHasViewAndSubmitRole_AssertNoDraftItems() {
+    when(userDetailService.getUserDetail()).thenReturn(userDetail);
+
+    var viewingTeamOrgId = 10;
+    var viewingTeam = new Team();
+    viewingTeam.setTeamType(TeamType.INDUSTRY);
+    viewingTeam.setEnergyPortalOrgGroupId(viewingTeamOrgId);
+
+    var viewerTeamMemberRole = TeamMemberRoleTestUtil.Builder()
+        .withRole(IndustryTeamRole.SCAP_VIEWER.name())
+        .withTeam(viewingTeam)
+        .build();
+
+    var submittingTeamOrgId = 20;
+    var submittingTeam = new Team();
+    submittingTeam.setTeamType(TeamType.INDUSTRY);
+    submittingTeam.setEnergyPortalOrgGroupId(submittingTeamOrgId);
+
+    var submitterTeamMemberRole = TeamMemberRoleTestUtil.Builder()
+        .withRole(IndustryTeamRole.SCAP_SUBMITTER.name())
+        .withTeam(submittingTeam)
+        .build();
+
+    var draftOnViewerTeamScapDto = new WorkAreaItemDtoBuilder()
+        .withScapId(1)
+        .withOperatorId(viewingTeamOrgId)
+        .withScapDetailStatus(ScapDetailStatus.DRAFT)
+        .build();
+    var draftOnSubmitterTeamScapDto = new WorkAreaItemDtoBuilder()
+        .withScapId(2)
+        .withOperatorId(submittingTeamOrgId)
+        .withScapDetailStatus(ScapDetailStatus.DRAFT)
+        .build();
+    var submittedOnViewerTeamScapDto = new WorkAreaItemDtoBuilder()
+        .withScapId(3)
+        .withOperatorId(viewingTeamOrgId)
+        .withScapDetailStatus(ScapDetailStatus.SUBMITTED)
+        .build();
+    var submittedOnSubmitterTeamScapDto = new WorkAreaItemDtoBuilder()
+        .withScapId(4)
+        .withOperatorId(submittingTeamOrgId)
+        .withScapDetailStatus(ScapDetailStatus.SUBMITTED)
+        .build();
+
+    var viewerWorkAreaItemDtoList = List.of(draftOnViewerTeamScapDto, submittedOnViewerTeamScapDto);
+    var submitterWorkAreaItemDtoList = List.of(draftOnSubmitterTeamScapDto, submittedOnSubmitterTeamScapDto);
+
+
+    when(teamMemberService.findAllRolesByUser(List.of(viewingTeam, submittingTeam), userDetail.getWebUserAccountId()))
+        .thenReturn(List.of(viewerTeamMemberRole, submitterTeamMemberRole));
+
+    when(updateRequestService.getUpdateDueDate(new ScapId(4), UpdateRequestType.FURTHER_INFORMATION))
+        .thenReturn(Optional.empty());
+
+    when(workAreaItemDtoRepository.performQuery(any(), eq(SCAPS.ORGANISATION_GROUP_ID.in(viewingTeamOrgId))))
+        .thenReturn(viewerWorkAreaItemDtoList);
+    when(workAreaItemDtoRepository.performQuery(any(), eq(SCAPS.ORGANISATION_GROUP_ID.in(submittingTeamOrgId))))
+        .thenReturn(submitterWorkAreaItemDtoList);
+
+    var viewingTeamOrgGroup = OrganisationGroup.newBuilder().name("viewing team").organisationGroupId(viewingTeamOrgId).build();
+    var submittingTeamOrgGroup = OrganisationGroup.newBuilder().name("submitting team").organisationGroupId(submittingTeamOrgId).build();
+
+    when(organisationGroupService.getOrganisationGroupsByIds(
+        List.of(submittingTeamOrgId, submittingTeamOrgId),
+        WorkAreaService.ORGANISATION_GROUPS_REQUEST_PURPOSE))
+        .thenReturn(List.of(submittingTeamOrgGroup));
+
+    when(organisationGroupService.getOrganisationGroupsByIds(
+        List.of(viewingTeamOrgId, viewingTeamOrgId),
+        WorkAreaService.ORGANISATION_GROUPS_REQUEST_PURPOSE))
+        .thenReturn(List.of(viewingTeamOrgGroup));
+
+    var views = workAreaService
+        .getWorkAreaItems(new WorkAreaFilter(), false, List.of(viewingTeam, submittingTeam));
+
+    assertThat(views).extracting(
+        item -> item.scapId().scapId()
+    ).containsExactly(
+        submittedOnSubmitterTeamScapDto.scapId(),
+        submittedOnViewerTeamScapDto.scapId(),
+        draftOnSubmitterTeamScapDto.scapId()
+    );
   }
 
   @Test
@@ -329,7 +446,7 @@ class WorkAreaServiceTest {
 
     private Integer scapId = 1;
     private String projectName = null;
-    private final Integer operatorId = organisationGroup.getOrganisationGroupId();
+    private Integer operatorId = organisationGroup.getOrganisationGroupId();
     private ScapDetailStatus status = ScapDetailStatus.DRAFT;
     private Boolean projectClosedOut = false;
     private Boolean hasContractingPerformance = false;
@@ -380,6 +497,11 @@ class WorkAreaServiceTest {
 
     public WorkAreaItemDtoBuilder withSubmittedTimestamp(Instant submittedTimestamp) {
       this.submittedTimestamp = submittedTimestamp;
+      return this;
+    }
+
+    public WorkAreaItemDtoBuilder withOperatorId(Integer operatorId) {
+      this.operatorId = operatorId;
       return this;
     }
 

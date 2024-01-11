@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.HasAnyPermissionForScap;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
-import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermission;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction;
@@ -21,7 +21,7 @@ import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 
 @Controller
 @RequestMapping("{scapId}/")
-@UserHasAnyPermission(permissions = RolePermission.SUBMIT_SCAP)
+@HasAnyPermissionForScap(permissions = RolePermission.SUBMIT_SCAP)
 @ScapHasStatus(permittedStatuses = {ScapDetailStatus.SUBMITTED, ScapDetailStatus.APPROVED, ScapDetailStatus.DRAFT})
 public class ScapUpdateController {
 

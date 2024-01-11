@@ -216,7 +216,7 @@ class TeamMemberServiceTest {
   }
 
   @Test
-  void getTeamMember_whenMemberIsInTeam_thenGetTeamMember() {
+  void findTeamMember_whenMemberIsInTeam_thenGetTeamMember() {
     var team = new Team(UUID.randomUUID());
     team.setTeamType(TeamType.REGULATOR);
 
@@ -248,7 +248,7 @@ class TeamMemberServiceTest {
   }
 
   @Test
-  void getTeamMember_whenMemberIsNotInTeam_thenEmpty() {
+  void findTeamMember_whenMemberIsNotInTeam_thenEmpty() {
     var team = new Team(UUID.randomUUID());
     team.setTeamType(TeamType.REGULATOR);
 
@@ -258,6 +258,44 @@ class TeamMemberServiceTest {
 
     var result = teamMemberService.findTeamMember(team, wuaId);
 
+    assertTrue(result.isEmpty());
+  }
+
+  @Test
+  void findTeamMemberRole_whenMemberIsInTeam_thenReturn() {
+    var team = new Team(UUID.randomUUID());
+    team.setTeamType(TeamType.REGULATOR);
+
+    var wuaId = new WebUserAccountId(123L);
+    var role = TeamMemberRoleTestUtil.Builder()
+        .withRole(RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER.name())
+        .withWebUserAccountId(wuaId.id())
+        .build();
+
+    when(teamMemberRoleRepository.findAllByTeamInAndWuaId(List.of(team), wuaId.id()))
+        .thenReturn(List.of(role));
+    var result = teamMemberService.findAllRolesByUser(List.of(team), wuaId);
+
+    assertThat(result)
+        .extracting(
+            TeamMemberRole::getRole,
+            teamMemberRole -> teamMemberRole.getTeam().getTeamType(),
+            TeamMemberRole::getWuaId
+    ).containsExactly(
+        tuple(role.getRole(), team.getTeamType(), wuaId.id())
+    );
+  }
+
+  @Test
+  void findTeamMemberRole_whenMemberIsNotInTeam_thenEmptyList() {
+    var team = new Team(UUID.randomUUID());
+    team.setTeamType(TeamType.INDUSTRY);
+
+    var wuaId = new WebUserAccountId(123L);
+
+    when(teamMemberRoleRepository.findAllByTeamInAndWuaId(List.of(team), wuaId.id())).thenReturn(List.of());
+
+    var result = teamMemberService.findAllRolesByUser(List.of(team), wuaId);
     assertTrue(result.isEmpty());
   }
 
