@@ -2,6 +2,8 @@ package uk.co.nstauthority.scap.energyportal;
 
 import java.io.Serial;
 import java.io.Serializable;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 public record WebUserAccountId(Long id) implements Serializable {
 
@@ -29,6 +31,13 @@ public record WebUserAccountId(Long id) implements Serializable {
   }
 
   public static WebUserAccountId valueOf(String webUserAccountId) {
-    return new WebUserAccountId(Long.valueOf(webUserAccountId));
+    try {
+      return new WebUserAccountId(Long.valueOf(webUserAccountId));
+    } catch (Exception e) {
+      throw new ResponseStatusException(
+          HttpStatus.NOT_FOUND,
+          String.format("Cannot find WebUserAccount with ID: %s", webUserAccountId)
+      );
+    }
   }
 }
