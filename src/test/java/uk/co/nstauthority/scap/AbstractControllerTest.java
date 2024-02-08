@@ -42,6 +42,10 @@ import uk.co.nstauthority.scap.endpointvalidation.rules.ScapHasStatusRule;
 import uk.co.nstauthority.scap.endpointvalidation.rules.UserHasAnyPermissionRule;
 import uk.co.nstauthority.scap.error.FooterService;
 import uk.co.nstauthority.scap.fds.navigation.TopNavigationService;
+import uk.co.nstauthority.scap.jooq.JooqStatisticsListener;
+import uk.co.nstauthority.scap.jpa.HibernateQueryCounterImpl;
+import uk.co.nstauthority.scap.mvc.PostAuthenticationRequestMdcFilter;
+import uk.co.nstauthority.scap.mvc.RequestLogFilter;
 import uk.co.nstauthority.scap.mvc.WithDefaultPageControllerAdvice;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
@@ -69,7 +73,9 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
     AnyPermissionForScapRule.class,
     UserHasAnyPermissionRule.class,
     AnyPermissionForTeamRule.class,
-    ScapHandlerInterceptor.class
+    ScapHandlerInterceptor.class,
+    RequestLogFilter.class,
+    PostAuthenticationRequestMdcFilter.class
 })
 @WithDefaultPageControllerAdvice
 @WebMvcTest
@@ -101,6 +107,9 @@ public abstract class AbstractControllerTest {
   @SpyBean
   protected FooterService footerService;
 
+  @MockBean
+  protected JooqStatisticsListener jooqStatisticsListener;
+
   @BeforeEach
   void setup() {
     when(userDetailService.getUserDetail()).thenReturn(testUser);
@@ -129,6 +138,11 @@ public abstract class AbstractControllerTest {
       messageSource.setBasename("messages");
       messageSource.setDefaultEncoding("UTF-8");
       return messageSource;
+    }
+
+    @Bean
+    public HibernateQueryCounterImpl hibernateQueryCounter() {
+      return new HibernateQueryCounterImpl();
     }
 
     @Bean

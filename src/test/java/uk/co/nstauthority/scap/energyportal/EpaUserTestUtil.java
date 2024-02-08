@@ -17,6 +17,7 @@ class EpaUserTestUtil {
 
     private int webUserAccountId = 1;
     private int personId = 2;
+    private String loginId = "loginId";
     private String title = "title";
     private String forename = "forename";
     private String surname = "surname";
@@ -34,6 +35,11 @@ class EpaUserTestUtil {
 
     Builder withPersonId(int personId) {
       this.personId = personId;
+      return this;
+    }
+
+    Builder withLoginId(String loginId) {
+      this.loginId = loginId;
       return this;
     }
 
@@ -81,6 +87,7 @@ class EpaUserTestUtil {
       return new User(
           webUserAccountId,
           personId,
+          loginId,
           title,
           forename,
           surname,

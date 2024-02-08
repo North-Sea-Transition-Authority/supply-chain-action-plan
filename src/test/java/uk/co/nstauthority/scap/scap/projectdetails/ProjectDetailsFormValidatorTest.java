@@ -234,7 +234,15 @@ class ProjectDetailsFormValidatorTest {
   void validate_HasPlatforms() {
     var facilityId = 1209;
     var facilityIds = Collections.singleton(facilityId);
-    var facilities = List.of(new Facility(facilityId, "Test facility", null, null, null));
+    var facilities = List.of(
+        Facility.newBuilder()
+            .id(facilityId)
+            .name("Test facility name")
+            .type(null)
+            .status(null)
+            .isInUkcs(null)
+            .build()
+    );
 
     form.setHasPlatforms(true);
     form.setInstallationIds(facilityIds);
@@ -248,7 +256,6 @@ class ProjectDetailsFormValidatorTest {
 
     assertFalse(bindingResult.hasErrors());
   }
-
 
 
   private ProjectDetailsForm getValidProjectDetailsForm() {

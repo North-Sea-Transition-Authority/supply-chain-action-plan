@@ -20,6 +20,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.fivium.energyportalapi.generated.types.Facility;
+import uk.co.fivium.energyportalapi.generated.types.FacilityStatus;
+import uk.co.fivium.energyportalapi.generated.types.FacilityType;
 import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;
@@ -176,7 +178,14 @@ class ProjectDetailsFormServiceTest {
   void getPreselectedFacilities() {
     var facilityId = 14;
     var projectFacilityIds = Collections.singleton(facilityId);
-    var facility = new Facility(facilityId, "Test facility name", null, null, null);
+    var facility = Facility.newBuilder()
+        .id(facilityId)
+        .name("Test facility name")
+        .type(null)
+        .status(null)
+        .isInUkcs(null)
+        .build();
+
     var facilities = List.of(facility);
 
     when(facilityService

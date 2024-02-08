@@ -58,19 +58,25 @@ class ProjectDetailsRestControllerTest extends AbstractControllerTest {
 
 
     mockMvc.perform(get(
-        ReverseRouter.route(on(ProjectDetailsRestController.class).getFieldSearchResults(null)))
+            ReverseRouter.route(on(ProjectDetailsRestController.class).getFieldSearchResults(null)))
             .param("term", searchTerm))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(content().json("""
-{"results":[{"id":"1","text":"test field 1"},{"id":"2","text":"test field 2"}]}
-"""));
-    }
+            {"results":[{"id":"1","text":"test field 1"},{"id":"2","text":"test field 2"}]}
+            """));
+  }
 
   @Test
   void getFacilitySearchResults() throws Exception {
     var searchTerm = "test";
-    var facility = new Facility(1, "test facility", null, null, null);
+    var facility = Facility.newBuilder()
+        .id(1)
+        .name("test facility")
+        .type(null)
+        .status(null)
+        .isInUkcs(null)
+        .build();
     var facilities = List.of(facility);
     var facilitiesRestSearchResult = new RestSearchResult(List.of(
         new RestSearchItem(String.valueOf(facility.getId()), facility.getName())
@@ -81,13 +87,13 @@ class ProjectDetailsRestControllerTest extends AbstractControllerTest {
     when(facilityService.facilitiesToRestSearchResult(facilities)).thenReturn(facilitiesRestSearchResult);
 
     var response = mockMvc.perform(get(
-        ReverseRouter.route(on(ProjectDetailsRestController.class).getFacilitySearchResults(null)))
-        .param("term", searchTerm))
+            ReverseRouter.route(on(ProjectDetailsRestController.class).getFacilitySearchResults(null)))
+            .param("term", searchTerm))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(content().json("""
-{"results":[{"id":"1","text":"test facility"}]}
-"""))
+            {"results":[{"id":"1","text":"test facility"}]}
+            """))
         .andReturn()
         .getResponse();
   }

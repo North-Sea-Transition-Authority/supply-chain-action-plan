@@ -19,8 +19,11 @@ import org.springframework.security.saml2.provider.service.registration.RelyingP
 import org.springframework.security.saml2.provider.service.registration.Saml2MessageBinding;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import uk.co.nstauthority.scap.authentication.SamlResponseParser;
 import uk.co.nstauthority.scap.authentication.ServiceLogoutSuccessHandler;
+import uk.co.nstauthority.scap.mvc.PostAuthenticationRequestMdcFilter;
+import uk.co.nstauthority.scap.mvc.RequestLogFilter;
 
 @Configuration
 public class WebSecurityConfiguration {
@@ -30,16 +33,21 @@ public class WebSecurityConfiguration {
   private final SamlResponseParser samlResponseParser;
 
   private final ServiceLogoutSuccessHandler serviceLogoutSuccessHandler;
+  private final RequestLogFilter requestLogFilter;
+  private final PostAuthenticationRequestMdcFilter postAuthenticationRequestMdcFilter;
 
   private static final String SCAP_ACCESS_PERMISSION = "SCAP_ACCESS_PRIVILEGE";
 
   @Autowired
   public WebSecurityConfiguration(SamlProperties samlProperties,
                                   SamlResponseParser samlResponseParser,
-                                  ServiceLogoutSuccessHandler serviceLogoutSuccessHandler) {
+                                  ServiceLogoutSuccessHandler serviceLogoutSuccessHandler, RequestLogFilter requestLogFilter,
+                                  PostAuthenticationRequestMdcFilter postAuthenticationRequestMdcFilter) {
     this.samlProperties = samlProperties;
     this.samlResponseParser = samlResponseParser;
     this.serviceLogoutSuccessHandler = serviceLogoutSuccessHandler;
+    this.requestLogFilter = requestLogFilter;
+    this.postAuthenticationRequestMdcFilter = postAuthenticationRequestMdcFilter;
   }
 
   @Bean
@@ -69,9 +77,14 @@ public class WebSecurityConfiguration {
           .logout()
           .logoutSuccessHandler(serviceLogoutSuccessHandler)
         .and()
+        .securityContext(securityContext -> securityContext
+            .requireExplicitSave(true)
+        )
         .exceptionHandling()
         .accessDeniedHandler(serviceDeniedHandler());
 
+    httpSecurity.addFilterBefore(requestLogFilter, SecurityContextHolderFilter.class);
+    httpSecurity.addFilterAfter(postAuthenticationRequestMdcFilter, SecurityContextHolderFilter.class);
 
     return httpSecurity.build();
   }
