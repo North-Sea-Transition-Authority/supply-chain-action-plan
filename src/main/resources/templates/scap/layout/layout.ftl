@@ -24,6 +24,13 @@
   </#assign>
 </#if>
 
+<#macro cookieBanner>
+  <@fdsCookieBanner.analyticsCookieBanner
+   serviceName=serviceBranding.name()
+   cookieSettingsUrl=springUrl(cookiesStatementUrl)
+  />
+</#macro>
+
 <#assign serviceName = serviceBranding.name() />
 <#macro defaultPage
   htmlTitle
@@ -101,11 +108,6 @@
     <script src="<@spring.url'/assets/javascript/googleAnalyticsEventTracking.js'/>"></script>
   </#assign>
 
-  <@fdsCookieBanner.analyticsCookieBanner
-    serviceName=serviceBranding.name()
-    cookieSettingsUrl=springUrl(cookiesStatementUrl)
-  />
-
   <@fdsDefaultPageTemplate
     htmlTitle=htmlTitle
     serviceName=serviceName
@@ -134,6 +136,7 @@
     wrapperWidth=wrapperWidth
     footerContent=footerContent
     customScriptContent=analyticsScript
+    cookieBannerMacro=cookieBanner
   >
     <@fdsGoogleAnalytics.googleAnalytics measurementId=analytics.appTag />
     <@fdsGoogleAnalytics.googleAnalytics measurementId=analytics.globalTag />
