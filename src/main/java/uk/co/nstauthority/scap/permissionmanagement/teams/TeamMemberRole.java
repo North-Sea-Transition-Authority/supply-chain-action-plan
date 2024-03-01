@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.permissionmanagement.teams;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,7 +15,7 @@ import uk.co.nstauthority.scap.permissionmanagement.Team;
 
 @Entity
 @Table(name = "team_member_roles")
-class TeamMemberRole {
+public class TeamMemberRole {
 
   @Id
   @GeneratedValue(generator = "uuid")
@@ -36,7 +37,8 @@ class TeamMemberRole {
   protected TeamMemberRole() {
   }
 
-  TeamMemberRole(UUID uuid) {
+  @VisibleForTesting
+  public TeamMemberRole(UUID uuid) {
     this.uuid = uuid;
   }
 

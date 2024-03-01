@@ -37,6 +37,7 @@ import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.ScapHandlerInterceptor;
 import uk.co.nstauthority.scap.endpointvalidation.rules.AnyPermissionForScapRule;
 import uk.co.nstauthority.scap.endpointvalidation.rules.AnyPermissionForTeamRule;
+import uk.co.nstauthority.scap.endpointvalidation.rules.CanAccessScapRule;
 import uk.co.nstauthority.scap.endpointvalidation.rules.MemberOfTeamRule;
 import uk.co.nstauthority.scap.endpointvalidation.rules.ScapHasStatusRule;
 import uk.co.nstauthority.scap.endpointvalidation.rules.UserHasAnyPermissionRule;
@@ -69,7 +70,8 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
     AnyPermissionForScapRule.class,
     UserHasAnyPermissionRule.class,
     AnyPermissionForTeamRule.class,
-    ScapHandlerInterceptor.class
+    ScapHandlerInterceptor.class,
+    CanAccessScapRule.class
 })
 @WithDefaultPageControllerAdvice
 @WebMvcTest

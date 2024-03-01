@@ -68,7 +68,7 @@ public abstract class AbstractScapSubmitterControllerTest extends AbstractContro
         .build();
   }
 
-  private Team getTeam() {
+  protected Team getTeam() {
     return TeamTestUtil
         .Builder()
         .withTeamType(TeamType.INDUSTRY)
@@ -77,7 +77,7 @@ public abstract class AbstractScapSubmitterControllerTest extends AbstractContro
         .build();
   }
 
-  private Scap getScap() {
+  protected Scap getScap() {
     var scap = new Scap(SCAP_ID.scapId());
     scap.setReference("Test Scap");
     scap.setOrganisationGroupId(1000);

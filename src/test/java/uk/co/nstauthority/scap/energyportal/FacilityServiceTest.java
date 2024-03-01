@@ -36,7 +36,13 @@ class FacilityServiceTest {
     var searchTerm = "test search term";
     var purpose = "test purpose";
     var facilities = List.of(
-        new Facility(39, "Test facility", FacilityType.FLARE_TOWER, FacilityStatus.OPERATIONAL, true)
+        Facility.newBuilder()
+            .id(39)
+            .name("Test facility")
+            .type(FacilityType.FLARE_TOWER)
+            .status(FacilityStatus.OPERATIONAL)
+            .isInUkcs(true)
+            .build()
     );
 
     var requestPurposeArgumentCaptor = ArgumentCaptor.forClass(RequestPurpose.class);
@@ -63,7 +69,13 @@ class FacilityServiceTest {
     var ids = List.of(39);
     var purpose = "test purpose";
     var facilities = List.of(
-        new Facility(39, "Test facility", FacilityType.FLARE_TOWER, FacilityStatus.OPERATIONAL, true)
+        Facility.newBuilder()
+            .id(39)
+            .name("Test facility")
+            .type(FacilityType.FLARE_TOWER)
+            .status(FacilityStatus.OPERATIONAL)
+            .isInUkcs(true)
+            .build()
     );
 
     var requestPurposeArgumentCaptor = ArgumentCaptor.forClass(RequestPurpose.class);
@@ -87,7 +99,13 @@ class FacilityServiceTest {
 
   @Test
   void facilitiesToRestSearchResult() {
-    var facility = new Facility(39, "Test facility", FacilityType.FLARE_TOWER, FacilityStatus.OPERATIONAL, true);
+    var facility = Facility.newBuilder()
+        .id(39)
+        .name("Test facility")
+        .type(FacilityType.FLARE_TOWER)
+        .status(FacilityStatus.OPERATIONAL)
+        .isInUkcs(true)
+        .build();
 
     var restSearchResult = facilityService.facilitiesToRestSearchResult(List.of(facility));
 

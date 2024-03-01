@@ -139,8 +139,15 @@ class ProjectDetailsServiceTest {
     var projectFacility = new ProjectFacility();
     projectFacility.setFacilityId(projectFacilityId);
     var facilities = List.of(
-        new Facility(projectFacilityId, "facility name", null, null, null)
+        Facility.newBuilder()
+            .id(projectFacilityId)
+            .name("facility name")
+            .type(null)
+            .status(null)
+            .isInUkcs(null)
+            .build()
     );
+
 
     when(projectFacilityRepository.findAllByProjectDetails(projectDetails)).thenReturn(List.of(projectFacility));
     when(facilityService.findFacilitiesByIds(

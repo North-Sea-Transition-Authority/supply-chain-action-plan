@@ -57,6 +57,10 @@ public class TeamMemberService {
     return Optional.of(teamMember);
   }
 
+  public List<TeamMemberRole> findAllRolesByUser(List<Team> teams, WebUserAccountId wuaId) {
+    return teamMemberRoleRepository.findAllByTeamInAndWuaId(teams, wuaId.id());
+  }
+
   public TeamMember getTeamMember(Team team, WebUserAccountId wuaId) {
     return findTeamMember(team, wuaId)
         .orElseThrow(() -> new ScapEntityNotFoundException(

@@ -176,7 +176,14 @@ class ProjectDetailsFormServiceTest {
   void getPreselectedFacilities() {
     var facilityId = 14;
     var projectFacilityIds = Collections.singleton(facilityId);
-    var facility = new Facility(facilityId, "Test facility name", null, null, null);
+    var facility = Facility.newBuilder()
+        .id(facilityId)
+        .name("Test facility name")
+        .type(null)
+        .status(null)
+        .isInUkcs(null)
+        .build();
+
     var facilities = List.of(facility);
 
     when(facilityService

@@ -70,7 +70,13 @@ class ProjectDetailsRestControllerTest extends AbstractControllerTest {
   @Test
   void getFacilitySearchResults() throws Exception {
     var searchTerm = "test";
-    var facility = new Facility(1, "test facility", null, null, null);
+    var facility = Facility.newBuilder()
+        .id(1)
+        .name("test facility")
+        .type(null)
+        .status(null)
+        .isInUkcs(null)
+        .build();
     var facilities = List.of(facility);
     var facilitiesRestSearchResult = new RestSearchResult(List.of(
         new RestSearchItem(String.valueOf(facility.getId()), facility.getName())
