@@ -1,10 +1,15 @@
 plugins {
-	id 'org.springframework.boot' version '2.7.1'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'org.springframework.boot' version '2.7.11'
+	id 'io.spring.dependency-management' version '1.1.0'
 	id 'java'
 	id "org.sonarqube" version "3.3"
 	id 'checkstyle'
 	id 'jacoco'
+  id 'nu.studer.jooq' version '8.1'
+  //docker-compose needed to startup a postgres container for Jooq codegen
+  id 'com.avast.gradle.docker-compose' version "0.16.9"
+  //Flyway added manually here, as it's used for the Jooq codegen
+  id "org.flywaydb.flyway" version "9.12.0"
 }
 
 group = 'uk.co.nstauthority'
@@ -13,21 +18,56 @@ sourceCompatibility = '17'
 
 repositories {
 	mavenCentral()
+  maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" }
+  maven { url "https://nexus.fivium.co.uk/repository/maven-releases/" }
+  maven { url "https://nexus.fivium.co.uk/repository/maven-snapshots/" }
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-freemarker'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.flywaydb:flyway-core'
+  implementation 'commons-validator:commons-validator:1.7'
 
-	runtimeOnly 'org.postgresql:postgresql'
+  implementation 'com.amazonaws:aws-java-sdk-s3:1.12.351'
+  implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+  implementation 'com.google.guava:guava:31.1-jre'
 
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	// Using H2 for the tests as a temporary measure until a final decision is made on which database is being used.
-	testImplementation 'com.h2database:h2:2.1.214'
+  implementation 'fi.solita.clamav:clamav-client:1.0.1'
+
+  implementation 'io.micrometer:micrometer-registry-statsd:1.7.8'
+
+  implementation 'org.apache.commons:commons-lang3:3.12.0'
+  implementation 'org.flywaydb:flyway-core'
+  implementation 'org.jooq:jooq-codegen'
+  implementation 'org.jooq:jooq-meta'
+  implementation 'org.hibernate:hibernate-envers'
+  implementation 'org.opensaml:opensaml-core:4.2.0'
+  implementation 'org.opensaml:opensaml-saml-api:4.2.0'
+  implementation 'org.opensaml:opensaml-saml-impl:4.2.0'
+  implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'org.springframework.boot:spring-boot-starter-validation'
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-security'
+  implementation 'org.springframework.boot:spring-boot-starter-quartz'
+  implementation 'org.springframework.boot:spring-boot-starter-jooq'
+  implementation 'org.springframework.security:spring-security-saml2-service-provider'
+  implementation 'org.springframework.session:spring-session-core'
+  implementation 'org.springframework.session:spring-session-jdbc'
+
+  implementation 'uk.co.fivium.digital.energyportalteamaccesslibrary:energy-portal-team-access-libray:develop-SNAPSHOT'
+  implementation 'uk.co.fivium.digitalformlibrary:digital-form-library:v3.0.0'
+  implementation 'uk.co.fivium.energyportalapi:client:develop-SNAPSHOT'
+  implementation 'uk.co.fivium:fivium-notify-spring-boot-starter:3.17.2-4.2-SNAPSHOT'
+  implementation 'uk.co.fivium.feedbackmanagementservice:client:v2.2.0'
+
+  runtimeOnly 'org.postgresql:postgresql:42.5.1'
+  jooqGenerator 'org.postgresql:postgresql'
+
+  annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.testcontainers:postgresql:1.17.6'
+  testImplementation 'org.springframework.security:spring-security-test'
 
 }
 
@@ -42,23 +82,92 @@ tasks {
 	}
 }
 
-sonarqube {
-	properties {
-		property "sonar.projectKey", "Fivium_${rootProject.name}"
-		property "sonar.organization", "fivium-gh"
-		property "sonar.host.url", "https://sonarcloud.io"
-		if (System.getenv("DRONE_PULL_REQUEST") != null) {
-			property("sonar.pullrequest.key", System.getenv("DRONE_PULL_REQUEST"))
+dockerCompose {
+  useComposeFiles = ['devtools/local-dev-compose.yml']
+}
 
-			if (System.getenv("DRONE_SOURCE_BRANCH") != null) {
-				property("sonar.pullrequest.branch", System.getenv("DRONE_SOURCE_BRANCH"))
-			}
-			if (System.getenv("DRONE_TARGET_BRANCH") != null) {
-				property("sonar.pullrequest.base", System.getenv("DRONE_TARGET_BRANCH"))
-			}
-		}
-		property 'sonar.coverage.jacoco.xmlReportPaths', "$buildDir/reports/jacoco/test/jacocoTestReport.xml"
-	}
+flyway {
+  user = 'scap_app'
+  password = 'dev1'
+  schemas = ['scap']
+  placeholders = [
+    'powerbiAuthentication' : "powerbiUser",
+    'datawarehouseAuthentication' : "datawarehouseUser"
+  ]
+}
+
+//Set the url before the build to dynamically set the port
+//This must be done here, not above, as the serviceInfos object won't exist at configuration time
+flywayMigrate.doFirst {
+  url = 'jdbc:postgresql://' + dockerCompose.servicesInfos['scap-db'].host + ':' + dockerCompose.servicesInfos['scap-db'].ports[5432] + '/scap'
+  System.setProperty('DB_URL', url)
+}
+
+jooq {
+  version = dependencyManagement.importedProperties['jooq.version']
+  configurations {
+    main {
+      generateSchemaSourceOnCompilation = false
+      generationTool {
+        jdbc {
+          driver = 'org.postgresql.Driver'
+          user = 'scap_app'
+          password = 'dev1'
+        }
+        generator {
+          database {
+            name = 'org.jooq.meta.postgres.PostgresDatabase'
+            inputSchema = 'scap'
+          }
+          target {
+            packageName = 'uk.co.nstauthority.scap.generated.jooq'
+          }
+        }
+      }
+    }
+  }
+}
+
+flywayMigrate.dependsOn(composeUp)
+
+generateJooq.dependsOn(flywayMigrate)
+
+generateJooq.finalizedBy(composeDown)
+
+generateJooq.doFirst {
+  //Jooq doesn't allow you to specify the config at runtime
+  //This will make the field modifiable so we can change the url
+  def clazz = generateJooq.class.superclass
+  def field = clazz.getDeclaredField("jooqConfiguration")
+
+  field.accessible = true
+
+  def jooqConfiguration = (org.jooq.meta.jaxb.Configuration) field.get(generateJooq)
+  jooqConfiguration.jdbc.url = System.getProperty('DB_URL')
+}
+
+sonarqube {
+  properties {
+    property 'sonar.projectKey', 'Fivium_supply-chain-action-plan'
+    property 'sonar.organization', 'fivium-gh'
+    property 'sonar.host.url', 'https://sonarcloud.io'
+    property 'sonar.login', System.getenv('SONARCLOUD_TOKEN')
+
+    if (System.getenv('DRONE_PULL_REQUEST') != null) {
+      property 'sonar.pullrequest.key', System.getenv('DRONE_PULL_REQUEST')
+      property 'sonar.pullrequest.base', System.getenv('DRONE_TARGET_BRANCH')
+      property 'sonar.pullrequest.branch', System.getenv('DRONE_SOURCE_BRANCH')
+      property 'sonar.pullrequest.provider', 'github'
+      property 'sonar.pullrequest.github.repository', 'supply-chain-action-plan'
+      property 'sonar.pullrequest.github.endpoint', 'https://api.github.com/'
+    } else {
+      property 'sonar.branch.name', System.getenv('DRONE_BRANCH')
+      if (System.getenv('DRONE_BRANCH') != 'develop') {
+        property 'sonar.branch.target', 'develop'
+      }
+      property 'sonar.coverage.jacoco.xmlReportPaths', "$buildDir/reports/jacoco/test/jacocoTestReport.xml"
+    }
+  }
 }
 
 checkstyle {
@@ -67,6 +176,8 @@ checkstyle {
 	ignoreFailures = false
 	maxWarnings = 0
 }
+
+checkstyleMain.exclude 'uk/co/nstauthority/scap/generated/**'
 
 jacocoTestReport {
 	reports {

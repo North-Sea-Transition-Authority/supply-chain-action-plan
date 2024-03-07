@@ -1,0 +1,1 @@
+ALTER TABLE scap_planned_tenders ADD COLUMN has_more_planned_tender_activities TEXT;

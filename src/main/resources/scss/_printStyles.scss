@@ -1,0 +1,57 @@
+* {
+  @include govuk-media-query($media-type: print) {
+    overflow: visible !important;
+  }
+}
+.govuk-accordion {
+  &__section-content {
+    @include govuk-media-query($media-type: print) {
+      display: block !important;
+    }
+  }
+  &__controls, &__section-button {
+    @include govuk-media-query($media-type: print) {
+      display: none;
+    }
+  }
+}
+.govuk-back-link {
+  @include govuk-media-query($media-type: print) {
+    display: none;
+  }
+}
+.govuk-tabs {
+  &__panel {
+    @include govuk-media-query($media-type: print) {
+      border: 0 !important;
+      padding: 0 !important;
+    }
+  }
+  &__title, &__list {
+    @include govuk-media-query($media-type: print) {
+      display: none;
+    }
+  }
+}
+.fds-summary-list-card{
+  @include govuk-media-query($media-type: print) {
+    border-left: 0;
+    border-right: 0;
+
+    &__heading {
+      font-size: 24px;
+    }
+
+  }
+}
+.print-details {
+  @include govuk-media-query($media-type: print) {
+    display: none;
+  }
+}
+
+.govuk-form-group  {
+  @include govuk-media-query($media-type: print) {
+    display: none;
+  }
+}

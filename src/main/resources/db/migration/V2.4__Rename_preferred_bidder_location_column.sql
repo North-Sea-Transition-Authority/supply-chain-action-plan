@@ -1,0 +1,1 @@
+ALTER TABLE awarded_contracts RENAME COLUMN preferred_bidder_location TO preferred_bidder_country_id;

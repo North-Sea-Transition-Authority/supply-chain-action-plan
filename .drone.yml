@@ -30,20 +30,35 @@ steps:
         from_secret: bitbucket_ssh_key
 
   - name: build-frontend
-    image: node:10
+    image: node:18
     commands:
       - cd fivium-design-system-core && npm install && npx gulp build && cd ..
       - npm install
       - npx gulp buildAll
 
-  - name: build-backend
-    image: eclipse-temurin:17-jdk
+  - name: build-java
+    image: quay.io/testcontainers/dind-drone-plugin
+    privileged: true
+    # See https://confluence.fivium.co.uk/display/JAVA/Testcontainers
     environment:
-      SONAR_TOKEN:
-        from_secret: sonarcloud_token
-    commands:
-      - chmod +x gradlew
-      - ./gradlew checkstyleMain test bootJar sonarqube
+      CI_WORKSPACE: /drone/src
+      GRADLE_USER_HOME: /drone/src/gradle_cache
+      DOCKER_CONFIG_JSON:
+        from_secret: docker_config
+      DOCKER_CONFIG: /drone/dockerconfig # testcontainers override location for Docker config JSON
+    volumes:
+      - name: docker-cache-overlay2
+        path: /drone/docker/overlay2
+      - name: docker-cache-image
+        path: /drone/docker/image
+    settings:
+      storage_driver: overlay2 --insecure-registry repo1.dev.fivium.local:5000 --dns=192.168.10.1
+      cmd:
+        - mkdir /drone/dockerconfig
+        - echo $DOCKER_CONFIG_JSON > /drone/dockerconfig/config.json
+        - chmod +x gradlew
+        - ./gradlew generateJooq checkstyleMain test bootJar --continue --parallel --max-workers=3
+      build_image: repo1.dev.fivium.local:5000/docker-compose-java17
 
   - name: sync-reports
     image: alpine:3.16.0
@@ -56,11 +71,28 @@ steps:
     when:
       status: [ success, failure ]
 
+  - name: code-analysis
+    image: repo1.dev.fivium.local:5000/sonarcloud-scan-java17:latest
+    environment:
+      SONARCLOUD_TOKEN:
+        from_secret: sonarcloud_token
+      # This SONAR_USER_HOME is the cache path - not the actual user home
+      SONAR_USER_HOME: /drone/src/sonar_cache
+    commands:
+      - chmod +x gradlew
+      - ./gradlew sonarqube -info
+    when:
+      # The Pull Request Pipeline will run the Code Analysis on all other branches (once a PR is open)
+      branch:
+        - develop
+        - main
+        - drone/*
+
   - name: publish-docker-develop
     image: plugins/docker:19.03.8
     settings:
       registry: quay.io
-      repo: quay.io/fivium/xyz-template
+      repo: quay.io/fivium/supply-chain-action-plan
       tags:
         - develop
       config:
@@ -75,7 +107,7 @@ steps:
     image: plugins/docker:19.03.8
     settings:
       registry: quay.io
-      repo: quay.io/fivium/xyz-template
+      repo: quay.io/fivium/supply-chain-action-plan
       tags:
         - ${DRONE_BRANCH/\//-}-${DRONE_BUILD_NUMBER}
       config:
@@ -88,29 +120,30 @@ steps:
       status:
         - success
 
-  - name: trivy-build-image
-    image: docker:20.10.9
-    volumes:
-      - name: docker-sock
-        path: /var/run/docker.sock
-    commands:
-      - docker build -t quay.io/fivium/xyz-template:trivy-scan-target .
-
-  - name: trivy-scan
-    image: aquasec/trivy:0.20.0
-    volumes:
-      - name: docker-sock
-        path: /var/run/docker.sock
-      - name: drone-trivy-cache
-        path: /root/trivy-cache
-      - name: webfiles
-        path: /var/webfiles
-    commands:
-      # timeout set as initial cache population can seemingly take a while sometimes
-      - trivy --format template --template "@contrib/html.tpl" -o /var/webfiles/${DRONE_BUILD_NUMBER}/trivy-scan.html image --timeout 30m --exit-code 1 quay.io/fivium/xyz-template:trivy-scan-target
-    when:
-      status:
-        - success
+# Disabling trivy scan until timeout is fixed
+#  - name: trivy-build-image
+#    image: docker:20.10.9
+#    volumes:
+#      - name: docker-sock
+#        path: /var/run/docker.sock
+#    commands:
+#      - docker build -t quay.io/fivium/supply-chain-action-plan:trivy-scan-target .
+#
+#  - name: trivy-scan
+#    image: aquasec/trivy:0.20.0
+#    volumes:
+#      - name: docker-sock
+#        path: /var/run/docker.sock
+#      - name: drone-trivy-cache
+#        path: /root/trivy-cache
+#      - name: webfiles
+#        path: /var/webfiles
+#    commands:
+#      # timeout set as initial cache population can seemingly take a while sometimes
+#      - trivy --format template --template "@contrib/html.tpl" -o /var/webfiles/${DRONE_BUILD_NUMBER}/trivy-scan.html image --timeout 30m --exit-code 1 quay.io/fivium/supply-chain-action-plan:trivy-scan-target
+#    when:
+#      status:
+#        - success
 
   - name: deploy-dev-st
     image: plugins/downstream:linux-amd64
@@ -142,9 +175,9 @@ steps:
   - name: slack
     image: plugins/slack
     settings:
-      webhook: https://hooks.slack.com/services/UPDATE_WEBHOOK
-      channel: xyz-template-builds
-      template: "*{{build.status}}* <{{build.link}}|Commit {{truncate build.commit 7}} on {{build.branch}} by ${DRONE_COMMIT_AUTHOR_NAME}>\nReports published to: http://drone-assets.fivium.local:9090/xyz-template/{{build.number}}/"
+      webhook: https://hooks.slack.com/services/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
+      channel: scap-pipelines
+      template: "*{{build.status}}* <{{build.link}}|Commit {{truncate build.commit 7}} on {{build.branch}} by ${DRONE_COMMIT_AUTHOR_NAME}>\nReports published to: http://drone-assets.fivium.local:9090/scap/{{build.number}}/"
     when:
       status: [ success, failure ]
 
@@ -156,7 +189,7 @@ trigger:
 volumes:
   - name: webfiles
     host:
-      path: /home/fivium/www/xyz-template
+      path: /home/fivium/www/supply-chain-action-plan
 
   - name: drone-cache
     host:
@@ -170,24 +203,151 @@ volumes:
     host:
       path: /root/.cache/
 
+  - name: docker-cache-overlay2
+    host:
+      path: /home/fivium/docker-drone-cache-v2/overlay2
+
+  - name: docker-cache-image
+    host:
+      path: /home/fivium/docker-drone-cache-v2/image
+
+---
+kind: pipeline
+type: docker
+name: github-pr
+
+clone:
+  disable: true
+
+steps:
+  - name: clone
+    image: alpine/git:v2.26.2
+    commands:
+      # Manually cloning as there seems to be a bug with DRONE_BRANCH on Pull Request Events
+      # DRONE_BRANCH is set to the target branch, rather than the current branch
+      # This means that Sonarcloud doesn't think anything has changed
+      - git clone https://github.com/Fivium/supply-chain-action-plan.git .
+      - git checkout $DRONE_SOURCE_BRANCH
+
+  - name: restore-cache
+    image: drillster/drone-volume-cache
+    volumes:
+      - name: drone-cache
+        path: /cache
+    settings:
+      restore: true
+      mount:
+        - ./node_modules
+        # We can only mount volume caches into the working directory, so all steps which use Gradle must have
+        # the GRADLE_USER_HOME environment variable pointing here.
+        - ./gradle_cache
+        - ./sonar_cache
+
+  - name: fetch-fds-submodule
+    image: alpine/git:v2.26.2
+    commands:
+      - echo "$${BITBUCKET_SSH_KEY}" > bitbucket_ssh_key
+      - chmod 600 bitbucket_ssh_key
+      - export GIT_SSH_COMMAND="ssh -i bitbucket_ssh_key -F /dev/null  -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+      - git submodule update --init --recursive
+    environment:
+      BITBUCKET_SSH_KEY:
+        from_secret: bitbucket_ssh_key
+
+  - name: build-frontend
+    image: node:18
+    commands:
+      - cd fivium-design-system-core && npm install && npx gulp build && cd ..
+      - npm install
+      - npx gulp buildAll
+
+  # This is in the PR pipeline so the code-analysis below can access the test data (to see coverage)
+  - name: build-java
+    image: quay.io/testcontainers/dind-drone-plugin
+    privileged: true
+    # See https://confluence.fivium.co.uk/display/JAVA/Testcontainers
+    environment:
+      CI_WORKSPACE: /drone/src
+      GRADLE_USER_HOME: /drone/src/gradle_cache
+      DOCKER_CONFIG_JSON:
+        from_secret: docker_config
+      DOCKER_CONFIG: /drone/dockerconfig # testcontainers override location for Docker config JSON
+    volumes:
+      - name: docker-cache-overlay2
+        path: /drone/docker/overlay2
+      - name: docker-cache-image
+        path: /drone/docker/image
+    settings:
+      storage_driver: overlay2 --insecure-registry repo1.dev.fivium.local:5000 --dns=192.168.10.1
+      cmd:
+        - mkdir /drone/dockerconfig
+        - echo $DOCKER_CONFIG_JSON > /drone/dockerconfig/config.json
+        - chmod +x gradlew
+        - ./gradlew generateJooq checkstyleMain test bootJar --continue --parallel --max-workers=3
+      build_image: repo1.dev.fivium.local:5000/docker-compose-java17
+
+  # This is in the PR pipeline as only PR events get the necessary information for proper github integration
+  - name: code-analysis
+    image: repo1.dev.fivium.local:5000/sonarcloud-scan-java17:latest
+    environment:
+      SONARCLOUD_TOKEN:
+        from_secret: sonarcloud_token
+      GRADLE_USER_HOME: /drone/src/gradle_cache
+      # This SONAR_USER_HOME is the cache path - not the actual user home
+      SONAR_USER_HOME: /drone/src/sonar_cache
+    commands:
+      - chmod +x gradlew
+      - ./gradlew sonarqube -info
+
+  - name: rebuild-cache
+    image: drillster/drone-volume-cache
+    volumes:
+      - name: drone-cache
+        path: /cache
+    settings:
+      rebuild: true
+      mount:
+        - ./node_modules
+        - ./gradle_cache
+        - ./sonar_cache
+
+trigger:
+  event:
+    - pull_request
+
+volumes:
+  - name: drone-cache
+    host:
+      path: /home/fivium/drone-cache
+
+  - name: docker-cache-overlay2
+    host:
+      path: /home/fivium/docker-drone-cache-v2/overlay2
+
+  - name: docker-cache-image
+    host:
+      path: /home/fivium/docker-drone-cache-v2/image
+
 ---
 
 kind: secret
 name: docker_config
-data: BUILD_SECRET
+data: BCdTz9wh5SpiiigVIOyZDpNbVH2aubaa9j7Oq1Lt0Lo6UmLHhweQ0Y8eXeEkIJ9G/M10fF4m1nbpXaLO34/1ZCSOa4ox+oOzli9A1et6QgK8Y5HyfVr7M/VXFlN+mIAiV0qWiIz9Sk0g/L92TpKwaV5ssvvvjXnGW3FFixHSbtXViwxOMxfVG08FqGmucWL0TLn14GvCNi9NrtFIAe8GbTRQ00jTReEbBqax4BUQiCkygm14XkDrMk1/i+5C/r8NS0tUkWl4N3EZgazYmKQ2xMc7pqu+gzu2PkOilyzTYatsu2biwHvy37PHS/Cz8eT5SUk8zCaIVmfkWLtq1O+7dcN0I9kNN5D1mBUTdlHyoMDwnsk7oUI1jFAKFXtE4i7Q3YT9MdA6Oj1O0vXS0YM=
+
 ---
 
 kind: secret
 name: sonarcloud_token
-data: BUILD_SECRET
+data: Xl4S16Tgul+zX9m1HMzBm/gX8jcPxIePV1YBz78RKL5vlZYjAr1XPBpRNx9J94duGnhwVzlGx/nTWIzxeJU/HXcG4B4=
 
 ---
 
 kind: secret
 name: bitbucket_ssh_key
-data: BUILD_SECRET
+data: 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
+
 ---
 
 kind: secret
 name: drone_token
-data: BUILD_SECRET
+data: CMXLCjcwlTl4vjml8cb6GTVUw5tbO9O6K/UMUDTTjbQ7MnJbsQPKEXc/mVUfYJs0KUaPA6Rfs1zOQV3D

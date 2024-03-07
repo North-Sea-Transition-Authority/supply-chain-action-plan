@@ -1,0 +1,40 @@
+package uk.co.nstauthority.scap.scap.casemanagement.approval;
+
+import java.util.ArrayList;
+import java.util.List;
+import uk.co.fivium.formlibrary.input.StringInput;
+import uk.co.nstauthority.scap.enumutil.YesNo;
+import uk.co.nstauthority.scap.file.FileUploadForm;
+
+public class ScapApprovalForm {
+
+  private StringInput approvalComments = new StringInput("approvalComments", "Approval comments");
+
+  private YesNo projectClosedOut;
+
+  private List<FileUploadForm> approvalDocuments = new ArrayList<>();
+
+  public StringInput getApprovalComments() {
+    return approvalComments;
+  }
+
+  public void setApprovalComments(StringInput approvalComments) {
+    this.approvalComments = approvalComments;
+  }
+
+  public YesNo getProjectClosedOut() {
+    return projectClosedOut;
+  }
+
+  public void setProjectClosedOut(YesNo projectClosedOut) {
+    this.projectClosedOut = projectClosedOut;
+  }
+
+  public List<FileUploadForm> getApprovalDocuments() {
+    return approvalDocuments;
+  }
+
+  public void setApprovalDocuments(List<FileUploadForm> approvalDocuments) {
+    this.approvalDocuments = approvalDocuments;
+  }
+}

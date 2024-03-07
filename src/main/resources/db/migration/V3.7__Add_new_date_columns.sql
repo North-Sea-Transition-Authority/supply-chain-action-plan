@@ -1,0 +1,3 @@
+ALTER TABLE planned_tender_activities ADD COLUMN expected_actual_tender_start_date DATE;
+ALTER TABLE planned_tender_activities ADD COLUMN expected_contract_award_date DATE;
+ALTER TABLE awarded_contracts ADD COLUMN contract_award_date DATE;
