@@ -1,5 +1,9 @@
-import { deepmerge } from 'deepmerge-ts'
+import { deepmergeCustom } from 'deepmerge-ts'
 import { config as wdioConf } from './wdio.conf'
+
+const deepmerge = deepmergeCustom({
+  mergeArrays: false
+})
 
 export const config = deepmerge(wdioConf, {
   // selenium server opts
@@ -13,4 +17,6 @@ export const config = deepmerge(wdioConf, {
     browserName: 'firefox'
   }],
   baseUrl: 'http://e2e-app:8080',
-}, { clone: false })
+})
+
+console.log(config);
