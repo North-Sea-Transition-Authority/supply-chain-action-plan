@@ -3,7 +3,7 @@ import { config as wdioConf } from './wdio.conf'
 
 export const config = deepmerge(wdioConf, {
   // selenium server opts
-  hostname: 'e2e-chrome',
+  hostname: 'e2e-firefox',
   port: 4444,
   path: '/wd/hub',
   protocol: 'http',
