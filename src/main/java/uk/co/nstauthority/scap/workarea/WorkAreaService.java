@@ -2,8 +2,6 @@ package uk.co.nstauthority.scap.workarea;
 
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAPS;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAP_DETAILS;
-import static uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestType.FURTHER_INFORMATION;
-import static uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestType.UPDATE;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
@@ -26,12 +24,11 @@ import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRole;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSubmissionStage;
-import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestType;
 
 @Service
 class WorkAreaService {
@@ -41,9 +38,6 @@ class WorkAreaService {
   private final WorkAreaItemDtoRepository workAreaItemDtoRepository;
   private final OrganisationGroupService organisationGroupService;
   private final WorkAreaFilterService workAreaFilterService;
-
-  private final UpdateRequestService updateRequestService;
-  private final ScapDetailService scapDetailService;
   private final TeamMemberService teamMemberService;
   private final UserDetailService userDetailService;
 
@@ -51,15 +45,11 @@ class WorkAreaService {
   WorkAreaService(WorkAreaItemDtoRepository workAreaItemDtoRepository,
                   OrganisationGroupService organisationGroupService,
                   WorkAreaFilterService workAreaFilterService,
-                  UpdateRequestService updateRequestService,
-                  ScapDetailService scapDetailService,
                   TeamMemberService teamMemberService,
                   UserDetailService userDetailService) {
     this.workAreaItemDtoRepository = workAreaItemDtoRepository;
     this.organisationGroupService = organisationGroupService;
     this.workAreaFilterService = workAreaFilterService;
-    this.updateRequestService = updateRequestService;
-    this.scapDetailService = scapDetailService;
     this.teamMemberService = teamMemberService;
     this.userDetailService = userDetailService;
   }
@@ -87,6 +77,7 @@ class WorkAreaService {
         .filter(workAreaItem -> !workAreaItem.status().equals(ScapDetailStatus.DRAFT));
 
     return Stream.concat(submitterItems, viewerItems)
+        .distinct()
         .sorted(Comparator
             .comparing((WorkAreaItem dto) -> dto.status().getDisplayOrder()).reversed())
         .toList();
@@ -143,9 +134,14 @@ class WorkAreaService {
             workAreaItemDto.projectName(),
             workAreaItemDto.status(),
             inferStatus(workAreaItemDto),
-            updateRequestService.getUpdateDueDate(new ScapId(workAreaItemDto.scapId()), FURTHER_INFORMATION).isPresent(),
-            scapDetailService.isUpdateInProgress(new ScapId(workAreaItemDto.scapId())),
-            getUpdateDueDate(new ScapId(workAreaItemDto.scapId()))))
+            workAreaItemDto.resolutionDate() == null
+                && UpdateRequestType.FURTHER_INFORMATION.equals(workAreaItemDto.updateRequestType())
+                && workAreaItemDto.dueDate() != null,
+            (workAreaItemDto.scapVersionNumber() > 1) && ScapDetailStatus.DRAFT.equals(workAreaItemDto.status()),
+            workAreaItemDto.dueDate() != null
+                ? workAreaItemDto.dueDate().format(DateTimeFormatter.ofPattern(DateUtils.SHORT_DATE))
+                : null)
+        )
         .toList();
 
   }
@@ -172,12 +168,6 @@ class WorkAreaService {
       case SUBMITTED -> dto.submittedTimestamp();
       default -> dto.createdTimestamp();
     };
-  }
-
-  private String getUpdateDueDate(ScapId scapId) {
-    var updateDate = updateRequestService.getUpdateDueDate(scapId, UPDATE);
-    return updateDate.map(localDate -> localDate.format(DateTimeFormatter.ofPattern(DateUtils.SHORT_DATE)))
-        .orElse(null);
   }
 }
 

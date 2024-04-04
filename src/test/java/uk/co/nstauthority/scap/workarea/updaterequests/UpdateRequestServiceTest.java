@@ -28,7 +28,6 @@ import uk.co.nstauthority.scap.scap.casemanagement.CaseEvent;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailEntityTestUtil;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
@@ -41,9 +40,6 @@ class UpdateRequestServiceTest {
 
   @Mock
   UserDetailService userDetailService;
-
-  @Mock
-  ScapDetailService scapDetailService;
 
   @Mock
   ScapService scapService;
@@ -68,8 +64,9 @@ class UpdateRequestServiceTest {
 
   @BeforeEach
   void setup() {
-    updateRequestService = new UpdateRequestService(updateRequestRepository,
-        scapService, scapDetailService,
+    updateRequestService = new UpdateRequestService(
+        updateRequestRepository,
+        scapService,
         userDetailService,
         clock);
 
