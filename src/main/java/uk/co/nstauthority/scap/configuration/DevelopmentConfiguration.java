@@ -7,7 +7,7 @@ import org.springframework.session.web.http.CookieSerializer;
 import org.springframework.session.web.http.DefaultCookieSerializer;
 
 @Configuration
-@Profile({"development"})
+@Profile({"development", "e2e"})
 public class DevelopmentConfiguration {
 
   /**

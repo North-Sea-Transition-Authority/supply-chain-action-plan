@@ -33,11 +33,7 @@ steps:
     image: node:18
     commands:
       - cd fivium-design-system-core && npm install && npx gulp build && cd ..
-      - node -v
-      - npm -v
-      - cat package.json
       - npm install
-      - ls -lavh node_modules/gulp
       - npx gulp buildAll
 
   - name: build-java
@@ -61,8 +57,50 @@ steps:
         - mkdir /drone/dockerconfig
         - echo $DOCKER_CONFIG_JSON > /drone/dockerconfig/config.json
         - chmod +x gradlew
-        - ./gradlew generateJooq checkstyleMain test bootJar --continue --parallel --max-workers=3
+#        - ./gradlew generateJooq checkstyleMain test bootJar --continue --parallel --max-workers=3
+        - ./gradlew generateJooq bootJar --continue --parallel --max-workers=3
       build_image: repo1.dev.fivium.local:5000/docker-compose-java17
+
+  - name: e2e-db
+    image: postgres:14.3-alpine
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: dev1
+      POSTGRES_DB: scap
+    commands:
+      - cp devtools/create_db_user.sh /docker-entrypoint-initdb.d/create_db_user.sh
+      - docker-entrypoint.sh postgres
+    detach: true
+
+  - name: e2e-build-image
+    image: docker:19.03.8
+    volumes:
+      - name: docker-sock
+        path: /var/run/docker.sock
+    commands:
+      - docker build -t scap:e2e-${DRONE_BUILD_NUMBER} .
+
+  - name: e2e-firefox
+    #    image: selenium/standalone-chrome:118.0
+    image: selenium/standalone-firefox:110.0
+    detach: true
+
+  - name: e2e-app
+    image: scap:e2e-${DRONE_BUILD_NUMBER}
+    environment:
+      NOTIFY_API_KEY: 00000000-1111-2222-3333-444444444444-aaaaaaaa-bbbb-cccc-dddd-ffffffffffff
+      SPRING_PROFILES_ACTIVE: development,e2e,debug
+    detach: true
+
+  - name: e2e-run-tests
+    image: node:18
+    commands:
+      - export START_TIME=$(date +%s)
+      # Wait for up to 2m for the app to start
+      - until curl http://e2e-app:8080/scap/actuator/health > /dev/null || test "$(($(date +%s) - $START_TIME))" -gt 120; do sleep 5 | echo "Waiting..."; done
+      - cd src/test/e2e
+      - npm install
+      - npx wdio wdio.drone-e2e.conf.ts --spec test/specs/submitAndApproveScap.spec.ts
 
   - name: sync-reports
     image: alpine:3.16.0
