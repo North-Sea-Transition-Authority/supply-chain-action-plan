@@ -71,7 +71,7 @@ describe('Submit and update Rejected Actual Tender SCAP', () => {
         await approveScapPage.selectDecisionApproveFromDropdown();
         await approveScapPage.approveScapInSidePannel();
         const successMessage = await approveScapPage.getPageTitle();
-        await expect(successMessage).toEqual(`SCAP: ${scapRef} has been approved`);
+        await expect(successMessage).toEqual(`SCAP: ${scapRef} has no objection`);
     })
     it('should succesfully set the next required update', async () =>{
         await rejectUpdateScapPage.setNextRequiredUpdate();

@@ -5,7 +5,7 @@ import {FdsDateInput} from "../../test-library/page-objects/components/FdsDateIn
 export class RejectOrUpdateScapPage extends Page {
     public async selectDecisionApproveFromDropdown() {
         await $(`button=Decisions`).click();
-        await $(`button=Approve SCAP`).click();
+        await $(`button=SCAP has no objection`).click();
     }
 
     public async requestFurtherInformation() {

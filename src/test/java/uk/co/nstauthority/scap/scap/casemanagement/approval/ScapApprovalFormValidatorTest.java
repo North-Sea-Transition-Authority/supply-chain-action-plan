@@ -13,10 +13,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.nstauthority.scap.enumutil.YesNo;
 import uk.co.nstauthority.scap.file.FileUploadForm;
-import uk.co.nstauthority.scap.scap.casemanagement.consultationrequest.ConsultationRequestForm;
 import uk.co.nstauthority.scap.scap.casemanagement.furtherinfo.FurtherInfoRequestForm;
-import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentForm;
-import uk.co.nstauthority.scap.scap.casemanagement.qacomments.QaCommentFormValidator;
 
 @ExtendWith(MockitoExtension.class)
 class ScapApprovalFormValidatorTest {
@@ -36,7 +33,7 @@ class ScapApprovalFormValidatorTest {
     validator.validate(form, bindingResult);
     assertTrue(bindingResult.hasFieldErrors());
     assertThat(bindingResult.getFieldError("approvalComments.inputValue").getDefaultMessage())
-        .isEqualTo("Enter Approval comments");
+        .isEqualTo("Enter no objection comments");
   }
 
   @Test
@@ -77,7 +74,7 @@ class ScapApprovalFormValidatorTest {
     validator.validate(form, bindingResult);
     assertTrue(bindingResult.hasFieldErrors());
     assertThat(bindingResult.getFieldError("approvalComments.inputValue").getDefaultMessage())
-        .isEqualTo("Approval comments must be 4000 characters or less");
+        .isEqualTo("No objection comments must be 4000 characters or less");
   }
 
   @Test

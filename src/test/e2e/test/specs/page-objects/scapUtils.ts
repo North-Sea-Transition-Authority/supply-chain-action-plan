@@ -84,7 +84,7 @@ export class ScapUtils extends Page {
         await approveScapPage.selectDecisionApproveFromDropdown();
         await approveScapPage.approveScapInSidePannel();
         const successMessage = await approveScapPage.getPageTitle();
-        await expect(successMessage).toEqual(`SCAP: ${scapRef} has been approved`);
+        await expect(successMessage).toEqual(`SCAP: ${scapRef} has no objection`);
     }
 
     public async signOut () {

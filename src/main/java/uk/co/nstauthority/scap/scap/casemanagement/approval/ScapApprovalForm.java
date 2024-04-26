@@ -8,7 +8,7 @@ import uk.co.nstauthority.scap.file.FileUploadForm;
 
 public class ScapApprovalForm {
 
-  private StringInput approvalComments = new StringInput("approvalComments", "Approval comments");
+  private StringInput approvalComments = new StringInput("approvalComments", "no objection comments");
 
   private YesNo projectClosedOut;
 
