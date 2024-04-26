@@ -8,6 +8,7 @@ import uk.co.fivium.energyportalapi.client.RequestPurpose;
 import uk.co.fivium.energyportalapi.client.pathfinder.PathfinderApi;
 import uk.co.fivium.energyportalapi.generated.client.PathfinderProjectsProjectionRoot;
 import uk.co.fivium.energyportalapi.generated.types.PathfinderProject;
+import uk.co.fivium.energyportalapi.generated.types.PathfinderProjectStatus;
 import uk.co.fivium.energyportalapi.generated.types.PathfinderProjectType;
 import uk.co.nstauthority.scap.fds.addtolist.AddToListItem;
 import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
@@ -24,6 +25,10 @@ public class PathfinderProjectService {
           .projectTitle();
   static final RequestPurpose FIND_ALL_BY_IDS_REQUEST_PURPOSE =
       new RequestPurpose("Pre-fill Related Pathfinder projects form for SCAP");
+  static final List<PathfinderProjectStatus> NON_ARCHIVED_STATUSES = List.of(
+      PathfinderProjectStatus.PUBLISHED,
+      PathfinderProjectStatus.QA
+  );
 
   @Autowired
   public PathfinderProjectService(PathfinderApi pathfinderApi) {
@@ -31,16 +36,15 @@ public class PathfinderProjectService {
   }
 
   public RestSearchResult searchProjects(String term, String searchPurpose, Integer operatorOrganisationGroupId) {
-    var results = pathfinderApi.searchProjects(
+    var restSearchItems = pathfinderApi.searchProjects(
         null,
-        null,
+        NON_ARCHIVED_STATUSES,
         term,
         operatorOrganisationGroupId,
         PathfinderProjectType.INFRASTRUCTURE,
         PATHFINDER_PROJECTS_PROJECTION_ROOT,
         new RequestPurpose(searchPurpose)
-    );
-    var restSearchItems = results.stream()
+    ).stream()
         .map(pathfinderProject -> new RestSearchItem(
             pathfinderProject.getProjectId().toString(),
             pathfinderProject.getProjectTitle()
