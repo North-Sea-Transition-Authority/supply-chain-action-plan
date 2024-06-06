@@ -42,7 +42,7 @@ out/
 /src/main/resources/templates/fds/
 /src/main/resources/public/assets/html5shiv/html5shiv.min.js
 /src/test/e2e/test/test-library
-
+/src/test/e2e/reports
 ### Node ###
 logs
 node_modules

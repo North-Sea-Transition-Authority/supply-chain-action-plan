@@ -12,7 +12,7 @@
             "@wdio/globals/types",
             "expect-webdriverio",
             "@wdio/mocha-framework",
-            "@wdio/shared-store-service/build/types"
+            "@wdio/shared-store-service"
         ],
         "skipLibCheck": true,
         "noEmit": true,

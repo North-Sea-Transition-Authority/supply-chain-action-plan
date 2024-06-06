@@ -5,7 +5,7 @@ import {FdsRadio} from "../../test-library/page-objects/components/FdsRadio";
 export class ApproveScapPage extends Page {
     public async selectDecisionApproveFromDropdown() {
         await $(`button=Decisions`).click();
-        await $(`button=SCAP has no objection`).click();
+        await $(`button=No objection`).click();
     }
 
     public async approveScapInSidePannel() {
