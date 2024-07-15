@@ -35,22 +35,19 @@ dependencies {
     exclude group: 'commons-logging', module: 'commons-logging'
   }
 
-  implementation 'com.amazonaws:aws-java-sdk-s3:1.12.351'
+  implementation 'com.amazonaws:aws-java-sdk-s3:1.12.753'
   implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-  implementation 'com.google.guava:guava:31.1-jre'
+  implementation 'com.google.guava:guava:33.2.1-jre'
 
   implementation 'fi.solita.clamav:clamav-client:1.0.1'
 
-  implementation 'io.micrometer:micrometer-registry-statsd:1.7.8'
+  implementation 'io.micrometer:micrometer-registry-statsd'
 
   implementation 'org.apache.commons:commons-lang3:3.12.0'
   implementation 'org.flywaydb:flyway-core'
   implementation 'org.flywaydb:flyway-database-postgresql'
   implementation 'org.jooq:jooq-codegen'
   implementation 'org.jooq:jooq-meta'
-  implementation 'org.opensaml:opensaml-core:4.2.0'
-  implementation 'org.opensaml:opensaml-saml-api:4.2.0'
-  implementation 'org.opensaml:opensaml-saml-impl:4.2.0'
   implementation 'org.springframework.boot:spring-boot-starter-freemarker'
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -80,6 +77,11 @@ dependencies {
   testImplementation 'org.testcontainers:postgresql'
   testImplementation 'org.springframework.security:spring-security-test'
 
+  constraints {
+    implementation('org.bouncycastle:bcpkix-jdk18on:1.78') {
+      because 'opensaml core uses a version with vulnerabilities'
+    }
+  }
 }
 
 tasks {
