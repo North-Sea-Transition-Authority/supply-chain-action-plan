@@ -1,10 +1,10 @@
 package uk.co.nstauthority.scap.scap.actualtender.activity.bidparticipants;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;

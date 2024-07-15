@@ -49,6 +49,6 @@ class ScapStartControllerTest extends AbstractControllerTest {
         ReverseRouter.route(on(ScapStartController.class).renderStartNewScap()))
             .with(authenticatedScapUser()))
         .andExpect(status().is3xxRedirection())
-        .andExpect(view().name("redirect:/work-area/"));
+        .andExpect(view().name("redirect:/work-area"));
   }
 }

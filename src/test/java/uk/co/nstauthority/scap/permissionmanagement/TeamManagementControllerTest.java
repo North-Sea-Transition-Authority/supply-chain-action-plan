@@ -251,7 +251,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
                 .with(csrf())
                 .with(authenticatedScapUser()))
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectUrl("/permission-management/"));
+        .andExpect(redirectUrl("/permission-management"));
 
     verify(teamService).archiveTeam(team);
   }

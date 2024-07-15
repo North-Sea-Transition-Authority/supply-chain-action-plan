@@ -3,10 +3,10 @@ package uk.co.nstauthority.scap.workarea;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import java.time.Clock;
 import java.util.Collections;
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

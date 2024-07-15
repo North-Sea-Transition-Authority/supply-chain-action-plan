@@ -1,6 +1,6 @@
 package uk.co.nstauthority.scap.scap.projectperformance;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;

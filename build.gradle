@@ -1,8 +1,8 @@
 plugins {
-	id 'org.springframework.boot' version '2.7.11'
-	id 'io.spring.dependency-management' version '1.1.0'
+	id 'org.springframework.boot' version '3.3.1'
+	id 'io.spring.dependency-management' version '1.1.5'
 	id 'java'
-	id "org.sonarqube" version "3.3"
+	id "org.sonarqube" version "5.0.0.4638"
 	id 'checkstyle'
 	id 'jacoco'
   id 'nu.studer.jooq' version '8.1'
@@ -14,7 +14,12 @@ plugins {
 
 group = 'uk.co.nstauthority'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
+}
 
 repositories {
 	mavenCentral()
@@ -24,7 +29,11 @@ repositories {
 }
 
 dependencies {
-  implementation 'commons-validator:commons-validator:1.7'
+  implementation('commons-validator:commons-validator:1.7') {
+    // Exclude commons-logging to fix "Standard Commons Logging discovery in action with spring-jcl: please remove
+    // commons-logging.jar from classpath in order to avoid potential conflicts" warning on startup.
+    exclude group: 'commons-logging', module: 'commons-logging'
+  }
 
   implementation 'com.amazonaws:aws-java-sdk-s3:1.12.351'
   implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
@@ -36,9 +45,9 @@ dependencies {
 
   implementation 'org.apache.commons:commons-lang3:3.12.0'
   implementation 'org.flywaydb:flyway-core'
+  implementation 'org.flywaydb:flyway-database-postgresql'
   implementation 'org.jooq:jooq-codegen'
   implementation 'org.jooq:jooq-meta'
-  implementation 'org.hibernate:hibernate-envers'
   implementation 'org.opensaml:opensaml-core:4.2.0'
   implementation 'org.opensaml:opensaml-saml-api:4.2.0'
   implementation 'org.opensaml:opensaml-saml-impl:4.2.0'
@@ -48,25 +57,27 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-validation'
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'org.springframework.boot:spring-boot-starter-security'
-  implementation 'org.springframework.boot:spring-boot-starter-quartz'
   implementation 'org.springframework.boot:spring-boot-starter-jooq'
   implementation 'org.springframework.security:spring-security-saml2-service-provider'
   implementation 'org.springframework.session:spring-session-core'
   implementation 'org.springframework.session:spring-session-jdbc'
+  implementation 'org.springframework.data:spring-data-envers'
+  implementation 'net.javacrumbs.shedlock:shedlock-spring:5.6.0'
+  implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:5.6.0'
 
   implementation 'uk.co.fivium.digital.energyportalteamaccesslibrary:energy-portal-team-access-libray:develop-SNAPSHOT'
-  implementation 'uk.co.fivium.digitalformlibrary:digital-form-library:v3.0.0'
-  implementation 'uk.co.fivium.energyportalapi:client:v6.5.0'
-  implementation 'uk.co.fivium:fivium-notify-spring-boot-starter:3.17.2-4.2-SNAPSHOT'
+  implementation 'uk.co.fivium.digitalformlibrary:digital-form-library:spring-boot-3.2-support-SNAPSHOT'
+  implementation 'uk.co.fivium.energyportalapi:client:v12.0.0'
+  implementation 'uk.co.fivium:digital-notification-library-spring-boot-starter:v1.0.1'
   implementation 'uk.co.fivium.feedbackmanagementservice:client:v2.2.0'
 
-  runtimeOnly 'org.postgresql:postgresql:42.5.1'
+  runtimeOnly 'org.postgresql:postgresql'
   jooqGenerator 'org.postgresql:postgresql'
 
   annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
-  testImplementation 'org.testcontainers:postgresql:1.17.6'
+  testImplementation 'org.testcontainers:postgresql'
   testImplementation 'org.springframework.security:spring-security-test'
 
 }

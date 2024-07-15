@@ -4,16 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.co.nstauthority.scap.utils.ObjectTestingUtil.assertValuesEqual;
 
+import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import javax.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -172,9 +171,10 @@ class ActualTenderCopyServiceTest {
 
     actualTenderCopyService.copyEntity(oldScapDetail, newScapDetail, NewScapType.REINSTATEMENT);
     verify(actualTenderActivityCopyService).copyAwardedContracts(activitiesMap);
-    verify(entityManager, times(2)).persist(performanceCaptor.capture());
+    verify(entityManager).detach(oldContractingPerformance);
+    verify(entityManager).persist(performanceCaptor.capture());
 
-    var result = performanceCaptor.getAllValues().get(1);
+    var result = performanceCaptor.getValue();
     assertValuesEqual(result, oldContractingPerformance, List.of("id", "contractingPerformanceOverview", "actualTenderActivity", "createdTimestamp"));
     assertThat(result.getActualTenderActivity()).isEqualTo(newActivity);
     assertThat(result.getId()).isNull();
@@ -204,7 +204,8 @@ class ActualTenderCopyServiceTest {
 
     actualTenderCopyService.copyEntity(oldScapDetail, newScapDetail, NewScapType.REINSTATEMENT);
     verify(actualTenderActivityCopyService).copyAwardedContracts(activitiesMap);
-    verify(entityManager, times(2)).persist(participantCaptor.capture());
+    verify(entityManager).detach(oldInvitationParticpant);
+    verify(entityManager).persist(participantCaptor.capture());
 
     var result = participantCaptor.getValue();
     assertValuesEqual(result, oldInvitationParticpant, List.of("id", "actualTenderActivity", "createdTimestamp"));

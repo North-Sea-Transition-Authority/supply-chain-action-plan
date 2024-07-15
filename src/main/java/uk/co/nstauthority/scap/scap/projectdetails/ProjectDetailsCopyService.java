@@ -1,6 +1,6 @@
 package uk.co.nstauthority.scap.scap.projectdetails;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.scap.copy.CopyService;
 import uk.co.nstauthority.scap.scap.copy.EntityCopyService;

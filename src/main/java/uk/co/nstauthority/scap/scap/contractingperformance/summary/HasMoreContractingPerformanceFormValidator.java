@@ -1,6 +1,6 @@
 package uk.co.nstauthority.scap.scap.contractingperformance.summary;
 
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;

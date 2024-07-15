@@ -1,7 +1,7 @@
 package uk.co.nstauthority.scap.file;
 
+import jakarta.annotation.Nullable;
 import java.util.Optional;
-import javax.annotation.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 public class FileUploadResult {

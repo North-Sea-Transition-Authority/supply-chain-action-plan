@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.stereotype.Controller;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -74,12 +75,13 @@ class DefaultPageControllerAdviceTest extends AbstractControllerTest {
   static class TestApplication {
   }
 
+  @Controller
   @RequestMapping("/endpoint")
   static class TestController {
 
-    @GetMapping()
+    @GetMapping
     ModelAndView testEndpoint() {
-      return new ModelAndView();
+      return new ModelAndView("testTemplate");
     }
   }
 

@@ -57,8 +57,9 @@ steps:
         - mkdir /drone/dockerconfig
         - echo $DOCKER_CONFIG_JSON > /drone/dockerconfig/config.json
         - chmod +x gradlew
-        - ./gradlew generateJooq checkstyleMain test bootJar --continue --parallel --max-workers=3
-      build_image: repo1.dev.fivium.local:5000/docker-compose-java17
+        - ./gradlew generateJooq
+        - ./gradlew checkstyleMain test bootJar --continue --parallel --max-workers=3
+      build_image: repo1.dev.fivium.local:5000/docker-compose-java21
 
   - name: e2e-db
     image: postgres:14.3-alpine
@@ -86,7 +87,8 @@ steps:
   - name: e2e-app
     image: scap:e2e-${DRONE_BUILD_NUMBER}
     environment:
-      NOTIFY_API_KEY: 00000000-1111-2222-3333-444444444444-aaaaaaaa-bbbb-cccc-dddd-ffffffffffff
+      NOTIFY_API_KEY:
+        from_secret: govuk_notify_test_api_key
       SPRING_PROFILES_ACTIVE: development,e2e
     detach: true
 
@@ -118,7 +120,7 @@ steps:
       status: [ success, failure ]
 
   - name: code-analysis
-    image: repo1.dev.fivium.local:5000/sonarcloud-scan-java17:latest
+    image: repo1.dev.fivium.local:5000/sonarcloud-scan-java21:latest
     environment:
       SONARCLOUD_TOKEN:
         from_secret: sonarcloud_token
@@ -314,12 +316,13 @@ steps:
         - mkdir /drone/dockerconfig
         - echo $DOCKER_CONFIG_JSON > /drone/dockerconfig/config.json
         - chmod +x gradlew
-        - ./gradlew generateJooq checkstyleMain test bootJar --continue --parallel --max-workers=3
-      build_image: repo1.dev.fivium.local:5000/docker-compose-java17
+        - ./gradlew generateJooq
+        - ./gradlew checkstyleMain test bootJar --continue --parallel --max-workers=3
+      build_image: repo1.dev.fivium.local:5000/docker-compose-java21
 
   # This is in the PR pipeline as only PR events get the necessary information for proper github integration
   - name: code-analysis
-    image: repo1.dev.fivium.local:5000/sonarcloud-scan-java17:latest
+    image: repo1.dev.fivium.local:5000/sonarcloud-scan-java21:latest
     environment:
       SONARCLOUD_TOKEN:
         from_secret: sonarcloud_token
@@ -382,3 +385,9 @@ data: C3QRAm9k/eNQYEYoC0ODDnVx1KdhyZI8gdV6XdOLQhXYEBK7g+qLHeBXXqEplqhSoWV9UtmP4H
 kind: secret
 name: drone_token
 data: CMXLCjcwlTl4vjml8cb6GTVUw5tbO9O6K/UMUDTTjbQ7MnJbsQPKEXc/mVUfYJs0KUaPA6Rfs1zOQV3D
+
+---
+
+kind: secret
+name: govuk_notify_test_api_key
+data: ci2XbampEYV8R+5kqn/MM29i+4PpxKrFPqppC3nWxPCR8mfmoi/ok+Pu6OyzVjDGV69WISi/qr5pLvgkhjZ+nbo60BhN8fmh6GUHdyRlWnXm7RSrHtomwmzKpsjij9gem0m2Y5++qwEzamYwLG6E3XAFpeVB7cyByaw6aFQ=

@@ -1,8 +1,8 @@
 package uk.co.nstauthority.scap.scap.plannedtender.activity;
 
+import jakarta.transaction.Transactional;
 import java.time.Clock;
 import java.util.List;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;

@@ -1,10 +1,10 @@
 package uk.co.nstauthority.scap.scap.projectperformance;
 
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;

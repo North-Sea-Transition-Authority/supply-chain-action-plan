@@ -1,12 +1,12 @@
 package uk.co.nstauthority.scap.scap.actualtender.activity;
 
+import jakarta.transaction.Transactional;
 import java.time.Clock;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.energyportal.OrganisationUnitService;

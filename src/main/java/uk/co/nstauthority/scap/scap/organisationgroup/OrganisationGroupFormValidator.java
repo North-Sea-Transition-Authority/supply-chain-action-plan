@@ -1,7 +1,7 @@
 package uk.co.nstauthority.scap.scap.organisationgroup;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;

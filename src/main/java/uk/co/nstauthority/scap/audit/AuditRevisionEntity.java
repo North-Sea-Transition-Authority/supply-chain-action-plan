@@ -1,12 +1,12 @@
 package uk.co.nstauthority.scap.audit;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import org.hibernate.envers.RevisionEntity;
 import org.hibernate.envers.RevisionNumber;
 import org.hibernate.envers.RevisionTimestamp;
@@ -25,7 +25,7 @@ class AuditRevisionEntity {
   @RevisionTimestamp
   private Date createdTimestamp;
 
-  private long webUserAccountId;
+  private Long webUserAccountId;
 
   long getId() {
     return id;
@@ -43,11 +43,11 @@ class AuditRevisionEntity {
     this.createdTimestamp = createdTimestamp;
   }
 
-  public long getWebUserAccountId() {
+  public Long getWebUserAccountId() {
     return webUserAccountId;
   }
 
-  public void setWebUserAccountId(long webUserAccountId) {
+  public void setWebUserAccountId(Long webUserAccountId) {
     this.webUserAccountId = webUserAccountId;
   }
 }

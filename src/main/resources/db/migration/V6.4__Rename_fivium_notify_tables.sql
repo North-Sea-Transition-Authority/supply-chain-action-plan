@@ -1,0 +1,4 @@
+ALTER TABLE outbound_email_personalisation RENAME TO outbound_email_personalisation_old;
+ALTER TABLE outbound_email RENAME TO outbound_email_old;
+ALTER TABLE outbound_sms_personalisation RENAME TO outbound_sms_personalisation_old;
+ALTER TABLE outbound_sms RENAME TO outbound_sms_old;

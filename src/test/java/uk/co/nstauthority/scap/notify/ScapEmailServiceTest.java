@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.notify;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -10,8 +11,8 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,12 +29,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import uk.co.fivium.digitalnotificationlibrary.core.notification.DomainReference;
+import uk.co.fivium.digitalnotificationlibrary.core.notification.MailMergeField;
+import uk.co.fivium.digitalnotificationlibrary.core.notification.MergedTemplate;
+import uk.co.fivium.digitalnotificationlibrary.core.notification.NotificationLibraryClient;
+import uk.co.fivium.digitalnotificationlibrary.core.notification.Template;
+import uk.co.fivium.digitalnotificationlibrary.core.notification.TemplateType;
+import uk.co.fivium.digitalnotificationlibrary.core.notification.email.EmailRecipient;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.fivium.energyportalapi.generated.types.User;
 import uk.co.nstauthority.scap.TestEntityProvider;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.TestUserProvider;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
+import uk.co.nstauthority.scap.correlationidutil.CorrelationIdUtil;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
@@ -56,8 +65,15 @@ class ScapEmailServiceTest {
 
   static MockHttpServletRequest request;
 
+  private static final Template TEMPLATE = new Template(
+      "",
+      TemplateType.EMAIL,
+      Set.of(),
+      Template.VerificationStatus.CONFIRMED_NOTIFY_TEMPLATE
+  );
+
   @Mock
-  private NotifyEmailService notifyEmailService;
+  private NotificationLibraryClient notificationLibraryClient;
 
   @Mock
   private TeamService teamService;
@@ -78,7 +94,13 @@ class ScapEmailServiceTest {
   private ScapEmailService scapEmailService;
 
   @Captor
-  ArgumentCaptor<EmailProperties> argumentCaptor;
+  private ArgumentCaptor<MergedTemplate> mergedTemplateCaptor;
+
+  @Captor
+  private ArgumentCaptor<EmailRecipient> emailRecipientCaptor;
+
+  @Captor
+  private ArgumentCaptor<DomainReference> domainReferenceCaptor;
 
   private static final ScapDetail SCAP_DETAIL = TestEntityProvider.getScapDetail();
   private static final ServiceUserDetail LOGGED_IN_USER = TestUserProvider.getUser();
@@ -98,14 +120,14 @@ class ScapEmailServiceTest {
   private TeamMember regulatorTeamMember2;
 
   @BeforeAll
-  static void setupTests() {
+  static void beforeAll() {
     request = new MockHttpServletRequest();
     request.setContextPath(CONTEXT_PATH);
     RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
   }
 
   @BeforeEach
-  void setup() {
+  void beforeEach() {
     recipient = User.newBuilder()
         .forename("Jim")
         .primaryEmailAddress("jim@scap.co.uk")
@@ -139,62 +161,82 @@ class ScapEmailServiceTest {
   @ParameterizedTest
   @MethodSource("projectClosedOutArguments")
   void sendScapApprovalEmails(boolean projectClosedOutBool, String projectClosedOutString) {
+    when(notificationLibraryClient.getTemplate(GovukNotifyTemplate.SCAP_APPROVAL_NOTIFICATION.getTemplateId()))
+        .thenReturn(TEMPLATE);
     when(teamService.getByEnergyPortalOrgGroupId(SCAP_DETAIL.getScap().getOrganisationGroupId()))
         .thenReturn(industryTeam);
     when(teamMemberService.getTeamMembers(industryTeam)).thenReturn(List.of(industryTeamMember1, industryTeamMember2));
     when(energyPortalUserService.searchUsersByIds(Collections.singletonList(industryTeamMember1.wuaId())))
         .thenReturn(Collections.singletonList(recipient));
 
+    CorrelationIdUtil.setCorrelationIdOnMdc("log-correlation-id");
+
     scapEmailService.sendScapApprovalEmails(SCAP_DETAIL, SCAP_SUBMISSION_STAGE, projectClosedOutBool);
 
-    verify(notifyEmailService).sendEmail(argumentCaptor.capture(), eq(recipient.getPrimaryEmailAddress()));
-
-    assertThat(argumentCaptor.getValue()).extracting(
-        EmailProperties::getTemplate,
-        EmailProperties::getEmailPersonalisations
-    ).containsExactly(
-        NotifyTemplate.SCAP_APPROVED,
-        Map.of(
-            "SCAP reference", SCAP_DETAIL.getScap().getReference(),
-            "SCAP submission stage", SCAP_SUBMISSION_STAGE.getDisplayName(),
-            "action-performing user", LOGGED_IN_USER.displayName(),
-            "SCAP case url", SCAP_SUMMARY_URL,
-            "recipient name", recipient.getForename(),
-            "Project closed out", projectClosedOutString,
-            "TEST_EMAIL", "no"
-        )
+    verify(notificationLibraryClient).sendEmail(
+        mergedTemplateCaptor.capture(),
+        emailRecipientCaptor.capture(),
+        domainReferenceCaptor.capture(),
+        eq("log-correlation-id")
     );
+
+    assertThat(mergedTemplateCaptor.getValue().getTemplate()).isEqualTo(TEMPLATE);
+    assertThat(mergedTemplateCaptor.getValue().getMailMergeFields())
+        .extracting(MailMergeField::name, MailMergeField::value)
+        .containsOnly(
+            tuple("SCAP reference", SCAP_DETAIL.getScap().getReference()),
+            tuple("SCAP submission stage", SCAP_SUBMISSION_STAGE.getDisplayName()),
+            tuple("action-performing user", LOGGED_IN_USER.displayName()),
+            tuple("SCAP case url", SCAP_SUMMARY_URL),
+            tuple("recipient name", recipient.getForename()),
+            tuple("Project closed out", projectClosedOutString)
+        );
+
+    assertThat(emailRecipientCaptor.getValue().getEmailAddress()).isEqualTo(recipient.getPrimaryEmailAddress());
+
+    assertThat(domainReferenceCaptor.getValue()).isEqualTo(SCAP_DETAIL);
   }
 
   @Test
   void sendScapWithdrawalEmails() {
+    when(notificationLibraryClient.getTemplate(GovukNotifyTemplate.SCAP_WITHDRAWAL_NOTIFICATION.getTemplateId()))
+        .thenReturn(TEMPLATE);
     when(teamService.getByEnergyPortalOrgGroupId(SCAP_DETAIL.getScap().getOrganisationGroupId()))
         .thenReturn(industryTeam);
     when(teamMemberService.getTeamMembers(industryTeam)).thenReturn(List.of(industryTeamMember1, industryTeamMember2));
     when(energyPortalUserService.searchUsersByIds(Collections.singletonList(industryTeamMember1.wuaId())))
         .thenReturn(Collections.singletonList(recipient));
 
+    CorrelationIdUtil.setCorrelationIdOnMdc("log-correlation-id");
+
     scapEmailService.sendScapWithdrawalEmails(SCAP_DETAIL);
 
-    verify(notifyEmailService).sendEmail(argumentCaptor.capture(), eq(recipient.getPrimaryEmailAddress()));
-
-    assertThat(argumentCaptor.getValue()).extracting(
-        EmailProperties::getTemplate,
-        EmailProperties::getEmailPersonalisations
-    ).containsExactly(
-        NotifyTemplate.SCAP_WITHDRAWN,
-        Map.of(
-            "SCAP reference", SCAP_DETAIL.getScap().getReference(),
-            "action-performing user", LOGGED_IN_USER.displayName(),
-            "SCAP case url", SCAP_SUMMARY_URL,
-            "recipient name", recipient.getForename(),
-            "TEST_EMAIL", "no"
-        )
+    verify(notificationLibraryClient).sendEmail(
+        mergedTemplateCaptor.capture(),
+        emailRecipientCaptor.capture(),
+        domainReferenceCaptor.capture(),
+        eq("log-correlation-id")
     );
+
+    assertThat(mergedTemplateCaptor.getValue().getTemplate()).isEqualTo(TEMPLATE);
+    assertThat(mergedTemplateCaptor.getValue().getMailMergeFields())
+        .extracting(MailMergeField::name, MailMergeField::value)
+        .containsOnly(
+            tuple("SCAP reference", SCAP_DETAIL.getScap().getReference()),
+            tuple("action-performing user", LOGGED_IN_USER.displayName()),
+            tuple("SCAP case url", SCAP_SUMMARY_URL),
+            tuple("recipient name", recipient.getForename())
+        );
+
+    assertThat(emailRecipientCaptor.getValue().getEmailAddress()).isEqualTo(recipient.getPrimaryEmailAddress());
+
+    assertThat(domainReferenceCaptor.getValue()).isEqualTo(SCAP_DETAIL);
   }
 
   @Test
   void sendScapSubmissionEmails() {
+    when(notificationLibraryClient.getTemplate(GovukNotifyTemplate.SCAP_SUBMISSION_NOTIFICATION.getTemplateId()))
+        .thenReturn(TEMPLATE);
     when(teamService.getRegulatorTeam()).thenReturn(regulatorTeam);
     when(teamMemberService.getTeamMembers(regulatorTeam)).thenReturn(List.of(regulatorTeamMember1, regulatorTeamMember2));
     when(energyPortalUserService.searchUsersByIds(Collections.singletonList(regulatorTeamMember1.wuaId())))
@@ -203,33 +245,45 @@ class ScapEmailServiceTest {
         SCAP_DETAIL.getScap().getOrganisationGroupId(), ScapEmailService.SUBMISSION_EMAIL_ORG_GROUP_REQUEST_PURPOSE))
         .thenReturn(Optional.of(organisationGroup));
 
+    CorrelationIdUtil.setCorrelationIdOnMdc("log-correlation-id");
+
     scapEmailService.sendScapSubmissionEmails(SCAP_DETAIL);
 
-    verify(notifyEmailService).sendEmail(argumentCaptor.capture(), eq(recipient.getPrimaryEmailAddress()));
-
-    assertThat(argumentCaptor.getValue()).extracting(
-        EmailProperties::getTemplate,
-        EmailProperties::getEmailPersonalisations
-    ).containsExactly(
-        NotifyTemplate.SCAP_SUBMITTED,
-        Map.of(
-            "SCAP reference", SCAP_DETAIL.getScap().getReference(),
-            "action-performing user", LOGGED_IN_USER.displayName(),
-            "SCAP case url", SCAP_SUMMARY_URL,
-            "recipient name", recipient.getForename(),
-            "TEST_EMAIL", "no",
-            "organisation name", organisationGroup.getName()
-        )
+    verify(notificationLibraryClient).sendEmail(
+        mergedTemplateCaptor.capture(),
+        emailRecipientCaptor.capture(),
+        domainReferenceCaptor.capture(),
+        eq("log-correlation-id")
     );
+
+    assertThat(mergedTemplateCaptor.getValue().getTemplate()).isEqualTo(TEMPLATE);
+    assertThat(mergedTemplateCaptor.getValue().getMailMergeFields())
+        .extracting(MailMergeField::name, MailMergeField::value)
+        .containsOnly(
+            tuple("SCAP reference", SCAP_DETAIL.getScap().getReference()),
+            tuple(  "action-performing user", LOGGED_IN_USER.displayName()),
+            tuple("SCAP case url", SCAP_SUMMARY_URL),
+            tuple("recipient name", recipient.getForename()),
+            tuple("organisation name", organisationGroup.getName())
+        );
+
+    assertThat(emailRecipientCaptor.getValue().getEmailAddress()).isEqualTo(recipient.getPrimaryEmailAddress());
+
+    assertThat(domainReferenceCaptor.getValue()).isEqualTo(SCAP_DETAIL);
   }
 
   @Test
   void sendScapSubmissionEmails_OrgGroupNotFound_AssertThrows() {
+    when(notificationLibraryClient.getTemplate(GovukNotifyTemplate.SCAP_SUBMISSION_NOTIFICATION.getTemplateId()))
+        .thenReturn(TEMPLATE);
+
     var organisationGroupId = SCAP_DETAIL.getScap().getOrganisationGroupId();
 
     when(organisationGroupService.getOrganisationGroupById(
         organisationGroupId, ScapEmailService.SUBMISSION_EMAIL_ORG_GROUP_REQUEST_PURPOSE))
         .thenReturn(Optional.empty());
+
+    CorrelationIdUtil.setCorrelationIdOnMdc("log-correlation-id");
 
     assertThatThrownBy(() -> scapEmailService.sendScapSubmissionEmails(SCAP_DETAIL))
         .isInstanceOf(ScapEntityNotFoundException.class)
@@ -239,7 +293,7 @@ class ScapEmailServiceTest {
         organisationGroupId, ScapEmailService.SUBMISSION_EMAIL_ORG_GROUP_REQUEST_PURPOSE
     );
     verifyNoMoreInteractions(
-        notifyEmailService, teamService, teamMemberService, energyPortalUserService, organisationGroupService
+        notificationLibraryClient, teamService, teamMemberService, energyPortalUserService, organisationGroupService
     );
   }
 

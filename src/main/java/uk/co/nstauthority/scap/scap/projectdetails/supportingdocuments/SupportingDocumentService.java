@@ -2,10 +2,10 @@ package uk.co.nstauthority.scap.scap.projectdetails.supportingdocuments;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

@@ -1,9 +1,9 @@
 package uk.co.nstauthority.scap.scap.summary;
 
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.transaction.Transactional;
 import java.util.Collections;
 import java.util.Objects;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.fivium.formlibrary.validator.date.DateUtils;

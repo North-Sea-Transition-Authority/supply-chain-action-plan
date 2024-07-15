@@ -192,8 +192,8 @@ class ScapSummaryViewServiceTest {
         fields,
         hasFacilitiesEnum,
         facilities,
-        "1 Jan 2023",
-        "1 Jan 2024",
+        "1 January 2023",
+        "1 January 2024",
         Collections.emptyList()
     );
   }

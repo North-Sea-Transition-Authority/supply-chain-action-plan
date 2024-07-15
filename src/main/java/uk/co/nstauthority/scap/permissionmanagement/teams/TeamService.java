@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.permissionmanagement.teams;
 
 import static uk.co.nstauthority.scap.permissionmanagement.TeamType.REGULATOR;
 
+import jakarta.transaction.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -9,7 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;

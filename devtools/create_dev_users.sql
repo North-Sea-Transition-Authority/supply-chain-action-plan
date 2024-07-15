@@ -1,5 +1,5 @@
 -- Script used for testing, adds SCAP Test Accounts, with correct roles already setup:
--- https://confluence.fivium.co.uk/display/BESPOKE/SCAP+Test+Accounts
+-- https://fivium.atlassian.net/wiki/spaces/BESPOKE/pages/1738766/SCAP+Test+Accounts
 
 SET SEARCH_PATH = 'scap';
 

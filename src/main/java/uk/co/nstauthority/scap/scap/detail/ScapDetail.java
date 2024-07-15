@@ -1,25 +1,26 @@
 package uk.co.nstauthority.scap.scap.detail;
 
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.Instant;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.envers.Audited;
+import uk.co.fivium.digitalnotificationlibrary.core.notification.DomainReference;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @Entity
 @Table(name = "scap_details")
-public class ScapDetail {
+public class ScapDetail implements DomainReference {
   @Id
   @Audited
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -160,5 +161,15 @@ public class ScapDetail {
 
   public void setParentScap(Scap parentScap) {
     this.parentScap = parentScap;
+  }
+
+  @Override
+  public String getDomainId() {
+    return String.valueOf(id);
+  }
+
+  @Override
+  public String getDomainType() {
+    return "SCAP_DETAIL";
   }
 }

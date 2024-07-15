@@ -2,10 +2,10 @@ package uk.co.nstauthority.scap.endpointvalidation.rules;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.commons.util.AnnotationUtils;
 import org.mockito.Mock;

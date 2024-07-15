@@ -56,35 +56,24 @@ public class WebSecurityConfiguration {
     authenticationProvider.setResponseAuthenticationConverter(r -> samlResponseParser.parseSamlResponse(r.getResponse()));
 
     httpSecurity
-        .csrf()
-          .ignoringAntMatchers(
-              "/notify/callback",
-              "/api/v1/logout/*")
-        .and()
-        .authorizeHttpRequests()
-          .mvcMatchers(
-              "/assets/**",
-              "/notify/callback",
-              "/api/v1/logout/*",
-              "/actuator/health")
+        .authorizeHttpRequests(http -> http
+            .requestMatchers(
+                "/assets/**",
+                "/notify/callback",
+                "/api/v1/logout/*",
+                "/actuator/health"
+            )
             .permitAll()
-          .mvcMatchers("/*")
-            .hasAuthority(SCAP_ACCESS_PERMISSION)
-          .anyRequest()
-            .authenticated()
-        .and()
-        .saml2Login(saml2 -> saml2.authenticationManager(new ProviderManager(authenticationProvider)))
-          .logout()
-          .logoutSuccessHandler(serviceLogoutSuccessHandler)
-        .and()
-        .securityContext(securityContext -> securityContext
-            .requireExplicitSave(true)
+            .requestMatchers("/*").hasAuthority(SCAP_ACCESS_PERMISSION)
+            .anyRequest().authenticated()
         )
-        .exceptionHandling()
-        .accessDeniedHandler(serviceDeniedHandler());
-
-    httpSecurity.addFilterBefore(requestLogFilter, SecurityContextHolderFilter.class);
-    httpSecurity.addFilterAfter(postAuthenticationRequestMdcFilter, SecurityContextHolderFilter.class);
+        .saml2Login(saml2 -> saml2.authenticationManager(new ProviderManager(authenticationProvider)))
+        .logout(logout -> logout.logoutSuccessHandler(serviceLogoutSuccessHandler))
+        .csrf(csrf -> csrf.ignoringRequestMatchers("/notify/callback", "/api/v1/logout/*"))
+        .securityContext(securityContext -> securityContext.requireExplicitSave(true))
+        .exceptionHandling(exceptionHandling -> exceptionHandling.accessDeniedHandler(serviceDeniedHandler()))
+        .addFilterBefore(requestLogFilter, SecurityContextHolderFilter.class)
+        .addFilterAfter(postAuthenticationRequestMdcFilter, SecurityContextHolderFilter.class);
 
     return httpSecurity.build();
   }

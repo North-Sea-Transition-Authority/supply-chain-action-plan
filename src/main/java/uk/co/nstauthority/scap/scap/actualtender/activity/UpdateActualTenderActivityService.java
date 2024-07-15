@@ -1,7 +1,7 @@
 package uk.co.nstauthority.scap.scap.actualtender.activity;
 
+import jakarta.transaction.Transactional;
 import java.util.Collections;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContractService;

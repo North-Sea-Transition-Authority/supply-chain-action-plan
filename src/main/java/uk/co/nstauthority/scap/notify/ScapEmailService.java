@@ -3,12 +3,16 @@ package uk.co.nstauthority.scap.notify;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.List;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.fivium.digitalnotificationlibrary.core.notification.DomainReference;
+import uk.co.fivium.digitalnotificationlibrary.core.notification.MergedTemplate;
+import uk.co.fivium.digitalnotificationlibrary.core.notification.NotificationLibraryClient;
+import uk.co.fivium.digitalnotificationlibrary.core.notification.email.EmailRecipient;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.fivium.energyportalapi.generated.types.User;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
+import uk.co.nstauthority.scap.correlationidutil.CorrelationIdUtil;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
@@ -26,7 +30,7 @@ import uk.co.nstauthority.scap.util.AbsoluteReverseRouter;
 @Service
 public class ScapEmailService {
 
-  private final NotifyEmailService notifyEmailService;
+  private final NotificationLibraryClient notificationLibraryClient;
   private final TeamService teamService;
   private final TeamMemberService teamMemberService;
   private final EnergyPortalUserService energyPortalUserService;
@@ -37,13 +41,15 @@ public class ScapEmailService {
       "Get organisation name for sending SCAP submission confirmation.";
 
   @Autowired
-  ScapEmailService(NotifyEmailService notifyEmailService,
-                   TeamService teamService,
-                   TeamMemberService teamMemberService,
-                   EnergyPortalUserService energyPortalUserService,
-                   UserDetailService userDetailService,
-                   OrganisationGroupService organisationGroupService) {
-    this.notifyEmailService = notifyEmailService;
+  ScapEmailService(
+      NotificationLibraryClient notificationLibraryClient,
+      TeamService teamService,
+      TeamMemberService teamMemberService,
+      EnergyPortalUserService energyPortalUserService,
+      UserDetailService userDetailService,
+      OrganisationGroupService organisationGroupService
+  ) {
+    this.notificationLibraryClient = notificationLibraryClient;
     this.teamService = teamService;
     this.teamMemberService = teamMemberService;
     this.energyPortalUserService = energyPortalUserService;
@@ -51,52 +57,61 @@ public class ScapEmailService {
     this.organisationGroupService = organisationGroupService;
   }
 
-  public void sendScapApprovalEmails(ScapDetail scapDetail,
-                                     ScapSubmissionStage scapSubmissionStage,
-                                     boolean projectClosedOut) {
+  public void sendScapApprovalEmails(
+      ScapDetail scapDetail,
+      ScapSubmissionStage scapSubmissionStage,
+      boolean projectClosedOut
+  ) {
     var scap = scapDetail.getScap();
-    var emailProperties = new EmailProperties(NotifyTemplate.SCAP_APPROVED);
-    var personalisations = emailProperties.getEmailPersonalisations();
-    addDefaultPersonalisations(personalisations, scap);
-    personalisations.put("SCAP submission stage", scapSubmissionStage.getDisplayName());
-    personalisations.put("Project closed out", projectClosedOut ? "yes" : "no");
+
+    var mergedTemplateBuilder = getTemplateForScap(GovukNotifyTemplate.SCAP_APPROVAL_NOTIFICATION, scap)
+        .withMailMergeField("SCAP submission stage", scapSubmissionStage.getDisplayName())
+        .withMailMergeField("Project closed out", projectClosedOut ? "yes" : "no");
+
     var recipients = getScapSubmitterRecipients(scap);
-    sendEmailsWithRecipientNames(emailProperties, recipients);
+    sendEmailsWithRecipientNames(mergedTemplateBuilder, recipients, scapDetail);
   }
 
   public void sendScapWithdrawalEmails(ScapDetail scapDetail) {
     var scap = scapDetail.getScap();
-    var emailProperties = new EmailProperties(NotifyTemplate.SCAP_WITHDRAWN);
-    var personalisations = emailProperties.getEmailPersonalisations();
-    addDefaultPersonalisations(personalisations, scap);
+
+    var mergedTemplateBuilder = getTemplateForScap(GovukNotifyTemplate.SCAP_WITHDRAWAL_NOTIFICATION, scap);
 
     var recipients = getScapSubmitterRecipients(scap);
-    sendEmailsWithRecipientNames(emailProperties, recipients);
+    sendEmailsWithRecipientNames(mergedTemplateBuilder, recipients, scapDetail);
   }
 
   public void sendScapSubmissionEmails(ScapDetail scapDetail) {
     var scap = scapDetail.getScap();
-    var emailProperties = new EmailProperties(NotifyTemplate.SCAP_SUBMITTED);
-    var personalisations = emailProperties.getEmailPersonalisations();
+
     var organisationGroup = organisationGroupService.getOrganisationGroupById(
         scap.getOrganisationGroupId(), SUBMISSION_EMAIL_ORG_GROUP_REQUEST_PURPOSE
     );
-    addDefaultPersonalisations(personalisations, scap);
-    personalisations.put("organisation name", organisationGroup.map(OrganisationGroup::getName).orElseThrow(() ->
-        new ScapEntityNotFoundException("Could not find Organisation Group with ID [%d]"
-            .formatted(scap.getOrganisationGroupId()))));
+
+    var mergedTemplateBuilder = getTemplateForScap(GovukNotifyTemplate.SCAP_SUBMISSION_NOTIFICATION, scap)
+        .withMailMergeField(
+            "organisation name",
+            organisationGroup.map(OrganisationGroup::getName)
+                .orElseThrow(() ->
+                    new ScapEntityNotFoundException(
+                        "Could not find Organisation Group with ID [%d]".formatted(scap.getOrganisationGroupId()))
+                )
+        );
 
     var recipients = getScapCaseOfficerRecipients();
-    sendEmailsWithRecipientNames(emailProperties, recipients);
+    sendEmailsWithRecipientNames(mergedTemplateBuilder, recipients, scapDetail);
   }
 
-  private void addDefaultPersonalisations(Map<String, String> personalisations, Scap scap) {
+  private MergedTemplate.MergedTemplateBuilder getTemplateForScap(GovukNotifyTemplate notifyTemplate, Scap scap) {
     var currentUser = userDetailService.getUserDetail();
 
-    personalisations.put("action-performing user", currentUser.displayName());
-    personalisations.put("SCAP reference", scap.getReference());
-    personalisations.put("SCAP case url",
-        AbsoluteReverseRouter.route(on(ScapSummaryController.class).getScapSummary(scap.getScapId())));
+    return notificationLibraryClient.getTemplate(notifyTemplate.getTemplateId())
+        .withMailMergeField("action-performing user", currentUser.displayName())
+        .withMailMergeField("SCAP reference", scap.getReference())
+        .withMailMergeField(
+            "SCAP case url",
+            AbsoluteReverseRouter.route(on(ScapSummaryController.class).getScapSummary(scap.getScapId()))
+        );
   }
 
   private List<User> getScapCaseOfficerRecipients() {
@@ -117,10 +132,24 @@ public class ScapEmailService {
     return energyPortalUserService.searchUsersByIds(teamMemberIds);
   }
 
-  private void sendEmailsWithRecipientNames(EmailProperties emailProperties, List<User> recipients) {
+  private void sendEmailsWithRecipientNames(
+      MergedTemplate.MergedTemplateBuilder mergedTemplateBuilder,
+      List<User> recipients,
+      DomainReference domainReference
+  ) {
     recipients.forEach(recipient -> {
-      emailProperties.getEmailPersonalisations().put("recipient name", recipient.getForename());
-      notifyEmailService.sendEmail(emailProperties, recipient.getPrimaryEmailAddress());
+      var mergedTemplate = mergedTemplateBuilder
+          .withMailMergeField("recipient name", recipient.getForename())
+          .merge();
+
+      var emailRecipient = EmailRecipient.directEmailAddress(recipient.getPrimaryEmailAddress());
+
+      notificationLibraryClient.sendEmail(
+          mergedTemplate,
+          emailRecipient,
+          domainReference,
+          CorrelationIdUtil.getCorrelationIdFromMdc()
+      );
     });
   }
 }

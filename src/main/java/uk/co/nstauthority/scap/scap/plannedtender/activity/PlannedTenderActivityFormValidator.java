@@ -1,7 +1,7 @@
 package uk.co.nstauthority.scap.scap.plannedtender.activity;
 
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;

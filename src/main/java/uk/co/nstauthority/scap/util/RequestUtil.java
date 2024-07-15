@@ -1,8 +1,8 @@
 package uk.co.nstauthority.scap.util;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
 import org.springframework.web.servlet.HandlerMapping;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 

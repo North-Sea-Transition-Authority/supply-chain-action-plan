@@ -1,8 +1,8 @@
 package uk.co.nstauthority.scap.scap.summary.contractingperformance;
 
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
-import javax.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;

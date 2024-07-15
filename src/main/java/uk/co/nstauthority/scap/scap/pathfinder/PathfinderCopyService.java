@@ -1,7 +1,7 @@
 package uk.co.nstauthority.scap.scap.pathfinder;
 
+import jakarta.persistence.EntityManager;
 import java.time.Instant;
-import javax.persistence.EntityManager;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.scap.copy.CopyService;

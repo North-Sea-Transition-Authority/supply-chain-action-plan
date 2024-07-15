@@ -1,11 +1,11 @@
 package uk.co.nstauthority.scap.scap.pathfinder;
 
+import jakarta.transaction.Transactional;
 import java.time.Clock;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.energyportal.PathfinderProjectService;

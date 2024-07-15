@@ -57,10 +57,9 @@ Note that this template uses a Postgres database, so make sure that the database
 | CLAMAV_HOST                    | Virus scanner host location                                                                                                  |
 | FILE_UPLOAD_MAX_ALLOWED_SIZE   | Maximum file upload size in bytes                                                                                            |
 | FILE_UPLOAD_ALLOWED_EXTENSIONS | Allowed file extensions for document uploads                                                                                 |
-| SCAP_EMAIL_MODE                | Can be test or production. Test mode will redirect all outbound emails to the test recipient(s)                              |
+| NOTIFY_EMAIL_MODE              | Can be test or production. Test mode will redirect all outbound emails to the test recipient(s)                              |
 | NOTIFY_TEST_EMAIL_RECIPIENT    | If email is test mode, who to send emails to. Value can be a CSV list                                                        |
 | NOTIFY_API_KEY                 | The GOV.UK Notify key                                                                                                        |
-| NOTIFY_CALLBACK_TOKEN          | The GOV.UK Notify callback token                                                                                             |
 | ENABLE_STATSD                  | Whether or not to export stats to Grafana, generally set to false on local and true anywhere else                            |
 | STATSD_HOST                    | The hostname for the endpoint that takes StatsD metrics                                                                      |
 | STATSD_PORT                    | The port for the endpoint that takes StatsD metrics                                                                          |

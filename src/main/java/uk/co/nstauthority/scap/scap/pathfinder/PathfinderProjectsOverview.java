@@ -1,14 +1,14 @@
 package uk.co.nstauthority.scap.scap.pathfinder;
 
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import org.hibernate.annotations.UuidGenerator;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @Entity
@@ -16,7 +16,7 @@ import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 public class PathfinderProjectsOverview {
 
   @Id
-  @GeneratedValue(generator = "uuid")
+  @UuidGenerator
   private UUID id;
 
   @OneToOne
