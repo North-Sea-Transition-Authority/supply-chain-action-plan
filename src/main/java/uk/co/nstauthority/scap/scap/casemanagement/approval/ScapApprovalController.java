@@ -89,7 +89,7 @@ public class ScapApprovalController {
   @PostMapping(params = CaseEventAction.APPROVED)
   public ModelAndView saveScapApprovalForm(@PathVariable("scapId") ScapId scapId,
                                            @RequestParam(CaseEventAction.APPROVED) String caseEventAction,
-                                           @RequestParam("Approve-scap-Panel") Boolean slideOutPanelOpen,
+                                           @RequestParam("No-Objection-scap-Panel") Boolean slideOutPanelOpen,
                                            @ModelAttribute("scapApprovalForm") ScapApprovalForm scapApprovalForm,
                                            BindingResult bindingResult,
                                            RedirectAttributes redirectAttributes) {
@@ -141,7 +141,7 @@ public class ScapApprovalController {
               projectClosedOut
           );
           NotificationBannerUtils.successBannerRedirect(
-              "SCAP: %s has been approved".formatted(scapDetail.getScap().getReference()),
+              "SCAP: %s has no objection".formatted(scapDetail.getScap().getReference()),
               emptyList(),
               redirectAttributes);
           return ReverseRouter.redirect(on(ScapSummaryController.class).getScapSummary(scapId));

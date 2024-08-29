@@ -5,6 +5,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -33,7 +34,7 @@ import uk.co.nstauthority.scap.authentication.TestUserProvider;
 import uk.co.nstauthority.scap.fds.ErrorItem;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
-import uk.co.nstauthority.scap.permissionmanagement.TeamType;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.start.ScapStartController;
 import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
@@ -66,7 +67,8 @@ class OrganisationGroupControllerTest extends AbstractScapSubmitterControllerTes
     team.setEnergyPortalOrgGroupId(1);
 
     when(userDetailService.getUserDetail()).thenReturn(USER);
-    when(teamService.getTeamsOfTypeThatUserBelongsTo(USER, TeamType.INDUSTRY)).thenReturn(Collections.singletonList(team));
+    when(teamService.findAllTeamsForUserBasedOnPermission(List.of(IndustryTeamRole.SCAP_SUBMITTER), USER.wuaId()))
+        .thenReturn(Collections.singletonList(team));
 
     mockMvc.perform(
         get(

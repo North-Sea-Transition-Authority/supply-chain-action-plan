@@ -16,12 +16,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
+import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRepository;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
 
 @Service
@@ -142,5 +145,29 @@ public class TeamService {
   public void archiveTeam(Team team) {
     teamMemberRoleService.deleteUsersInTeam(team);
     teamRepository.delete(team);
+  }
+
+  public List<RolePermission> findAllPermissionsForUserInOrganisationGroup(Long wuaId, Integer organisationGroupId) {
+    var team = teamRepository.findByEnergyPortalOrgGroupId(organisationGroupId);
+
+    if (team.isEmpty()) {
+      return List.of();
+    }
+
+    return teamMemberService.findTeamMember(team.get(), new WebUserAccountId(wuaId))
+        .stream()
+        .flatMap(teamMember -> teamMember.roles().stream())
+        .flatMap(teamRole -> teamRole.getRolePermissions().stream())
+        .toList();
+  }
+
+  public List<Team> findAllTeamsForUserBasedOnPermission(List<TeamRole> teamRoles, Long wuaId) {
+    var teams = teamRepository.findAllTeamsThatUserIsMemberOf(wuaId);
+    return teamMemberService.findAllRolesByUser(teams, new WebUserAccountId(wuaId))
+        .stream()
+        .filter(teamMemberRole -> teamRoles.contains(IndustryTeamRole.valueOf(teamMemberRole.getRole()))
+            || teamRoles.contains(RegulatorTeamRole.valueOf(teamMemberRole.getRole())))
+        .map(TeamMemberRole::getTeam)
+        .toList();
   }
 }

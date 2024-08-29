@@ -1,29 +1,14 @@
-#Transient Vulnerability from spring-boot-starter-actuator
-  CVE-2022-25857
-  CVE-2022-38749
-  CVE-2022-38750
-  CVE-2022-38751
-  CVE-2022-38752
-
-#Transient Vulnerability from spring-security-saml2-service-provider
-  CVE-2015-7501
-  CVE-2015-6420
-  CVE-2021-40690
-  CVE-2019-12400
-  CVE-2020-13936
-  CVE-2020-15522
-
-#Transient Vulnerability from spring security
-  CVE-2022-40151
-  CVE-2022-40152
-  CVE-2022-40153
-  CVE-2022-40154
-  CVE-2022-40155
-  CVE-2022-40156
-  CVE-2022-31692
+# Transient Vulnerability from spring-boot-starter-actuator
+CVE-2022-25857
+CVE-2022-38749
+CVE-2022-38750
+CVE-2022-38751
+CVE-2022-38752
 
 # Transient vulnerability from energy portal API and spring-boot-starter
-  CVE-2022-41854
-  CVE-2022-41946
-  CVE-2016-1000027
-  CVE-2022-1471
+CVE-2022-41854
+CVE-2016-1000027
+CVE-2022-1471
+
+# netty (likely via actuator, not showing up in dependency tree)
+CVE-2022-24823

@@ -12,7 +12,6 @@ import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEvent;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 
@@ -23,32 +22,29 @@ public class UpdateRequestService {
 
   private final ScapService scapService;
 
-  private final ScapDetailService scapDetailService;
-
   private final UserDetailService userDetailService;
 
   private final Clock clock;
 
   @Autowired
   public UpdateRequestService(UpdateRequestRepository updateRequestRepository,
-                              ScapService scapService, ScapDetailService scapDetailService,
+                              ScapService scapService,
                               UserDetailService userDetailService,
                               Clock clock) {
     this.updateRequestRepository = updateRequestRepository;
     this.scapService = scapService;
-    this.scapDetailService = scapDetailService;
     this.userDetailService = userDetailService;
     this.clock = clock;
   }
 
-  public UpdateRequest createUpdateRequest(ScapDetail scapDetail,
+  public void createUpdateRequest(ScapDetail scapDetail,
                                            UpdateRequestType requestType,
                                            LocalDate dueDate,
                                            CaseEvent caseEvent) {
     var updateRequest = new UpdateRequest(scapDetail.getScap(), requestType, dueDate, caseEvent);
     updateRequest.setCreatedTimestamp(LocalDate.now());
     updateRequest.setCreatedByUserId(userDetailService.getUserDetail().getWebUserAccountId().toInt());
-    return updateRequestRepository.save(updateRequest);
+    updateRequestRepository.save(updateRequest);
   }
 
   @Transactional
@@ -80,7 +76,7 @@ public class UpdateRequestService {
             scapService.getScapById(scapId),
             requestType);
 
-    return requestActionOptional.map(t -> Optional.of(t.getDueDate())).orElse(Optional.empty());
+    return requestActionOptional.map(UpdateRequest::getDueDate);
   }
 
   public List<UpdateRequest> findAllByScapId(ScapId scapId) {

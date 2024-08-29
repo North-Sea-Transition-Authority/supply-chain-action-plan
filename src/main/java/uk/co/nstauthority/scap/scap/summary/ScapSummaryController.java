@@ -102,6 +102,11 @@ public class ScapSummaryController {
         && userPermissions.contains(SUBMIT_SCAP)) {
       return ReverseRouter.redirect(on(TaskListController.class).renderTaskList(scapId));
     }
+
+    var userPermissionsBasedOnTeams = teamService.findAllPermissionsForUserInOrganisationGroup(
+        user.wuaId(),
+        versionedDetail.getScap().getOrganisationGroupId());
+
     var scapSummary = scapSummaryViewService.getScapSummaryView(versionedDetail);
     var orgGroup = organisationGroupService
         .getOrganisationGroupById(versionedDetail.getScap().getOrganisationGroupId(), "Get Org Group for Summary");
@@ -113,9 +118,7 @@ public class ScapSummaryController {
         .withScapStatus(scapSummaryViewService.inferSubmissionStatusFromSummary(scapSummary))
         .withCaseEventTimeline(getCaseEventView(scapId))
         .withApplicableActions(caseEventService.getApplicableActionsForScap(scapId))
-        .withIsUpdateable(
-            teamMemberService.getAllPermissionsForUser(userDetailService.getUserDetail().wuaId()),
-            versionedDetail.getStatus())
+        .withIsUpdateable(userPermissionsBasedOnTeams, versionedDetail.getStatus())
         .withUpdateInProgress(scapDetailService.isUpdateInProgress(scapId))
         .withScapVersions(scapDetailService.getAllVersionsForUser(versionedDetail.getScap()))
         .withCurrentVersion(versionedDetail.getVersionNumber());

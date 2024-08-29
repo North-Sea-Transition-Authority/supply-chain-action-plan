@@ -1,15 +1,15 @@
 <#include '../../../layout/layout.ftl'>
-<@fdsSlideOutPanel.slideOutPanel panelId="Approve-scap-Panel" headingText="Approve SCAP">
+<@fdsSlideOutPanel.slideOutPanel panelId="No-Objection-scap-Panel" headingText="No objection">
     <@fdsForm.htmlForm actionUrl=springUrl(approvalFormSubmitUrl)>
         <@fdsTextarea.textarea
         path="scapApprovalForm.approvalComments.inputValue"
-        labelText="Approval comments"/>
+        labelText="No objection comments"/>
         <@fdsRadio.radioGroup path="scapApprovalForm.projectClosedOut" labelText="Has the SCAP been fully completed?">
             <@fdsRadio.radioItem itemMap={"YES":"Yes"} path="scapApprovalForm.projectClosedOut" itemHintText="It will not be possible to update this SCAP once fully completed"/>
             <@fdsRadio.radioItem itemMap={"NO":"No"} path="scapApprovalForm.projectClosedOut"/>
         </@fdsRadio.radioGroup>
         <@fdsFieldset.fieldset
-        legendHeading="Supporting Approval document"
+        legendHeading="Supporting no objection document"
         legendHeadingSize="h2"
         legendHeadingClass="govuk-fieldset__legend--m"
         optionalLabel=true
@@ -28,6 +28,6 @@
           multiFile=false
           />
         </@fdsFieldset.fieldset>
-        <@fdsAction.button buttonText="Approve SCAP" buttonName="APPROVED"/>
+        <@fdsAction.button buttonText="SCAP has no objection" buttonName="APPROVED"/>
     </@fdsForm.htmlForm>
 </@fdsSlideOutPanel.slideOutPanel>

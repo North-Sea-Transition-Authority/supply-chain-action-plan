@@ -20,6 +20,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.fivium.energyportalapi.generated.types.Facility;
+import uk.co.fivium.energyportalapi.generated.types.FacilityStatus;
+import uk.co.fivium.energyportalapi.generated.types.FacilityType;
 import uk.co.fivium.energyportalapi.generated.types.Field;
 import uk.co.nstauthority.scap.energyportal.FacilityService;
 import uk.co.nstauthority.scap.energyportal.FieldService;

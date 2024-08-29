@@ -1,6 +1,6 @@
 package uk.co.nstauthority.scap.authentication;
 
-enum EnergyPortalSamlAttribute {
+public enum EnergyPortalSamlAttribute {
 
   WEB_USER_ACCOUNT_ID("WUA_ID"),
   PERSON_ID("PERSON_ID"),
@@ -15,7 +15,7 @@ enum EnergyPortalSamlAttribute {
     this.attributeName = attributeName;
   }
 
-  String getAttributeName() {
+  public String getAttributeName() {
     return attributeName;
   }
 }

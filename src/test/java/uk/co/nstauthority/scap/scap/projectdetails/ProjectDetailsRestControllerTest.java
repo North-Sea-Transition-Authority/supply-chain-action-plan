@@ -58,14 +58,14 @@ class ProjectDetailsRestControllerTest extends AbstractControllerTest {
 
 
     mockMvc.perform(get(
-        ReverseRouter.route(on(ProjectDetailsRestController.class).getFieldSearchResults(null)))
+            ReverseRouter.route(on(ProjectDetailsRestController.class).getFieldSearchResults(null)))
             .param("term", searchTerm))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(content().json("""
-{"results":[{"id":"1","text":"test field 1"},{"id":"2","text":"test field 2"}]}
-"""));
-    }
+            {"results":[{"id":"1","text":"test field 1"},{"id":"2","text":"test field 2"}]}
+            """));
+  }
 
   @Test
   void getFacilitySearchResults() throws Exception {
@@ -86,15 +86,13 @@ class ProjectDetailsRestControllerTest extends AbstractControllerTest {
         .thenReturn(facilities);
     when(facilityService.facilitiesToRestSearchResult(facilities)).thenReturn(facilitiesRestSearchResult);
 
-    var response = mockMvc.perform(get(
-        ReverseRouter.route(on(ProjectDetailsRestController.class).getFacilitySearchResults(null)))
-        .param("term", searchTerm))
+    mockMvc.perform(get(
+            ReverseRouter.route(on(ProjectDetailsRestController.class).getFacilitySearchResults(null)))
+            .param("term", searchTerm))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(content().json("""
-{"results":[{"id":"1","text":"test facility"}]}
-"""))
-        .andReturn()
-        .getResponse();
+            {"results":[{"id":"1","text":"test facility"}]}
+            """));
   }
 }

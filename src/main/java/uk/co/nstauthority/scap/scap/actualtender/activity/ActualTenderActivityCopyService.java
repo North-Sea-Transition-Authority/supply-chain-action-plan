@@ -62,8 +62,9 @@ public class ActualTenderActivityCopyService {
           newAwardedContract.setActualTenderActivity(activities.get(contract.getActualTenderActivity()));
 
           newAwardedContract.setPreferredBidder(invitationToTenderParticipantRepository
-              .getByOrganisationUnitIdAndActualTenderActivity(
+              .getByOrganisationUnitIdAndCompanyNameAndActualTenderActivity(
                   contract.getPreferredBidder().getOrganisationUnitId(),
+                  contract.getPreferredBidder().getCompanyName(),
                   activities.get(contract.getActualTenderActivity())));
           entityManager.persist(newAwardedContract);
         });

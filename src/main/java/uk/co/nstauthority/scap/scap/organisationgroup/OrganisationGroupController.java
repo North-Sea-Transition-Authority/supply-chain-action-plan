@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.scap.organisationgroup;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.Comparator;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -17,7 +18,7 @@ import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermissi
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
-import uk.co.nstauthority.scap.permissionmanagement.TeamType;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 import uk.co.nstauthority.scap.restapi.scap.ScapRestController;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
@@ -113,7 +114,8 @@ public class OrganisationGroupController {
 
   private ModelAndView organisationGroupFormModelAndView(String backLinkUrl) {
     var user = userDetailService.getUserDetail();
-    var userTeams = teamService.getTeamsOfTypeThatUserBelongsTo(user, TeamType.INDUSTRY);
+    var userTeams = teamService.findAllTeamsForUserBasedOnPermission(List.of(IndustryTeamRole.SCAP_SUBMITTER), user.wuaId());
+
     var permittedOrganisationGroups = userTeams.stream()
         .sorted(Comparator.comparing(Team::getDisplayName))
         .collect(StreamUtils.toLinkedHashMap(

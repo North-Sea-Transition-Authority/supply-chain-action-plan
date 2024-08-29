@@ -81,7 +81,7 @@ If FDS is not on the latest version, follow the instructions to update it [here]
 
 ### 5. Generate Jooq classes
 Execute the gradle task `generateJooq`. You will need to re-generate when you change the database.
-(This requires docker to be running on your machine)
+(This requires docker to be running on your machine, but have the SCAP DB off)
 
 ### 6. Run the app
 Create a run configuration for the Spring app and start the application.

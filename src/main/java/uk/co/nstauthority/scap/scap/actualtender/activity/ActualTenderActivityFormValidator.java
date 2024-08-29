@@ -1,7 +1,7 @@
 package uk.co.nstauthority.scap.scap.actualtender.activity;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -82,7 +82,7 @@ class ActualTenderActivityFormValidator implements SmartValidator {
         "contractStage.required",
         MISSING_CONTRACT_STAGE_ERROR);
 
-    validateInvitationToTenderParticipants(form.getInvitationToTenderParticipants(), errors);
+    validateInvitationToTenderParticipants(form, errors);
   }
 
   private void validateScopeTitle(ActualTenderActivityForm form, Errors errors, ActualTender actualTender,
@@ -116,7 +116,8 @@ class ActualTenderActivityFormValidator implements SmartValidator {
     }
   }
 
-  private void validateInvitationToTenderParticipants(List<String> ittParticipants, Errors errors) {
+  private void validateInvitationToTenderParticipants(ActualTenderActivityForm form, Errors errors) {
+    var ittParticipants = form.getInvitationToTenderParticipants();
     if (Objects.isNull(ittParticipants) || ittParticipants.isEmpty()) {
       errors.rejectValue(
           ITT_PARTICIPANTS_SELECTOR_NAME,
@@ -134,6 +135,11 @@ class ActualTenderActivityFormValidator implements SmartValidator {
           "%s.invalid".formatted(ITT_PARTICIPANTS_SELECTOR_NAME),
           INVALID_ITT_PARTICIPANTS_ERROR
       );
+    }
+
+    var ittParticipantsWithoutDuplication = new HashSet<>(ittParticipants);
+    if (ittParticipants.size() !=  ittParticipantsWithoutDuplication.size()) {
+      form.setInvitationToTenderParticipants(ittParticipantsWithoutDuplication.stream().toList());
     }
   }
 }

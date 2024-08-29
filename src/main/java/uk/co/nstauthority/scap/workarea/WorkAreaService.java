@@ -2,8 +2,6 @@ package uk.co.nstauthority.scap.workarea;
 
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAPS;
 import static uk.co.nstauthority.scap.generated.jooq.Tables.SCAP_DETAILS;
-import static uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestType.FURTHER_INFORMATION;
-import static uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestType.UPDATE;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
@@ -15,18 +13,22 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.jooq.Condition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.fivium.formlibrary.validator.date.DateUtils;
+import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
-import uk.co.nstauthority.scap.scap.detail.ScapDetailService;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRole;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailStatus;
 import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.summary.ScapSubmissionStage;
-import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
+import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestType;
 
 @Service
 class WorkAreaService {
@@ -36,21 +38,20 @@ class WorkAreaService {
   private final WorkAreaItemDtoRepository workAreaItemDtoRepository;
   private final OrganisationGroupService organisationGroupService;
   private final WorkAreaFilterService workAreaFilterService;
-
-  private final UpdateRequestService updateRequestService;
-  private final ScapDetailService scapDetailService;
+  private final TeamMemberService teamMemberService;
+  private final UserDetailService userDetailService;
 
   @Autowired
   WorkAreaService(WorkAreaItemDtoRepository workAreaItemDtoRepository,
                   OrganisationGroupService organisationGroupService,
                   WorkAreaFilterService workAreaFilterService,
-                  UpdateRequestService updateRequestService,
-                  ScapDetailService scapDetailService) {
+                  TeamMemberService teamMemberService,
+                  UserDetailService userDetailService) {
     this.workAreaItemDtoRepository = workAreaItemDtoRepository;
     this.organisationGroupService = organisationGroupService;
     this.workAreaFilterService = workAreaFilterService;
-    this.updateRequestService = updateRequestService;
-    this.scapDetailService = scapDetailService;
+    this.teamMemberService = teamMemberService;
+    this.userDetailService = userDetailService;
   }
 
   public List<WorkAreaItem> getWorkAreaItems(WorkAreaFilter filter,
@@ -63,7 +64,23 @@ class WorkAreaService {
       return getRegulatorWorkAreaItems(conditions);
     }
 
-    return getIndustryWorkAreaItems(teams, conditions);
+    var wuaId = userDetailService.getUserDetail().getWebUserAccountId();
+    var teamsMemberRoles = teamMemberService.findAllRolesByUser(teams, wuaId);
+
+    var teamsBasedOnSubmitterRole = findAllTeamsBasedOnRole(IndustryTeamRole.SCAP_SUBMITTER, teamsMemberRoles);
+    var submitterItems = getIndustryWorkAreaItems(teamsBasedOnSubmitterRole, conditions)
+        .stream();
+
+    var teamsBasedOnViewerRole = findAllTeamsBasedOnRole(IndustryTeamRole.SCAP_VIEWER, teamsMemberRoles);
+    var viewerItems = getIndustryWorkAreaItems(teamsBasedOnViewerRole, conditions)
+        .stream()
+        .filter(workAreaItem -> !workAreaItem.status().equals(ScapDetailStatus.DRAFT));
+
+    return Stream.concat(submitterItems, viewerItems)
+        .distinct()
+        .sorted(Comparator
+            .comparing((WorkAreaItem dto) -> dto.status().getDisplayOrder()).reversed())
+        .toList();
   }
 
   private List<WorkAreaItem> getRegulatorWorkAreaItems(ArrayList<Condition> conditions) {
@@ -73,8 +90,16 @@ class WorkAreaService {
     return getItemsFromDtoList(workAreaItemDtoList);
   }
 
+  private List<Team> findAllTeamsBasedOnRole(IndustryTeamRole industryTeamRole, List<TeamMemberRole> teamMemberRoles) {
+    return teamMemberRoles.stream()
+        .filter(teamMemberRole -> teamMemberRole.getRole().equals(industryTeamRole.name()))
+        .map(TeamMemberRole::getTeam)
+        .toList();
+  }
+
   private List<WorkAreaItem> getIndustryWorkAreaItems(List<Team> teams, ArrayList<Condition> conditions) {
     var organisationGroupIds = teams.stream().map(Team::getEnergyPortalOrgGroupId).toList();
+
     if (organisationGroupIds.isEmpty()) {
       return Collections.emptyList();
     }
@@ -109,9 +134,14 @@ class WorkAreaService {
             workAreaItemDto.projectName(),
             workAreaItemDto.status(),
             inferStatus(workAreaItemDto),
-            updateRequestService.getUpdateDueDate(new ScapId(workAreaItemDto.scapId()), FURTHER_INFORMATION).isPresent(),
-            scapDetailService.isUpdateInProgress(new ScapId(workAreaItemDto.scapId())),
-            getUpdateDueDate(new ScapId(workAreaItemDto.scapId()))))
+            workAreaItemDto.resolutionDate() == null
+                && UpdateRequestType.FURTHER_INFORMATION.equals(workAreaItemDto.updateRequestType())
+                && workAreaItemDto.dueDate() != null,
+            (workAreaItemDto.scapVersionNumber() > 1) && ScapDetailStatus.DRAFT.equals(workAreaItemDto.status()),
+            workAreaItemDto.dueDate() != null
+                ? workAreaItemDto.dueDate().format(DateTimeFormatter.ofPattern(DateUtils.SHORT_DATE))
+                : null)
+        )
         .toList();
 
   }
@@ -139,10 +169,5 @@ class WorkAreaService {
       default -> dto.createdTimestamp();
     };
   }
-
-  private String getUpdateDueDate(ScapId scapId) {
-    var updateDate = updateRequestService.getUpdateDueDate(scapId, UPDATE);
-    return updateDate.map(localDate -> localDate.format(DateTimeFormatter.ofPattern(DateUtils.SHORT_DATE)))
-        .orElse(null);
-  }
 }
+

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
+import static uk.co.nstauthority.scap.energyportal.PathfinderProjectService.NON_ARCHIVED_STATUSES;
 
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,7 @@ class PathfinderProjectServiceTest {
         .when(pathfinderApi)
         .searchProjects(
             eq(null),
-            eq(null),
+            eq(NON_ARCHIVED_STATUSES),
             eq(searchTerm),
             eq(operatorId),
             eq(PathfinderProjectType.INFRASTRUCTURE),
@@ -57,7 +58,7 @@ class PathfinderProjectServiceTest {
 
     verify(pathfinderApi).searchProjects(
         eq(null),
-        eq(null),
+        eq(NON_ARCHIVED_STATUSES),
         eq(searchTerm),
         eq(operatorId),
         eq(PathfinderProjectType.INFRASTRUCTURE),

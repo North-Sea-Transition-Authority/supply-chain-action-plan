@@ -90,7 +90,10 @@ class ActualTenderActivityCopyServiceTest {
     oldAwardedContract.setPaymentTerms(1);
 
     when(invitationToTenderParticipantRepository
-        .getByOrganisationUnitIdAndActualTenderActivity(oldPreferredBidder.getOrganisationUnitId(), oldActualTenderActivity))
+        .getByOrganisationUnitIdAndCompanyNameAndActualTenderActivity(
+            oldPreferredBidder.getOrganisationUnitId(),
+            oldPreferredBidder.getCompanyName(),
+            oldActualTenderActivity))
         .thenReturn(newPreferredBidder);
     when(awardedContractService.getByActualTenderActivityIn(map.keySet().stream().toList()))
         .thenReturn(List.of(oldAwardedContract));
