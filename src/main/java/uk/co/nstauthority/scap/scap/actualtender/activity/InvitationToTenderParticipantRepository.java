@@ -5,8 +5,10 @@ import org.springframework.data.repository.CrudRepository;
 
 interface InvitationToTenderParticipantRepository extends CrudRepository<InvitationToTenderParticipant, Integer> {
 
-  InvitationToTenderParticipant getByOrganisationUnitIdAndActualTenderActivity(Integer organisationUnitId,
-                                                                               ActualTenderActivity actualTenderActivity);
+  InvitationToTenderParticipant getByOrganisationUnitIdAndCompanyNameAndActualTenderActivity(
+      Integer organisationUnitId,
+      String companyName,
+      ActualTenderActivity actualTenderActivity);
 
   List<InvitationToTenderParticipant> findAllByActualTenderActivity(ActualTenderActivity actualTenderActivity);
 

@@ -246,4 +246,18 @@ class ActualTenderActivityFormValidatorTest {
         entry(fieldName, Collections.singleton("%s.invalid".formatted(fieldName)))
     );
   }
+
+  @Test
+  void validate_InvalidIttParticipantsDuplicated_AssertRemovedFromForm() {
+    form.setScopeTitle("test scope title");
+    form.setScopeDescription("test scope description");
+    form.setRemunerationModel(RemunerationModel.OTHER);
+    form.setRemunerationModelName("test remuneration model");
+    form.setContractStage(ContractStage.CONTRACT_AWARDED);
+    form.setInvitationToTenderParticipants(List.of("FT_test", "FT_test"));
+
+    validator.validate(form, bindingResult, new ActualTenderFormValidatorHint(actualTender));
+
+    assertThat(form.getInvitationToTenderParticipants()).containsExactly("FT_test");
+  }
 }

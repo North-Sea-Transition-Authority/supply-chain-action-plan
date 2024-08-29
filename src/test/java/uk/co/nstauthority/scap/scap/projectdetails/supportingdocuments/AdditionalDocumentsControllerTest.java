@@ -12,6 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -28,6 +30,11 @@ import uk.co.nstauthority.scap.file.FileTestUtil;
 import uk.co.nstauthority.scap.file.FileUploadService;
 import uk.co.nstauthority.scap.file.UploadedFile;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
+import uk.co.nstauthority.scap.permissionmanagement.TeamType;
+import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
+import uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTeamRole;
+import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRole;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 
 @ContextConfiguration(classes = AdditionalDocumentsController.class)
@@ -54,9 +61,18 @@ class AdditionalDocumentsControllerTest extends AbstractScapSubmitterControllerT
   }
 
   @Test
+  void download_whenCantAccessScap_assertForbidden() throws Exception {
+    givenUserCantAccessScap();
+    mockMvc.perform(
+            get(ReverseRouter.route(
+                on(AdditionalDocumentsController.class).download(SCAP_ID, uploadedFile.getId())))
+                .with(user(USER)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
   void upload_assertStatusOk() throws Exception {
     when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(scapDetail);
-
     MockMultipartFile mockMultipartFile = new MockMultipartFile("file", (byte[]) null);
     mockMvc.perform(multipart(ReverseRouter.route(
             on(AdditionalDocumentsController.class).upload(SCAP_ID, null)))
@@ -70,7 +86,7 @@ class AdditionalDocumentsControllerTest extends AbstractScapSubmitterControllerT
 
   @Test
   void download_assertStatusOk() throws Exception {
-    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(scapDetail);
+    givenUserCanAccessScap();
     when(supportingDocumentService.getUploadedFile(scapDetail, uploadedFile.getId())).thenReturn(uploadedFile);
     var fileResource = new ClassPathResource("banner.txt");
     when(fileUploadService.downloadFile(uploadedFile)).thenReturn(fileResource.getInputStream());
@@ -97,14 +113,47 @@ class AdditionalDocumentsControllerTest extends AbstractScapSubmitterControllerT
 
   @Test
   void delete_assertStatusOk() throws Exception {
-    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(scapDetail);
-
-    mockMvc.perform(post(
+    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(scapDetail);    mockMvc.perform(post(
             ReverseRouter.route(on(AdditionalDocumentsController.class).delete(SCAP_ID, uploadedFile.getId())))
             .with(user(USER))
             .with(csrf()))
         .andExpect(status().isOk());
 
     verify(supportingDocumentService, times(1)).deleteFile(scapDetail, uploadedFile.getId());
+  }
+
+  private void givenUserCanAccessScap() {
+    scapDetail.setScap(getScap());
+    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(scapDetail);
+    var industryTeam = getTeam();
+    var regulatorTeam = new Team();
+
+    when(teamService.getByEnergyPortalOrgGroupId(scapDetail.getScap().getOrganisationGroupId()))
+        .thenReturn(industryTeam);
+    when(teamService.getRegulatorTeam()).thenReturn(regulatorTeam);
+
+    var teamMemberRole = new TeamMemberRole(UUID.randomUUID());
+    teamMemberRole.setRole(IndustryTeamRole.SCAP_SUBMITTER.getEnumName());
+    teamMemberRole.setTeam(industryTeam);
+    when(teamMemberService.findAllRolesByUser(List.of(industryTeam, regulatorTeam), webUserAccountId))
+        .thenReturn(List.of(teamMemberRole));
+  }
+
+  private void givenUserCantAccessScap() {
+    scapDetail.setScap(getScap());
+    when(scapDetailService.getLatestByScapId(SCAP_ID)).thenReturn(scapDetail);
+    var industryTeam = getTeam();
+    var regulatorTeam = new Team();
+    regulatorTeam.setTeamType(TeamType.REGULATOR);
+
+    when(teamService.getByEnergyPortalOrgGroupId(scapDetail.getScap().getOrganisationGroupId()))
+        .thenReturn(industryTeam);
+    when(teamService.getRegulatorTeam()).thenReturn(regulatorTeam);
+
+    var teamMemberRole = new TeamMemberRole(UUID.randomUUID());
+    teamMemberRole.setRole(RegulatorTeamRole.ACCESS_MANAGER.getEnumName());
+    teamMemberRole.setTeam(regulatorTeam);
+    when(teamMemberService.findAllRolesByUser(List.of(industryTeam, regulatorTeam), webUserAccountId))
+        .thenReturn(List.of(teamMemberRole));
   }
 }

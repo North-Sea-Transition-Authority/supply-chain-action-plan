@@ -148,6 +148,7 @@ class ProjectDetailsServiceTest {
             .build()
     );
 
+
     when(projectFacilityRepository.findAllByProjectDetails(projectDetails)).thenReturn(List.of(projectFacility));
     when(facilityService.findFacilitiesByIds(
         List.of(projectFacilityId), ProjectDetailsService.PROJECT_FACILITIES_REQUEST_PURPOSE))

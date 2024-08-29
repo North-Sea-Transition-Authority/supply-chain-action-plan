@@ -259,17 +259,17 @@ class ProjectDetailsFormValidatorTest {
 
 
   private ProjectDetailsForm getValidProjectDetailsForm() {
-    var form = new ProjectDetailsForm();
-    form.setProjectName("Test project name");
-    form.setProjectSummary("This is a test project");
-    form.setProjectTypes(Set.of(ProjectType.CARBON_STORAGE_PERMIT));
-    form.setProjectCostEstimate("2.2");
-    form.setAwareOfLocalContentCommitment(true);
-    form.setExpectsToMeetLocalContentCommitment(true);
-    form.setFieldIds(new HashSet<>(VALID_FIELD_IDS));
-    form.setHasPlatforms(false);
-    form.setExpectedStartDate(LocalDate.of(2022, 1, 22));
-    form.setExpectedEndDate(LocalDate.of(2023, 12, 27));
-    return form;
+    var validForm = new ProjectDetailsForm();
+    validForm.setProjectName("Test project name");
+    validForm.setProjectSummary("This is a test project");
+    validForm.setProjectTypes(Set.of(ProjectType.CARBON_STORAGE_PERMIT));
+    validForm.setProjectCostEstimate("2.2");
+    validForm.setAwareOfLocalContentCommitment(true);
+    validForm.setExpectsToMeetLocalContentCommitment(true);
+    validForm.setFieldIds(new HashSet<>(VALID_FIELD_IDS));
+    validForm.setHasPlatforms(false);
+    validForm.setExpectedStartDate(LocalDate.of(2022, 1, 22));
+    validForm.setExpectedEndDate(LocalDate.of(2023, 12, 27));
+    return validForm;
   }
 }

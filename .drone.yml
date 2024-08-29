@@ -33,7 +33,11 @@ steps:
     image: node:18
     commands:
       - cd fivium-design-system-core && npm install && npx gulp build && cd ..
+      - node -v
+      - npm -v
+      - cat package.json
       - npm install
+      - ls -lavh node_modules/gulp
       - npx gulp buildAll
 
   - name: build-java

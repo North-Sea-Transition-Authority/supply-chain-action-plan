@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import uk.co.nstauthority.scap.endpointvalidation.annotations.CanAccessScap;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.HasAnyPermissionForScap;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.ScapHasStatus;
 import uk.co.nstauthority.scap.file.FileDeleteResult;
@@ -25,8 +26,6 @@ import uk.co.nstauthority.scap.scap.scap.ScapId;
 
 @RestController
 @RequestMapping("/{scapId}/additional-documents")
-@HasAnyPermissionForScap(permissions = {RolePermission.SUBMIT_SCAP})
-@ScapHasStatus(permittedStatuses = ScapDetailStatus.DRAFT)
 public class AdditionalDocumentsController {
 
   private final SupportingDocumentService supportingDocumentService;
@@ -44,6 +43,8 @@ public class AdditionalDocumentsController {
 
   @PostMapping("upload")
   @ResponseBody
+  @HasAnyPermissionForScap(permissions = {RolePermission.SUBMIT_SCAP})
+  @ScapHasStatus(permittedStatuses = ScapDetailStatus.DRAFT)
   public FileUploadResult upload(@PathVariable("scapId") ScapId scapId,
                                  @RequestParam("file") MultipartFile multipartFile) {
     var scapDetail = scapDetailService.getLatestByScapId(scapId);
@@ -52,6 +53,7 @@ public class AdditionalDocumentsController {
 
   @GetMapping("download/{uploadedFileId}")
   @ResponseBody
+  @CanAccessScap
   public ResponseEntity<InputStreamResource> download(@PathVariable("scapId") ScapId scapId,
                                                       @PathVariable("uploadedFileId") UUID uploadedFileId) {
     var scapDetail = scapDetailService.getLatestByScapId(scapId);
@@ -62,6 +64,8 @@ public class AdditionalDocumentsController {
 
   @PostMapping("delete/{uploadedFileId}")
   @ResponseBody
+  @HasAnyPermissionForScap(permissions = {RolePermission.SUBMIT_SCAP})
+  @ScapHasStatus(permittedStatuses = ScapDetailStatus.DRAFT)
   public FileDeleteResult delete(@PathVariable("scapId") ScapId scapId,
                                  @PathVariable("uploadedFileId") UUID uploadedFileId) {
     var scapDetail = scapDetailService.getLatestByScapId(scapId);
