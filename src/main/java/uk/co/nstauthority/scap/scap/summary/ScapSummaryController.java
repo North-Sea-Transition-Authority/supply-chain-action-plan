@@ -131,7 +131,7 @@ public class ScapSummaryController {
     return generator.generate();
   }
 
-  @PostMapping("/")
+  @PostMapping
   public ModelAndView getScapVersionSummary(@PathVariable("scapId") ScapId scapId,
                                             @ModelAttribute("versionSelectForm") VersionSelectForm form) {
     return ReverseRouter.redirect(on(ScapSummaryController.class)
