@@ -34,7 +34,7 @@ public class TeamMemberRole {
   protected TeamMemberRole() {
   }
 
-  TeamMemberRole(UUID uuid) {
+  public TeamMemberRole(UUID uuid) {
     this.uuid = uuid;
   }
 

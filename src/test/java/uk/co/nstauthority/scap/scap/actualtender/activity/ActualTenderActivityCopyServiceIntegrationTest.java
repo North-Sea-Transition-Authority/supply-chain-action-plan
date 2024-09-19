@@ -2,10 +2,10 @@ package uk.co.nstauthority.scap.scap.actualtender.activity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.Map;
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.co.nstauthority.scap.integrationtest.AbstractIntegrationTest;
