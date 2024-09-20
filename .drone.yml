@@ -182,7 +182,7 @@ steps:
       - docker build -t quay.io/fivium/supply-chain-action-plan:trivy-scan-target .
 
   - name: trivy-scan
-    image: aquasec/trivy:0.20.0
+    image: aquasec/trivy:0.55.2
     volumes:
       - name: docker-sock
         path: /var/run/docker.sock
@@ -192,7 +192,7 @@ steps:
         path: /var/webfiles
     commands:
       # timeout set as initial cache population can seemingly take a while sometimes
-      - trivy --format template --template "@contrib/html.tpl" -o /var/webfiles/${DRONE_BUILD_NUMBER}/trivy-scan.html image --timeout 30m --exit-code 1 quay.io/fivium/supply-chain-action-plan:trivy-scan-target
+      - trivy image --timeout 30m --exit-code 1 quay.io/fivium/supply-chain-action-plan:trivy-scan-target
     when:
       status:
         - success
