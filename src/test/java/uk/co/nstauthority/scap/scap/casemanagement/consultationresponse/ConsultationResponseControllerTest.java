@@ -110,7 +110,7 @@ class ConsultationResponseControllerTest extends AbstractControllerTest {
             .flashAttr("form", getConsultationResponseForm()))
         .andExpect(status().is3xxRedirection())
         .andExpect(flash().attributeExists("notificationBannerView"));
-    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_CONSULTATION_RESPONSE, SCAP_DETAIL, 1, TEST_STRING, null);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_CONSULTATION_RESPONSE, SCAP_DETAIL, 1, TEST_STRING, null, null);
   }
 
   @Test
@@ -133,7 +133,7 @@ class ConsultationResponseControllerTest extends AbstractControllerTest {
             .flashAttr("form", form))
         .andExpect(status().is3xxRedirection())
         .andExpect(flash().attributeExists("notificationBannerView"));
-    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_CONSULTATION_RESPONSE, SCAP_DETAIL, 1, TEST_STRING, file.getUploadedFileId());
+    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_CONSULTATION_RESPONSE, SCAP_DETAIL, 1, TEST_STRING, null, file.getUploadedFileId());
   }
 
   @Test

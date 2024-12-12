@@ -84,7 +84,7 @@ public class CaseEventService {
                                   ScapDetail scapDetail,
                                   Integer scapVersion,
                                   String comments) {
-    return recordNewEvent(subject, scapDetail, scapVersion, comments, null);
+    return recordNewEvent(subject, scapDetail, scapVersion, comments, null, null);
   }
 
   @Transactional
@@ -92,6 +92,7 @@ public class CaseEventService {
                                   ScapDetail scapDetail,
                                   Integer scapVersion,
                                   String comments,
+                                  String decisionRationale,
                                   UUID fileId) {
     updateRequestService.resolveUpdateRequest(scapDetail, subject);
     UploadedFile uploadedFile = null;
@@ -106,6 +107,7 @@ public class CaseEventService {
     caseEvent.setScapId(scapDetail.getScap().getScapId().scapId());
     caseEvent.setVersionNumber(scapVersion);
     caseEvent.setComments(comments);
+    caseEvent.setDecisionRationale(decisionRationale);
     caseEvent.setUploadedFile(uploadedFile);
 
     var loggedInUser = userDetailService.getUserDetail();
@@ -146,6 +148,7 @@ public class CaseEventService {
                 DateUtil.instantToString(caseEvent.getEventTime()),
                 userDisplayNames.get(caseEvent.getEventByWuaId()),
                 caseEvent.getComments(),
+                caseEvent.getDecisionRationale(),
                 updateRequests
                     .stream()
                     .filter(updateRequest -> updateRequest.getCaseEvent().getId().equals(caseEvent.getId()))

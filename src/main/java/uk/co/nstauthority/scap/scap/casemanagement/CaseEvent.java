@@ -37,6 +37,8 @@ public class CaseEvent {
   private Long eventByWuaId;
   private String comments;
 
+  private String decisionRationale;
+
   @OneToOne
   @JoinColumn(name = "file_id")
   private UploadedFile uploadedFile;
@@ -99,6 +101,14 @@ public class CaseEvent {
 
   public void setComments(String comments) {
     this.comments = comments;
+  }
+
+  public String getDecisionRationale() {
+    return decisionRationale;
+  }
+
+  public void setDecisionRationale(String decisionRationale) {
+    this.decisionRationale = decisionRationale;
   }
 
   public UploadedFile getUploadedFile() {

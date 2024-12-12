@@ -105,7 +105,7 @@ class FurtherInfoResponseControllerTest extends AbstractScapSubmitterControllerT
         .with(csrf()))
         .andExpect(status().is3xxRedirection());
 
-    verify(caseEventService).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_DETAIL, 1, null, null);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_DETAIL, 1, null, null, null);
   }
 
   @Test
@@ -124,7 +124,7 @@ class FurtherInfoResponseControllerTest extends AbstractScapSubmitterControllerT
         .andExpect(status().is3xxRedirection())
         .andExpect(flash().attributeExists("notificationBannerView"));
 
-    verify(caseEventService).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_DETAIL, 1, TEST_STRING, null);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_DETAIL, 1, TEST_STRING, null, null);
   }
 
   @Test
@@ -148,7 +148,7 @@ class FurtherInfoResponseControllerTest extends AbstractScapSubmitterControllerT
         .andExpect(status().is3xxRedirection())
         .andExpect(flash().attributeExists("notificationBannerView"));
 
-    verify(caseEventService).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_DETAIL, 1, TEST_STRING, file.getUploadedFileId());
+    verify(caseEventService).recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE, SCAP_DETAIL, 1, TEST_STRING, null, file.getUploadedFileId());
   }
 
   @Test

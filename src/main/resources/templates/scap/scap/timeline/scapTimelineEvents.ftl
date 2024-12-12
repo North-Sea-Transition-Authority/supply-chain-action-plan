@@ -35,6 +35,11 @@
           <@fdsDataItems.dataValues key="Comments" value=caseEvent.comments()></@fdsDataItems.dataValues>
         </@fdsDataItems.dataItem>
       </#if>
+      <#if caseEvent.hasDecisionRationale()>
+        <@fdsDataItems.dataItem>
+          <@fdsDataItems.dataValues key="Summary of decision rationale" value=caseEvent.decisionRationale()></@fdsDataItems.dataValues>
+        </@fdsDataItems.dataItem>
+      </#if>
       <#if caseEvent.hasSupportingDocument()>
         <@fdsDataItems.dataItem>
           <#assign fileUploadLink>

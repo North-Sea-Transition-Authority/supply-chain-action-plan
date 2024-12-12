@@ -2,6 +2,7 @@
 <#import '../summary/scapSummary.ftl' as scapSummary>
 <#import '../summary/scapSummaryCard.ftl' as scapSummaryCard>
 <#import '../timeline/scapTimelineEvents.ftl' as timeline>
+<#import '../../scap/macros/noObjectionGuidance.ftl' as noObjectionGuidance>
 
 <#assign pageTitle = projectName!'' />
 <#assign customerMnemonic = customerBranding.mnemonic() />
@@ -91,6 +92,8 @@ backLinkUrl=springUrl(backLinkUrl)
     <p class="govuk-body">
       Click the link to print your application. In the print dialog displayed change your printer to ‘Print to PDF’. This will allow you to save the application as a PDF.</p>
   </@fdsDetails.summaryDetails>
+
+  <@noObjectionGuidance.noObjectionGuidance/>
 
   <@fdsTabs.tabs tabsHeading="SCAP overview tabs">
     <@fdsTabs.tabList>

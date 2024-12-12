@@ -117,6 +117,7 @@ public class ConsultationResponseController {
               scapDetail,
               scapDetail.getVersionNumber(),
               consultationResponseForm.getResponseComments().getInputValue(),
+              null,
               uploadedFile);
           NotificationBannerUtils.successBannerRedirect(
               "Recorded consultation response on: %s".formatted(scapDetail.getScap().getReference()),

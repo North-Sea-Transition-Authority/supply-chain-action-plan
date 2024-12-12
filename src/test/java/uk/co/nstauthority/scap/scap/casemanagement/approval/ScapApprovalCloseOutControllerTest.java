@@ -120,7 +120,7 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl(expectedRedirect))
         .andExpect(flash().attributeExists("notificationBannerView"));
-    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_CLOSED_OUT, scapDetail, 1, TEST_STRING, null);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_CLOSED_OUT, scapDetail, 1, TEST_STRING, TEST_STRING, null);
     verify(scapDetailService).closeOutScap(scapDetail);
     verify(scapEmailService).sendScapApprovalEmails(scapDetail, null, true);
   }
@@ -203,6 +203,7 @@ class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
 
     form.setApprovalComments(input);
     form.setProjectClosedOut(YesNo.YES);
+    form.getDecisionRationale().setInputValue(TEST_STRING);
     return form;
   }
 

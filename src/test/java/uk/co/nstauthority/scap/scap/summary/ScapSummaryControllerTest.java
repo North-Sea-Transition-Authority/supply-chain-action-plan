@@ -399,6 +399,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
         "",
         null,
         null,
+        null,
         null);
     return List.of(timelineEvent);
   }

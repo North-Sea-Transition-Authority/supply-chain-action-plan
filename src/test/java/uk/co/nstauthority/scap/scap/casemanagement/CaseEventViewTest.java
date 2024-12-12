@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.scap.casemanagement;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -20,6 +21,7 @@ class CaseEventViewTest {
         null,
         null,
         null,
+        null,
         null);
 
     assertFalse(timelineEventView.hasComments());
@@ -33,6 +35,7 @@ class CaseEventViewTest {
         "2020-03-02 00:00:00",
         "Testing Account",
         "this event view has comments",
+        null,
         null,
         null,
         null);
@@ -50,6 +53,7 @@ class CaseEventViewTest {
         "this event view has comments",
         null,
         null,
+        null,
         null);
 
     assertFalse(caseEventView.hasBeenRespondedTo());
@@ -63,10 +67,43 @@ class CaseEventViewTest {
         "2020-03-02 00:00:00",
         "Testing Account",
         "this event view has comments",
+        "decision rationale",
         "2020-05-02 00:00:00",
         "2020-05-02 00:00:00",
         null);
 
     assertTrue(caseEventView.hasBeenRespondedTo());
+  }
+
+  @Test
+  void caseEventView_hasDecisionRationale_noRationale() {
+    var timelineEventView = new CaseEventView(CaseEventSubject.SCAP_SUBMITTED.getDisplayName(),
+        1,
+        1,
+        "2020-03-02 00:00:00",
+        "Testing Account",
+        null,
+        null,
+        null,
+        null,
+        null);
+
+    assertThat(timelineEventView.hasDecisionRationale()).isFalse();
+  }
+
+  @Test
+  void caseEventView_hasDecisionRationale_hasRationale() {
+    var timelineEventView = new CaseEventView(CaseEventSubject.SCAP_SUBMITTED.getDisplayName(),
+        1,
+        1,
+        "2020-03-02 00:00:00",
+        "Testing Account",
+        "this event view has comments",
+        "decision rationale",
+        null,
+        null,
+        null);
+
+    assertThat(timelineEventView.hasDecisionRationale()).isTrue();
   }
 }

@@ -1,0 +1,1 @@
+ALTER TABLE case_events ADD COLUMN decision_rationale VARCHAR(300)

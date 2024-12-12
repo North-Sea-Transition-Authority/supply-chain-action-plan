@@ -78,11 +78,14 @@ If FDS is not on the latest version, follow the instructions to update it [here]
 - `npm install`
 - `npx gulp buildAll`
 
-### 5. Generate Jooq classes
+### 6. Generate Jooq classes
 Execute the gradle task `generateJooq`. You will need to re-generate when you change the database.
 (This requires docker to be running on your machine, but have the SCAP DB off)
 
-### 6. Run the app
+### 7. Bootstrap your local DB
+Run the script in `devtools/create_dev_users.sql` to bootstrap your DB.
+
+### 8. Run the app
 Create a run configuration for the Spring app and start the application.
 
 The application will be running on `localhost:8080/scap/<endpoint>`

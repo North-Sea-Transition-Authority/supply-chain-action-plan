@@ -120,6 +120,7 @@ public class FurtherInfoResponseController {
               scapDetail,
               scapDetail.getVersionNumber(),
               furtherInfoResponseForm.getInfoResponse().getInputValue(),
+              null,
               uploadedFile);
           NotificationBannerUtils.successBannerRedirect(
               "Responded to further information request on %s".formatted(scapDetail.getScap().getReference()),

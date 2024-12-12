@@ -108,6 +108,7 @@ class ScapApprovalControllerTest extends AbstractScapSubmitterControllerTest {
         scapDetail,
         1,
         getScapApprovalForm().getApprovalComments().getInputValue(),
+        getScapApprovalForm().getDecisionRationale().getInputValue(),
         null);
     verify(scapDetailService).approveScap(scapDetail);
   }
@@ -128,7 +129,7 @@ class ScapApprovalControllerTest extends AbstractScapSubmitterControllerTest {
         .andExpect(status().is3xxRedirection())
         .andExpect(flash().attributeExists("notificationBannerView"));
 
-    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_APPROVED, scapDetail, 1, TEST_STRING, null);
+    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_APPROVED, scapDetail, 1, TEST_STRING, TEST_STRING, null);
     verify(scapDetailService).approveScap(scapDetail);
     verify(scapEmailService).sendScapApprovalEmails(scapDetail, null, false);
   }
@@ -154,7 +155,7 @@ class ScapApprovalControllerTest extends AbstractScapSubmitterControllerTest {
         .andExpect(status().is3xxRedirection())
         .andExpect(flash().attributeExists("notificationBannerView"));
 
-    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_APPROVED, scapDetail, 1, TEST_STRING, file.getUploadedFileId());
+    verify(caseEventService).recordNewEvent(CaseEventSubject.SCAP_APPROVED, scapDetail, 1, TEST_STRING, TEST_STRING, file.getUploadedFileId());
     verify(scapDetailService).approveScap(scapDetail);
     verify(scapEmailService).sendScapApprovalEmails(scapDetail, null, false);
   }
@@ -190,6 +191,7 @@ class ScapApprovalControllerTest extends AbstractScapSubmitterControllerTest {
 
     form.setApprovalComments(input);
     form.setProjectClosedOut(YesNo.NO);
+    form.getDecisionRationale().setInputValue(TEST_STRING);
     return form;
   }
 

@@ -128,6 +128,7 @@ public class ScapApprovalController {
               scapDetail,
               scapDetail.getVersionNumber(),
               scapApprovalForm.getApprovalComments().getInputValue(),
+              scapApprovalForm.getDecisionRationale().getInputValue(),
               uploadedFile);
           var projectClosedOut = scapApprovalForm.getProjectClosedOut().equals(YesNo.YES);
           if (projectClosedOut) {

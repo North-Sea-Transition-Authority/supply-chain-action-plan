@@ -14,6 +14,10 @@ public class ScapApprovalForm {
 
   private List<FileUploadForm> approvalDocuments = new ArrayList<>();
 
+  private StringInput decisionRationale = new StringInput("decisionRationale", "summary of decision rationale");
+
+  private Boolean understandGuidance;
+
   public StringInput getApprovalComments() {
     return approvalComments;
   }
@@ -36,5 +40,21 @@ public class ScapApprovalForm {
 
   public void setApprovalDocuments(List<FileUploadForm> approvalDocuments) {
     this.approvalDocuments = approvalDocuments;
+  }
+
+  public StringInput getDecisionRationale() {
+    return decisionRationale;
+  }
+
+  public void setDecisionRationale(StringInput decisionRationale) {
+    this.decisionRationale = decisionRationale;
+  }
+
+  public Boolean getUnderstandGuidance() {
+    return understandGuidance;
+  }
+
+  public void setUnderstandGuidance(Boolean understandGuidance) {
+    this.understandGuidance = understandGuidance;
   }
 }

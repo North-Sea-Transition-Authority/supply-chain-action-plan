@@ -9,11 +9,16 @@ public record CaseEventView(String caseEventSubject,
                             String formattedTime,
                             String userDisplayName,
                             String comments,
+                            String decisionRationale,
                             String dateOfUpdateDeadline,
                             String dateOfResponse,
                             FileUploadSummaryView supportingDocument) {
   public boolean hasComments() {
     return (Objects.nonNull(comments) && !comments.isEmpty());
+  }
+
+  public boolean hasDecisionRationale() {
+    return (Objects.nonNull(decisionRationale) && !decisionRationale.isEmpty());
   }
 
   public boolean hasBeenRespondedTo() {

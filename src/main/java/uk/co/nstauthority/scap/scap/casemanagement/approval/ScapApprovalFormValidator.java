@@ -11,6 +11,10 @@ import uk.co.fivium.formlibrary.validator.string.StringInputValidator;
 @Service
 public class ScapApprovalFormValidator implements Validator {
 
+  private static final String UNDERSTAND_GUIDANCE_FIELD_NAME = "understandGuidance";
+  private static final String UNDERSTAND_GUIDANCE_ERROR_CODE = "%s.notFound".formatted(UNDERSTAND_GUIDANCE_FIELD_NAME);
+  private static final String UNDERSTAND_GUIDANCE_ERROR_MESSAGE = "You must understand what no objection means.";
+
   @Override
   public boolean supports(Class<?> clazz) {
     return ScapApprovalForm.class.equals(clazz);
@@ -30,5 +34,17 @@ public class ScapApprovalFormValidator implements Validator {
         "projectClosedOut.required",
         "You must declare if the project has been completed."
     );
+
+    StringInputValidator.builder()
+        .mustHaveCharacterCountAtMost(300)
+        .validate(form.getDecisionRationale(), errors);
+
+    if (!Boolean.TRUE.equals(form.getUnderstandGuidance())) {
+      errors.rejectValue(
+          UNDERSTAND_GUIDANCE_FIELD_NAME,
+          UNDERSTAND_GUIDANCE_ERROR_CODE,
+          UNDERSTAND_GUIDANCE_ERROR_MESSAGE
+      );
+    }
   }
 }

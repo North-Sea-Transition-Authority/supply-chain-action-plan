@@ -55,6 +55,8 @@ class ScapApprovalFormValidatorTest {
     form.setApprovalComments(input);
     form.setProjectClosedOut(YesNo.YES);
     form.setApprovalDocuments(List.of(new FileUploadForm()));
+    form.getDecisionRationale().setInputValue("decision rationale");
+    form.setUnderstandGuidance(true);
 
     bindingResult = new BeanPropertyBindingResult(form, "form");
 
@@ -75,6 +77,62 @@ class ScapApprovalFormValidatorTest {
     assertTrue(bindingResult.hasFieldErrors());
     assertThat(bindingResult.getFieldError("approvalComments.inputValue").getDefaultMessage())
         .isEqualTo("No objection comments must be 4000 characters or less");
+  }
+
+  @Test
+  void scapApprovalFormValidator_noRationaleGiven_invalid() {
+    form = new ScapApprovalForm();
+    var input = form.getApprovalComments();
+    input.setInputValue("This is a Test String");
+    form.setApprovalComments(input);
+    form.setProjectClosedOut(YesNo.YES);
+    form.setApprovalDocuments(List.of(new FileUploadForm()));
+    form.getDecisionRationale().setInputValue("");
+    form.setUnderstandGuidance(true);
+
+    bindingResult = new BeanPropertyBindingResult(form, "form");
+
+    validator.validate(form, bindingResult);
+    assertTrue(bindingResult.hasFieldErrors());
+    assertThat(bindingResult.getFieldError("decisionRationale.inputValue").getDefaultMessage())
+        .isEqualTo("Enter summary of decision rationale");
+  }
+
+  @Test
+  void scapApprovalFormValidator_rationaleMoreThan300Chars_invalid() {
+    form = new ScapApprovalForm();
+    var input = form.getApprovalComments();
+    input.setInputValue("This is a Test String");
+    form.setApprovalComments(input);
+    form.setProjectClosedOut(YesNo.YES);
+    form.setApprovalDocuments(List.of(new FileUploadForm()));
+    form.getDecisionRationale().setInputValue("A".repeat(301));
+    form.setUnderstandGuidance(true);
+
+    bindingResult = new BeanPropertyBindingResult(form, "form");
+
+    validator.validate(form, bindingResult);
+    assertTrue(bindingResult.hasFieldErrors());
+    assertThat(bindingResult.getFieldError("decisionRationale.inputValue").getDefaultMessage())
+        .isEqualTo("Summary of decision rationale must be 300 characters or less");
+  }
+
+  @Test
+  void scapApprovalFormValidator_dontUNderstanObjectionMeaning() {
+    form = new ScapApprovalForm();
+    var input = form.getApprovalComments();
+    input.setInputValue("This is a Test String");
+    form.setApprovalComments(input);
+    form.setProjectClosedOut(YesNo.YES);
+    form.setApprovalDocuments(List.of(new FileUploadForm()));
+    form.getDecisionRationale().setInputValue("A".repeat(300));
+    form.setUnderstandGuidance(null);
+
+    bindingResult = new BeanPropertyBindingResult(form, "form");
+    validator.validate(form, bindingResult);
+    assertTrue(bindingResult.hasFieldErrors());
+    assertThat(bindingResult.getFieldError("understandGuidance").getDefaultMessage())
+        .isEqualTo("You must understand what no objection means.");
   }
 
   @Test
