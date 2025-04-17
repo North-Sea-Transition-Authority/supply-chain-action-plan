@@ -11,11 +11,7 @@
               <#else>
                 <#assign itemUrl = ""/>
               </#if>
-              <#if item.label().name() == 'BLOCKED'>
-                <#assign tagText="Cannot start yet"/>
-                <#assign tagClass="govuk-tag--grey"/>
-                <#assign itemUrl=""/>
-              <#elseif item.label().name() == 'NOT_STARTED'>
+              <#if item.label().name() == 'NOT_STARTED'>
                 <#assign tagText="Not started"/>
                 <#assign tagClass="govuk-tag--grey"/>
               <#elseif item.label().name() == 'IN_PROGRESS'>

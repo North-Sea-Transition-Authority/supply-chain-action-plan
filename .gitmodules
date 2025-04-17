@@ -1,6 +1,4 @@
 [submodule "fivium-design-system-core"]
 	path = fivium-design-system-core
 	url = git@bitbucket.org:fiviumuk/fivium-design-system-core.git
-	# Use temporary fork of release branch to include https://bitbucket.org/fiviumuk/fivium-design-system-core/commits/751082f973966bcf95e22550fd7eac440f043579
-	# Can be switched back to normal release branch once merged into a formal release
-	branch = release/v5.4.8-govuk-4.4.1-scap-e2e
+	branch = release/v6.2.0-govuk-5.9.0

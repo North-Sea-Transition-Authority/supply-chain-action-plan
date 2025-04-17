@@ -13,6 +13,7 @@
 <#-- @ftlvariable name="cookiesStatementUrl" type="String" -->
 <#-- @ftlvariable name="feedbackUrl" type="String" -->
 <#-- @ftlvariable name="analytics" type=" uk.co.nstauthority.scap.configuration.AnalyticsProperties" -->
+<#-- @ftlvariable name="navigationItems" type="java.util.List<TopNavigationItem>" -->
 
 <#if notificationBannerView??>
   <#assign notificationBannerContent>
@@ -26,8 +27,8 @@
 
 <#macro cookieBanner>
   <@fdsCookieBanner.analyticsCookieBanner
-   serviceName=serviceBranding.name()
-   cookieSettingsUrl=springUrl(cookiesStatementUrl)
+     serviceName=serviceBranding.name()
+     cookieSettingsUrl=springUrl(cookiesStatementUrl)
   />
 </#macro>
 
@@ -43,7 +44,7 @@
   caption=""
   singleErrorMessage=""
   wrapperWidth=false
-  topNavigation=false
+  topNavigation=true
 >
   <#assign customerMnemonic = customerBranding.mnemonic() />
   <#assign serviceHomeUrl = springUrl(serviceHomeUrl) />
@@ -70,20 +71,21 @@
   </#if>
 
   <#assign headerContent>
-      <@fdsHeader.header
+    <@fdsHeader.header
       homePageUrl=serviceHomeUrl
       serviceUrl=serviceHomeUrl
       logoProductText=customerMnemonic
       headerNav=true
       serviceName=serviceName
       headerLogo="GOV_CREST"
+      logoText=customerBranding.name()
       wrapperWidth=wrapperWidth
-      >
+    >
         <#if loggedInUser?has_content>
           <@fdsHeader.headerNavigation>
             <@fdsHeader.headerNavigationItem
-            itemText=loggedInUser.displayName()
-            itemActive=false
+              itemText=loggedInUser.displayName()
+              itemActive=false
             />
             <@fdsHeader.headerNavigationSignOutButton formUrl=springUrl("/logout") buttonText="Sign out"/>
           </@fdsHeader.headerNavigation>
@@ -105,7 +107,7 @@
     <@fdsNstaFooter.nstaFooter metaLinks=true footerMetaContent=footerMetaContent wrapperWidth=wrapperWidth/>
   </#assign>
   <#assign analyticsScript>
-    <script src="<@spring.url'/assets/javascript/googleAnalyticsEventTracking.js'/>"></script>
+    <script type="module" src="<@spring.url'/assets/javascript/googleAnalyticsEventTracking.js'/>"></script>
   </#assign>
 
   <@fdsDefaultPageTemplate
@@ -114,6 +116,7 @@
     htmlAppTitle=serviceName
     pageHeading=pageHeading
     headerLogo="GOV_CREST"
+    logoText=customerBranding.name()
     logoProductText=customerMnemonic
     topNavigation=topNavigation
     phaseBanner=phaseBanner
@@ -137,6 +140,7 @@
     footerContent=footerContent
     customScriptContent=analyticsScript
     cookieBannerMacro=cookieBanner
+    navigationItems=navigationItems
   >
     <@fdsGoogleAnalytics.googleAnalytics measurementId=analytics.appTag />
     <@fdsGoogleAnalytics.googleAnalytics measurementId=analytics.globalTag />

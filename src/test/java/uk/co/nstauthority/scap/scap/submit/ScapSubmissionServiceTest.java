@@ -41,8 +41,7 @@ class ScapSubmissionServiceTest {
   @Test
   void isScapValid_NoItemsComplete_AssertFalse() {
     var taskListItems = List.of(
-        new TaskListItem("test item 1", TaskListLabel.NOT_COMPLETED, "#"),
-        new TaskListItem("test item 2", TaskListLabel.BLOCKED, "#")
+        new TaskListItem("test item 1", TaskListLabel.NOT_COMPLETED, "#")
     );
     when(scapFormTaskListSectionService.getSection(SCAP_DETAIL))
         .thenReturn(Optional.of(new TaskListSection("Test section", 1, taskListItems)));

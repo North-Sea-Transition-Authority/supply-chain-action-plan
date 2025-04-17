@@ -5,8 +5,7 @@ public enum TaskListLabel {
   NOT_STARTED,
   IN_PROGRESS,
   COMPLETED,
-  NOT_COMPLETED,
-  BLOCKED;
+  NOT_COMPLETED;
 
   public static TaskListLabel from(boolean isValid) {
     if (isValid) {

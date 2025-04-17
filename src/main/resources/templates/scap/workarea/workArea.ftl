@@ -62,11 +62,11 @@
 <#-- @ftlvariable name="workAreaItem" type="uk.co.nstauthority.scap.workarea.WorkAreaItem" -->
   <#assign tagContentInfoRequest>
     <#if workAreaItem.updateInProgress()>
-      <@fdsResultList.resultListTag tagClass="govuk-tag--blue" tagText="Update in progress"/>
+      <@fdsTag.tag tagClass="govuk-tag--blue">Update in progress</@fdsTag.tag>
     <#elseif workAreaItem.requestDueBy()?has_content>
-        <@fdsResultList.resultListTag tagClass="govuk-tag--blue" tagText="Update due by " + workAreaItem.requestDueBy()/>
+      <@fdsTag.tag tagClass="govuk-tag--blue">Update due by ${workAreaItem.requestDueBy()}</@fdsTag.tag>
     <#elseif workAreaItem.outstandingInformationRequest()>
-      <@fdsResultList.resultListTag tagClass="govuk-tag--blue" tagText="Further information requested"/>
+      <@fdsTag.tag tagClass="govuk-tag--blue">Further information requested</@fdsTag.tag>
     </#if>
   </#assign>
   <@fdsResultList.resultListItem

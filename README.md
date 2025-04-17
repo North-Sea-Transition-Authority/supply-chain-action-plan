@@ -1,19 +1,4 @@
-# Template SpringBoot Project
-
-## Configuring the project
-
-This template project can be used to help start your new Digital project. This README will contain details on what needs to be changed to get your project configured.
-Here are the steps required for you to configure this template into your specific project: 
-- Replace usages of the `XYZ-TEMPLATE`, `xyzt`, `XYZ Template` 
-- Update `https://hooks.slack.com/services/UPDATE_WEBHOOK` with the new slack webhook 
-- Rename the packages (currently it's `uk.co.nstauthority.scap`)
-- Rename the class `XyzTemplateApplication`
-- Build the secrets and add to `.drone.yml`
-- Rename the project : File > Project Structure > Project > Project Name
-- Update banner.txt
-- Update the README
-
-Note that this template uses a Postgres database, so make sure that the database is running correctly after you have renamed it by following the first Setup step below. 
+# Supply chain action plan
 
 ## Pre-requisites
 - Java 17
@@ -72,15 +57,17 @@ Note that this template uses a Postgres database, so make sure that the database
 - `cd fivium-design-system-core && npm install && npx gulp build && cd ..`
 
 #### 3.1. Update the Fivium Design System
-If FDS is not on the latest version, follow the instructions to update it [here](https://confluence.fivium.co.uk/display/FDS/Releases)
+If FDS is not on the latest version, follow the instructions to update it [here](https://fivium.atlassian.net/wiki/spaces/FDS/pages/10354845/Releases)
 
 ### 4. Build frontend components
 - `npm install`
 - `npx gulp buildAll`
 
 ### 6. Generate Jooq classes
+_This requires docker to be running on your machine, but have nothing running in docker_
+
 Execute the gradle task `generateJooq`. You will need to re-generate when you change the database.
-(This requires docker to be running on your machine, but have the SCAP DB off)
+
 
 ### 7. Bootstrap your local DB
 Run the script in `devtools/create_dev_users.sql` to bootstrap your DB.
