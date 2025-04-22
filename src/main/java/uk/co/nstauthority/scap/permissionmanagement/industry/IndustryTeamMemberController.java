@@ -64,8 +64,7 @@ public class IndustryTeamMemberController {
       modelAndView
           .addObject("addTeamMemberUrl",
               ReverseRouter.route(on(IndustryAddMemberController.class).renderAddTeamMember(teamId)))
-          .addObject("canRemoveUsers", industryTeamService.isAccessManager(teamId, user))
-          .addObject("canEditUsers", industryTeamService.isAccessManager(teamId, user));
+          .addObject("canEditOrRemoveUsers", industryTeamService.isAccessManager(teamId, user));
     }
     if (isOrganisationAccessManager(user)) {
       modelAndView

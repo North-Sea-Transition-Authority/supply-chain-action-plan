@@ -72,9 +72,7 @@ public class RegulatorTeamMemberController {
       modelAndView
           .addObject("addTeamMemberUrl",
               ReverseRouter.route(on(RegulatorAddMemberController.class).renderAddTeamMember(teamId)))
-          .addObject("canRemoveUsers", teamMemberService.isMemberOfTeamWithAnyRoleOf(teamId, user,
-              Set.of(RegulatorTeamRole.ACCESS_MANAGER.name())))
-          .addObject("canEditUsers", teamMemberService.isMemberOfTeamWithAnyRoleOf(teamId, user,
+          .addObject("canEditOrRemoveUsers", teamMemberService.isMemberOfTeamWithAnyRoleOf(teamId, user,
               Set.of(RegulatorTeamRole.ACCESS_MANAGER.name())));
     }
 

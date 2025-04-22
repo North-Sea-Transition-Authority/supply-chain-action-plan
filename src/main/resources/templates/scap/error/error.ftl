@@ -8,9 +8,10 @@
 <#assign pageTitle = "Sorry, there is a problem with the service" />
 
 <@defaultPage
-htmlTitle=pageTitle
-pageHeading=pageTitle
-phaseBanner=false
+  htmlTitle=pageTitle
+  pageHeading=pageTitle
+  phaseBanner=false
+  topNavigation=false
 >
   <p class="govuk-body">Try again later.</p>
   <p class="govuk-body">

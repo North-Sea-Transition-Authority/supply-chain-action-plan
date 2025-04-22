@@ -12,12 +12,12 @@
       <@fdsSummaryList.summaryListCardActionItem
         itemUrl=listItem.changeLinkUrl()
         itemText="Change"
-        itemScreenReaderText="Change this planned tender activity"
+        itemScreenReaderText="Planned tender activity ${listId+1}"
       />
       <@fdsSummaryList.summaryListCardActionItem
         itemUrl=springUrl(listItem.deleteLinkUrl())
         itemText="Delete"
-        itemScreenReaderText="Delete this planned tender activity"
+        itemScreenReaderText="Planned tender activity ${listId+1}"
       />
     </@fdsSummaryList.summaryListCardActionList>
   </#assign>

@@ -1,7 +1,6 @@
 <#include '../../fds/objects/layouts/generic.ftl'>
 
-<#macro teamMembers name members canRemoveUsers=false canEditUsers=false>
-  <#assign showActionColumn = canRemoveUsers || canEditUsers/>
+<#macro teamMembers name members canEditOrRemoveUsers>
   <table class="govuk-table">
     <caption class="govuk-table__caption govuk-table__caption--m govuk-visually-hidden">Members of ${name}</caption>
     <thead class="govuk-table__head">
@@ -9,7 +8,7 @@
         <th scope="col" class="govuk-table__header">Name</th>
         <th scope="col" class="govuk-table__header">Contact details</th>
         <th scope="col" class="govuk-table__header">Roles</th>
-          <#if showActionColumn>
+          <#if canEditOrRemoveUsers>
             <th scope="col" class="govuk-table__header">Actions</th>
           </#if>
       </tr>
@@ -35,14 +34,16 @@
               </#list>
           </ul>
         </td>
-          <#if showActionColumn>
+          <#if canEditOrRemoveUsers>
             <td class="govuk-table__cell">
-              <#if canEditUsers>
-                <ul class="govuk-list govuk-!-margin-bottom-0"><@fdsAction.link linkText="Edit" linkUrl=springUrl(member.editUrl()) linkScreenReaderText=member.getDisplayName() /></ul>
-              </#if>
-              <#if canRemoveUsers>
-                <ul class="govuk-list govuk-!-margin-bottom-0"><@fdsAction.link linkText="Remove" linkUrl=springUrl(member.removeUrl()) linkScreenReaderText=member.getDisplayName() /></ul>
-              </#if>
+              <ul class="govuk-list govuk-!-margin-bottom-0">
+                <li >
+                  <@fdsAction.link linkText="Edit" linkUrl=springUrl(member.editUrl()) linkScreenReaderText=member.getDisplayName()/>
+                </li>
+                <li >
+                  <@fdsAction.link linkText="Remove" linkUrl=springUrl(member.removeUrl()) linkScreenReaderText=member.getDisplayName() />
+                </li>
+              </ul>
             </td>
           </#if>
       </tr>

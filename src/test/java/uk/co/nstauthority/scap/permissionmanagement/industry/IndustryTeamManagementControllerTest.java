@@ -100,8 +100,7 @@ class IndustryTeamManagementControllerTest extends AbstractIndustryTeamControlle
         .andExpect(model().attribute("teamName", team.getDisplayName()))
         .andExpect(model().attribute("teamRoles", IndustryTeamRole.values()))
         .andExpect(model().attribute("teamMembers", List.of(teamMemberView)))
-        .andExpect(model().attribute("canRemoveUsers", true))
-        .andExpect(model().attribute("canEditUsers", true))
+        .andExpect(model().attribute("canEditOrRemoveUsers", true))
         .andExpect(model().attribute("addTeamMemberUrl", expectedAddUrl));
   }
 

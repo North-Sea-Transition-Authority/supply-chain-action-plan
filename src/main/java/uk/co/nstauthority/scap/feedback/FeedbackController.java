@@ -72,6 +72,7 @@ public class FeedbackController {
   private ModelAndView feedbackFormModelAndView(ScapId scapId) {
     return new ModelAndView("scap/feedback/giveFeedback")
         .addObject("satisfactionRadioItems", SatisfactionRating.getRadioItems())
-        .addObject("scapId", scapId);
+        .addObject("scapId", scapId)
+        .addObject("cancelUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)));
   }
 }

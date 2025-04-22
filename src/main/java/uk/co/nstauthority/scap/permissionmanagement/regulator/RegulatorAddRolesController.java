@@ -76,12 +76,17 @@ class RegulatorAddRolesController extends AddRolesController {
                                       @PathVariable("webUserAccountId") WebUserAccountId webUserAccountId,
                                       @ModelAttribute("form") TeamMemberRolesForm form,
                                       BindingResult bindingResult) {
+    var energyPortalUser = energyPortalUserService.getEnergyPortalUser(webUserAccountId);
     regulatorTeamMemberRolesValidator.validate(form, bindingResult);
     return super.saveAddTeamMemberRoles(teamId,
         webUserAccountId,
         form,
         bindingResult,
         ReverseRouter.redirect(on(RegulatorTeamMemberController.class).renderMemberList(teamId)),
-        ReverseRouter.redirect(on(RegulatorAddRolesController.class).renderAddTeamMemberRoles(teamId, webUserAccountId)));
+        getAddTeamMemberRolesModelAndView(energyPortalUser, form)
+            .addObject("roles", DisplayableEnumOptionUtil.getDisplayableOptionsWithDescription(RegulatorTeamRole.class))
+            .addObject(
+                "backLinkUrl",
+                ReverseRouter.route(on(RegulatorAddMemberController.class).renderAddTeamMember(teamId))));
   }
 }

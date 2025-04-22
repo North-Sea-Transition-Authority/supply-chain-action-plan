@@ -35,18 +35,13 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 class IndustryAddRolesController extends AddRolesController {
 
   private final EnergyPortalUserService energyPortalUserService;
-
   private final IndustryTeamMemberRolesValidator industryTeamMemberRolesValidator;
 
   @Autowired
-  protected IndustryAddRolesController(
-      TeamService regulatorTeamService,
-      ControllerHelperService controllerHelperService,
-      EnergyPortalUserService energyPortalUserService,
-      IndustryTeamMemberRolesValidator industryTeamMemberRolesValidator) {
-    super(regulatorTeamService,
-        controllerHelperService,
-        energyPortalUserService);
+  protected IndustryAddRolesController(TeamService regulatorTeamService, ControllerHelperService controllerHelperService,
+                                       EnergyPortalUserService energyPortalUserService,
+                                       IndustryTeamMemberRolesValidator industryTeamMemberRolesValidator) {
+    super(regulatorTeamService, controllerHelperService, energyPortalUserService);
     this.energyPortalUserService = energyPortalUserService;
     this.industryTeamMemberRolesValidator = industryTeamMemberRolesValidator;
   }
@@ -59,8 +54,7 @@ class IndustryAddRolesController extends AddRolesController {
         .addObject("roles", DisplayableEnumOptionUtil.getDisplayableOptionsWithDescription(IndustryTeamRole.class))
         .addObject(
             "backLinkUrl",
-            ReverseRouter.route(on(IndustryAddMemberController.class).renderAddTeamMember(teamId)))
-        ;
+            ReverseRouter.route(on(IndustryAddMemberController.class).renderAddTeamMember(teamId)));
   }
 
   @Override

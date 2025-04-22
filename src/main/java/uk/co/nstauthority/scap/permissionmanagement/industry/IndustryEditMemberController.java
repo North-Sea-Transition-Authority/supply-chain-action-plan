@@ -33,24 +33,19 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
 @RequestMapping("/permission-management/industry/{teamId}/edit/{wuaId}")
 @HasAnyPermissionForTeam(allowRegulatorAccess = true, permissions = RolePermission.MANAGE_ORGANISATIONS)
 public class IndustryEditMemberController {
+
   private final TeamMemberService teamMemberService;
   private final TeamMemberViewService teamMemberViewService;
-
   private final TeamMemberRoleService teamMemberRoleService;
   private final ControllerHelperService controllerHelperService;
-
   private final IndustryTeamMemberEditRolesValidator industryTeamMemberEditRolesValidator;
-
   private final TeamService teamService;
 
   @Autowired
-  IndustryEditMemberController(
-      TeamMemberService teamMemberService,
-      TeamMemberViewService teamMemberViewService,
-      TeamMemberRoleService teamMemberRoleService,
-      ControllerHelperService controllerHelperService,
-      IndustryTeamMemberEditRolesValidator industryTeamMemberEditRolesValidator,
-      TeamService teamService) {
+  IndustryEditMemberController(TeamMemberService teamMemberService, TeamMemberViewService teamMemberViewService,
+                               TeamMemberRoleService teamMemberRoleService, ControllerHelperService controllerHelperService,
+                               IndustryTeamMemberEditRolesValidator industryTeamMemberEditRolesValidator,
+                               TeamService teamService) {
     this.teamService = teamService;
     this.teamMemberService = teamMemberService;
     this.teamMemberViewService = teamMemberViewService;
@@ -58,7 +53,6 @@ public class IndustryEditMemberController {
     this.controllerHelperService = controllerHelperService;
     this.industryTeamMemberEditRolesValidator = industryTeamMemberEditRolesValidator;
   }
-
 
   @GetMapping
   public ModelAndView renderEditMember(@PathVariable("teamId") TeamId teamId,

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +28,6 @@ import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 @RequestMapping("{scapId}/pathfinder-projects")
 @HasAnyPermissionForScap(permissions = RolePermission.SUBMIT_SCAP)
 public class PathfinderController {
-
 
   private final ControllerHelperService controllerHelperService;
   private final ScapDetailService scapDetailService;
@@ -68,8 +68,9 @@ public class PathfinderController {
 
   @PostMapping
   ModelAndView savePathfinderProjectsForm(@PathVariable("scapId") ScapId scapId,
-                                          @ModelAttribute("form") PathfinderForm form) {
-    var bindingResult = pathfinderFormValidator.validate(form);
+                                          @ModelAttribute("form") PathfinderForm form,
+                                          BindingResult bindingResult) {
+    pathfinderFormValidator.validate(form, bindingResult);
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,

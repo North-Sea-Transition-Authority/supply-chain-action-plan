@@ -6,9 +6,10 @@
 <#assign pageTitle = "Page not found" />
 
 <@defaultPage
-htmlTitle=pageTitle
-pageHeading=pageTitle
-phaseBanner=false
+  htmlTitle=pageTitle
+  pageHeading=pageTitle
+  phaseBanner=false
+  topNavigation=false
 >
   <p class="govuk-body">
     If you typed the web address, check it is correct.

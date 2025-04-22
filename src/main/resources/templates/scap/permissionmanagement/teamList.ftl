@@ -29,7 +29,7 @@
           <td class="govuk-table__cell">${team.DisplayName()}</td>
           <td class="govuk-table__cell">${team.teamType().getDisplayText()}</td>
           <td class="govuk-table__cell">
-            <@fdsAction.link linkText="Manage" linkUrl=springUrl(team.manageUrl())/>
+            <@fdsAction.link linkText="Manage" linkUrl=springUrl(team.manageUrl()) linkScreenReaderText=team.DisplayName()/>
           </td>
         </tr>
       </#list>

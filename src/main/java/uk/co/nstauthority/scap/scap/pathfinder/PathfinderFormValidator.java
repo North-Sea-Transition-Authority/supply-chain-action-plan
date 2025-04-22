@@ -29,7 +29,6 @@ public class PathfinderFormValidator implements Validator {
     return PathfinderForm.class.equals(clazz);
   }
 
-
   public BindingResult validate(PathfinderForm form) {
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     validate(form, bindingResult);

@@ -35,7 +35,7 @@
     </#if>
     <#if removeTeamUrl?has_content>
         <@fdsAction.link
-        linkText="Archive Team"
+        linkText="Archive team"
         linkUrl=springUrl(removeTeamUrl)
         linkClass="govuk-button govuk-button--warning"
         role=true
@@ -44,7 +44,7 @@
   </@fdsAction.buttonGroup>
 
   <#if teamMembers?has_content>
-      <@teamMembersMacro.teamMembers name=teamName members=teamMembers canRemoveUsers=canRemoveUsers!false canEditUsers=canEditUsers!false/>
+      <@teamMembersMacro.teamMembers name=teamName members=teamMembers canEditOrRemoveUsers=canEditOrRemoveUsers!false/>
   <#else>
     <@fdsInsetText.insetText>
       ${teamName} has no members.

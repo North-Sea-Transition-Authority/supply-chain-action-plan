@@ -1,6 +1,9 @@
 package uk.co.nstauthority.scap.scap.pathfinder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -21,6 +24,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.validation.BindingResult;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.energyportal.PathfinderProjectService;
 import uk.co.nstauthority.scap.energyportal.rest.PathfinderRestController;
@@ -151,10 +155,15 @@ class PathfinderControllerTest extends AbstractScapSubmitterControllerTest {
   void savePathfinderProjectsForm_InvalidForm_AssertNeverSaves() throws Exception {
     var testForm = new PathfinderForm();
 
-    when(pathfinderFormValidator.validate(testForm))
-        .thenReturn(ValidatorTestingUtil.bindingResultWithErrors(testForm));
+    doAnswer(invocation -> {
+      var bindingResult = invocation.getArgument(1, BindingResult.class);
+      bindingResult.rejectValue("hasPathfinderProjects", "mandatory", "validation message");
+      return null;
+    })
+        .when(pathfinderFormValidator)
+        .validate(eq(testForm), any(BindingResult.class));
 
-    mockMvc.perform(post(ReverseRouter.route(on(PathfinderController.class).savePathfinderProjectsForm(SCAP_ID, null)))
+    mockMvc.perform(post(ReverseRouter.route(on(PathfinderController.class).savePathfinderProjectsForm(SCAP_ID, null, null)))
             .with(authenticatedScapUser())
             .with(csrf())
             .flashAttr("form", testForm))
@@ -178,7 +187,7 @@ class PathfinderControllerTest extends AbstractScapSubmitterControllerTest {
         .thenReturn(ValidatorTestingUtil.bindingResultWithoutErrors(testForm));
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(PathfinderController.class).savePathfinderProjectsForm(SCAP_ID, null)))
+        post(ReverseRouter.route(on(PathfinderController.class).savePathfinderProjectsForm(SCAP_ID, null, null)))
             .with(authenticatedScapUser())
             .with(csrf())
             .flashAttr("form", testForm))

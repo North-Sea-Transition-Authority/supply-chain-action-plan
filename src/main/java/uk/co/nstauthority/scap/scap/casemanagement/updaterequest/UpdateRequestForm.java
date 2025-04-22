@@ -5,11 +5,11 @@ import uk.co.fivium.formlibrary.input.ThreeFieldDateInput;
 
 public class UpdateRequestForm {
 
-  private StringInput infoRequest = new StringInput("infoRequest", "Application update required");
+  private StringInput infoRequest = new StringInput("infoRequest", "application update required");
 
   private ThreeFieldDateInput dueDate =  new ThreeFieldDateInput(
       "dueDate",
-      "Update due by");
+      "update due by");
 
   public StringInput getInfoRequest() {
     return infoRequest;

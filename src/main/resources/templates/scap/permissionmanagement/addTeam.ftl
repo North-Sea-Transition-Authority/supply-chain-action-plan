@@ -4,24 +4,22 @@
 
 <#include "../layout/layout.ftl">
 
-
-
 <@defaultPage
-htmlTitle=pageTitle
-pageHeading=pageTitle
-errorItems=errorList
-pageSize=PageSize.FULL_WIDTH
-topNavigation=true
-backLink=true
-backLinkUrl=springUrl(teamListUrl)
+  htmlTitle=pageTitle
+  pageHeading=""
+  errorItems=errorList
+  topNavigation=true
+  backLink=true
+  backLinkUrl=springUrl(teamListUrl)
 >
     <@fdsForm.htmlForm actionUrl=springUrl(submitFormUrl)>
       <@fdsSearchSelector.searchSelectorRest path="form.organisationGroupId.inputValue"
-      restUrl=springUrl(organisationGroupSearchRestUrl)
-      labelText="Which organisation group would you like to create a team for?"
-      pageHeading=true
-      selectorMinInputLength=2
-      preselectedItems={}
+        restUrl=springUrl(organisationGroupSearchRestUrl)
+        labelText="Which organisation group would you like to create a team for?"
+        pageHeading=true
+        selectorMinInputLength=2
+        labelClass="govuk-heading-m"
+        preselectedItems={}
       />
       <@fdsAction.button buttonText="Add organisation group"/>
     </@fdsForm.htmlForm>

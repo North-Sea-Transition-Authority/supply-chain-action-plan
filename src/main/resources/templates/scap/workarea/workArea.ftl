@@ -102,7 +102,7 @@
 </#macro>
 
 <#macro referenceFilter form>
-  <@fdsSearch.searchFilterItem itemName="Reference" expanded=form.referenceSearchTerm?has_content>
+  <@fdsSearch.searchFilterItem itemName="SCAP reference" expanded=form.referenceSearchTerm?has_content>
     <@fdsSearch.searchTextInput
       path="form.referenceSearchTerm"
       labelText=""
