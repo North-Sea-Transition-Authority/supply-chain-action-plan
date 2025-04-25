@@ -68,7 +68,6 @@ _This requires docker to be running on your machine, but have nothing running in
 
 Execute the gradle task `generateJooq`. You will need to re-generate when you change the database.
 
-
 ### 7. Bootstrap your local DB
 Run the script in `devtools/create_dev_users.sql` to bootstrap your DB.
 
@@ -76,8 +75,6 @@ Run the script in `devtools/create_dev_users.sql` to bootstrap your DB.
 Create a run configuration for the Spring app and start the application.
 
 The application will be running on `localhost:8080/scap/<endpoint>`
-
-## Development setup
 
 ### Checkstyle
 1. In Intellij install the Checkstyle-IDEA plugin (from third-party repositories)
@@ -89,3 +86,52 @@ The application will be running on `localhost:8080/scap/<endpoint>`
 
 Note that Checkstyle rules are checked during the build process and any broken rules will fail the build.
 
+## End to End Tests
+This project uses WDIO and Selenium to run Screen Based E2E tests.
+
+The test suite uses Test Containers for Node to start up the applications, as well as selenium-chromium.
+This keeps the running context very similar between local and drone runs.
+
+### Running the tests
+To run the tests for the first time, simply run:
+```shell
+./gradlew bootJar
+npx gulp buildAll
+cd e2eTests
+npm ci
+npm run wdio
+cd ..
+```
+
+After that you can just run:
+```shell
+cd e2eTests
+rm -rf reports
+npm run wdio
+cd ..
+```
+
+You can also install the [WebDriverIO IntelliJ plugin](https://plugins.jetbrains.com/plugin/16147-webdriverio) and add a
+run configuration but this doesn't do much and is a bit buggy. You'll also need to set:
+- workingDirectory: e2eTests (needs to be a full path)
+- wdioConfigFile: e2eTests/wdio.conf.ts (needs to be a full path)
+
+By default, the test suite will create a new docker image each time which is slow. If you're running the tests a lot,
+you can set an environment variable to tell the test suite to use that image rather than make its own.
+```shell
+./gradlew bootJar 
+docker build -t supply-chain-action-plan:e2eTests . 
+export APP_IMAGE_TO_TEST=supply-chain-action-plan:e2eTests
+```
+Alteratively, set the variable as an environment variable in your run configuration if using the plugin.
+
+### Debugging the tests
+Full screenshots and recordings are captured in the `e2eTests/reports` folder.
+
+When using the Plugin, you can also add breakpoints to the Typescript.
+
+There is also a log line: `Started Selenium - VNC: localhost:...` Navigate to that URL to connect to the chrome
+container and interact with the browser.
+
+### Authoring tests
+- The FDS testing library can be accessed using `import {FdsButton} from "@fdsTestingLibrary/page-objects/components/FdsButton.ts";`

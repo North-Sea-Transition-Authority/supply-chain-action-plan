@@ -66,8 +66,8 @@ gulp.task('copyFdsImages', () => {
 });
 
 gulp.task('copyFdsTestLibrary', () => {
-  return gulp.src(['fivium-design-system-core/test-library/**/*'])
-    .pipe(gulp.dest('src/test/e2e/test/test-library'));
+  return gulp.src(['fivium-design-system-core/test-library/**/*.ts'])
+    .pipe(gulp.dest('e2eTests/test-library'));
 });
 
 // Init all appropriate resources into project's public/assets
@@ -77,4 +77,4 @@ gulp.task('sassCi', gulp.series(['initFds'], () => {
   return compileSass(true);
 }));
 
-gulp.task('buildAll', gulp.series(['sassCi']));
+gulp.task('buildAll', gulp.series(['sassCi', 'copyFdsTestLibrary']));

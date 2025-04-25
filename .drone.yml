@@ -65,58 +65,40 @@ steps:
         - ./gradlew checkstyleMain test bootJar --continue --parallel --max-workers=3
       build_image: repo1.dev.fivium.local:5000/docker-compose-java21
 
-  - name: e2e-db
-    image: postgres:14.3-alpine
+  - name: e2e-tests
+    image: quay.io/testcontainers/dind-drone-plugin
+    privileged: true
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: dev1
-      POSTGRES_DB: scap
-    commands:
-      - cp devtools/create_db_user.sh /docker-entrypoint-initdb.d/create_db_user.sh
-      - docker-entrypoint.sh postgres
-    detach: true
-
-  - name: e2e-build-image
-    image: docker:19.03.8
-    volumes:
-      - name: docker-sock
-        path: /var/run/docker.sock
-    commands:
-      - docker build -t scap:e2e-${DRONE_BUILD_NUMBER} .
-
-  - name: e2e-firefox
-    image: selenium/standalone-firefox:110.0
-    detach: true
-
-  - name: e2e-app
-    image: scap:e2e-${DRONE_BUILD_NUMBER}
-    environment:
+      TZ: Europe/London
+      CI_WORKSPACE: /drone/src
+      DOCKER_CONFIG_JSON:
+        from_secret: docker_config
+      DOCKER_CONFIG: /drone/dockerconfig
       NOTIFY_API_KEY:
         from_secret: govuk_notify_test_api_key
-      SPRING_PROFILES_ACTIVE: development,e2e
-    detach: true
-
-  - name: e2e-run-tests
-    image: node:18
-    commands:
-      - cd src/test/e2e
-      - npm install
-      # Run any SQL setup scripts
-      - node bootstrap-sql.mjs
-      # Fix bug with screenshot reporting  https://github.com/QualityOps/wdio-timeline-reporter/issues/59
-      - sed -i -e 's/afterTest(test)/afterTest(test,context,{passed})/g' node_modules/wdio-timeline-reporter/build/timeline-service.js
-      - sed -i -e 's/(screenshotStrategy === ON_ERROR \&\& !test.passed)/(screenshotStrategy === ON_ERROR \&\& !passed)/g' node_modules/wdio-timeline-reporter/build/timeline-service.js
-      # Wait for up to 2m for the app to start
-      - export START_TIME=$(date +%s)
-      - until curl http://e2e-app:8080/scap/actuator/health > /dev/null || test "$(($(date +%s) - $START_TIME))" -gt 120; do sleep 5 | echo "Waiting..."; done
-      - npx wdio wdio.drone-e2e.conf.ts --log-level=warn
+    volumes:
+      - name: docker-cache-overlay2
+        path: /drone/docker/overlay2
+      - name: docker-cache-image
+        path: /drone/docker/image
+    settings:
+      storage_driver: overlay2 --insecure-registry repo1.dev.fivium.local:5000 --dns=192.168.10.1
+      cmd:
+        - mkdir /drone/dockerconfig
+        - echo $DOCKER_CONFIG_JSON > /drone/dockerconfig/config.json
+        - cd e2eTests
+        - npm ci
+        - npm run wdio
+      build_image: node:18
 
   - name: sync-reports
     image: alpine:3.16.0
     commands:
       - mkdir -p /var/webfiles/${DRONE_BUILD_NUMBER}
+      # mkdir to prevent error if Java Tests don't run
+      - mkdir -p build/reports
       - cp -r build/reports /var/webfiles/${DRONE_BUILD_NUMBER} | true
-      - cp -r src/test/e2e/reports /var/webfiles/${DRONE_BUILD_NUMBER} | true
+      - cp -r e2eTests/reports /var/webfiles/${DRONE_BUILD_NUMBER} | true
     volumes:
       - name: webfiles
         path: /var/webfiles
@@ -214,7 +196,7 @@ steps:
     settings:
       webhook: https://hooks.slack.com/services/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
       channel: scap-pipelines
-      template: "*{{build.status}}* <{{build.link}}|Commit {{truncate build.commit 7}} on {{build.branch}} by ${DRONE_COMMIT_AUTHOR_NAME}>\nReports published to: http://drone-assets.fivium.local:9090/supply-chain-action-plan/{{build.number}}/"
+      template: "file:/drone/src/e2eTests/slack.txt"
     when:
       status: [ success, failure ]
 

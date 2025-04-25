@@ -44,7 +44,7 @@
       </@fdsSearch.searchPageContent>
     <#else>
       <@fdsSearch.searchPageContent twoThirdsWidth=true>
-        <h3 class="govuk-heading-s">There are no matching results</h3>
+        <h2 class="govuk-heading-s">There are no matching results</h2>
         <p class="govuk-body">Improve your results by:</p>
         <ul class="govuk-list govuk-list--bullet">
           <li>removing filters</li>
