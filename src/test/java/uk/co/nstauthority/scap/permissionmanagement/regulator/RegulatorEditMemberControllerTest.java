@@ -70,7 +70,7 @@ class RegulatorEditMemberControllerTest extends AbstractRegulatorTeamControllerT
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
     mockMvc.perform(post(ReverseRouter.route(on(RegulatorEditMemberController.class)
-        .editMember(teamId, webUserAccountId, form, bindingResult)))
+        .editMember(teamId, webUserAccountId, form, bindingResult, null)))
         .with(user(user))
         .with(csrf()))
         .andExpect(status().is3xxRedirection())

@@ -94,19 +94,23 @@ This keeps the running context very similar between local and drone runs.
 
 ### Running the tests
 To run the tests for the first time, simply run:
+Notify API key - https://tpm.fivium.co.uk/index.php/pwd/view/2082
 ```shell
 ./gradlew bootJar
 npx gulp buildAll
 cd e2eTests
 npm ci
+export NOTIFY_API_KEY=${add api key here}
 npm run wdio
 cd ..
 ```
 
 After that you can just run:
+Notify API key - https://tpm.fivium.co.uk/index.php/pwd/view/2082
 ```shell
 cd e2eTests
 rm -rf reports
+export NOTIFY_API_KEY=${add api key here} 
 npm run wdio
 cd ..
 ```

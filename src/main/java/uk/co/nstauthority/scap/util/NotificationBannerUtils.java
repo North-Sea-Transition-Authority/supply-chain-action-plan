@@ -10,7 +10,7 @@ import uk.co.nstauthority.scap.fds.notificationbanner.NotificationBannerView;
 
 public class NotificationBannerUtils {
 
-  private static final String NOTIFICATION_BANNER_OBJECT_NAME = "notificationBannerView";
+  public static final String NOTIFICATION_BANNER_OBJECT_NAME = "notificationBannerView";
 
   private NotificationBannerUtils() {
     throw new IllegalUtilClassInstantiationException(NotificationBannerUtils.class);

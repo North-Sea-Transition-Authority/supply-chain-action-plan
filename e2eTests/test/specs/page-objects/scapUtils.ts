@@ -90,6 +90,11 @@ export class ScapUtils extends Page {
     public async signOut () {
         await $(`button=Sign out`).click();
     }
+
+    public async clickBackButton() {
+        const backLinkElement = await $(`//a[contains(@class, 'govuk-back-link')][normalize-space(text()) = "Back"]`);
+        await backLinkElement.click();
+    }
 }
 
 export default new ScapUtils();

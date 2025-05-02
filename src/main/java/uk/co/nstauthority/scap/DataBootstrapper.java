@@ -53,26 +53,30 @@ class DataBootstrapper {
 
     LOGGER.info("Bootstrapping teams and users");
 
-    var submitter = energyPortalUserService.findUsersByUsername("industryScapSubmitter@scap.co.uk").getFirst();
-    var regulator = energyPortalUserService.findUsersByUsername("RegulatorScapCaseOfficer@scap.co.uk").getFirst();
-
-    var newTeam = new Team();
-    newTeam.setDisplayName("CENTRICA");
-    newTeam.setTeamType(TeamType.INDUSTRY);
+    var industrySubmitter = energyPortalUserService.findUsersByUsername("industryScapSubmitter@scap.co.uk").getFirst();
+    var regulatorCaseOfficer = energyPortalUserService.findUsersByUsername("RegulatorScapCaseOfficer@scap.co.uk").getFirst();
+    var industryTeam = new Team();
+    industryTeam.setDisplayName("CENTRICA");
+    industryTeam.setTeamType(TeamType.INDUSTRY);
     var orgId = organisationGroupService.getOrganisationGroupsByName("CENTRICA", "").getFirst().getOrganisationGroupId();
-    newTeam.setEnergyPortalOrgGroupId(orgId);
+    industryTeam.setEnergyPortalOrgGroupId(orgId);
 
     var regulatorTeam = teamService.getRegulatorTeam();
 
-    entityManager.persist(newTeam);
+    entityManager.persist(industryTeam);
 
-    teamMemberRoleService.addUserTeamRoles(newTeam, submitter.webUserAccountId(), Set.of(IndustryTeamRole.SCAP_SUBMITTER.name()));
+    teamMemberRoleService.addUserTeamRoles(
+        industryTeam,
+        industrySubmitter.webUserAccountId(),
+        Set.of(IndustryTeamRole.SCAP_SUBMITTER.name())
+    );
     teamMemberRoleService.addUserTeamRoles(
         regulatorTeam,
-        regulator.webUserAccountId(),
-        Set.of(RegulatorTeamRole.SCAP_CASE_OFFICER.name())
+        regulatorCaseOfficer.webUserAccountId(),
+        Set.of(RegulatorTeamRole.SCAP_CASE_OFFICER.name(), RegulatorTeamRole.ACCESS_MANAGER.name(),
+            RegulatorTeamRole.ORGANISATION_ACCESS_MANAGER.name())
     );
-    LOGGER.info("New team {} + {} has been created and added users:", newTeam.getDisplayName(), newTeam.getUuid());
-    LOGGER.info("{} + {}", submitter.displayName(), submitter.webUserAccountId());
+    LOGGER.info("New team {} + {} has been created and added users:", industryTeam.getDisplayName(), industryTeam.getUuid());
+    LOGGER.info("{} + {}", industrySubmitter.displayName(), industrySubmitter.webUserAccountId());
   }
 }

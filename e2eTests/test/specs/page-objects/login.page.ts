@@ -1,7 +1,7 @@
 import {Page} from './page.ts'
 
-const industryScapSubmitter = "IndustryScapSubmitter@scap.co.uk"
-const regulatorScapCaseOfficer = "RegulatorScapCaseOfficer@scap.co.uk";
+export const industryScapSubmitter = "IndustryScapSubmitter@scap.co.uk"
+export const regulatorScapCaseOfficer = "RegulatorScapCaseOfficer@scap.co.uk";
 const password = "dev";
 
 /**

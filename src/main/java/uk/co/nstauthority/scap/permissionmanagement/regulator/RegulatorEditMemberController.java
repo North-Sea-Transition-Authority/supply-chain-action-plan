@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.permissionmanagement.regulator;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.HasAnyPermissionForTeam;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.IsMemberOfTeam;
@@ -26,6 +28,7 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamRoleUtil;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRoleService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 
 @Controller
 @IsMemberOfTeam
@@ -76,7 +79,8 @@ public class RegulatorEditMemberController {
   public ModelAndView editMember(@PathVariable("teamId") TeamId teamId,
                                  @PathVariable("wuaId") WebUserAccountId wuaId,
                                  @ModelAttribute("form") TeamMemberRolesForm form,
-                                 BindingResult bindingResult) {
+                                 BindingResult bindingResult,
+                                 RedirectAttributes redirectAttributes) {
 
     var team = teamService.getTeam(teamId);
 
@@ -86,6 +90,11 @@ public class RegulatorEditMemberController {
 
     regulatorTeamMemberEditRolesValidator.validate(form, bindingResult,
         new RegulatorTeamMemberEditRolesValidatorDto(team, teamMember));
+
+    NotificationBannerUtils.successBannerRedirect(
+        "Updated roles for %s".formatted(userView.getDisplayName()),
+        Collections.emptyList(),
+        redirectAttributes);
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,

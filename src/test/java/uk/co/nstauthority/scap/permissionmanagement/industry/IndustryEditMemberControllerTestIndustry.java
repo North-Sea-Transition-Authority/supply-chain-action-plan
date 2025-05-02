@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.permissionmanagement.industry;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -14,6 +15,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRolesForm;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRoleService;
+import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 
 @ContextConfiguration(classes = IndustryEditMemberController.class)
 class IndustryEditMemberControllerTest extends AbstractIndustryTeamControllerTest {
@@ -39,12 +41,16 @@ class IndustryEditMemberControllerTest extends AbstractIndustryTeamControllerTes
     var form = new TeamMemberRolesForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
-    mockMvc.perform(post(ReverseRouter.route(on(IndustryEditMemberController.class)
-        .editMember(teamId, webUserAccountId, form, bindingResult)))
+    var flashAttributes = mockMvc.perform(post(ReverseRouter.route(on(IndustryEditMemberController.class)
+        .editMember(teamId, webUserAccountId, form, bindingResult, null)))
         .with(authenticatedScapUser())
         .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name("redirect:/permission-management/industry/%s"
-            .formatted(teamId.uuid())));
+            .formatted(teamId.uuid())))
+        .andReturn()
+        .getFlashMap();
+
+    assertThat(flashAttributes.get(NotificationBannerUtils.NOTIFICATION_BANNER_OBJECT_NAME)).isNotNull();
   }
 }

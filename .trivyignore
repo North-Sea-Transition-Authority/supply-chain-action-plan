@@ -17,6 +17,7 @@ CVE-2022-24823
 CVE-2024-7254
 CVE-2024-38810
 CVE-2024-38816
+CVE-2025-22235
 
 
 # commons-io:commons-io needs 2.14.0 (not on spring yet)

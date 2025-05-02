@@ -2,6 +2,7 @@ package uk.co.nstauthority.scap.permissionmanagement.industry;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.HasAnyPermissionForTeam;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.IsMemberOfTeam;
@@ -27,6 +29,7 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRolesForm;
 import uk.co.nstauthority.scap.permissionmanagement.TeamRole;
 import uk.co.nstauthority.scap.permissionmanagement.teams.AddRolesController;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamService;
+import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 
 @Controller
 @IsMemberOfTeam(allowRegulatorAccess = true)
@@ -71,8 +74,16 @@ class IndustryAddRolesController extends AddRolesController {
   protected ModelAndView saveAddTeamMemberRoles(@PathVariable("teamId") TeamId teamId,
                                                 @PathVariable("wuaId") WebUserAccountId webUserAccountId,
                                                 @ModelAttribute("form") TeamMemberRolesForm form,
-                                                BindingResult bindingResult) {
+                                                BindingResult bindingResult,
+                                                RedirectAttributes redirectAttributes) {
+    var energyPortalUser = energyPortalUserService.getEnergyPortalUser(webUserAccountId);
     industryTeamMemberRolesValidator.validate(form, bindingResult);
+
+    NotificationBannerUtils.successBannerRedirect(
+        "%s has been added to the team".formatted(energyPortalUser.displayName()),
+        Collections.emptyList(),
+        redirectAttributes);
+
     return super.saveAddTeamMemberRoles(teamId,
         webUserAccountId,
         form,
