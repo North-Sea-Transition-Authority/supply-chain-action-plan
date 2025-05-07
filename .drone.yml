@@ -194,7 +194,8 @@ steps:
   - name: slack
     image: plugins/slack
     settings:
-      webhook: https://hooks.slack.com/services/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
+      webhook: 
+        from_secret: slack_webhook
       channel: scap-pipelines
       template: "file:/drone/src/e2eTests/slack.txt"
     when:
@@ -377,3 +378,9 @@ data: CMXLCjcwlTl4vjml8cb6GTVUw5tbO9O6K/UMUDTTjbQ7MnJbsQPKEXc/mVUfYJs0KUaPA6Rfs1
 kind: secret
 name: govuk_notify_test_api_key
 data: ci2XbampEYV8R+5kqn/MM29i+4PpxKrFPqppC3nWxPCR8mfmoi/ok+Pu6OyzVjDGV69WISi/qr5pLvgkhjZ+nbo60BhN8fmh6GUHdyRlWnXm7RSrHtomwmzKpsjij9gem0m2Y5++qwEzamYwLG6E3XAFpeVB7cyByaw6aFQ=
+
+---
+
+kind: secret
+name: slack_webhook
+data: Yq4JHu6b8/JhIvJ0V9+pRoLP083ZdGR26DSkRgLi5B6QjrbcT5qVqAtGdnL5/BJctS6b3wfe8nFhOhpI3dS4Htrur6jjy+MguuCLDNyKcpI1lQWA7w/RG7FxWPFwuCjwT7Shzk2m6pdN3t8=
