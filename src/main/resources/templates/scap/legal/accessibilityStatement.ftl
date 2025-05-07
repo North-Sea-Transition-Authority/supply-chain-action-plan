@@ -77,7 +77,7 @@
     </li>
     <li>
       when uploading a file on macOS with VoiceOver enabled, the user is unable to select the ‘Choose a file’ via
-      keyboard only. This fails WCAG 2.2 success criterion 2.2.1 (Keyboard).
+      keyboard only. This fails WCAG 2.2 success criterion 2.1.1 (Keyboard).
     </li>
   </ul>
 
