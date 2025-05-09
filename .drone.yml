@@ -178,6 +178,21 @@ steps:
     when:
       status:
         - success
+          
+  - name: scan-and-sync-public-repo
+    image: quay.io/fivium/drone-trufflehog-plugin:v1.0
+    settings:
+      scan_since_commit_hash: 591e3d684a9d1e298e05554d686bd517e59aca63
+      sync_to_mirror: true
+      mirror_remote_url: git@github.com:North-Sea-Transition-Authority/supply-chain-action-plan.git
+      mirror_branch_to_sync: develop
+      mirror_remote_ssh_key:
+        from_secret: sync_ssh_key
+    when:
+      event:
+        - push
+      branch:
+        - develop
 
   - name: rebuild-cache
     image: drillster/drone-volume-cache
@@ -384,3 +399,9 @@ data: ci2XbampEYV8R+5kqn/MM29i+4PpxKrFPqppC3nWxPCR8mfmoi/ok+Pu6OyzVjDGV69WISi/qr
 kind: secret
 name: slack_webhook
 data: Yq4JHu6b8/JhIvJ0V9+pRoLP083ZdGR26DSkRgLi5B6QjrbcT5qVqAtGdnL5/BJctS6b3wfe8nFhOhpI3dS4Htrur6jjy+MguuCLDNyKcpI1lQWA7w/RG7FxWPFwuCjwT7Shzk2m6pdN3t8=
+
+---
+
+kind: secret
+name: sync_ssh_key
+data: yfYih219/J1QVnglTEkdQRQXMO7Nba93nXGgIh4WDlR5AmQnoI8NmVsUcE6wG7HZHYeazo7mhAfzjUBtBkiqpbs0Yr2N/g1dtmEik/6HM7HtvmE5W2GP+hwZGNsMGtwkTlEuCyufq4lTRxbl1rtaWYWYKRsVe/NGlHWpMuohHnWLcoawq/JD2gnusB7yA3/Id60joiMFBjhVRN3VDWP9VG2HusPICwMom79rF0qhPctpgrzlcqimFGw7uK29HK7hMOYHliy96+WQaD+E0ekHkuJ7l2b9GqozaSSGN6vH4SoSbeNVnSaFUoG1QhEJgFqZ6EEuX4r2M0t12BSgy+9aL9P+CV3nxJy2p6vJSGV0XIQ5Iw71IClbHXuHbSRxjbEx9M9l2024RX6D34/Gtcjh23yKOOK2QKIqS+VWLBvr5rzmXfGKEYz8dty+g0PVuXp7U1IEMQebHEKv/kKNkirvyse+fYjIXiUmrqH8lDGq4BEevDnlBfDwS42ZQbH3tBsBMu/zyHK19vW0sXjwgStFEqQGSIzAf2BCuPxP7bKnSrP2ZK3K0wK5L5VBfQbz5qLeFw2yQa4X7Odtf+pDxreoQZNEtXA7pDP91Nx+es4=
