@@ -51,11 +51,11 @@
 <#-- @ftlvariable name="isUpdateable" type="java.lang.Boolean" -->
 
 <@defaultPage
-htmlTitle=pageTitle
-caption=operator
-pageHeading=projectReference
-pageSize=PageSize.FULL_WIDTH
-backLinkUrl=springUrl(backLinkUrl)
+  htmlTitle=pageTitle
+  caption=operator
+  pageHeading=projectReference
+  pageSize=PageSize.FULL_WIDTH
+  backLinkUrl=springUrl(backLinkUrl)
 >
   <@scapSummaryCard.summaryCard/>
   <#if updateText?has_content>

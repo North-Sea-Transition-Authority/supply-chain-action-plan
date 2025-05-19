@@ -13,12 +13,12 @@ CVE-2022-1471
 # netty (likely via actuator, not showing up in dependency tree)
 CVE-2022-24823
 
-# Spring CVEs, should be fixed in 3.3.4
-CVE-2024-7254
-CVE-2024-38810
-CVE-2024-38816
-CVE-2025-22235
+# org.springframework.boot:spring-boot-starter-web (should be fixed in 3.4.5)
+CVE-2025-31650
+CVE-2025-31651
 
+# org.springframework.boot:spring-boot
+CVE-2025-22235
 
 # commons-io:commons-io needs 2.14.0 (not on spring yet)
 CVE-2024-47554
@@ -26,6 +26,8 @@ CVE-2024-47554
 io.netty:netty-common
 CVE-2024-47535
 
+# com.google.protobuf:protobuf-java
+CVE-2024-7254
 
 CVE-2024-12798
 CVE-2024-12801

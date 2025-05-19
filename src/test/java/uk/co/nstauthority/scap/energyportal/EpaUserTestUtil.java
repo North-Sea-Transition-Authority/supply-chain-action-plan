@@ -84,19 +84,19 @@ class EpaUserTestUtil {
     }
 
     User build() {
-      return new User(
-          webUserAccountId,
-          personId,
-          loginId,
-          title,
-          forename,
-          surname,
-          middleInitials,
-          primaryEmailAddress,
-          telephoneNumber,
-          canLogin,
-          isAccountShared
-      );
+      var user = new User();
+      user.setWebUserAccountId(webUserAccountId);
+      user.setPersonId(personId);
+      user.setLoginId(loginId);
+      user.setTitle(title);
+      user.setForename(forename);
+      user.setSurname(surname);
+      user.setMiddleInitials(middleInitials);
+      user.setPrimaryEmailAddress(primaryEmailAddress);
+      user.setTelephoneNumber(telephoneNumber);
+      user.setCanLogin(canLogin);
+      user.setIsAccountShared(isAccountShared);
+      return user;
     }
 
   }
