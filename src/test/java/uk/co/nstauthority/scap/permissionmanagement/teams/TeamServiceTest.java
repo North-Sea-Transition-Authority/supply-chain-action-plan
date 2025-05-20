@@ -417,7 +417,7 @@ class TeamServiceTest {
         .build();
 
     var regulatorTeamMemberRole = TeamMemberRoleTestUtil.Builder()
-        .withRole("SCAP_VIEWER")
+        .withRole("SCAP_CASE_OFFICER")
         .withTeam(regulatorTeam)
         .build();
 

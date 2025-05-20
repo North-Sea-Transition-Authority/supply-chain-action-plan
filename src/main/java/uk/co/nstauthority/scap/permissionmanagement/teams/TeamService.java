@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.permissionmanagement.teams;
 import static uk.co.nstauthority.scap.permissionmanagement.TeamType.REGULATOR;
 
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -163,11 +164,22 @@ public class TeamService {
 
   public List<Team> findAllTeamsForUserBasedOnPermission(List<TeamRole> teamRoles, Long wuaId) {
     var teams = teamRepository.findAllTeamsThatUserIsMemberOf(wuaId);
-    return teamMemberService.findAllRolesByUser(teams, new WebUserAccountId(wuaId))
-        .stream()
-        .filter(teamMemberRole -> teamRoles.contains(IndustryTeamRole.valueOf(teamMemberRole.getRole()))
-            || teamRoles.contains(RegulatorTeamRole.valueOf(teamMemberRole.getRole())))
-        .map(TeamMemberRole::getTeam)
-        .toList();
+    var allRolesForUser = teamMemberService.findAllRolesByUser(teams, new WebUserAccountId(wuaId));
+
+    var teamsUserIsIn = new ArrayList<Team>();
+
+    for (var teamMemberRole : allRolesForUser) {
+      if (TeamType.INDUSTRY.equals(teamMemberRole.getTeam().getTeamType())
+          && teamRoles.contains(IndustryTeamRole.valueOf(teamMemberRole.getRole()))) {
+        teamsUserIsIn.add(teamMemberRole.getTeam());
+      }
+
+      if (TeamType.REGULATOR.equals(teamMemberRole.getTeam().getTeamType())
+          && teamRoles.contains(RegulatorTeamRole.valueOf(teamMemberRole.getRole()))) {
+        teamsUserIsIn.add(teamMemberRole.getTeam());
+      }
+    }
+
+    return teamsUserIsIn;
   }
 }
