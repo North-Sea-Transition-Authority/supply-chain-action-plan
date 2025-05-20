@@ -6,6 +6,7 @@ import {FdsTextInput} from "../../../test-library/page-objects/components/FdsTex
 import {FdsDateInput} from "../../../test-library/page-objects/components/FdsDateInput.ts";
 import {FdsSearchSelector} from "../../../test-library/page-objects/components/FdsSearchSelector.ts";
 import {FdsCheckbox} from "../../../test-library/page-objects/components/FdsCheckbox.ts";
+import fdsUtils from "./fdsUtils.ts";
 
 export class ProjectDetailsPage extends Page {
 
@@ -14,7 +15,7 @@ export class ProjectDetailsPage extends Page {
         await FdsTextarea.enterTextWithLabel("Project summary", "Automation Test Project Summary Text");
         await FdsCheckbox.selectCheckboxItemWithText("Project type", "Field development plan");
         await FdsTextInput.enterTextWithLabel("Project cost estimate", "15");
-        await FdsCheckbox.selectCheckboxItemWithPartialText("North Sea Transition Deal commitments", "I confirm that I am aware of the industry voluntary commitment to achieving 50% UK");
+        await fdsUtils.selectCheckboxWithLabelText("I confirm that I am aware of the industry voluntary commitment to achieving 50% UK content on all related new energy and decommissioning projects");
         await FdsRadio.selectRadioItemWithText("Do you anticipate that this project will meet the 50% target?", "Yes");
         await FdsSearchSelector.searchAndSelectOption("What fields are related to this project?", "test");
         await FdsRadio.selectRadioItemWithText("Are any installations or subsea infrastructure related to this project?", "No");

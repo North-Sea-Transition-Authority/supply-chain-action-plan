@@ -40,11 +40,13 @@
       (CapEx) project phase of FDP / FDPa / Carbon Storage projects,
       or the Abandonment and Decommissioning Expenditure (AbEx) for the decommissioning of assets.
     </@fdsDetails.summaryDetails>
-    <@fdsCheckbox.checkbox
-      fieldsetHeadingText="North Sea Transition Deal commitments"
-      path="form.awareOfLocalContentCommitment"
-      labelText="I confirm that I am aware of the industry voluntary commitment to achieving 50% UK content on all related new energy and decommissioning projects"
-    />
+    <h3 class="govuk-heading-s">North Sea Transition Deal commitments</h3>
+    <@fdsCheckbox.checkboxGroup path="form.awareOfLocalContentCommitment">
+      <@fdsCheckbox.checkboxItem
+        path="form.awareOfLocalContentCommitment"
+        labelText="I confirm that I am aware of the industry voluntary commitment to achieving 50% UK content on all related new energy and decommissioning projects"
+      />
+    </@fdsCheckbox.checkboxGroup>
     <@fdsDetails.summaryDetails summaryTitle="Where can I get information on the voluntary commitment">
       Information on the industry voluntary commitment to achieving 50% UK content on all related new energy and
       decommissioning projects can be found in the

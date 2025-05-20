@@ -35,7 +35,6 @@ const rejectUpdateScapPage = new RejectOrUpdateScapPage();
 const SHARED_STORE_SCAP_REF = "scapRef";
 export class ScapUtils extends Page {
 
-
     public async updateFurtherInformation () {
         await loginPage.open();
         await loginPage.loginRegulatorScapCaseOfficer();
