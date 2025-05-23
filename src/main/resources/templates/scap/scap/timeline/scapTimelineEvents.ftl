@@ -31,7 +31,7 @@
         </@fdsDataItems.dataItem>
       </#if>
       <#if caseEvent.hasComments()>
-        <@fdsDataItems.dataItem dataItemListClasses="govuk-!-text-break-word">
+        <@fdsDataItems.dataItem>
           <@fdsDataItems.dataValues key="Comments" value=caseEvent.comments()/>
         </@fdsDataItems.dataItem>
       </#if>

@@ -140,7 +140,6 @@
     footerContent=footerContent
     customScriptContent=analyticsScript
     cookieBannerMacro=cookieBanner
-    navigationItems=navigationItems
   >
     <@fdsGoogleAnalytics.googleAnalytics measurementId=analytics.appTag />
     <@fdsGoogleAnalytics.googleAnalytics measurementId=analytics.globalTag />
