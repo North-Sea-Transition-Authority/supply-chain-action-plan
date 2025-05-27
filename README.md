@@ -54,7 +54,7 @@
 
 ### 3. Initialise the Fivium Design System
 - `git submodule update --init --recursive`
-- `cd fivium-design-system-core && npm install && npx gulp build && cd ..`
+- `cd fivium-design-system-core && npm install && npx gulp buildAll && cd ..`
 
 #### 3.1. Update the Fivium Design System
 If FDS is not on the latest version, follow the instructions to update it [here](https://fivium.atlassian.net/wiki/spaces/FDS/pages/10354845/Releases)

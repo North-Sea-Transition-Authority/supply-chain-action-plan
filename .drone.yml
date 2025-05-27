@@ -32,7 +32,7 @@ steps:
   - name: build-frontend
     image: node:18
     commands:
-      - cd fivium-design-system-core && npm install && npx gulp build && cd ..
+      - cd fivium-design-system-core && npm install && npx gulp buildAll && cd ..
       - node -v
       - npm -v
       - cat package.json
@@ -292,7 +292,7 @@ steps:
   - name: build-frontend
     image: node:18
     commands:
-      - cd fivium-design-system-core && npm install && npx gulp build && cd ..
+      - cd fivium-design-system-core && npm install && npx gulp buildAll && cd ..
       - npm install
       - npx gulp buildAll
 

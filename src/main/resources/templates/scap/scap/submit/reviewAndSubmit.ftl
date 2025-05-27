@@ -24,7 +24,7 @@
 
   <@fdsForm.htmlForm>
     <#if isValid>
-      <h3 class="govuk-heading-s">Acknowledgements</h3>
+      <h2 class="govuk-heading-s">Acknowledgements</h2>
       <@fdsCheckbox.checkboxGroup path="form.approvedByStakeholders">
         <@fdsCheckbox.checkboxItem
           labelText="I confirm that this SCAP has been checked, reviewed and approved by all of our internal stakeholders"
