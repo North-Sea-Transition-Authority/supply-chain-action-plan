@@ -20,10 +20,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.validation.BindingResult;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
@@ -49,22 +49,22 @@ import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 @ContextConfiguration(classes = FurtherInfoResponseController.class)
 class FurtherInfoResponseControllerTest extends AbstractScapSubmitterControllerTest {
 
-  @MockBean
+  @MockitoBean
   private CaseEventService caseEventService;
 
-  @SpyBean
+  @MockitoSpyBean
   private ControllerHelperService controllerHelperService;
 
-  @MockBean
+  @MockitoBean
   private ScapSummaryViewService scapSummaryViewService;
 
-  @MockBean
+  @MockitoBean
   private OrganisationGroupService organisationGroupService;
 
-  @MockBean
+  @MockitoBean
   private FurtherInfoResponseFormValidator furtherInfoResponseFormValidator;
 
-  @MockBean
+  @MockitoBean
   CaseEventDocumentService caseEventDocumentService;
 
   private static final ScapId SCAP_ID = new ScapId(1111);
@@ -92,7 +92,7 @@ class FurtherInfoResponseControllerTest extends AbstractScapSubmitterControllerT
   }
 
   @Test
-  void saveQaComments_ValidationSuccesful_saved() throws Exception {
+  void saveInfoResponseForm_ValidationSuccessful_saved() throws Exception {
     mockMvc.perform(post(ReverseRouter.route(on(FurtherInfoResponseController.class)
         .saveInfoResponseForm(
             SCAP_ID,
@@ -109,7 +109,7 @@ class FurtherInfoResponseControllerTest extends AbstractScapSubmitterControllerT
   }
 
   @Test
-  void saveQaComments_ValidationSuccesful_savedWithComments() throws Exception {
+  void saveInfoResponseForm_ValidationSuccessful_savedWithComments() throws Exception {
     mockMvc.perform(post(ReverseRouter.route(on(FurtherInfoResponseController.class)
             .saveInfoResponseForm(
                 SCAP_ID,
@@ -128,7 +128,7 @@ class FurtherInfoResponseControllerTest extends AbstractScapSubmitterControllerT
   }
 
   @Test
-  void saveQaComments_ValidationSuccesful_savedWithFile() throws Exception {
+  void saveInfoResponseForm_ValidationSuccessful_savedWithFile() throws Exception {
     var form = getFurtherInfoResponseForm();
     var file = new FileUploadForm();
     file.setUploadedFileId(UUID.randomUUID());
@@ -152,7 +152,7 @@ class FurtherInfoResponseControllerTest extends AbstractScapSubmitterControllerT
   }
 
   @Test
-  void saveQaComments_ValidationFailed_Reroute() throws Exception {
+  void saveInfoResponseForm_ValidationFailed_Reroute() throws Exception {
     doAnswer(invocation -> {
       var bindingResult = (BindingResult) invocation.getArgument(1);
       bindingResult.rejectValue("infoResponse.inputValue", "testError", "This is an error message");

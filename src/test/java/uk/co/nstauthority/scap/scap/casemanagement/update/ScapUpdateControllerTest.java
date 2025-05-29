@@ -33,8 +33,8 @@ import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 @WithMockUser
 @ContextConfiguration(classes = ScapUpdateController.class)
 class ScapUpdateControllerTest extends AbstractScapSubmitterControllerTest {
-  private ScapDetail scapDetail;
 
+  private ScapDetail scapDetail;
   private Scap scap;
 
   @BeforeEach

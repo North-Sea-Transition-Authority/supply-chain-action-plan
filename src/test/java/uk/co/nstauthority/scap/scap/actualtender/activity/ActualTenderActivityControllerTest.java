@@ -22,10 +22,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -50,22 +50,22 @@ class ActualTenderActivityControllerTest extends AbstractScapSubmitterController
   @Autowired
   Clock clock;
 
-  @MockBean
+  @MockitoBean
   ActualTenderService actualTenderService;
 
-  @MockBean
+  @MockitoBean
   ActualTenderActivityFormService actualTenderActivityFormService;
 
-  @MockBean
+  @MockitoBean
   ActualTenderActivityService actualTenderActivityService;
 
-  @MockBean
+  @MockitoBean
   InvitationToTenderParticipantService invitationToTenderParticipantService;
 
-  @MockBean
+  @MockitoBean
   ContractingPerformanceService contractingPerformanceService;
 
-  @MockBean
+  @MockitoBean
   UpdateActualTenderActivityService updateActualTenderActivityService;
 
   private ActualTender actualTender;

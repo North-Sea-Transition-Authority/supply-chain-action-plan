@@ -16,9 +16,9 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
@@ -36,10 +36,10 @@ import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamRole;
 @ContextConfiguration(classes = RegulatorTeamMemberController.class)
 class RegulatorTeamManagementControllerTest extends AbstractControllerTest {
 
-  @MockBean
+  @MockitoBean
   private TeamMemberViewService teamMemberViewService;
 
-  @MockBean
+  @MockitoBean
   private RegulatorTeamService regulatorTeamService;
 
   @Autowired

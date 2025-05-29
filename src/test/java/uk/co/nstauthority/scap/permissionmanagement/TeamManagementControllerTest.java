@@ -21,8 +21,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.industry.AbstractIndustryTeamControllerTest;
@@ -36,10 +36,10 @@ import uk.co.nstauthority.scap.scap.organisationgroup.OrganisationGroupService;
 @ContextConfiguration(classes = TeamManagementController.class)
 class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
 
-  @MockBean
+  @MockitoBean
   private OrganisationGroupService organisationGroupService;
 
-  @MockBean
+  @MockitoBean
   private NewTeamFormValidator newTeamFormvalidator;
 
   @Test

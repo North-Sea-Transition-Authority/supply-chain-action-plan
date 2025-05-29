@@ -18,14 +18,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderControllerRedirectionServiceTestConfig;
@@ -37,8 +36,6 @@ import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderPart
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipantService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.awardedcontract.AwardedContractController;
 import uk.co.nstauthority.scap.scap.actualtender.summary.ActualTenderSummaryController;
-import uk.co.nstauthority.scap.scap.scap.Scap;
-import uk.co.nstauthority.scap.scap.scap.ScapService;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = BidParticipantsController.class)
@@ -46,13 +43,13 @@ import uk.co.nstauthority.scap.scap.scap.ScapService;
 @Import(ActualTenderControllerRedirectionServiceTestConfig.class)
 class BidParticipantsControllerTest extends AbstractScapSubmitterControllerTest {
 
-  @MockBean
+  @MockitoBean
   ActualTenderActivityService actualTenderActivityService;
 
-  @MockBean
+  @MockitoBean
   BidParticipantsFormService bidParticipantsFormService;
 
-  @MockBean
+  @MockitoBean
   InvitationToTenderParticipantService invitationToTenderParticipantService;
 
   private ActualTenderActivity actualTenderActivity;

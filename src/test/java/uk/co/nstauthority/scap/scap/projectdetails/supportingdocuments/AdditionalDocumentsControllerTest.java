@@ -16,13 +16,13 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
@@ -42,10 +42,10 @@ class AdditionalDocumentsControllerTest extends AbstractScapSubmitterControllerT
 
   private static final ServiceUserDetail USER = ServiceUserDetailTestUtil.Builder().build();
 
-  @MockBean
+  @MockitoBean
   SupportingDocumentService supportingDocumentService;
 
-  @MockBean
+  @MockitoBean
   FileUploadService fileUploadService;
 
   private ScapDetail scapDetail;

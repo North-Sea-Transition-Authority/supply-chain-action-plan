@@ -16,10 +16,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
@@ -42,19 +42,19 @@ import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
 @Import(ActualTenderControllerRedirectionServiceTestConfig.class)
 class DeleteActualTenderActivityControllerTest extends AbstractScapSubmitterControllerTest {
 
-  @MockBean
+  @MockitoBean
   ActualTenderService actualTenderService;
 
-  @MockBean
+  @MockitoBean
   ActualTenderActivityService actualTenderActivityService;
 
-  @MockBean
+  @MockitoBean
   ActualTenderSummaryViewService actualTenderSummaryViewService;
 
-  @MockBean
+  @MockitoBean
   DeleteActualTenderActivityService deleteActualTenderActivityService;
 
-  @MockBean
+  @MockitoBean
   ContractingPerformanceService contractingPerformanceService;
 
   private ActualTenderActivity actualTenderActivity;

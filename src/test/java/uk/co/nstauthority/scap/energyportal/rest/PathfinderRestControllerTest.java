@@ -10,9 +10,9 @@ import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.energyportal.PathfinderProjectService;
@@ -26,7 +26,7 @@ class PathfinderRestControllerTest extends AbstractScapSubmitterControllerTest {
 
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
-  @MockBean
+  @MockitoBean
   private PathfinderProjectService pathfinderProjectService;
 
   @Test

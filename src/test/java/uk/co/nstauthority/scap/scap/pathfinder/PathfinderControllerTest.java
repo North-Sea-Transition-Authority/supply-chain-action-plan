@@ -22,8 +22,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BindingResult;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.energyportal.PathfinderProjectService;
@@ -37,13 +37,13 @@ import uk.co.nstauthority.scap.utils.ValidatorTestingUtil;
 @ContextConfiguration(classes = PathfinderController.class)
 class PathfinderControllerTest extends AbstractScapSubmitterControllerTest {
 
-  @MockBean
+  @MockitoBean
   private PathfinderService pathfinderService;
 
-  @MockBean
+  @MockitoBean
   private PathfinderFormValidator pathfinderFormValidator;
 
-  @MockBean
+  @MockitoBean
   private PathfinderProjectService pathfinderProjectService;
 
   @Test

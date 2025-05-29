@@ -23,9 +23,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -43,20 +43,21 @@ import uk.co.nstauthority.scap.scap.contractingperformance.summary.ContractingPe
 @WithMockUser
 class ContractingPerformanceControllerTest extends AbstractScapSubmitterControllerTest {
 
-  @MockBean
+  @MockitoBean
   ContractingPerformanceOverviewService contractingPerformanceOverviewService;
 
-  @MockBean
+  @MockitoBean
   ContractingPerformanceService contractingPerformanceService;
 
-  @MockBean
+  @MockitoBean
   ContractingPerformanceFormService contractingPerformanceFormService;
 
-  @MockBean
+  @MockitoBean
   ActualTenderService actualTenderService;
 
-  @MockBean
+  @MockitoBean
   ActualTenderActivityService actualTenderActivityService;
+
   private ActualTender actualTender;
   private ContractingPerformanceOverview contractingPerformanceOverview;
 

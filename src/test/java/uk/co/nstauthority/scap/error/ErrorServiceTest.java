@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
@@ -50,16 +50,16 @@ class ErrorServiceTest {
   @Autowired
   private ServiceBrandingConfigurationProperties serviceBrandingConfigurationProperties;
 
-  @MockBean
+  @MockitoBean
   private TopNavigationService topNavigationService;
 
-  @MockBean
+  @MockitoBean
   private AnalyticsProperties analyticsProperties;
 
-  @MockBean
+  @MockitoBean
   private FooterService footerService;
 
-  @MockBean
+  @MockitoBean
   private HttpServletRequest request;
 
   private ErrorService errorService;

@@ -22,9 +22,9 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.EnergyPortalAccessService;
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.InstigatingWebUserAccountId;
@@ -41,21 +41,21 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRemovalServi
 @ContextConfiguration(classes = RegulatorRemoveMemberController.class)
 class RegulatorRemoveMemberControllerTest extends AbstractRegulatorTeamControllerTest{
 
-  @MockBean
+  @MockitoBean
   private TeamMemberRemovalService teamMemberRemovalService;
 
-  @MockBean
+  @MockitoBean
   private EnergyPortalAccessService energyPortalAccessService;
 
-  private static final WebUserAccountId wuaId = new WebUserAccountId(1000L);
+  private static final WebUserAccountId WUA_ID = new WebUserAccountId(1000L);
 
   @Test
   void renderRemoveMember_noTeamFound_RedirectsToMemberList() throws Exception {
     canRemoveTeamMember();
-    when(teamMemberService.findTeamMember(team, wuaId)).thenReturn(Optional.empty());
+    when(teamMemberService.findTeamMember(team, WUA_ID)).thenReturn(Optional.empty());
 
     mockMvc.perform(get(ReverseRouter.route(on(RegulatorRemoveMemberController.class)
-            .renderRemoveMember(teamId, wuaId))))
+            .renderRemoveMember(teamId, WUA_ID))))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectUrl("/permission-management/regulator/%s".formatted(teamId.uuid().toString())));
   }
@@ -144,7 +144,7 @@ class RegulatorRemoveMemberControllerTest extends AbstractRegulatorTeamControlle
   }
 
   private void canRemoveTeamMember() {
-    when(teamMemberService.findTeamMember(team, wuaId)).thenReturn(Optional.of(teamMember));
+    when(teamMemberService.findTeamMember(team, WUA_ID)).thenReturn(Optional.of(teamMember));
     when(teamMemberRemovalService.canRemoveTeamMember(any(), any())).thenReturn(true);
   }
 }

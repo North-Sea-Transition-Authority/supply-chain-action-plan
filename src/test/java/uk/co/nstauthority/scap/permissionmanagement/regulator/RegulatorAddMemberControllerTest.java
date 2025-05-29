@@ -17,8 +17,8 @@ import static uk.co.nstauthority.scap.utils.ControllerTestingUtil.redirectUrl;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.EnergyPortalAccessService;
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.InstigatingWebUserAccountId;
@@ -35,13 +35,13 @@ import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
 @ContextConfiguration(classes = RegulatorAddMemberController.class)
 class RegulatorAddMemberControllerTest extends AbstractRegulatorTeamControllerTest {
 
-  @MockBean
+  @MockitoBean
   AddTeamMemberValidator addTeamMemberValidator;
 
-  @MockBean
+  @MockitoBean
   EnergyPortalUserService energyPortalUserService;
 
-  @MockBean
+  @MockitoBean
   EnergyPortalAccessService energyPortalAccessService;
 
   private static final EnergyPortalUserDto energyPortalDto = EnergyPortalUserDtoTestUtil.Builder().build();

@@ -1,6 +1,5 @@
 package uk.co.nstauthority.scap.permissionmanagement.industry;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -9,25 +8,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.enumutil.DisplayableEnumOptionUtil;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
-import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
 
 @ContextConfiguration(classes = IndustryAddRolesController.class)
 class IndustryAddRolesControllerTest extends AbstractIndustryTeamControllerTest {
 
-  @MockBean
+  @MockitoBean
   ControllerHelperService controllerHelperService;
 
-  @MockBean
+  @MockitoBean
   EnergyPortalUserService energyPortalUserService;
 
-  @MockBean
+  @MockitoBean
   IndustryTeamMemberRolesValidator industryTeamMemberRolesValidator;
 
   @Test

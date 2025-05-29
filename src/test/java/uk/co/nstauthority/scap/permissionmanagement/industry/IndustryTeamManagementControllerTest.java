@@ -12,10 +12,9 @@ import static uk.co.nstauthority.scap.permissionmanagement.regulator.RegulatorTe
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
@@ -26,12 +25,12 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamManagementControll
 
 @ContextConfiguration(classes = IndustryTeamMemberController.class)
 class IndustryTeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
-  @MockBean
+
+  @MockitoBean
   private IndustryTeamService industryTeamService;
 
-  @Autowired
+  @MockitoBean
   private ApplicationContext applicationContext;
-
 
   @Test
   void renderMemberList_whenNotAuthenticated_thenUnauthorised() throws Exception {

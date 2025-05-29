@@ -9,8 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberRolesForm;
@@ -20,10 +20,10 @@ import uk.co.nstauthority.scap.util.NotificationBannerUtils;
 @ContextConfiguration(classes = IndustryEditMemberController.class)
 class IndustryEditMemberControllerTest extends AbstractIndustryTeamControllerTest {
 
-  @MockBean
+  @MockitoBean
   TeamMemberRoleService teamMemberRoleService;
 
-  @MockBean
+  @MockitoBean
   IndustryTeamMemberEditRolesValidator industryTeamMemberEditRolesValidator;
 
   @Test

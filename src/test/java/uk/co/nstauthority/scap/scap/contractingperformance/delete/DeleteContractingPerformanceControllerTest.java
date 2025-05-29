@@ -17,9 +17,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
@@ -39,13 +39,13 @@ import uk.co.nstauthority.scap.utils.ControllerTestingUtil;
 @WithMockUser
 class DeleteContractingPerformanceControllerTest extends AbstractScapSubmitterControllerTest {
 
-  @MockBean
+  @MockitoBean
   ContractingPerformanceOverviewService contractingPerformanceOverviewService;
 
-  @MockBean
+  @MockitoBean
   ContractingPerformanceService contractingPerformanceService;
 
-  @MockBean
+  @MockitoBean
   ContractingPerformanceSummaryViewService contractingPerformanceSummaryViewService;
 
   private Integer contractingPerformanceId = 4357;

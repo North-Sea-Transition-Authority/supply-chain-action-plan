@@ -13,10 +13,10 @@ import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationUnit;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.energyportal.OrganisationUnitService;
@@ -30,7 +30,7 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 @WithMockUser
 class OrganisationUnitRestControllerTest extends AbstractControllerTest {
 
-  @MockBean
+  @MockitoBean
   OrganisationUnitService organisationUnitService;
 
   @Test

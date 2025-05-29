@@ -18,9 +18,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
@@ -39,10 +39,10 @@ import uk.co.nstauthority.scap.scap.plannedtender.list.PlannedTenderActivityList
 @WithMockUser
 class DeletePlannedTenderActivityControllerTest extends AbstractScapSubmitterControllerTest {
 
-  @MockBean
+  @MockitoBean
   PlannedTenderService plannedTenderService;
 
-  @MockBean
+  @MockitoBean
   PlannedTenderActivityService plannedTenderActivityService;
 
   private PlannedTenderActivity plannedTenderActivity;

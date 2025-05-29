@@ -34,8 +34,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.ResultMatcher;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
@@ -70,25 +70,25 @@ import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestType;
 @ContextConfiguration(classes = ScapSummaryController.class)
 class ScapSummaryControllerTest extends AbstractControllerTest {
 
-  @MockBean
+  @MockitoBean
   ProjectDetailsService projectDetailsService;
 
-  @MockBean
+  @MockitoBean
   ScapSummaryViewService scapSummaryViewService;
 
-  @MockBean
+  @MockitoBean
   OrganisationGroupService organisationGroupService;
 
-  @MockBean
+  @MockitoBean
   CaseEventService caseEventService;
 
-  @MockBean
+  @MockitoBean
   UpdateRequestService updateRequestService;
 
-  @MockBean
+  @MockitoBean
   EnergyPortalUserService energyPortalUserService;
 
-  @MockBean
+  @MockitoBean
   CaseEventDocumentService caseEventDocumentService;
 
   private static final ScapId SCAP_ID = new ScapId(1000);

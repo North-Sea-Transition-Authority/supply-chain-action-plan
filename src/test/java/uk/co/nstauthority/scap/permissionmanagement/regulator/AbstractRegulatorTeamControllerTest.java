@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
@@ -36,7 +36,7 @@ public abstract class AbstractRegulatorTeamControllerTest extends AbstractContro
 
   protected final TeamMember teamMember = getTeamMember();
 
-  @MockBean
+  @MockitoBean
   TeamMemberViewService teamMemberViewService;
 
   @BeforeEach

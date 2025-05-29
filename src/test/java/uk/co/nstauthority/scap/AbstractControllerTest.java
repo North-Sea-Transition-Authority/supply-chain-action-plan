@@ -14,19 +14,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import uk.co.nstauthority.scap.authentication.SamlResponseParser;
 import uk.co.nstauthority.scap.authentication.ServiceLogoutSuccessHandler;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
+import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
 import uk.co.nstauthority.scap.branding.IncludeBusinessSupportConfiguration;
 import uk.co.nstauthority.scap.branding.IncludeServiceBrandingConfigurationProperties;
 import uk.co.nstauthority.scap.configuration.AnalyticsProperties;
@@ -88,28 +88,28 @@ public abstract class AbstractControllerTest {
   @Autowired
   protected MockMvc mockMvc;
 
-  @MockBean
+  @MockitoBean
   protected UserDetailService userDetailService;
 
-  @MockBean
+  @MockitoBean
   protected TeamMemberService teamMemberService;
 
-  @MockBean
+  @MockitoBean
   protected TopNavigationService topNavigationService;
 
-  @MockBean
+  @MockitoBean
   protected TeamService teamService;
 
-  @MockBean
+  @MockitoBean
   protected ScapService scapService;
 
-  @MockBean
+  @MockitoBean
   protected ScapDetailService scapDetailService;
 
-  @SpyBean
+  @Autowired
   protected FooterService footerService;
 
-  @MockBean
+  @MockitoBean
   protected JooqStatisticsListener jooqStatisticsListener;
 
   @BeforeEach
@@ -132,6 +132,11 @@ public abstract class AbstractControllerTest {
     @Bean
     public ValidationErrorOrderingService validationErrorOrderingService() {
       return new ValidationErrorOrderingService(messageSource());
+    }
+
+    @Bean
+    public FooterService footerService(CustomerConfigurationProperties customerConfigurationProperties) {
+      return new FooterService(customerConfigurationProperties);
     }
 
     @Bean("messageSource")

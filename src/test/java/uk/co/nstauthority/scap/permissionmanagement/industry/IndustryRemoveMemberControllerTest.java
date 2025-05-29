@@ -22,9 +22,9 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.EnergyPortalAccessService;
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.InstigatingWebUserAccountId;
@@ -43,10 +43,10 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRemovalServi
 @ContextConfiguration(classes = IndustryRemoveMemberController.class)
 class IndustryRemoveMemberControllerTest extends AbstractIndustryTeamControllerTest{
 
-  @MockBean
+  @MockitoBean
   private TeamMemberRemovalService teamMemberRemovalService;
 
-  @MockBean
+  @MockitoBean
   EnergyPortalAccessService energyPortalAccessService;
 
   private static final WebUserAccountId wuaId = new WebUserAccountId(1000L);

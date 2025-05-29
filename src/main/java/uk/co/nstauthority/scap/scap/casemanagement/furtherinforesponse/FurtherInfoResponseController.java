@@ -114,7 +114,7 @@ public class FurtherInfoResponseController {
         () -> {
           var uploadedFile = furtherInfoResponseForm.getInfoResponseDocuments().isEmpty()
               ? null
-              : furtherInfoResponseForm.getInfoResponseDocuments().get(0).getUploadedFileId();
+              : furtherInfoResponseForm.getInfoResponseDocuments().getFirst().getUploadedFileId();
           caseEventDocumentService.updateSupportingDocumentFileDescriptions(furtherInfoResponseForm.getInfoResponseDocuments());
           caseEventService.recordNewEvent(CaseEventSubject.FURTHER_INFO_RESPONSE,
               scapDetail,

@@ -23,9 +23,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BindingResult;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.AbstractControllerTest;
@@ -52,22 +52,22 @@ import uk.co.nstauthority.scap.scap.summary.ScapSummaryViewService;
 @ContextConfiguration(classes = ScapApprovalController.class)
 class ScapApprovalCloseOutControllerTest extends AbstractControllerTest {
 
-  @MockBean
+  @MockitoBean
   private CaseEventService caseEventService;
 
-  @MockBean
+  @MockitoBean
   private ScapSummaryViewService scapSummaryViewService;
 
-  @MockBean
+  @MockitoBean
   private OrganisationGroupService organisationGroupService;
 
-  @MockBean
+  @MockitoBean
   private ScapApprovalFormValidator consultationRequestFormValidator;
 
-  @MockBean
+  @MockitoBean
   private CaseEventDocumentService caseEventDocumentService;
 
-  @MockBean
+  @MockitoBean
   private ScapEmailService scapEmailService;
 
   private static final ScapId SCAP_ID = new ScapId(1111);

@@ -16,9 +16,9 @@ import static uk.co.nstauthority.scap.scap.summary.ScapSummaryControllerTestUtil
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
@@ -32,7 +32,7 @@ import uk.co.nstauthority.scap.workarea.WorkAreaController;
 @WithMockUser
 class ScapDeletionControllerTest extends AbstractScapSubmitterControllerTest {
 
-  @MockBean
+  @MockitoBean
   ScapSummaryViewService scapSummaryViewService;
 
   @Test

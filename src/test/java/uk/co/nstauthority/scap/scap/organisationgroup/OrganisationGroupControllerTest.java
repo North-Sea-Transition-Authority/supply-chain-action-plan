@@ -5,7 +5,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -21,9 +20,9 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -45,16 +44,16 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 @WithMockUser
 class OrganisationGroupControllerTest extends AbstractScapSubmitterControllerTest {
 
-  @MockBean
+  @MockitoBean
   OrganisationGroupFormService organisationGroupFormService;
 
-  @MockBean
+  @MockitoBean
   ValidationErrorOrderingService validationErrorOrderingService;
 
-  @MockBean
+  @MockitoBean
   OrganisationGroupService organisationGroupService;
 
-  @MockBean
+  @MockitoBean
   ScapOperatorService scapOperatorService;
 
   static final Integer ORGANISATION_GROUP_ID = 1664;

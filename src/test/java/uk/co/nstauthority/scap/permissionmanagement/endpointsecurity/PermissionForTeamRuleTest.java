@@ -36,7 +36,6 @@ class PermissionForTeamRuleTest extends AbstractControllerTest {
 
   private static final TeamId teamId = new TeamId(UUID.randomUUID());
 
-
   @Test
   void preHandle_whenMethodHasNoSupportedAnnotations_thenOkResponse() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(on(TestController.class)

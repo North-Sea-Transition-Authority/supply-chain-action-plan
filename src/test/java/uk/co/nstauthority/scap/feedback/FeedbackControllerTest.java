@@ -18,8 +18,8 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BindingResult;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.authentication.TestUserProvider;
@@ -32,11 +32,10 @@ import uk.co.nstauthority.scap.workarea.WorkAreaController;
 @ContextConfiguration(classes = FeedbackController.class)
 class FeedbackControllerTest extends AbstractControllerTest {
 
-
-  @MockBean
+  @MockitoBean
   private FeedbackFormValidator feedbackFormValidator;
 
-  @MockBean
+  @MockitoBean
   private FeedbackService feedbackService;
 
   private static final ScapId SCAP_ID = ScapId.valueOf(1111);

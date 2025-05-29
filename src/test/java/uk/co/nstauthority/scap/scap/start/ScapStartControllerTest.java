@@ -41,7 +41,6 @@ class ScapStartControllerTest extends AbstractControllerTest {
             ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null))));
   }
 
-
   @Test
   void renderStartNewScap_NoPermission_WorkAreaRedirect() throws Exception {
     when(teamMemberService.getAllPermissionsForUser(testUser)).thenReturn(List.of(RolePermission.VIEW_SCAP));

@@ -11,10 +11,10 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
 import uk.co.nstauthority.scap.fds.searchselector.RestSearchResult;
@@ -25,7 +25,7 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 @WithMockUser
 class ScapRestControllerTest extends AbstractScapSubmitterControllerTest {
 
-  @MockBean
+  @MockitoBean
   private ScapRestService scapRestService;
 
   @Test

@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.co.nstauthority.scap.AbstractControllerTestWithSecurity;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
@@ -30,7 +30,7 @@ public abstract class AbstractIndustryTeamControllerTest extends AbstractControl
 
   protected final TeamMember teamMember = getTeamMember();
 
-  @MockBean
+  @MockitoBean
   TeamMemberViewService teamMemberViewService;
 
   @BeforeEach

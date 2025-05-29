@@ -30,7 +30,6 @@ public class ProjectField implements ProjectDetailsChild {
   }
 
   public ProjectField(ProjectDetails projectDetails, Integer fieldId, Instant createdTimestamp) {
-    this.id = UUID.randomUUID();
     this.projectDetails = projectDetails;
     this.fieldId = fieldId;
     this.createdTimestamp = createdTimestamp;

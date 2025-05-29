@@ -26,9 +26,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BindingResult;
 import uk.co.nstauthority.scap.AbstractScapSubmitterControllerTest;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
@@ -50,22 +50,22 @@ import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestType;
 @ContextConfiguration(classes = ScapSubmissionController.class)
 class ScapSubmissionControllerTest extends AbstractScapSubmitterControllerTest {
 
-  @MockBean
+  @MockitoBean
   ScapSummaryViewService scapSummaryViewService;
 
-  @MockBean
+  @MockitoBean
   CaseEventService caseEventService;
 
-  @MockBean
+  @MockitoBean
   ReviewAndSubmitFormService reviewAndSubmitFormService;
 
-  @MockBean
+  @MockitoBean
   ScapEmailService scapEmailService;
 
-  @MockBean
+  @MockitoBean
   UpdateRequestService updateRequestService;
 
-  @MockBean
+  @MockitoBean
   ScapSubmissionService scapSubmissionService;
 
   @BeforeEach

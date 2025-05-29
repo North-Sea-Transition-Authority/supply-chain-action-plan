@@ -9,8 +9,8 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.enumutil.DisplayableEnumOptionUtil;
@@ -20,17 +20,16 @@ import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
 
-
 @ContextConfiguration(classes = RegulatorAddRolesController.class)
 class RegulatorAddRolesControllerTest extends AbstractRegulatorTeamControllerTest {
 
-  @MockBean
+  @MockitoBean
   ControllerHelperService controllerHelperService;
 
-  @MockBean
+  @MockitoBean
   EnergyPortalUserService energyPortalUserService;
 
-  @MockBean
+  @MockitoBean
   RegulatorTeamMemberRolesValidator industryTeamMemberRolesValidator;
 
   @Test

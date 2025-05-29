@@ -10,10 +10,10 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.co.fivium.energyportalapi.generated.types.Country;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.energyportal.CountryService;
@@ -26,7 +26,7 @@ import uk.co.nstauthority.scap.mvc.ReverseRouter;
 @ContextConfiguration(classes = AwardedContractRestController.class)
 class AwardedContractRestControllerTest extends AbstractControllerTest {
 
-  @MockBean
+  @MockitoBean
   CountryService countryService;
 
   @Test

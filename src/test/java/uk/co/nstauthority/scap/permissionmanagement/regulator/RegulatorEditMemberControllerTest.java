@@ -12,8 +12,8 @@ import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
@@ -28,16 +28,16 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRoleService;
 @ContextConfiguration(classes = RegulatorEditMemberController.class)
 class RegulatorEditMemberControllerTest extends AbstractRegulatorTeamControllerTest {
 
-  @MockBean
+  @MockitoBean
   TeamMemberRoleService teamMemberRoleService;
 
-  @MockBean
+  @MockitoBean
   RegulatorTeamMemberEditRolesValidator regulatorTeamMemberEditRolesValidator;
 
-  @MockBean
+  @MockitoBean
   RegulatorTeamService regulatorTeamService;
 
-  private TeamId teamId = new TeamId(UUID.randomUUID());
+  private static final TeamId TEAM_ID = new TeamId(UUID.randomUUID());
 
   private ServiceUserDetail user;
 
@@ -57,8 +57,8 @@ class RegulatorEditMemberControllerTest extends AbstractRegulatorTeamControllerT
   @Test
   void renderEditMember() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(on(RegulatorEditMemberController.class)
-        .renderEditMember(teamId, webUserAccountId)))
-        .with(user(user)))
+            .renderEditMember(TEAM_ID, webUserAccountId)))
+            .with(user(user)))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/AddTeamMemberRoles"));
   }
@@ -70,11 +70,11 @@ class RegulatorEditMemberControllerTest extends AbstractRegulatorTeamControllerT
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
     mockMvc.perform(post(ReverseRouter.route(on(RegulatorEditMemberController.class)
-        .editMember(teamId, webUserAccountId, form, bindingResult, null)))
-        .with(user(user))
-        .with(csrf()))
+            .editMember(TEAM_ID, webUserAccountId, form, bindingResult, null)))
+            .with(user(user))
+            .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name("redirect:/permission-management/regulator/%s"
-            .formatted(teamId.uuid())));
+            .formatted(TEAM_ID.uuid())));
   }
 }
