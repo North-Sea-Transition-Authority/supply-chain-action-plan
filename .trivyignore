@@ -6,3 +6,17 @@ CVE-2024-7254
 
 # uk.co.fivium:digital-notification-library-spring-boot-starter:v1.0.1
 CVE-2024-47554
+
+# org.apache.tomcat.embed:tomcat-embed-core
+CVE-2025-48988
+CVE-2025-49125
+CVE-2025-46701
+
+# org.postgresql:postgresql
+CVE-2025-49146
+
+# org.springframework:spring-context
+CVE-2025-22233
+
+# org.springframework:spring-web
+CVE-2025-41234

@@ -1,7 +1,7 @@
 # Supply chain action plan
 
 ## Pre-requisites
-- Java 17
+- Java 21
 - Node LTS + NPM
 - [Docker for Windows](https://hub.docker.com/editions/community/docker-ce-desktop-windows)
   (See [Docker setup](https://confluence.fivium.co.uk/display/JAVA/Java+development+environment+setup#Javadevelopmentenvironmentsetup-Docker)
@@ -19,7 +19,17 @@
 
 ### 2. Add the required profile
 
-### Development
+### Regardless of profile
+
+| Environment Variable                       | Description                                                                                           |
+|--------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| NOTIFY_API_KEY                             | The GovUK notify development key from TPM For local: https://tpm.fivium.co.uk/index.php/pwd/view/2082 | 
+| SCAP_EPMQ_SNS_SQS_AWS_ACCESS_KEY_ID        | AWS access key id for SNS/SQS.                                                                        |
+| SCAP_EPMQ_SNS_SQS_AWS_SECRET_ACCESS_KEY    | AWS secret access key for SNS/SQS.                                                                    |
+| SCAP_EPMQ_SNS_SQS_AWS_REGION_ID (optional) | The AWS region to run in. Defaults to `eu-west-2`                                                     |
+| SCAP_EPMQ_ENVIRONMENT_SUFFIX               | Something unique per environment, e.g. `dev`. For local dev this can be your initials.                |
+
+#### Development
 - In your IntelliJ run configuration for the Spring app, include `development` in your active profiles
 - The following environment variables are required when using this profile:
 
@@ -29,7 +39,7 @@
 | NOTIFY_API_KEY              | The GovUK notify development key from TPM: https://tpm.fivium.co.uk/index.php/pwd/view/2082 |
 
 
-### Production
+#### Production
 - In your IntelliJ run configuration for the Spring app, include `production` in your active profiles
 - The following environment variables are required when using this profile:
 
@@ -44,13 +54,23 @@
 | FILE_UPLOAD_ALLOWED_EXTENSIONS | Allowed file extensions for document uploads                                                                                 |
 | NOTIFY_EMAIL_MODE              | Can be test or production. Test mode will redirect all outbound emails to the test recipient(s)                              |
 | NOTIFY_TEST_EMAIL_RECIPIENT    | If email is test mode, who to send emails to. Value can be a CSV list                                                        |
-| NOTIFY_API_KEY                 | The GOV.UK Notify key                                                                                                        |
 | ENABLE_STATSD                  | Whether or not to export stats to Grafana, generally set to false on local and true anywhere else                            |
 | STATSD_HOST                    | The hostname for the endpoint that takes StatsD metrics                                                                      |
 | STATSD_PORT                    | The port for the endpoint that takes StatsD metrics                                                                          |
 | METRICS_EXPORT_TYPE            | The 'flavour' of metrics, one of STATSD or DATADOG. Use DATADOG as it has better out-of-the-box metrics tagging capabilities |
 | METRICS_INSTANCE_TAG           | Tag to help with filtering stats, set to the name of this instance, e.g. dev, st, uat, prod                                  |
 | METRICS_SOURCE_TYPE_TAG        | Tag to help with filtering stats, set to the name of this project, i.e. scap                                                 |
+
+#### Energy Portal accounts service integration
+
+In order to integrate with the Energy Portal accounts service as the IDP you need to include the `use-epas` profile. If running Energy Portal accounts service
+locally add the `use-epas-development` profile as well.
+
+For deployed environments we require the following environment variables to be set
+- EPAS_SAML_ENTITY_ID
+- EPAS_SAML_LOGIN_URL
+- EPAS_LOGOUT_REQUEST_URL
+- EPAS_SAML_BASE_URL (e.g. https://nsta.itportal.dev.fivium.co.uk)
 
 ### 3. Initialise the Fivium Design System
 - `git submodule update --init --recursive`
@@ -95,22 +115,28 @@ This keeps the running context very similar between local and drone runs.
 ### Running the tests
 To run the tests for the first time, simply run:
 Notify API key - https://tpm.fivium.co.uk/index.php/pwd/view/2082
+EPMQ keys - https://tpm.fivium.co.uk/index.php/pwd/view/2134
 ```shell
 ./gradlew bootJar
 npx gulp buildAll
 cd e2eTests
 npm ci
 export NOTIFY_API_KEY=${add api key here}
+export SCAP_EPMQ_SNS_SQS_AWS_ACCESS_KEY_ID=${add api key here}
+export SCAP_EPMQ_SNS_SQS_AWS_SECRET_ACCESS_KEY=${add api key here}
 npm run wdio
 cd ..
 ```
 
 After that you can just run:
 Notify API key - https://tpm.fivium.co.uk/index.php/pwd/view/2082
+EPMQ keys - https://tpm.fivium.co.uk/index.php/pwd/view/2134
 ```shell
 cd e2eTests
 rm -rf reports
 export NOTIFY_API_KEY=${add api key here} 
+export SCAP_EPMQ_SNS_SQS_AWS_ACCESS_KEY_ID=${add api key here}
+export SCAP_EPMQ_SNS_SQS_AWS_SECRET_ACCESS_KEY=${add api key here}
 npm run wdio
 cd ..
 ```

@@ -17,7 +17,6 @@ import static uk.co.nstauthority.scap.utils.ControllerTestingUtil.redirectUrl;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -34,9 +33,8 @@ import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.teams.AddTeamMemberValidator;
 import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
 
-@ActiveProfiles("use-epas")
 @ContextConfiguration(classes = RegulatorAddMemberController.class)
-class RegulatorAddMemberControllerTest extends AbstractRegulatorTeamControllerTest {
+class RegulatorAddMemberControllerFoxIdpTest extends AbstractRegulatorTeamControllerTest {
 
   @MockitoBean
   AddTeamMemberValidator addTeamMemberValidator;
@@ -99,13 +97,11 @@ class RegulatorAddMemberControllerTest extends AbstractRegulatorTeamControllerTe
         .andExpect(redirectUrl("/permission-management/regulator/%s/add-member/%s/roles"
             .formatted(teamId.uuid().toString(), energyPortalDto.webUserAccountId())));
 
-    verify(energyPortalServiceAccessService).addUser(energyPortalDto.webUserAccountId());
-
-    verify(energyPortalAccessService, never()).addUserToAccessTeam(
-        any(ResourceType.class),
+    verify(energyPortalAccessService).addUserToAccessTeam(any(ResourceType.class),
         any(TargetWebUserAccountId.class),
-        any(InstigatingWebUserAccountId.class)
-    );
+        any(InstigatingWebUserAccountId.class));
+
+    verify(energyPortalServiceAccessService, never()).addUser(anyLong());
   }
 
   @Test
@@ -121,10 +117,10 @@ class RegulatorAddMemberControllerTest extends AbstractRegulatorTeamControllerTe
         .andExpect(redirectUrl("/permission-management/regulator/%s/add-member/%s/roles"
             .formatted(teamId.uuid().toString(), energyPortalDto.webUserAccountId())));
 
-    verify(energyPortalServiceAccessService, never()).addUser(energyPortalDto.webUserAccountId());
-
     verify(energyPortalAccessService, never()).addUserToAccessTeam(any(ResourceType.class),
         any(TargetWebUserAccountId.class),
         any(InstigatingWebUserAccountId.class));
+
+    verify(energyPortalServiceAccessService, never()).addUser(anyLong());
   }
 }

@@ -3,13 +3,18 @@ package uk.co.nstauthority.scap.integrationtest;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
+import uk.co.fivium.energyportal.accounts.starter.EnergyPortalServiceAccessService;
 
 @SuppressWarnings("rawtypes")
 @IntegrationTest
 @ExtendWith(SpringExtension.class)
 public abstract class AbstractIntegrationTest {
+
+  @MockitoBean
+  private EnergyPortalServiceAccessService energyPortalServiceAccessService;
 
   protected static PostgreSQLContainer scapDb;
 

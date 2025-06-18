@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.permissionmanagement.regulator;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.EnergyPortalAccessService;
+import uk.co.fivium.energyportal.accounts.starter.EnergyPortalServiceAccessService;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.configuration.SamlProperties;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
@@ -39,13 +41,20 @@ class RegulatorAddMemberController extends AddMemberController {
                                EnergyPortalUserService energyPortalUserService,
                                EnergyPortalAccessService energyPortalAccessService,
                                UserDetailService userDetailService,
-                               TeamMemberService teamMemberService) {
-    super(samlProperties,
+                               TeamMemberService teamMemberService,
+                               EnergyPortalServiceAccessService energyPortalServiceAccessService,
+                               Environment environment) {
+    super(
+        samlProperties,
         controllerHelperService,
         addTeamMemberValidator,
         energyPortalUserService,
         energyPortalAccessService,
-        userDetailService, teamMemberService);
+        userDetailService,
+        teamMemberService,
+        energyPortalServiceAccessService,
+        environment
+    );
   }
 
   @GetMapping("/add-member")

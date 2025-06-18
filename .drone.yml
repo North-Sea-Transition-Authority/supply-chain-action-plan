@@ -76,6 +76,10 @@ steps:
       DOCKER_CONFIG: /drone/dockerconfig
       NOTIFY_API_KEY:
         from_secret: govuk_notify_test_api_key
+      SCAP_EPMQ_SNS_SQS_AWS_ACCESS_KEY_ID:
+        from_secret: epmq_sns_sqs_aws_access_key_id
+      SCAP_EPMQ_SNS_SQS_AWS_SECRET_ACCESS_KEY:
+        from_secret: epmq_sns_sqs_aws_secret_access_key
     volumes:
       - name: docker-cache-overlay2
         path: /drone/docker/overlay2
@@ -405,3 +409,15 @@ data: Yq4JHu6b8/JhIvJ0V9+pRoLP083ZdGR26DSkRgLi5B6QjrbcT5qVqAtGdnL5/BJctS6b3wfe8n
 kind: secret
 name: sync_ssh_key
 data: yfYih219/J1QVnglTEkdQRQXMO7Nba93nXGgIh4WDlR5AmQnoI8NmVsUcE6wG7HZHYeazo7mhAfzjUBtBkiqpbs0Yr2N/g1dtmEik/6HM7HtvmE5W2GP+hwZGNsMGtwkTlEuCyufq4lTRxbl1rtaWYWYKRsVe/NGlHWpMuohHnWLcoawq/JD2gnusB7yA3/Id60joiMFBjhVRN3VDWP9VG2HusPICwMom79rF0qhPctpgrzlcqimFGw7uK29HK7hMOYHliy96+WQaD+E0ekHkuJ7l2b9GqozaSSGN6vH4SoSbeNVnSaFUoG1QhEJgFqZ6EEuX4r2M0t12BSgy+9aL9P+CV3nxJy2p6vJSGV0XIQ5Iw71IClbHXuHbSRxjbEx9M9l2024RX6D34/Gtcjh23yKOOK2QKIqS+VWLBvr5rzmXfGKEYz8dty+g0PVuXp7U1IEMQebHEKv/kKNkirvyse+fYjIXiUmrqH8lDGq4BEevDnlBfDwS42ZQbH3tBsBMu/zyHK19vW0sXjwgStFEqQGSIzAf2BCuPxP7bKnSrP2ZK3K0wK5L5VBfQbz5qLeFw2yQa4X7Odtf+pDxreoQZNEtXA7pDP91Nx+es4=
+
+---
+
+kind: secret
+name: epmq_sns_sqs_aws_access_key_id
+data: eOpoiHm6zY8hTNGjY7sUv7IsjjEYnozaMz7UvosM1E1tNJ7w4x7nc2Ew7eCZSrNM
+
+---
+
+kind: secret
+name: epmq_sns_sqs_aws_secret_access_key
+data: Y5ht7hdVJAwZVWY3uFdVe+BqsCsfZMVtuWbeME+faBERtxfeza98Asurhizn4UpmlXkJ+UX5CFhQeM+HqqSs2Ds0W2M=

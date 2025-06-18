@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
@@ -38,11 +37,10 @@ import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRemovalService;
 
-@ActiveProfiles("use-epas")
 @WithMockUser
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = RegulatorRemoveMemberController.class)
-class RegulatorRemoveMemberControllerTest extends AbstractRegulatorTeamControllerTest{
+class RegulatorRemoveMemberControllerFoxIdpTest extends AbstractRegulatorTeamControllerTest{
 
   @MockitoBean
   private TeamMemberRemovalService teamMemberRemovalService;
@@ -113,13 +111,9 @@ class RegulatorRemoveMemberControllerTest extends AbstractRegulatorTeamControlle
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectUrl("/permission-management/regulator/%s".formatted(teamId.uuid().toString())));
 
-    verify(energyPortalServiceAccessService).removeUser(webUserAccountId.id());
-
-    verify(energyPortalAccessService, never()).removeUserFromAccessTeam(
-        any(ResourceType.class),
+    verify(energyPortalAccessService).removeUserFromAccessTeam(any(ResourceType.class),
         any(TargetWebUserAccountId.class),
-        any(InstigatingWebUserAccountId.class)
-    );
+        any(InstigatingWebUserAccountId.class));
   }
 
   @Test
@@ -135,13 +129,9 @@ class RegulatorRemoveMemberControllerTest extends AbstractRegulatorTeamControlle
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectUrl("/permission-management/regulator/%s".formatted(teamId.uuid().toString())));
 
-    verify(energyPortalServiceAccessService, never()).removeUser(webUserAccountId.id());
-
-    verify(energyPortalAccessService, never()).removeUserFromAccessTeam(
-        any(ResourceType.class),
+    verify(energyPortalAccessService, never()).removeUserFromAccessTeam(any(ResourceType.class),
         any(TargetWebUserAccountId.class),
-        any(InstigatingWebUserAccountId.class)
-    );
+        any(InstigatingWebUserAccountId.class));
   }
 
   @Test

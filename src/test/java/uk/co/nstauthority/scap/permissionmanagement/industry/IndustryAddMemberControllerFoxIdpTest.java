@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.permissionmanagement.regulator;
+package uk.co.nstauthority.scap.permissionmanagement.industry;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -11,13 +11,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 import static uk.co.nstauthority.scap.utils.ControllerTestingUtil.redirectUrl;
 
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -34,9 +32,8 @@ import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.teams.AddTeamMemberValidator;
 import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
 
-@ActiveProfiles("use-epas")
-@ContextConfiguration(classes = RegulatorAddMemberController.class)
-class RegulatorAddMemberControllerTest extends AbstractRegulatorTeamControllerTest {
+@ContextConfiguration(classes = IndustryAddMemberController.class)
+class IndustryAddMemberControllerFoxIdpTest extends AbstractIndustryTeamControllerTest {
 
   @MockitoBean
   AddTeamMemberValidator addTeamMemberValidator;
@@ -62,14 +59,12 @@ class RegulatorAddMemberControllerTest extends AbstractRegulatorTeamControllerTe
     when(energyPortalUserService.findUsersByUsername(any())).thenReturn(List.of(energyPortalDto));
   }
 
-
   @Test
   void renderAddMember() throws Exception {
     setupMocks();
-    mockMvc.perform(get(ReverseRouter.route(on(RegulatorAddMemberController.class)
+    mockMvc.perform(get(ReverseRouter.route(on(IndustryAddMemberController.class)
         .renderAddTeamMember(teamId)))
-        .with(user(user))
-        .with(csrf()))
+        .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/AddTeamMember"));
   }
@@ -77,54 +72,52 @@ class RegulatorAddMemberControllerTest extends AbstractRegulatorTeamControllerTe
   @Test
   void addMemberToTeam_ValidationSucceeds_rendersAddRoles() throws Exception {
     setupMocks();
-    mockMvc.perform(post(ReverseRouter.route(on(RegulatorAddMemberController.class)
+    mockMvc.perform(post(ReverseRouter.route(on(IndustryAddMemberController.class)
             .addMemberToTeamSubmission(teamId, form, bindingResult)))
-            .with(user(user))
+            .with(authenticatedScapUser())
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectUrl("/permission-management/regulator/%s/add-member/%s/roles"
+        .andExpect(redirectUrl("/permission-management/industry/%s/add-member/%s/roles"
             .formatted(teamId.uuid().toString(), energyPortalDto.webUserAccountId())));
   }
 
   @Test
-  void addMemberToTeam_FirstTeam_GetEnergyPortalAccess() throws Exception {
+  void addMemberToTeam_FirstTeam_GetEnergyPortalAccess()  throws Exception {
     setupMocks();
     when(teamMemberService.getAllPermissionsForUser(testUser.wuaId())).thenReturn(Collections.emptyList());
 
-    mockMvc.perform(post(ReverseRouter.route(on(RegulatorAddMemberController.class)
+    mockMvc.perform(post(ReverseRouter.route(on(IndustryAddMemberController.class)
             .addMemberToTeamSubmission(teamId, form, bindingResult)))
-            .with(user(user))
+            .with(authenticatedScapUser())
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectUrl("/permission-management/regulator/%s/add-member/%s/roles"
+        .andExpect(redirectUrl("/permission-management/industry/%s/add-member/%s/roles"
             .formatted(teamId.uuid().toString(), energyPortalDto.webUserAccountId())));
 
-    verify(energyPortalServiceAccessService).addUser(energyPortalDto.webUserAccountId());
-
-    verify(energyPortalAccessService, never()).addUserToAccessTeam(
-        any(ResourceType.class),
+    verify(energyPortalAccessService).addUserToAccessTeam(any(ResourceType.class),
         any(TargetWebUserAccountId.class),
-        any(InstigatingWebUserAccountId.class)
-    );
+        any(InstigatingWebUserAccountId.class));
+
+    verify(energyPortalServiceAccessService, never()).addUser(anyLong());
   }
 
   @Test
-  void addMemberToTeam_AlreadyHasAccess_NoCallToEPAccess() throws Exception {
+  void addMemberToTeam_AlreadyHasAccess_NoCallToEPAccess()  throws Exception {
     setupMocks();
     when(teamMemberService.getAllPermissionsForUser(anyLong())).thenReturn(List.of(RolePermission.SUBMIT_SCAP));
 
-    mockMvc.perform(post(ReverseRouter.route(on(RegulatorAddMemberController.class)
+    mockMvc.perform(post(ReverseRouter.route(on(IndustryAddMemberController.class)
             .addMemberToTeamSubmission(teamId, form, bindingResult)))
-            .with(user(user))
+            .with(authenticatedScapUser())
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectUrl("/permission-management/regulator/%s/add-member/%s/roles"
+        .andExpect(redirectUrl("/permission-management/industry/%s/add-member/%s/roles"
             .formatted(teamId.uuid().toString(), energyPortalDto.webUserAccountId())));
-
-    verify(energyPortalServiceAccessService, never()).addUser(energyPortalDto.webUserAccountId());
 
     verify(energyPortalAccessService, never()).addUserToAccessTeam(any(ResourceType.class),
         any(TargetWebUserAccountId.class),
         any(InstigatingWebUserAccountId.class));
+
+    verify(energyPortalServiceAccessService, never()).addUser(anyLong());
   }
 }

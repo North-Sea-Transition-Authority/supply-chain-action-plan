@@ -16,6 +16,7 @@ import static uk.co.nstauthority.scap.utils.ControllerTestingUtil.redirectUrl;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -23,6 +24,7 @@ import uk.co.fivium.digital.energyportalteamaccesslibrary.team.EnergyPortalAcces
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.InstigatingWebUserAccountId;
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.ResourceType;
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.TargetWebUserAccountId;
+import uk.co.fivium.energyportal.accounts.starter.EnergyPortalServiceAccessService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
@@ -31,6 +33,7 @@ import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.teams.AddTeamMemberValidator;
 import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
 
+@ActiveProfiles("use-epas")
 @ContextConfiguration(classes = IndustryAddMemberController.class)
 class IndustryAddMemberControllerTest extends AbstractIndustryTeamControllerTest {
 
@@ -42,6 +45,9 @@ class IndustryAddMemberControllerTest extends AbstractIndustryTeamControllerTest
 
   @MockitoBean
   EnergyPortalAccessService energyPortalAccessService;
+
+  @MockitoBean
+  EnergyPortalServiceAccessService energyPortalServiceAccessService;
 
   private static final EnergyPortalUserDto energyPortalDto = EnergyPortalUserDtoTestUtil.Builder().build();
 
@@ -90,9 +96,13 @@ class IndustryAddMemberControllerTest extends AbstractIndustryTeamControllerTest
         .andExpect(redirectUrl("/permission-management/industry/%s/add-member/%s/roles"
             .formatted(teamId.uuid().toString(), energyPortalDto.webUserAccountId())));
 
-    verify(energyPortalAccessService).addUserToAccessTeam(any(ResourceType.class),
+    verify(energyPortalServiceAccessService).addUser(energyPortalDto.webUserAccountId());
+
+    verify(energyPortalAccessService, never()).addUserToAccessTeam(
+        any(ResourceType.class),
         any(TargetWebUserAccountId.class),
-        any(InstigatingWebUserAccountId.class));
+        any(InstigatingWebUserAccountId.class)
+    );
   }
 
   @Test
@@ -107,6 +117,8 @@ class IndustryAddMemberControllerTest extends AbstractIndustryTeamControllerTest
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectUrl("/permission-management/industry/%s/add-member/%s/roles"
             .formatted(teamId.uuid().toString(), energyPortalDto.webUserAccountId())));
+
+    verify(energyPortalServiceAccessService, never()).addUser(anyLong());
 
     verify(energyPortalAccessService, never()).addUserToAccessTeam(any(ResourceType.class),
         any(TargetWebUserAccountId.class),

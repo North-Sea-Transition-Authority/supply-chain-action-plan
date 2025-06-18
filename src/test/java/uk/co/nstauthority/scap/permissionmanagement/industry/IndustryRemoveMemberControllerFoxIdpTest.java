@@ -1,4 +1,4 @@
-package uk.co.nstauthority.scap.permissionmanagement.regulator;
+package uk.co.nstauthority.scap.permissionmanagement.industry;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -22,8 +22,8 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
@@ -36,51 +36,51 @@ import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
+import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
+import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRemovalService;
 
-@ActiveProfiles("use-epas")
 @WithMockUser
 @ExtendWith(MockitoExtension.class)
-@ContextConfiguration(classes = RegulatorRemoveMemberController.class)
-class RegulatorRemoveMemberControllerTest extends AbstractRegulatorTeamControllerTest{
+@ContextConfiguration(classes = IndustryRemoveMemberController.class)
+class IndustryRemoveMemberControllerFoxIdpTest extends AbstractIndustryTeamControllerTest{
 
   @MockitoBean
   private TeamMemberRemovalService teamMemberRemovalService;
 
   @MockitoBean
-  private EnergyPortalAccessService energyPortalAccessService;
+  EnergyPortalAccessService energyPortalAccessService;
 
   @MockitoBean
   EnergyPortalServiceAccessService energyPortalServiceAccessService;
 
-  private static final WebUserAccountId WUA_ID = new WebUserAccountId(1000L);
+  private static final WebUserAccountId wuaId = new WebUserAccountId(1000L);
 
   @Test
   void renderRemoveMember_noTeamFound_RedirectsToMemberList() throws Exception {
-    canRemoveTeamMember();
-    when(teamMemberService.findTeamMember(team, WUA_ID)).thenReturn(Optional.empty());
-
-    mockMvc.perform(get(ReverseRouter.route(on(RegulatorRemoveMemberController.class)
-            .renderRemoveMember(teamId, WUA_ID))))
+    when(teamMemberService.findTeamMember(team, wuaId)).thenReturn(Optional.empty());
+    mockMvc.perform(get(ReverseRouter.route(on(IndustryRemoveMemberController.class)
+            .renderRemoveMember(teamId, wuaId))))
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectUrl("/permission-management/regulator/%s".formatted(teamId.uuid().toString())));
+        .andExpect(redirectUrl("/permission-management/industry/%s".formatted(teamId.uuid().toString())));
   }
 
   @Test
   void renderRemoveMember_teamFound_RenderRemoveForm() throws Exception {
-    mockMvc.perform(get(ReverseRouter.route(on(RegulatorRemoveMemberController.class)
-            .renderRemoveMember(teamId, webUserAccountId))))
+    canRemoveTeamMember();
+    mockMvc.perform(get(ReverseRouter.route(on(IndustryRemoveMemberController.class)
+            .renderRemoveMember(teamId, wuaId))))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/removeTeamMember"));
   }
 
   @Test
   void removeMember_cannotRemoveTeamMember_AddsErrorMessageToRenderRemoveMember() throws Exception {
-    var teamId = new TeamId(UUID.randomUUID());
-
-    mockMvc.perform(post(ReverseRouter.route(on(RegulatorRemoveMemberController.class)
+    canRemoveTeamMember();
+    when(teamMemberRemovalService.canRemoveTeamMember(any(), any())).thenReturn(false);
+    mockMvc.perform(post(ReverseRouter.route(on(IndustryRemoveMemberController.class)
             .removeMember(teamId,
-                webUserAccountId,
+                wuaId,
                 new RedirectAttributesModelMap())))
             .with(csrf()))
         .andExpect(status().isOk())
@@ -89,15 +89,15 @@ class RegulatorRemoveMemberControllerTest extends AbstractRegulatorTeamControlle
   }
 
   @Test
-  void removeMember_canRemoveTeamMember_RemoveMember() throws Exception {
+  void removeMember_canRemoveTeamMember_RemovesMember() throws Exception {
     canRemoveTeamMember();
-    mockMvc.perform(post(ReverseRouter.route(on(RegulatorRemoveMemberController.class)
+    mockMvc.perform(post(ReverseRouter.route(on(IndustryRemoveMemberController.class)
             .removeMember(teamId,
                 webUserAccountId,
                 new RedirectAttributesModelMap())))
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectUrl("/permission-management/regulator/%s".formatted(teamId.uuid().toString())));
+        .andExpect(redirectUrl("/permission-management/industry/%s".formatted(teamId.uuid().toString())));
   }
 
   @Test
@@ -105,21 +105,19 @@ class RegulatorRemoveMemberControllerTest extends AbstractRegulatorTeamControlle
     canRemoveTeamMember();
     when(teamMemberService.getAllPermissionsForUser(testUser.wuaId())).thenReturn(Collections.emptyList());
 
-    mockMvc.perform(post(ReverseRouter.route(on(RegulatorRemoveMemberController.class)
+    mockMvc.perform(post(ReverseRouter.route(on(IndustryRemoveMemberController.class)
             .removeMember(teamId,
                 webUserAccountId,
                 new RedirectAttributesModelMap())))
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectUrl("/permission-management/regulator/%s".formatted(teamId.uuid().toString())));
+        .andExpect(redirectUrl("/permission-management/industry/%s".formatted(teamId.uuid().toString())));
 
-    verify(energyPortalServiceAccessService).removeUser(webUserAccountId.id());
-
-    verify(energyPortalAccessService, never()).removeUserFromAccessTeam(
-        any(ResourceType.class),
+    verify(energyPortalAccessService).removeUserFromAccessTeam(any(ResourceType.class),
         any(TargetWebUserAccountId.class),
-        any(InstigatingWebUserAccountId.class)
-    );
+        any(InstigatingWebUserAccountId.class));
+
+    verify(energyPortalServiceAccessService, never()).removeUser(anyLong());
   }
 
   @Test
@@ -127,38 +125,42 @@ class RegulatorRemoveMemberControllerTest extends AbstractRegulatorTeamControlle
     canRemoveTeamMember();
     when(teamMemberService.getAllPermissionsForUser(anyLong())).thenReturn(List.of(RolePermission.SUBMIT_SCAP));
 
-    mockMvc.perform(post(ReverseRouter.route(on(RegulatorRemoveMemberController.class)
+    mockMvc.perform(post(ReverseRouter.route(on(IndustryRemoveMemberController.class)
             .removeMember(teamId,
                 webUserAccountId,
                 new RedirectAttributesModelMap())))
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectUrl("/permission-management/regulator/%s".formatted(teamId.uuid().toString())));
+        .andExpect(redirectUrl("/permission-management/industry/%s".formatted(teamId.uuid().toString())));
 
-    verify(energyPortalServiceAccessService, never()).removeUser(webUserAccountId.id());
-
-    verify(energyPortalAccessService, never()).removeUserFromAccessTeam(
-        any(ResourceType.class),
+    verify(energyPortalAccessService,never()).removeUserFromAccessTeam(any(ResourceType.class),
         any(TargetWebUserAccountId.class),
-        any(InstigatingWebUserAccountId.class)
-    );
+        any(InstigatingWebUserAccountId.class));
+
+    verify(energyPortalServiceAccessService, never()).removeUser(anyLong());
   }
 
   @Test
   void removeMember_noTeam_redirectsToMemberList() throws Exception {
-    //noinspection unchecked
-    when(teamMemberService.findTeamMember(any(), any())).thenReturn(Optional.of(teamMember),Optional.empty());
-    mockMvc.perform(post(ReverseRouter.route(on(RegulatorRemoveMemberController.class)
+    var teamId = new TeamId(UUID.randomUUID());
+    var wuaId = new WebUserAccountId(1000L);
+    var team = TeamTestUtil.Builder()
+        .withTeamType(TeamType.INDUSTRY)
+        .build();
+
+    when(teamService.getTeam(teamId)).thenReturn(team);
+
+    mockMvc.perform(post(ReverseRouter.route(on(IndustryRemoveMemberController.class)
             .removeMember(teamId,
-                webUserAccountId,
+                wuaId,
                 new RedirectAttributesModelMap())))
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectUrl("/permission-management/regulator/%s".formatted(teamId.uuid().toString())));
+        .andExpect(redirectUrl("/permission-management/industry/%s".formatted(teamId.uuid().toString())));
   }
 
   private void canRemoveTeamMember() {
-    when(teamMemberService.findTeamMember(team, WUA_ID)).thenReturn(Optional.of(teamMember));
+    when(teamMemberService.findTeamMember(team, wuaId)).thenReturn(Optional.of(teamMember));
     when(teamMemberRemovalService.canRemoveTeamMember(any(), any())).thenReturn(true);
   }
 }

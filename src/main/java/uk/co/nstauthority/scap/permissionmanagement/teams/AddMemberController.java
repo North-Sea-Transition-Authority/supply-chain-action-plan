@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.permissionmanagement.teams;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -14,6 +15,7 @@ import uk.co.fivium.digital.energyportalteamaccesslibrary.team.EnergyPortalAcces
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.InstigatingWebUserAccountId;
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.ResourceType;
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.TargetWebUserAccountId;
+import uk.co.fivium.energyportal.accounts.starter.EnergyPortalServiceAccessService;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.configuration.SamlProperties;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
@@ -42,6 +44,10 @@ public abstract class AddMemberController {
 
   private final TeamMemberService teamMemberService;
 
+  private final EnergyPortalServiceAccessService energyPortalServiceAccessService;
+
+  private final boolean useEpas;
+
   @Autowired
   protected AddMemberController(SamlProperties samlProperties,
                                 ControllerHelperService controllerHelperService,
@@ -49,7 +55,9 @@ public abstract class AddMemberController {
                                 EnergyPortalUserService energyPortalUserService,
                                 EnergyPortalAccessService energyPortalAccessService,
                                 UserDetailService userDetailService,
-                                TeamMemberService teamMemberService) {
+                                TeamMemberService teamMemberService,
+                                EnergyPortalServiceAccessService energyPortalServiceAccessService,
+                                Environment environment) {
     this.samlProperties = samlProperties;
     this.controllerHelperService = controllerHelperService;
     this.addTeamMemberValidator = addTeamMemberValidator;
@@ -57,6 +65,8 @@ public abstract class AddMemberController {
     this.energyPortalAccessService = energyPortalAccessService;
     this.userDetailService = userDetailService;
     this.teamMemberService = teamMemberService;
+    this.energyPortalServiceAccessService = energyPortalServiceAccessService;
+    this.useEpas = environment.matchesProfiles("use-epas");
   }
 
   protected ModelAndView getAddTeamMemberModelAndView(AddTeamMemberForm form) {
@@ -90,10 +100,17 @@ public abstract class AddMemberController {
 
     //A user who already has roles in the system should not need to have the scap access role added again.
     if (teamMemberService.getAllPermissionsForUser(userToAdd.webUserAccountId()).isEmpty()) {
+
+      if (useEpas) {
+        energyPortalServiceAccessService.addUser(userToAdd.webUserAccountId());
+        return;
+      }
+
       energyPortalAccessService.addUserToAccessTeam(
           new ResourceType("SCAP_ACCESS_TEAM"),
           new TargetWebUserAccountId(userToAdd.webUserAccountId()),
-          new InstigatingWebUserAccountId(loggedInUser.wuaId()));
+          new InstigatingWebUserAccountId(loggedInUser.wuaId())
+      );
     }
   }
 }

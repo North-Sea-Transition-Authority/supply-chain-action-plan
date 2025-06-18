@@ -4,6 +4,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -11,6 +12,7 @@ import uk.co.fivium.digital.energyportalteamaccesslibrary.team.EnergyPortalAcces
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.InstigatingWebUserAccountId;
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.ResourceType;
 import uk.co.fivium.digital.energyportalteamaccesslibrary.team.TargetWebUserAccountId;
+import uk.co.fivium.energyportal.accounts.starter.EnergyPortalServiceAccessService;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
@@ -35,6 +37,10 @@ public abstract class RemoveMemberController {
 
   private final EnergyPortalAccessService energyPortalAccessService;
 
+  private final EnergyPortalServiceAccessService energyPortalServiceAccessService;
+
+  private final boolean useEpas;
+
   @Autowired
   protected RemoveMemberController(
       TeamService teamService,
@@ -43,7 +49,8 @@ public abstract class RemoveMemberController {
       TeamMemberViewService teamMemberViewService,
       TeamMemberRemovalService teamMemberRemovalService,
       UserDetailService userDetailService,
-      EnergyPortalAccessService energyPortalAccessService) {
+      EnergyPortalAccessService energyPortalAccessService,
+      EnergyPortalServiceAccessService energyPortalServiceAccessService, Environment environment) {
     this.teamMemberService = teamMemberService;
     this.customerConfigurationProperties = customerConfigurationProperties;
     this.teamMemberViewService = teamMemberViewService;
@@ -51,6 +58,8 @@ public abstract class RemoveMemberController {
     this.teamService = teamService;
     this.userDetailService = userDetailService;
     this.energyPortalAccessService = energyPortalAccessService;
+    this.energyPortalServiceAccessService = energyPortalServiceAccessService;
+    this.useEpas = environment.matchesProfiles("use-epas");
   }
 
   public ModelAndView renderRemoveMember(@PathVariable("teamId") TeamId teamId,
@@ -118,6 +127,11 @@ public abstract class RemoveMemberController {
     if (teamMemberService.getAllPermissionsForUser(userToRemove.wuaId().id()).isEmpty()) {
       //A user who has no more roles in the system should have the scap access role removed.
       var loggedInUser = userDetailService.getUserDetail();
+
+      if (useEpas) {
+        energyPortalServiceAccessService.removeUser(userToRemove.wuaId().id());
+        return;
+      }
 
       energyPortalAccessService.removeUserFromAccessTeam(
           new ResourceType("SCAP_ACCESS_TEAM"),
