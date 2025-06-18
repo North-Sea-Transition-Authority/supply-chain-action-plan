@@ -26,6 +26,9 @@ public class RequestLogFilter extends OncePerRequestFilter {
   static final String MDC_WUA_ID = RequestLogFilter.class.getName() + ".%s".formatted(
       EnergyPortalSamlAttribute.WEB_USER_ACCOUNT_ID.getAttributeName()
   );
+  static final String MDC_PROXY_WUA_ID = RequestLogFilter.class.getName() + ".%s".formatted(
+      EnergyPortalSamlAttribute.PROXY_USER_WUA_ID.getAttributeName()
+  );
   static final String MDC_REQUEST_TYPE = RequestLogFilter.class.getName() + ".REQUEST_TYPE";
   private static final Logger LOGGER = LoggerFactory.getLogger(RequestLogFilter.class);
   private static final String UNKNOWN = "unknown";
@@ -67,17 +70,22 @@ public class RequestLogFilter extends OncePerRequestFilter {
 
       String requestType = StringUtils.firstNonBlank(MDC.get(MDC_REQUEST_TYPE), UNKNOWN);
       String userId = StringUtils.firstNonBlank(MDC.get(MDC_WUA_ID), UNKNOWN);
+      String proxyWuaId = MDC.get(MDC_PROXY_WUA_ID);
 
       var jooqQueryCount = jooqStatisticsListener.getCount();
       jooqStatisticsListener.clear();
       CorrelationIdUtil.clearCorrelationIdOnMdc();
 
       LOGGER.info(
-          "{} request: {} {}{} ({}), correlation id: {}, time: {}, status: {}, user id: {}, " +
+          "{} request: {} {}{} ({}), correlation id: {}, time: {}, status: {}, user id: {}, proxy user id: {}, " +
               "hibernate query count: {}, jooq query count: {}",
           requestType, request.getMethod(), request.getRequestURI(), queryString,
           mvcPattern, correlationId, stopwatch.elapsed(TimeUnit.MILLISECONDS),
-          response.getStatus(), userId, hibernateQueryCount, jooqQueryCount);
+          response.getStatus(), userId, proxyWuaId, hibernateQueryCount, jooqQueryCount);
+
+      CorrelationIdUtil.clearCorrelationIdOnMdc();
+      MDC.remove(MDC_WUA_ID);
+      MDC.remove(MDC_PROXY_WUA_ID);
     }
   }
 }

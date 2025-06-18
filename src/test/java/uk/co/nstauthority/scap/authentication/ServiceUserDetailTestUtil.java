@@ -22,9 +22,11 @@ public class ServiceUserDetailTestUtil {
     private String forename = "Forename";
     private String surname = "Surname";
     private String emailAddress = "test.user@test.com";
+    private Long proxyWuaId = null;
+    private String proxyUserDisplayName = "Proxy User";
 
     public ServiceUserDetail build() {
-      return new ServiceUserDetail(wuaId, personId, forename, surname, emailAddress);
+      return new ServiceUserDetail(wuaId, personId, forename, surname, emailAddress, proxyWuaId, proxyUserDisplayName);
     }
 
     public Builder withWuaId(Long wuaId) {
@@ -49,6 +51,16 @@ public class ServiceUserDetailTestUtil {
 
     public Builder withEmailAddress(String emailAddress) {
       this.emailAddress = emailAddress;
+      return this;
+    }
+
+    public Builder withProxyWuaId(Long proxyWuaId) {
+      this.proxyWuaId = proxyWuaId;
+      return this;
+    }
+
+    public Builder withProxyUserDisplayName(String proxyUserDisplayName) {
+      this.proxyUserDisplayName = proxyUserDisplayName;
       return this;
     }
   }

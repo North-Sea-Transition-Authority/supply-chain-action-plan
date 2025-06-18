@@ -11,7 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import uk.co.nstauthority.scap.authentication.SamlAuthenticationUtil;
 import uk.co.nstauthority.scap.authentication.ServiceSaml2Authentication;
-import uk.co.nstauthority.scap.authentication.TestUserProvider;
+import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
 
 @ExtendWith(MockitoExtension.class)
 class AuditRevisionEntityListenerTest {
@@ -25,7 +25,11 @@ class AuditRevisionEntityListenerTest {
 
   @Test
   void newRevision_userNoProxyInContext() {
-    var serviceUserDetail = TestUserProvider.getUser();
+    var serviceUserDetail = ServiceUserDetailTestUtil.Builder()
+        .withWuaId(100L)
+        .withProxyWuaId(null)
+        .build();
+
     SamlAuthenticationUtil.Builder()
         .withUser(serviceUserDetail)
         .setSecurityContext();
@@ -34,7 +38,28 @@ class AuditRevisionEntityListenerTest {
 
     auditRevisionEntityListener.newRevision(auditRevisionEntity);
 
-    assertThat(auditRevisionEntity.getWebUserAccountId()).isEqualTo(serviceUserDetail.wuaId());
+    assertThat(auditRevisionEntity.getWebUserAccountId()).isEqualTo(100L);
+    assertThat(auditRevisionEntity.getProxyWebUserAccountId()).isNull();
+  }
+
+  @Test
+  void newRevision_proxyUserInContext() {
+
+    var serviceUserDetail = ServiceUserDetailTestUtil.Builder()
+        .withWuaId(100L)
+        .withProxyWuaId(200L)
+        .build();
+
+    SamlAuthenticationUtil.Builder()
+        .withUser(serviceUserDetail)
+        .setSecurityContext();
+
+    var auditRevisionEntity = new AuditRevisionEntity();
+
+    auditRevisionEntityListener.newRevision(auditRevisionEntity);
+
+    assertThat(auditRevisionEntity.getWebUserAccountId()).isEqualTo(100L);
+    assertThat(auditRevisionEntity.getProxyWebUserAccountId()).isEqualTo(200L);
   }
 
   @Test

@@ -156,6 +156,50 @@ class SamlResponseParserTest {
         .isThrownBy(() -> samlResponseParser.parseSamlResponse(samlResponse));
   }
 
+  @Test
+  void parseSamlResponse_whenProxyUser() {
+
+    var attributes = samlAttributeBuilder()
+        .withWebUserAccountId("1")
+        .withForename("Normal")
+        .withSurname("User")
+        .withProxyWuaId("2")
+        .withProxyUserDisplayName("Super Admin")
+        .build();
+
+    var samlResponse = createResponse(attributes);
+
+    var authentication = samlResponseParser.parseSamlResponse(samlResponse);
+    var userDetails = (ServiceUserDetail) authentication.getPrincipal();
+
+    assertThat(userDetails.displayName()).isEqualTo("Super Admin/Normal User");
+    assertThat(userDetails.wuaId()).isEqualTo(1L);
+    assertThat(userDetails.proxyWuaId()).isEqualTo(2L);
+    assertThat(userDetails.proxyUserDisplayName()).isEqualTo("Super Admin");
+  }
+
+  @Test
+  void parseSamlResponse_whenNoProxyUser() {
+
+    var attributes = samlAttributeBuilder()
+        .withWebUserAccountId("1")
+        .withForename("Normal")
+        .withSurname("User")
+        .withProxyWuaId(null)
+        .withProxyUserDisplayName(null)
+        .build();
+
+    var samlResponse = createResponse(attributes);
+
+    var authentication = samlResponseParser.parseSamlResponse(samlResponse);
+    var userDetails = (ServiceUserDetail) authentication.getPrincipal();
+
+    assertThat(userDetails.displayName()).isEqualTo("Normal User");
+    assertThat(userDetails.wuaId()).isEqualTo(1L);
+    assertThat(userDetails.proxyWuaId()).isNull();
+    assertThat(userDetails.proxyUserDisplayName()).isNull();
+  }
+
   private Response createResponse(List<Attribute> samlAttributes) {
     var samlResponse = new ResponseBuilder().buildObject();
     var samlAssertion = new AssertionBuilder().buildObject();
@@ -178,6 +222,8 @@ class SamlResponseParserTest {
     private String surname = "Surname";
     private String emailAddress = "email@address.com";
     private String portalPrivilegeCsv = "PRIVILEGE_1";
+    private String proxyWuaId = null;
+    private String proxyUserDisplayName = null;
 
     private final List<Attribute> attributes = new ArrayList<>();
 
@@ -215,6 +261,16 @@ class SamlResponseParserTest {
       return this;
     }
 
+    SamlAttributeTestBuilder withProxyWuaId(String proxyWuaId) {
+      this.proxyWuaId = proxyWuaId;
+      return this;
+    }
+
+    SamlAttributeTestBuilder withProxyUserDisplayName(String proxyUserDisplayName) {
+      this.proxyUserDisplayName = proxyUserDisplayName;
+      return this;
+    }
+
     List<Attribute> build() {
       addAttribute(EnergyPortalSamlAttribute.WEB_USER_ACCOUNT_ID, webUserAccountId);
       addAttribute(EnergyPortalSamlAttribute.PERSON_ID, personId);
@@ -222,6 +278,8 @@ class SamlResponseParserTest {
       addAttribute(EnergyPortalSamlAttribute.SURNAME, surname);
       addAttribute(EnergyPortalSamlAttribute.EMAIL_ADDRESS, emailAddress);
       addAttribute(EnergyPortalSamlAttribute.PORTAL_PRIVILEGES, portalPrivilegeCsv);
+      addAttribute(EnergyPortalSamlAttribute.PROXY_USER_WUA_ID, proxyWuaId);
+      addAttribute(EnergyPortalSamlAttribute.PROXY_USER_NAME, proxyUserDisplayName);
       return this.attributes;
     }
 

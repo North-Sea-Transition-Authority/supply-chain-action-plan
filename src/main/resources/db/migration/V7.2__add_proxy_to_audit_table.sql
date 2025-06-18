@@ -1,0 +1,2 @@
+ALTER TABLE audit_revisions
+ADD COLUMN proxy_web_user_account_id INTEGER;

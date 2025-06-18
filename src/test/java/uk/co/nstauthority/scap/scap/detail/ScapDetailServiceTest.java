@@ -686,7 +686,7 @@ class ScapDetailServiceTest {
   }
 
   private ServiceUserDetail getUserDetail() {
-    return new ServiceUserDetail(1000L, 1000L, "Test", "Testerson", "test@test.com");
+    return new ServiceUserDetail(1000L, 1000L, "Test", "Testerson", "test@test.com", null, null);
   }
 
   private List<ScapDetail> getListScapDetail() {

@@ -27,6 +27,8 @@ class AuditRevisionEntity {
 
   private Long webUserAccountId;
 
+  private Long proxyWebUserAccountId;
+
   long getId() {
     return id;
   }
@@ -49,5 +51,13 @@ class AuditRevisionEntity {
 
   public void setWebUserAccountId(Long webUserAccountId) {
     this.webUserAccountId = webUserAccountId;
+  }
+
+  public Long getProxyWebUserAccountId() {
+    return proxyWebUserAccountId;
+  }
+
+  public void setProxyWebUserAccountId(Long proxyWebUserAccountId) {
+    this.proxyWebUserAccountId = proxyWebUserAccountId;
   }
 }

@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.authentication;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.ObjectUtils;
@@ -27,7 +28,34 @@ public class SamlResponseParser {
     var surname = getNonEmptyAttribute(parsedAttributes, EnergyPortalSamlAttribute.SURNAME);
     var email = getNonEmptyAttribute(parsedAttributes, EnergyPortalSamlAttribute.EMAIL_ADDRESS);
 
-    var userDetail = new ServiceUserDetail(Long.parseLong(wuaId), Long.parseLong(personId), forename, surname, email);
+    String proxyWuaIdAttribute = parsedAttributes.getOrDefault(
+        EnergyPortalSamlAttribute.PROXY_USER_WUA_ID.getAttributeName(),
+        null
+    );
+
+    var proxyWuaId = Optional.ofNullable(proxyWuaIdAttribute)
+        .filter(StringUtils::isNotBlank)
+        .map(Long::parseLong)
+        .orElse(null);
+
+    var proxyUserDisplayNameAttribute = parsedAttributes.getOrDefault(
+        EnergyPortalSamlAttribute.PROXY_USER_NAME.getAttributeName(),
+        null
+    );
+
+    var proxyUserDisplayName = Optional.ofNullable(proxyUserDisplayNameAttribute)
+        .filter(StringUtils::isNotBlank)
+        .orElse(null);
+
+    var userDetail = new ServiceUserDetail(
+        Long.parseLong(wuaId),
+        Long.parseLong(personId),
+        forename,
+        surname,
+        email,
+        proxyWuaId,
+        proxyUserDisplayName
+    );
 
     var portalPrivileges = getNonNullAttribute(parsedAttributes, EnergyPortalSamlAttribute.PORTAL_PRIVILEGES);
 
