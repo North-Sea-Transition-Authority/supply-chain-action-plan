@@ -172,7 +172,7 @@ class SamlResponseParserTest {
     var authentication = samlResponseParser.parseSamlResponse(samlResponse);
     var userDetails = (ServiceUserDetail) authentication.getPrincipal();
 
-    assertThat(userDetails.displayName()).isEqualTo("Super Admin/Normal User");
+    assertThat(userDetails.displayName()).isEqualTo("Super Admin as Normal User");
     assertThat(userDetails.wuaId()).isEqualTo(1L);
     assertThat(userDetails.proxyWuaId()).isEqualTo(2L);
     assertThat(userDetails.proxyUserDisplayName()).isEqualTo("Super Admin");

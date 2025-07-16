@@ -60,7 +60,8 @@ class DefaultPageControllerAdviceTest extends AbstractControllerTest {
         "cookiesStatementUrl",
         "feedbackUrl",
         "analytics",
-        "org.springframework.validation.BindingResult.analytics"
+        "org.springframework.validation.BindingResult.analytics",
+        "workAreaUrl"
     );
 
     assertThat((CustomerConfigurationProperties) modelMap.get("customerBranding")).hasNoNullFieldsOrProperties();
