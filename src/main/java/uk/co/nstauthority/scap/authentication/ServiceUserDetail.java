@@ -21,7 +21,7 @@ public record ServiceUserDetail(Long wuaId,
 
   public String displayName() {
     var userName = String.format("%s %s", forename, surname);
-    return Objects.nonNull(proxyUserDisplayName) ? String.format("%s/%s", proxyUserDisplayName, userName) : userName;
+    return Objects.nonNull(proxyUserDisplayName) ? String.format("%s as %s", proxyUserDisplayName, userName) : userName;
   }
 
   public WebUserAccountId getWebUserAccountId() {

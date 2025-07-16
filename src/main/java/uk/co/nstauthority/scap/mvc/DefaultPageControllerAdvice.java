@@ -92,6 +92,7 @@ class DefaultPageControllerAdvice {
 
   private void addTopNavigationItems(Model model, HttpServletRequest request) {
     model.addAttribute("navigationItems", topNavigationService.getTopNavigationItems());
+    model.addAttribute("workAreaUrl",  ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)));
     model.addAttribute("currentEndPoint", request.getRequestURI());
   }
 }

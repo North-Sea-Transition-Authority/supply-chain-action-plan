@@ -1,4 +1,5 @@
 <#include '../../fds/layout.ftl'>
+<#import '../../fds/components/header/energyPortalHeader.ftl' as fdsEnergyPortalHeader>
 <#import '_pageSizes.ftl' as PageSize>
 <#import '../scap/macros/notificationBanner.ftl' as notificationBanner>
 
@@ -14,6 +15,7 @@
 <#-- @ftlvariable name="feedbackUrl" type="String" -->
 <#-- @ftlvariable name="analytics" type=" uk.co.nstauthority.scap.configuration.AnalyticsProperties" -->
 <#-- @ftlvariable name="navigationItems" type="java.util.List<TopNavigationItem>" -->
+<#-- @ftlvariable name="workAreaUrl" type="String" -->
 
 <#if notificationBannerView??>
   <#assign notificationBannerContent>
@@ -36,7 +38,7 @@
 <#macro defaultPage
   htmlTitle
   pageHeading=""
-  phaseBanner=true
+  phaseBanner=false
   errorItems=[]
   pageSize=PageSize.TWO_THIRDS_COLUMN
   backLinkUrl=""
@@ -71,26 +73,7 @@
   </#if>
 
   <#assign headerContent>
-    <@fdsHeader.header
-      homePageUrl=serviceHomeUrl
-      serviceUrl=serviceHomeUrl
-      logoProductText=customerMnemonic
-      headerNav=true
-      serviceName=serviceName
-      headerLogo="GOV_CREST"
-      logoText=customerBranding.name()
-      wrapperWidth=wrapperWidth
-    >
-        <#if loggedInUser?has_content>
-          <@fdsHeader.headerNavigation>
-            <@fdsHeader.headerNavigationItem
-              itemText=loggedInUser.displayName()
-              itemActive=false
-            />
-            <@fdsHeader.headerNavigationSignOutButton formUrl=springUrl("/logout") buttonText="Sign out"/>
-          </@fdsHeader.headerNavigation>
-        </#if>
-      </@fdsHeader.header>
+      <@fdsEnergyPortalHeader.energyPortalHeader headerLogo="NSTA" userDisplayName=loggedInUser.displayName() signOutUrl=springUrl("/logout")  wrapperWidth=wrapperWidth/>
   </#assign>
 
   <#assign footerMetaContent>
@@ -119,8 +102,9 @@
     logoText=customerBranding.name()
     logoProductText=customerMnemonic
     topNavigation=topNavigation
+    topNavigationServiceName=serviceBranding.name()
+    topNavigationServiceUrl=springUrl(workAreaUrl)
     phaseBanner=phaseBanner
-    phaseBannerLink=springUrl(feedbackUrl)
     serviceUrl=serviceHomeUrl
     homePageUrl=serviceHomeUrl
     fullWidthColumn=fullWidthColumn
