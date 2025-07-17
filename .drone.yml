@@ -414,10 +414,10 @@ data: yfYih219/J1QVnglTEkdQRQXMO7Nba93nXGgIh4WDlR5AmQnoI8NmVsUcE6wG7HZHYeazo7mhA
 
 kind: secret
 name: epmq_sns_sqs_aws_access_key_id
-data: eOpoiHm6zY8hTNGjY7sUv7IsjjEYnozaMz7UvosM1E1tNJ7w4x7nc2Ew7eCZSrNM
+data: hrFCnpr2JJ+e3BbbxEFiEd3a3biyrT1csG+92p9KYJjwWE5T2K0N0FlIjmyj7QwX
 
 ---
 
 kind: secret
 name: epmq_sns_sqs_aws_secret_access_key
-data: Y5ht7hdVJAwZVWY3uFdVe+BqsCsfZMVtuWbeME+faBERtxfeza98Asurhizn4UpmlXkJ+UX5CFhQeM+HqqSs2Ds0W2M=
+data: sHmgTwCIq58jLok5pOFAHYIErOqN0Ha5n8RtXJTITP9FMRg1pJQIOg3kCGZMGH9lTgrfBc67n8SOwuKwHNzeTtVZNgI=
