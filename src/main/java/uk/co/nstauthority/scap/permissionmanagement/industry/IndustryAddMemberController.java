@@ -3,7 +3,6 @@ package uk.co.nstauthority.scap.permissionmanagement.industry;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,9 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-import uk.co.fivium.digital.energyportalteamaccesslibrary.team.EnergyPortalAccessService;
 import uk.co.fivium.energyportal.accounts.starter.EnergyPortalServiceAccessService;
-import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.configuration.SamlProperties;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.HasAnyPermissionForTeam;
@@ -39,21 +36,15 @@ class IndustryAddMemberController extends AddMemberController {
                               ControllerHelperService controllerHelperService,
                               AddTeamMemberValidator addTeamMemberValidator,
                               EnergyPortalUserService energyPortalUserService,
-                              EnergyPortalAccessService energyPortalAccessService,
-                              UserDetailService userDetailService,
                               TeamMemberService teamMemberService,
-                              EnergyPortalServiceAccessService energyPortalServiceAccessService,
-                              Environment environment) {
+                              EnergyPortalServiceAccessService energyPortalServiceAccessService) {
     super(
         samlProperties,
         controllerHelperService,
         addTeamMemberValidator,
         energyPortalUserService,
-        energyPortalAccessService,
-        userDetailService,
         teamMemberService,
-        energyPortalServiceAccessService,
-        environment
+        energyPortalServiceAccessService
     );
   }
 

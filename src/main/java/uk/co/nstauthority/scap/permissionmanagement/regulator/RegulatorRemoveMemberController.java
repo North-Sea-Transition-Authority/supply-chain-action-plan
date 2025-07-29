@@ -3,7 +3,6 @@ package uk.co.nstauthority.scap.permissionmanagement.regulator;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,9 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import uk.co.fivium.digital.energyportalteamaccesslibrary.team.EnergyPortalAccessService;
 import uk.co.fivium.energyportal.accounts.starter.EnergyPortalServiceAccessService;
-import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.HasAnyPermissionForTeam;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.IsMemberOfTeam;
@@ -39,19 +36,13 @@ public class RegulatorRemoveMemberController extends RemoveMemberController {
                                          CustomerConfigurationProperties customerConfigurationProperties,
                                          TeamMemberViewService teamMemberViewService,
                                          TeamMemberRemovalService teamMemberRemovalService,
-                                         UserDetailService userDetailService,
-                                         EnergyPortalAccessService energyPortalAccessService,
-                                         EnergyPortalServiceAccessService energyPortalServiceAccessService,
-                                         Environment environment) {
+                                         EnergyPortalServiceAccessService energyPortalServiceAccessService) {
     super(teamService,
         teamMemberService,
         customerConfigurationProperties,
         teamMemberViewService,
         teamMemberRemovalService,
-        userDetailService,
-        energyPortalAccessService,
-        energyPortalServiceAccessService,
-        environment
+        energyPortalServiceAccessService
     );
   }
 

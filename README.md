@@ -60,17 +60,10 @@
 | METRICS_EXPORT_TYPE            | The 'flavour' of metrics, one of STATSD or DATADOG. Use DATADOG as it has better out-of-the-box metrics tagging capabilities |
 | METRICS_INSTANCE_TAG           | Tag to help with filtering stats, set to the name of this instance, e.g. dev, st, uat, prod                                  |
 | METRICS_SOURCE_TYPE_TAG        | Tag to help with filtering stats, set to the name of this project, i.e. scap                                                 |
-
-#### Energy Portal accounts service integration
-
-In order to integrate with the Energy Portal accounts service as the IDP you need to include the `use-epas` profile. If running Energy Portal accounts service
-locally add the `use-epas-development` profile as well.
-
-For deployed environments we require the following environment variables to be set
-- EPAS_SAML_ENTITY_ID
-- EPAS_SAML_LOGIN_URL
-- EPAS_LOGOUT_REQUEST_URL
-- EPAS_SAML_BASE_URL (e.g. https://nsta.itportal.dev.fivium.co.uk)
+| EPAS_SAML_ENTITY_ID            | The entity ID is either:<ul><li>`energy-portal-accounts-service-dev` for dev/local</li><li>`energy-portal-accounts-service-st` for st</li><li>`energy-portal-accounts-service-uat` for uat</li><li>`energy-portal-accounts-service-prod` for prod</li></ul> |
+| EPAS_SAML_LOGIN_URL            | The login url e.g. https://desnz.itportal.dev.fivium.co.uk/accounts/saml/login                                                                                                                                                                              |
+| EPAS_LOGOUT_REQUEST_URL        | The logout url e.g https://desnz.itportal.dev.fivium.co.uk/accounts/service-provider-sign-out                                                                                                                                                               |
+| EPAS_SAML_BASE_URL             | The base url (e.g. https://desnz.itportal.dev.fivium.co.uk)                                                                                                                                                                                                 |
 
 ### 3. Initialise the Fivium Design System
 - `git submodule update --init --recursive`

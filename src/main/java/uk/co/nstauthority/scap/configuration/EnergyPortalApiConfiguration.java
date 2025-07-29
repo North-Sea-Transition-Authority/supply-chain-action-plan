@@ -5,7 +5,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
-import uk.co.fivium.digital.energyportalteamaccesslibrary.team.EnergyPortalAccessService;
 import uk.co.fivium.energyportalapi.client.EnergyPortal;
 import uk.co.fivium.energyportalapi.client.countries.CountryApi;
 import uk.co.fivium.energyportalapi.client.facility.FacilityApi;
@@ -25,11 +24,6 @@ public class EnergyPortalApiConfiguration {
   @NotNull String accessUrl;
 
   @NotNull String accessPreSharedKey;
-
-  @Bean
-  public EnergyPortalAccessService energyPortalAccessService() {
-    return new EnergyPortalAccessService(accessUrl, accessPreSharedKey);
-  }
 
   @Bean
   public EnergyPortal energyPortal() {

@@ -23,14 +23,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
-import uk.co.fivium.digital.energyportalteamaccesslibrary.team.EnergyPortalAccessService;
-import uk.co.fivium.digital.energyportalteamaccesslibrary.team.InstigatingWebUserAccountId;
-import uk.co.fivium.digital.energyportalteamaccesslibrary.team.ResourceType;
-import uk.co.fivium.digital.energyportalteamaccesslibrary.team.TargetWebUserAccountId;
 import uk.co.fivium.energyportal.accounts.starter.EnergyPortalServiceAccessService;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
@@ -43,14 +38,10 @@ import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberRemovalServi
 @WithMockUser
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = IndustryRemoveMemberController.class)
-@ActiveProfiles("use-epas")
 class IndustryRemoveMemberControllerTest extends AbstractIndustryTeamControllerTest{
 
   @MockitoBean
   private TeamMemberRemovalService teamMemberRemovalService;
-
-  @MockitoBean
-  EnergyPortalAccessService energyPortalAccessService;
 
   @MockitoBean
   EnergyPortalServiceAccessService energyPortalServiceAccessService;
@@ -115,12 +106,6 @@ class IndustryRemoveMemberControllerTest extends AbstractIndustryTeamControllerT
         .andExpect(redirectUrl("/permission-management/industry/%s".formatted(teamId.uuid().toString())));
 
     verify(energyPortalServiceAccessService).removeUser(webUserAccountId.id());
-
-    verify(energyPortalAccessService, never()).removeUserFromAccessTeam(
-        any(ResourceType.class),
-        any(TargetWebUserAccountId.class),
-        any(InstigatingWebUserAccountId.class)
-    );
   }
 
   @Test
@@ -137,12 +122,6 @@ class IndustryRemoveMemberControllerTest extends AbstractIndustryTeamControllerT
         .andExpect(redirectUrl("/permission-management/industry/%s".formatted(teamId.uuid().toString())));
 
     verify(energyPortalServiceAccessService, never()).removeUser(webUserAccountId.id());
-
-    verify(energyPortalAccessService,never()).removeUserFromAccessTeam(
-        any(ResourceType.class),
-        any(TargetWebUserAccountId.class),
-        any(InstigatingWebUserAccountId.class)
-    );
   }
 
   @Test
