@@ -20,3 +20,11 @@ CVE-2025-22233
 
 # org.springframework:spring-web
 CVE-2025-41234
+
+# commons-beanutils:commons-beanutils
+CVE-2025-48734
+
+# energy-portal-accounts-spring-boot-starter:v1.0.0
+CVE-2025-8916
+CVE-2025-41242
+CVE-2025-55163

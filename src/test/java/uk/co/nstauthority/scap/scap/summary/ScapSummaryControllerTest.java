@@ -302,12 +302,20 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     when(scapDetailService.getByScapIdAndVersionNumber(SCAP_ID, 4)).thenReturn(scapDetail);
 
     mockMvc.perform(get(
-            ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID, 4)))
+            ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID, "4")))
             .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/scap/summary/scapSummaryOverview"));
     verify(caseEventService, never()).getEventViewByScapId(SCAP_ID);
     verify(scapDetailService).getByScapIdAndVersionNumber(SCAP_ID, 4);
+  }
+
+  @Test
+  void renderSummary_IndustryUser_nonIntegerVersionNumber_errors() throws Exception {
+    mockMvc.perform(get(
+            ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID, "hello")))
+            .with(authenticatedScapUser()))
+        .andExpect(status().isNotFound());
   }
 
   @Test
@@ -370,7 +378,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
     when(scapDetailService.getByScapIdAndVersionNumber(SCAP_ID, 4)).thenReturn(scapDetail);
     when(scapSummaryViewService.inferSubmissionStatusFromSummary(any())).thenReturn(ScapSubmissionStage.DRAFT);
     mockMvc.perform(get(
-            ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID, 4)))
+            ReverseRouter.route(on(ScapSummaryController.class).getScapSummary(SCAP_ID, "4")))
             .with(authenticatedScapUser()))
         .andExpect(status);
   }
@@ -435,7 +443,7 @@ class ScapSummaryControllerTest extends AbstractControllerTest {
   void getScapVersionSummary() throws Exception {
     var requestedVersion = 3;
     var expectedRedirectUrl = ReverseRouter.route(on(ScapSummaryController.class)
-        .getScapSummary(SCAP_ID, requestedVersion));
+        .getScapSummary(SCAP_ID, String.valueOf(requestedVersion)));
     var form = new VersionSelectForm();
     form.setRequestedVersion(requestedVersion);
 

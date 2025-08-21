@@ -7,12 +7,14 @@ import static uk.co.nstauthority.scap.permissionmanagement.RolePermission.VIEW_S
 
 import java.util.Collections;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.HasAnyPermissionForScap;
@@ -31,7 +33,7 @@ import uk.co.nstauthority.scap.scap.tasklist.TaskListController;
 import uk.co.nstauthority.scap.workarea.updaterequests.UpdateRequestService;
 
 @Controller
-@RequestMapping("{scapId}")
+@RequestMapping({"{scapId}", "{scapId}/"})
 @HasAnyPermissionForScap(allowRegulatorAccess = true, permissions = {SUBMIT_SCAP, VIEW_SCAP})
 public class ScapSummaryController {
 
@@ -88,8 +90,11 @@ public class ScapSummaryController {
       ScapDetailStatus.APPROVED,
       ScapDetailStatus.CLOSED_OUT,
       ScapDetailStatus.WITHDRAWN})
-  public ModelAndView getScapSummary(@PathVariable("scapId") ScapId scapId,
-                                     @PathVariable("versionNumber") Integer versionNumber) {
+  ModelAndView getScapSummary(@PathVariable("scapId") ScapId scapId,
+                              @PathVariable("versionNumber") String versionNumberAsString) {
+
+    var versionNumber = throwNotFoundIfInvalidInteger(versionNumberAsString);
+
     var versionedDetail = scapDetailService.getActionableScapDetail(scapId, userDetailService.getUserDetail());
     if (versionNumber != null && versionNumber < versionedDetail.getVersionNumber()) {
       versionedDetail = scapDetailService.getByScapIdAndVersionNumber(scapId, versionNumber);
@@ -132,10 +137,10 @@ public class ScapSummaryController {
   }
 
   @PostMapping
-  public ModelAndView getScapVersionSummary(@PathVariable("scapId") ScapId scapId,
-                                            @ModelAttribute("versionSelectForm") VersionSelectForm form) {
+  ModelAndView getScapVersionSummary(@PathVariable("scapId") ScapId scapId,
+                                     @ModelAttribute("versionSelectForm") VersionSelectForm form) {
     return ReverseRouter.redirect(on(ScapSummaryController.class)
-        .getScapSummary(scapId, form.getRequestedVersion()))
+        .getScapSummary(scapId, form.getRequestedVersion().toString()))
         .addObject("versionSelectForm", form);
   }
 
@@ -144,5 +149,14 @@ public class ScapSummaryController {
       return caseEventService.getEventViewByScapId(scapId);
     }
     return Collections.emptyList();
+  }
+
+  private Integer throwNotFoundIfInvalidInteger(String str) {
+    try {
+      return str == null ? null : Integer.parseInt(str);
+    } catch (NumberFormatException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+          "Version number expected integer but found %s".formatted(str));
+    }
   }
 }
