@@ -5,6 +5,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderUserRolesService;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
@@ -14,10 +15,14 @@ public class TeamMemberRoleService {
 
   private final TeamMemberRoleRepository teamMemberRoleRepository;
 
+  private final EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService;
+
   @Autowired
   public TeamMemberRoleService(TeamMemberRoleRepository teamMemberRoleRepository,
-                               UserDetailService userDetailService) {
+                               UserDetailService userDetailService,
+                               EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService) {
     this.teamMemberRoleRepository = teamMemberRoleRepository;
+    this.energyPortalServiceProviderUserRolesService = energyPortalServiceProviderUserRolesService;
   }
 
   @Transactional
@@ -47,10 +52,23 @@ public class TeamMemberRoleService {
     });
 
     teamMemberRoleRepository.saveAll(teamMemberRoles);
+
+    energyPortalServiceProviderUserRolesService.publishUsersRolesForTeam(
+        wuaId,
+        team.getUuid().toString(),
+        team.getTeamType().name(),
+        roles
+    );
   }
 
   @Transactional
   public void deleteUsersInTeam(Team team) {
+    teamMemberRoleRepository.findAllByTeam(team).stream().map(TeamMemberRole::getWuaId).forEach(
+        wuaId -> energyPortalServiceProviderUserRolesService.publishRemoveUserFromTeam(
+            wuaId,
+            String.valueOf(team.getUuid())
+        )
+    );
     teamMemberRoleRepository.deleteAllByTeam(team);
   }
 }

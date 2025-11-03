@@ -8,4 +8,11 @@ public interface TeamRole extends DisplayableEnumOption {
   Set<RolePermission> getRolePermissions();
 
   String name();
+
+  String getDisplayName();
+
+  String getDescription();
+
+  int getDisplayOrder();
+
 }

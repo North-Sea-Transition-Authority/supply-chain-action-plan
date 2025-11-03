@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.permissionmanagement;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -23,6 +24,9 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import uk.co.fivium.energyportal.serviceproviders.epmq.ScopeType;
+import uk.co.fivium.energyportal.serviceproviders.epmq.messages.ServiceProviderTeamDto;
+import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderTeamService;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.industry.AbstractIndustryTeamControllerTest;
@@ -41,6 +45,9 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
 
   @MockitoBean
   private NewTeamFormValidator newTeamFormvalidator;
+
+  @MockitoBean
+  private EnergyPortalServiceProviderTeamService energyPortalServiceProviderTeamService;
 
   @Test
   void renderTeamList_notAuthorised_thenUnAuthorised() throws Exception {
@@ -164,9 +171,10 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
     form.setOrganisationGroupId("10000");
 
     var uuid = UUID.randomUUID();
+    var newTeam = TeamTestUtil.Builder().withTeamType(TeamType.INDUSTRY).withId(uuid).build();
 
     when(teamService.validate(any(), any())).thenReturn(emptyBindingResult());
-    when(teamService.createTeam("Royal Dutch Shell", 10000)).thenReturn(new Team(uuid));
+    when(teamService.createTeam("Royal Dutch Shell", 10000)).thenReturn(newTeam);
     when(organisationGroupService.getOrganisationGroupById(any(), any())).thenReturn(Optional.of(orgGroup));when(userDetailService.getUserDetail()).thenReturn(testUser);
     when(userDetailService.getUserDetail()).thenReturn(testUser);
 
@@ -177,6 +185,16 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
                 .with(authenticatedScapUser()))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl("/permission-management/industry/" + uuid));
+
+    var expectedServiceProviderTeamDto = new ServiceProviderTeamDto(
+        newTeam.getUuid().toString(),
+        String.valueOf(newTeam.getEnergyPortalOrgGroupId()),
+        ScopeType.ORGANISATION_GROUP,
+        newTeam.getTeamType().name()
+    );
+
+    verify(energyPortalServiceProviderTeamService)
+        .publishTeam(expectedServiceProviderTeamDto);
   }
 
   @Test
@@ -195,6 +213,8 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
                 .with(authenticatedScapUser()))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/addTeam"));
+
+    verify(energyPortalServiceProviderTeamService, never()).publishTeam(any());
   }
 
   @Test

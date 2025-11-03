@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.authentication;
 import java.io.Serializable;
 import java.util.Objects;
 import org.springframework.security.core.AuthenticatedPrincipal;
+import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 
 public record ServiceUserDetail(Long wuaId,
@@ -26,5 +27,17 @@ public record ServiceUserDetail(Long wuaId,
 
   public WebUserAccountId getWebUserAccountId() {
     return new WebUserAccountId(wuaId);
+  }
+
+  public static ServiceUserDetail from(EnergyPortalUserDto energyPortalUser) {
+    return new ServiceUserDetail(
+        energyPortalUser.webUserAccountId(),
+        null,
+        energyPortalUser.forename(),
+        energyPortalUser.surname(),
+        energyPortalUser.emailAddress(),
+        null,
+        null
+    );
   }
 }

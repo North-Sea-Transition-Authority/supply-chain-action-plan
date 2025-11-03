@@ -70,7 +70,7 @@ public enum IndustryTeamRole implements TeamRole {
     return rolePermissions;
   }
 
-  static Optional<IndustryTeamRole> getRoleFromString(String role) {
+  public static Optional<IndustryTeamRole> getRoleFromString(String role) {
     try {
       return Optional.of(IndustryTeamRole.valueOf(role.toUpperCase()));
     } catch (IllegalArgumentException exception) {

@@ -6,6 +6,8 @@ import java.util.Set;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
@@ -82,5 +84,23 @@ class AuditRevisionEntityListenerTest {
     auditRevisionEntityListener.newRevision(auditRevisionEntity);
 
     assertThat(auditRevisionEntity.getWebUserAccountId()).isNull();
+  }
+
+  @Test
+  void newRevision_whenNoAuthenticatedUser_thenUseFallbackUser() {
+    SecurityContextHolder.setContext(new SecurityContextImpl(null));
+
+    var auditRevision = new AuditRevisionEntity();
+    var serviceUserDetail = ServiceUserDetailTestUtil.Builder().build();
+
+    try (MockedStatic<AuditRevisionUtil> mockedUtil = Mockito.mockStatic(AuditRevisionUtil.class)) {
+      mockedUtil.when(AuditRevisionUtil::getFallbackAuditUser)
+          .thenReturn(serviceUserDetail);
+
+      auditRevisionEntityListener.newRevision(auditRevision);
+    }
+
+    assertThat(auditRevision.getWebUserAccountId()).isEqualTo(serviceUserDetail.wuaId());
+    assertThat(auditRevision.getProxyWebUserAccountId()).isEqualTo(serviceUserDetail.proxyWuaId());
   }
 }

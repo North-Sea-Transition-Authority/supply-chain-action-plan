@@ -3,12 +3,12 @@ package uk.co.nstauthority.scap.permissionmanagement.teams;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 
 @Repository
-interface TeamMemberRoleRepository extends CrudRepository<TeamMemberRole, UUID> {
+public interface TeamMemberRoleRepository extends ListCrudRepository<TeamMemberRole, UUID> {
 
   List<TeamMemberRole> findAllByTeam(Team team);
 

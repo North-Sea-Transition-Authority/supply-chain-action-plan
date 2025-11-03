@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import uk.co.fivium.energyportal.serviceproviders.epmq.ScopeType;
+import uk.co.fivium.energyportal.serviceproviders.epmq.messages.ServiceProviderTeamDto;
+import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderTeamService;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermission;
@@ -48,19 +51,24 @@ public class TeamManagementController {
   private final String organisationGroupSearchRestUrl =
       ReverseRouter.route(on(OrganisationGroupRestController.class).getOrganisationGroupSearchResults(null));
 
+
+  private final EnergyPortalServiceProviderTeamService energyPortalServiceProviderTeamService;
+
   @Autowired
   public TeamManagementController(TeamService teamService,
                                   TeamMemberService teamMemberService,
                                   UserDetailService userDetailService,
                                   ControllerHelperService controllerHelperService,
                                   OrganisationGroupService organisationGroupService,
-                                  NewTeamFormValidator newTeamFormvalidator) {
+                                  NewTeamFormValidator newTeamFormvalidator,
+                                  EnergyPortalServiceProviderTeamService energyPortalServiceProviderTeamService) {
     this.teamService = teamService;
     this.teamMemberService = teamMemberService;
     this.userDetailService = userDetailService;
     this.controllerHelperService = controllerHelperService;
     this.organisationGroupService = organisationGroupService;
     this.newTeamFormvalidator = newTeamFormvalidator;
+    this.energyPortalServiceProviderTeamService = energyPortalServiceProviderTeamService;
   }
 
   @GetMapping
@@ -141,6 +149,14 @@ public class TeamManagementController {
     if (orgGroup.isPresent()) {
       var team = teamService.createTeam(orgGroup.get().getName(),
           Integer.valueOf(groupId));
+
+      var serviceProviderTeam = new ServiceProviderTeamDto(
+          team.getUuid().toString(),
+          String.valueOf(team.getEnergyPortalOrgGroupId()),
+          ScopeType.ORGANISATION_GROUP,
+          team.getTeamType().name()
+      );
+      energyPortalServiceProviderTeamService.publishTeam(serviceProviderTeam);
 
       var view = ReverseRouter.redirect(on(
           IndustryTeamMemberController.class).renderMemberList(new TeamId(team.getUuid())));

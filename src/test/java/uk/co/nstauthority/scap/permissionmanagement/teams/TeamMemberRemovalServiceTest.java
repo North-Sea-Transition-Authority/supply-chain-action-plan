@@ -2,15 +2,19 @@ package uk.co.nstauthority.scap.permissionmanagement.teams;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderUserRolesService;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
@@ -26,13 +30,11 @@ class TeamMemberRemovalServiceTest {
   @Mock
   TeamMemberRoleRepository teamMemberRoleRepository;
 
+  @Mock
+  EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService;
 
+  @InjectMocks
   private TeamMemberRemovalService teamMemberRemovalService;
-
-  @BeforeEach
-  void setup() {
-    teamMemberRemovalService = new TeamMemberRemovalService(teamMemberService, teamMemberRoleRepository);
-  }
 
   @Test
   void removeTeamMember_lastAccessManager_IllegalStateException() {
@@ -44,6 +46,10 @@ class TeamMemberRemovalServiceTest {
 
     when(teamMemberService.getTeamMembers(team)).thenReturn(List.of(user));
     assertThrows(IllegalStateException.class, () -> teamMemberRemovalService.removeTeamMember(team, user));
+    verify(energyPortalServiceProviderUserRolesService, never()).publishRemoveUserFromTeam(
+        anyLong(),
+        any()
+    );
   }
 
   @Test
@@ -63,6 +69,10 @@ class TeamMemberRemovalServiceTest {
     when(teamMemberService.getTeamMembers(team)).thenReturn(List.of(user1, user2));
     teamMemberRemovalService.removeTeamMember(team, user1);
     verify(teamMemberRoleRepository).findAllByTeamAndWuaId(team, user1.wuaId().id());
+    verify(energyPortalServiceProviderUserRolesService).publishRemoveUserFromTeam(
+        1000L,
+        team.getUuid().toString()
+    );
   }
 
   @Test
@@ -82,6 +92,10 @@ class TeamMemberRemovalServiceTest {
     when(teamMemberService.getTeamMembers(team)).thenReturn(List.of(user1, user2));
     teamMemberRemovalService.removeTeamMember(team, user1);
     verify(teamMemberRoleRepository).findAllByTeamAndWuaId(team, user1.wuaId().id());
+    verify(energyPortalServiceProviderUserRolesService).publishRemoveUserFromTeam(
+        1000L,
+        team.getUuid().toString()
+    );
   }
 
   @Test

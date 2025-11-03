@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderUserRolesService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
@@ -17,15 +18,27 @@ public class TeamMemberRemovalService extends TeamMemberPersistenceService {
 
   private final TeamMemberService teamMemberService;
 
+  private final EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService;
+
   @Autowired
-  TeamMemberRemovalService(TeamMemberService teamMemberService, TeamMemberRoleRepository teamMemberRoleRepository) {
+  TeamMemberRemovalService(
+      TeamMemberService teamMemberService,
+      TeamMemberRoleRepository teamMemberRoleRepository,
+      EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService
+  ) {
     super(teamMemberRoleRepository);
     this.teamMemberService = teamMemberService;
+    this.energyPortalServiceProviderUserRolesService = energyPortalServiceProviderUserRolesService;
   }
 
   public void removeTeamMember(Team team, TeamMember teamMember) {
     if (canRemoveTeamMember(team, teamMember)) {
       super.removeMemberFromTeam(team, teamMember);
+
+      energyPortalServiceProviderUserRolesService.publishRemoveUserFromTeam(
+          teamMember.wuaId().id(),
+          team.getUuid().toString()
+      );
     } else {
       throw new IllegalStateException(
           "User [%s] cannot be removed from team [%s] as they are the last access manager".formatted(

@@ -1,9 +1,8 @@
 package uk.co.nstauthority.scap.permissionmanagement.teams;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Set;
@@ -15,9 +14,8 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.co.nstauthority.scap.authentication.ServiceUserDetailTestUtil;
+import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderUserRolesService;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
-import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 import uk.co.nstauthority.scap.utils.EnergyPortalUserDtoTestUtil;
@@ -30,6 +28,9 @@ class TeamMemberRoleServiceTest {
 
   @Mock
   private UserDetailService userDetailService;
+
+  @Mock
+  private EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService;
 
   @InjectMocks
   private TeamMemberRoleService teamMemberRoleService;
@@ -80,9 +81,6 @@ class TeamMemberRoleServiceTest {
         .withWebUserAccountId(100)
         .build();
     var role = "ROLE_NAME";
-    var instigatingUser = ServiceUserDetailTestUtil.Builder()
-        .withWuaId(200L)
-        .build();
 
     teamMemberRoleService.updateUserTeamRoles(team, existingUser.wuaId().id(), Set.of(role));
 
@@ -92,6 +90,13 @@ class TeamMemberRoleServiceTest {
     Assertions.assertThat(teamMemberRoleCaptor.getValue())
         .extracting(TeamMemberRole::getTeam, TeamMemberRole::getWuaId, TeamMemberRole::getRole)
         .containsExactly(tuple(team, existingUser.wuaId().id(), role));
+
+    verify(energyPortalServiceProviderUserRolesService).publishUsersRolesForTeam(
+        existingUser.wuaId().id(),
+        team.getUuid().toString(),
+        team.getTeamType().name(),
+        Set.of(role)
+    );
   }
 
   @Test
@@ -100,9 +105,6 @@ class TeamMemberRoleServiceTest {
     var team = TeamTestUtil.Builder().build();
     var existingUser = TeamMemberTestUtil.Builder()
         .withWebUserAccountId(100)
-        .build();
-    var instigatingUser = ServiceUserDetailTestUtil.Builder()
-        .withWuaId(200L)
         .build();
 
     var firstRole = "FIRST_ROLE_NAME";
@@ -123,13 +125,27 @@ class TeamMemberRoleServiceTest {
         );
 
     verify(teamMemberRoleRepository).deleteAllByTeamAndWuaId(team, existingUser.wuaId().id());
+    verify(energyPortalServiceProviderUserRolesService).publishUsersRolesForTeam(
+        existingUser.wuaId().id(),
+        team.getUuid().toString(),
+        team.getTeamType().name(),
+        Set.of(firstRole, secondRole)
+    );
   }
 
   @Test
   void deleteAllByTeam_verifyCalls() {
-    var team = new Team();
+    var team = TeamTestUtil.Builder().build();
+    var teamMemberRole = TeamMemberRoleTestUtil.Builder().build();
+
+    when(teamMemberRoleRepository.findAllByTeam(team)).thenReturn(List.of(teamMemberRole));
+
     teamMemberRoleService.deleteUsersInTeam(team);
 
     verify(teamMemberRoleRepository).deleteAllByTeam(team);
+    verify(energyPortalServiceProviderUserRolesService).publishRemoveUserFromTeam(
+        teamMemberRole.getWuaId(),
+        team.getUuid().toString()
+    );
   }
 }
