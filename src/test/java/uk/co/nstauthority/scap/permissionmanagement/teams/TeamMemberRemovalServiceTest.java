@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -14,7 +15,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.fivium.energyportal.starter.accounts.EnergyPortalServiceAccessService;
 import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderUserRolesService;
+import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewTestUtil;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
@@ -33,6 +36,9 @@ class TeamMemberRemovalServiceTest {
   @Mock
   EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService;
 
+  @Mock
+  EnergyPortalServiceAccessService energyPortalServiceAccessService;
+
   @InjectMocks
   private TeamMemberRemovalService teamMemberRemovalService;
 
@@ -50,6 +56,7 @@ class TeamMemberRemovalServiceTest {
         anyLong(),
         any()
     );
+    verifyNoInteractions(energyPortalServiceAccessService);
   }
 
   @Test
@@ -67,12 +74,39 @@ class TeamMemberRemovalServiceTest {
         .build();
 
     when(teamMemberService.getTeamMembers(team)).thenReturn(List.of(user1, user2));
+    when(teamMemberService.getAllPermissionsForUser(user1.wuaId().id())).thenReturn(List.of(RolePermission.GRANT_ROLES));
     teamMemberRemovalService.removeTeamMember(team, user1);
     verify(teamMemberRoleRepository).findAllByTeamAndWuaId(team, user1.wuaId().id());
     verify(energyPortalServiceProviderUserRolesService).publishRemoveUserFromTeam(
         1000L,
         team.getUuid().toString()
     );
+    verifyNoInteractions(energyPortalServiceAccessService);
+  }
+
+  @Test
+  void removeTeamMember_whenNoMoreRoles_thenRemoveAccess() {
+    var team = TeamTestUtil.Builder().build();
+    var user1 = TeamMemberTestUtil
+        .Builder()
+        .withRole(RegulatorTeamRole.ACCESS_MANAGER)
+        .withWebUserAccountId(1000)
+        .build();
+    var user2 = TeamMemberTestUtil
+        .Builder()
+        .withRole(RegulatorTeamRole.ACCESS_MANAGER)
+        .withWebUserAccountId(2000)
+        .build();
+
+    when(teamMemberService.getTeamMembers(team)).thenReturn(List.of(user1, user2));
+    when(teamMemberService.getAllPermissionsForUser(user1.wuaId().id())).thenReturn(List.of());
+    teamMemberRemovalService.removeTeamMember(team, user1);
+    verify(teamMemberRoleRepository).findAllByTeamAndWuaId(team, user1.wuaId().id());
+    verify(energyPortalServiceProviderUserRolesService).publishRemoveUserFromTeam(
+        1000L,
+        team.getUuid().toString()
+    );
+    verify(energyPortalServiceAccessService).removeUser(user1.wuaId().id());
   }
 
   @Test
@@ -90,12 +124,14 @@ class TeamMemberRemovalServiceTest {
         .build();
 
     when(teamMemberService.getTeamMembers(team)).thenReturn(List.of(user1, user2));
+    when(teamMemberService.getAllPermissionsForUser(user1.wuaId().id())).thenReturn(List.of(RolePermission.GRANT_ROLES));
     teamMemberRemovalService.removeTeamMember(team, user1);
     verify(teamMemberRoleRepository).findAllByTeamAndWuaId(team, user1.wuaId().id());
     verify(energyPortalServiceProviderUserRolesService).publishRemoveUserFromTeam(
         1000L,
         team.getUuid().toString()
     );
+    verifyNoInteractions(energyPortalServiceAccessService);
   }
 
   @Test

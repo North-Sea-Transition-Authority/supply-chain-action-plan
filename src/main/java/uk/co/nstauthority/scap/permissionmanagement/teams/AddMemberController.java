@@ -10,10 +10,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-import uk.co.fivium.energyportal.starter.accounts.EnergyPortalServiceAccessService;
 import uk.co.nstauthority.scap.configuration.SamlProperties;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
-import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
@@ -32,23 +30,15 @@ public abstract class AddMemberController {
 
   private final EnergyPortalUserService energyPortalUserService;
 
-  private final TeamMemberService teamMemberService;
-
-  private final EnergyPortalServiceAccessService energyPortalServiceAccessService;
-
   @Autowired
   protected AddMemberController(SamlProperties samlProperties,
                                 ControllerHelperService controllerHelperService,
                                 AddTeamMemberValidator addTeamMemberValidator,
-                                EnergyPortalUserService energyPortalUserService,
-                                TeamMemberService teamMemberService,
-                                EnergyPortalServiceAccessService energyPortalServiceAccessService) {
+                                EnergyPortalUserService energyPortalUserService) {
     this.samlProperties = samlProperties;
     this.controllerHelperService = controllerHelperService;
     this.addTeamMemberValidator = addTeamMemberValidator;
     this.energyPortalUserService = energyPortalUserService;
-    this.teamMemberService = teamMemberService;
-    this.energyPortalServiceAccessService = energyPortalServiceAccessService;
   }
 
   protected ModelAndView getAddTeamMemberModelAndView(AddTeamMemberForm form) {
@@ -69,18 +59,10 @@ public abstract class AddMemberController {
         getAddTeamMemberModelAndView(form),
         form,
         () -> {
-          var userToAdd = energyPortalUserService.findUsersByUsername(form.getUsername().getInputValue()).get(0);
-          requestEnergyPortalAccess(userToAdd);
+          var userToAdd = energyPortalUserService.findUsersByUsername(form.getUsername().getInputValue()).getFirst();
           return ReverseRouter.redirect(on(controller)
               .renderAddTeamMemberRoles(teamId, new WebUserAccountId(userToAdd.webUserAccountId())));
         }
     );
-  }
-
-  private void  requestEnergyPortalAccess(EnergyPortalUserDto userToAdd) {
-    //A user who already has roles in the system should not need to have the scap access role added again.
-    if (teamMemberService.getAllPermissionsForUser(userToAdd.webUserAccountId()).isEmpty()) {
-      energyPortalServiceAccessService.addUser(userToAdd.webUserAccountId());
-    }
   }
 }

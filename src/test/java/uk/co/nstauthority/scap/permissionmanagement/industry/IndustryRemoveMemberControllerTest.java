@@ -2,8 +2,6 @@ package uk.co.nstauthority.scap.permissionmanagement.industry;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -26,7 +24,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
-import uk.co.fivium.energyportal.starter.accounts.EnergyPortalServiceAccessService;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
@@ -42,9 +39,6 @@ class IndustryRemoveMemberControllerTest extends AbstractIndustryTeamControllerT
 
   @MockitoBean
   private TeamMemberRemovalService teamMemberRemovalService;
-
-  @MockitoBean
-  EnergyPortalServiceAccessService energyPortalServiceAccessService;
 
   private static final WebUserAccountId wuaId = new WebUserAccountId(1000L);
 
@@ -104,8 +98,6 @@ class IndustryRemoveMemberControllerTest extends AbstractIndustryTeamControllerT
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectUrl("/permission-management/industry/%s".formatted(teamId.uuid().toString())));
-
-    verify(energyPortalServiceAccessService).removeUser(webUserAccountId.id());
   }
 
   @Test
@@ -120,8 +112,6 @@ class IndustryRemoveMemberControllerTest extends AbstractIndustryTeamControllerT
             .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectUrl("/permission-management/industry/%s".formatted(teamId.uuid().toString())));
-
-    verify(energyPortalServiceAccessService, never()).removeUser(webUserAccountId.id());
   }
 
   @Test

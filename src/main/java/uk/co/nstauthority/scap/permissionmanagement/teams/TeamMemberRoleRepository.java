@@ -1,5 +1,6 @@
 package uk.co.nstauthority.scap.permissionmanagement.teams;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -25,4 +26,6 @@ public interface TeamMemberRoleRepository extends ListCrudRepository<TeamMemberR
   void deleteAllByTeam(Team team);
 
   List<TeamMemberRole> findAllByWuaId(Long wuaId);
+
+  List<TeamMemberRole> findAllByWuaIdIn(Collection<Long> wuaId);
 }

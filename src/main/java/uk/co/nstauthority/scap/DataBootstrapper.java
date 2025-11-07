@@ -53,8 +53,8 @@ class DataBootstrapper {
 
     LOGGER.info("Bootstrapping teams and users");
 
-    var industrySubmitter = energyPortalUserService.findUsersByUsername("industryScapSubmitter@scap.co.uk").getFirst();
-    var regulatorCaseOfficer = energyPortalUserService.findUsersByUsername("RegulatorScapCaseOfficer@scap.co.uk").getFirst();
+    var industrySubmitter = energyPortalUserService.findUsersByUsername("example@lol.co.uk").getFirst();
+    var regulatorCaseOfficer = energyPortalUserService.findUsersByUsername("example@lol.co.uk").getFirst();
     var industryTeam = new Team();
     industryTeam.setDisplayName("CENTRICA");
     industryTeam.setTeamType(TeamType.INDUSTRY);
@@ -65,12 +65,12 @@ class DataBootstrapper {
 
     entityManager.persist(industryTeam);
 
-    teamMemberRoleService.addUserTeamRoles(
+    teamMemberRoleService.updateUserTeamRoles(
         industryTeam,
         industrySubmitter.webUserAccountId(),
         Set.of(IndustryTeamRole.SCAP_SUBMITTER.name())
     );
-    teamMemberRoleService.addUserTeamRoles(
+    teamMemberRoleService.updateUserTeamRoles(
         regulatorTeam,
         regulatorCaseOfficer.webUserAccountId(),
         Set.of(RegulatorTeamRole.SCAP_CASE_OFFICER.name(), RegulatorTeamRole.ACCESS_MANAGER.name(),

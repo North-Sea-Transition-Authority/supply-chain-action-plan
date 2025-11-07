@@ -7,12 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import uk.co.fivium.energyportal.starter.accounts.EnergyPortalServiceAccessService;
 import uk.co.nstauthority.scap.branding.CustomerConfigurationProperties;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
-import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMemberViewService;
 import uk.co.nstauthority.scap.permissionmanagement.TeamType;
 import uk.co.nstauthority.scap.permissionmanagement.industry.IndustryTeamMemberController;
@@ -26,7 +24,6 @@ public abstract class RemoveMemberController {
   private final TeamMemberViewService teamMemberViewService;
   private final TeamMemberRemovalService teamMemberRemovalService;
   private final TeamService teamService;
-  private final EnergyPortalServiceAccessService energyPortalServiceAccessService;
 
   @Autowired
   protected RemoveMemberController(
@@ -34,14 +31,12 @@ public abstract class RemoveMemberController {
       TeamMemberService teamMemberService,
       CustomerConfigurationProperties customerConfigurationProperties,
       TeamMemberViewService teamMemberViewService,
-      TeamMemberRemovalService teamMemberRemovalService,
-      EnergyPortalServiceAccessService energyPortalServiceAccessService) {
+      TeamMemberRemovalService teamMemberRemovalService) {
     this.teamMemberService = teamMemberService;
     this.customerConfigurationProperties = customerConfigurationProperties;
     this.teamMemberViewService = teamMemberViewService;
     this.teamMemberRemovalService = teamMemberRemovalService;
     this.teamService = teamService;
-    this.energyPortalServiceAccessService = energyPortalServiceAccessService;
   }
 
   public ModelAndView renderRemoveMember(@PathVariable("teamId") TeamId teamId,
@@ -92,7 +87,6 @@ public abstract class RemoveMemberController {
 
     if (teamMemberRemovalService.canRemoveTeamMember(team, teamMember)) {
       teamMemberRemovalService.removeTeamMember(team, teamMember);
-      revokeEnergyPortalAccess(teamMember);
     } else {
       return renderRemoveMember(teamId, wuaId)
           .addObject("singleErrorMessage", TeamMemberRemovalService.LAST_ACCESS_MANAGER_ERROR_MESSAGE);
@@ -103,11 +97,5 @@ public abstract class RemoveMemberController {
         Collections.emptyList(),
         redirectAttributes);
     return successUrl;
-  }
-
-  private void revokeEnergyPortalAccess(TeamMember userToRemove) {
-    if (teamMemberService.getAllPermissionsForUser(userToRemove.wuaId().id()).isEmpty()) {
-      energyPortalServiceAccessService.removeUser(userToRemove.wuaId().id());
-    }
   }
 }

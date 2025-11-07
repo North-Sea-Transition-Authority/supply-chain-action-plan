@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.fivium.energyportal.starter.accounts.EnergyPortalServiceAccessService;
 import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderUserRolesService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
@@ -20,20 +21,28 @@ public class TeamMemberRemovalService extends TeamMemberPersistenceService {
 
   private final EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService;
 
+  private final EnergyPortalServiceAccessService energyPortalServiceAccessService;
+
   @Autowired
   TeamMemberRemovalService(
       TeamMemberService teamMemberService,
       TeamMemberRoleRepository teamMemberRoleRepository,
-      EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService
+      EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService,
+      EnergyPortalServiceAccessService energyPortalServiceAccessService
   ) {
     super(teamMemberRoleRepository);
     this.teamMemberService = teamMemberService;
     this.energyPortalServiceProviderUserRolesService = energyPortalServiceProviderUserRolesService;
+    this.energyPortalServiceAccessService = energyPortalServiceAccessService;
   }
 
   public void removeTeamMember(Team team, TeamMember teamMember) {
     if (canRemoveTeamMember(team, teamMember)) {
       super.removeMemberFromTeam(team, teamMember);
+
+      if (teamMemberService.getAllPermissionsForUser(teamMember.wuaId().id()).isEmpty()) {
+        energyPortalServiceAccessService.removeUser(teamMember.wuaId().id());
+      }
 
       energyPortalServiceProviderUserRolesService.publishRemoveUserFromTeam(
           teamMember.wuaId().id(),

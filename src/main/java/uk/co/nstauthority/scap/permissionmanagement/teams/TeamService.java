@@ -139,7 +139,7 @@ public class TeamService {
         .map(TeamRole::name)
         .collect(Collectors.toSet());
 
-    teamMemberRoleService.addUserTeamRoles(team, userToAdd, rolesAsStrings);
+    teamMemberRoleService.updateUserTeamRoles(team, userToAdd.webUserAccountId(), rolesAsStrings);
   }
 
   @Transactional

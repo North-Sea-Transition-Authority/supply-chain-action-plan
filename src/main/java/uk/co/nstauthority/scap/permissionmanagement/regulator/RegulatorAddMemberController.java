@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-import uk.co.fivium.energyportal.starter.accounts.EnergyPortalServiceAccessService;
 import uk.co.nstauthority.scap.configuration.SamlProperties;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.HasAnyPermissionForTeam;
@@ -23,7 +22,6 @@ import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
 import uk.co.nstauthority.scap.permissionmanagement.teams.AddMemberController;
 import uk.co.nstauthority.scap.permissionmanagement.teams.AddTeamMemberValidator;
-import uk.co.nstauthority.scap.permissionmanagement.teams.TeamMemberService;
 
 @Controller
 @IsMemberOfTeam
@@ -35,16 +33,12 @@ class RegulatorAddMemberController extends AddMemberController {
   RegulatorAddMemberController(SamlProperties samlProperties,
                                ControllerHelperService controllerHelperService,
                                AddTeamMemberValidator addTeamMemberValidator,
-                               EnergyPortalUserService energyPortalUserService,
-                               TeamMemberService teamMemberService,
-                               EnergyPortalServiceAccessService energyPortalServiceAccessService) {
+                               EnergyPortalUserService energyPortalUserService) {
     super(
         samlProperties,
         controllerHelperService,
         addTeamMemberValidator,
-        energyPortalUserService,
-        teamMemberService,
-        energyPortalServiceAccessService
+        energyPortalUserService
     );
   }
 

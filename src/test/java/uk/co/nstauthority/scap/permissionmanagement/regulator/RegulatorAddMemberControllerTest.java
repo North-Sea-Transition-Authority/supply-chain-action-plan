@@ -2,8 +2,6 @@ package uk.co.nstauthority.scap.permissionmanagement.regulator;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -20,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BeanPropertyBindingResult;
-import uk.co.fivium.energyportal.starter.accounts.EnergyPortalServiceAccessService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
@@ -37,9 +34,6 @@ class RegulatorAddMemberControllerTest extends AbstractRegulatorTeamControllerTe
 
   @MockitoBean
   EnergyPortalUserService energyPortalUserService;
-
-  @MockitoBean
-  EnergyPortalServiceAccessService energyPortalServiceAccessService;
 
   private static final EnergyPortalUserDto energyPortalDto = EnergyPortalUserDtoTestUtil.Builder().build();
 
@@ -89,8 +83,6 @@ class RegulatorAddMemberControllerTest extends AbstractRegulatorTeamControllerTe
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectUrl("/permission-management/regulator/%s/add-member/%s/roles"
             .formatted(teamId.uuid().toString(), energyPortalDto.webUserAccountId())));
-
-    verify(energyPortalServiceAccessService).addUser(energyPortalDto.webUserAccountId());
   }
 
   @Test
@@ -105,7 +97,5 @@ class RegulatorAddMemberControllerTest extends AbstractRegulatorTeamControllerTe
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectUrl("/permission-management/regulator/%s/add-member/%s/roles"
             .formatted(teamId.uuid().toString(), energyPortalDto.webUserAccountId())));
-
-    verify(energyPortalServiceAccessService, never()).addUser(energyPortalDto.webUserAccountId());
   }
 }
