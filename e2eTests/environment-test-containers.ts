@@ -1,9 +1,4 @@
-import {
-    GenericContainer,
-    Wait,
-    getContainerRuntimeClient,
-    StartedTestContainer,
-} from "testcontainers"
+import {GenericContainer, getContainerRuntimeClient, StartedTestContainer, Wait,} from "testcontainers"
 import {PostgreSqlContainer, StartedPostgreSqlContainer} from "@testcontainers/postgresql";
 import Docker from "dockerode";
 import getPort from 'get-port';
@@ -91,8 +86,6 @@ export async function startupAppContainer(database: StartedPostgreSqlContainer, 
         console.log("Built fresh image")
     }
 
-    const epmqEnvironmentSuffix = `e2e-${process.env.DRONE_BUILD_NUMBER || Math.floor(Math.random() * 1000)}`
-
     return container.withEnvironment({
             SPRING_PROFILES_ACTIVE: "development",
             DATABASE_URL: `jdbc:postgresql://postgres:5432/${database.getDatabase()}`,
@@ -103,7 +96,7 @@ export async function startupAppContainer(database: StartedPostgreSqlContainer, 
             "FILE-UPLOAD_CLAMAV_PORT" : "3310",
             "NOTIFY_API_KEY":process.env.NOTIFY_API_KEY,
             "NOTIFY_TEST_EMAIL_RECIPIENT":"test@test.co.uk",
-            "SCAP_EPMQ_ENVIRONMENT_SUFFIX": epmqEnvironmentSuffix,
+        "SCAP_EPMQ_ENVIRONMENT_SUFFIX": 'e2e',
             "SCAP_EPMQ_SNS_SQS_AWS_SECRET_ACCESS_KEY": process.env.SCAP_EPMQ_SNS_SQS_AWS_SECRET_ACCESS_KEY,
             "SCAP_EPMQ_SNS_SQS_AWS_ACCESS_KEY_ID": process.env.SCAP_EPMQ_SNS_SQS_AWS_ACCESS_KEY_ID,
 
