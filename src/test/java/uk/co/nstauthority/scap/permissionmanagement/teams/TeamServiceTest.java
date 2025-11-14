@@ -251,6 +251,24 @@ class TeamServiceTest {
   }
 
   @Test
+  void updateTeamName(){
+    var team = TeamTestUtil
+        .Builder()
+        .withTeamName("Old Team Name")
+        .withTeamType(TeamType.INDUSTRY)
+        .build();
+
+    var newName = "New Team Name";
+
+    var teamCaptor = ArgumentCaptor.forClass(Team.class);
+
+    teamService.updateTeamName(team, newName);
+    verify(teamRepository).save(teamCaptor.capture());
+
+    assertThat(teamCaptor.getValue().getDisplayName()).isEqualTo(newName);
+  }
+
+  @Test
   void userIsMemberofTeam_notMemberofTeam() {
     var user = ServiceUserDetailTestUtil.Builder().build();
     when(teamRepository.findAllTeamsThatUserIsMemberOf(user.wuaId())).thenReturn(emptyList());

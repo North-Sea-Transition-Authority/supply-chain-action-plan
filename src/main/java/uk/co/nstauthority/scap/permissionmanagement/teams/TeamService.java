@@ -104,6 +104,11 @@ public class TeamService {
     return team;
   }
 
+  public void updateTeamName(Team team, String newTeamName) {
+    team.setDisplayName(newTeamName);
+    teamRepository.save(team);
+  }
+
   public Team getRegulatorTeam() {
     return teamRepository.getTeamByTeamType(REGULATOR);
   }
