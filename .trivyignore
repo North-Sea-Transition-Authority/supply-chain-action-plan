@@ -33,9 +33,11 @@ CVE-2025-55163
 io.netty
 CVE-2025-58057
 CVE-2025-58056
+CVE-2025-67735
 
 # ch.qos.logback:logback-core
 CVE-2025-11226
+CVE-2026-1225
 
 # org.apache.tomcat.embed:tomcat-embed-core
 CVE-2025-55752

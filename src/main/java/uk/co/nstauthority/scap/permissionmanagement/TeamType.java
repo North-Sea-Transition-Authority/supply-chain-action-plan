@@ -1,6 +1,8 @@
 package uk.co.nstauthority.scap.permissionmanagement;
 
-public enum TeamType {
+import uk.co.fivium.digitalenummaterialisationlibrary.enummaterialisation.MaterialisableEnum;
+
+public enum TeamType implements MaterialisableEnum {
 
   REGULATOR("Regulator", "Teams for managing regulator users", 10),
   INDUSTRY("Industry", "Teams for managing industry users", 20);
@@ -19,10 +21,16 @@ public enum TeamType {
     return displayText;
   }
 
+  @Override
+  public String getDisplayName() {
+    return "%s (%s)".formatted(displayText, hintText);
+  }
+
   public String getHintText() {
     return hintText;
   }
 
+  @Override
   public int getDisplayOrder() {
     return displayOrder;
   }

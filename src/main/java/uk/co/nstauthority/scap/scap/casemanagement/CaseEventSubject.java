@@ -14,7 +14,9 @@ import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.UPDATE
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.UPDATE_SUBMITTED;
 import static uk.co.nstauthority.scap.scap.casemanagement.CaseEventAction.WITHDRAWN;
 
-public enum CaseEventSubject {
+import uk.co.fivium.digitalenummaterialisationlibrary.enummaterialisation.MaterialisableEnum;
+
+public enum CaseEventSubject implements MaterialisableEnum {
   QA_COMMENT(QA,
       "QA checks completed",
       "Complete QA checks",
@@ -80,6 +82,7 @@ public enum CaseEventSubject {
     this.actionPanelId = actionPanelId;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

@@ -62,7 +62,7 @@ steps:
         - echo $DOCKER_CONFIG_JSON > /drone/dockerconfig/config.json
         - chmod +x gradlew
         - ./gradlew generateJooq
-        - ./gradlew checkstyleMain test bootJar --continue --parallel --max-workers=3
+        - ./gradlew checkstyleMain test bootJar --continue --no-parallel
       build_image: repo1.dev.fivium.local:5000/docker-compose-java21
 
 # TODO: EDU-7081 re-enable these e2e tests

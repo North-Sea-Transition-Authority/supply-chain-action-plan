@@ -1,6 +1,8 @@
 package uk.co.nstauthority.scap.scap.casemanagement;
 
-public enum CaseEventGroups {
+import uk.co.fivium.digitalenummaterialisationlibrary.enummaterialisation.MaterialisableEnum;
+
+public enum CaseEventGroups implements MaterialisableEnum {
   CONSULTATIONS("Consultations"),
   UPDATE_SCAP("Update SCAP"),
   DECISIONS("Decisions"),
@@ -13,6 +15,7 @@ public enum CaseEventGroups {
     this.displayName = displayName;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

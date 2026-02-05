@@ -28,7 +28,7 @@ services:
       root: ./s3data
 
   clamav:
-    image: clamav/clamav:0.105
+    image: clamav/clamav:1.5.1
     ports:
       - "3310:3310"
 
