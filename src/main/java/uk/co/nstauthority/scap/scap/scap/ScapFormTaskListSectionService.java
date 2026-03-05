@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.scap.actualtender.ActualTenderTaskListItemService;
 import uk.co.nstauthority.scap.scap.actualtender.hasactualtender.HasActualTenderController;

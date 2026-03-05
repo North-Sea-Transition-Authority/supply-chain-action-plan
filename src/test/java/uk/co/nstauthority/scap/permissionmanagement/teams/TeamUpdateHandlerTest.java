@@ -38,45 +38,45 @@ class TeamUpdateHandlerTest {
   private EnergyPortalOrganisationGroupEvent event;
 
   @Test
-  void accept_whenGroupCreated_thenDoNothing(){
+  void onEnergyPortalOrganisationGroupEvent_whenGroupCreated_thenDoNothing(){
     createEvent("Test Organisation", true);
 
-    teamUpdateHandler.accept(event);
+    teamUpdateHandler.onEnergyPortalOrganisationGroupEvent(event);
 
     verifyNoInteractions(teamService);
   }
 
   @Test
-  void accept_whenGroupUpdated_andNoTeam_thenDoNothing(){
+  void onEnergyPortalOrganisationGroupEvent_whenGroupUpdated_andNoTeam_thenDoNothing(){
     createEvent("Test Organisation", false);
 
     when(teamService.findByEnergyPortalOrgGroupId(anyInt())).thenReturn(Optional.empty());
 
-    teamUpdateHandler.accept(event);
+    teamUpdateHandler.onEnergyPortalOrganisationGroupEvent(event);
 
     verify(teamService).findByEnergyPortalOrgGroupId(Math.toIntExact(event.groupId()));
     verify(teamService, never()).updateTeamName(any(), anyString());
   }
 
   @Test
-  void accept_whenGroupUpdated_andNameNotChanged_thenDoNothing(){
+  void onEnergyPortalOrganisationGroupEvent_whenGroupUpdated_andNameNotChanged_thenDoNothing(){
     createEvent("Test Organisation", false);
 
     when(teamService.findByEnergyPortalOrgGroupId(anyInt())).thenReturn(Optional.of(TEAM));
 
-    teamUpdateHandler.accept(event);
+    teamUpdateHandler.onEnergyPortalOrganisationGroupEvent(event);
 
     verify(teamService).findByEnergyPortalOrgGroupId(Math.toIntExact(event.groupId()));
     verify(teamService, never()).updateTeamName(any(), anyString());
   }
 
   @Test
-  void accept_whenGroupUpdated_andNameChanged_thenUpdateTeamName(){
+  void onEnergyPortalOrganisationGroupEvent_whenGroupUpdated_andNameChanged_thenUpdateTeamName(){
     createEvent("Updated Test Organisation", false);
 
     when(teamService.findByEnergyPortalOrgGroupId(anyInt())).thenReturn(Optional.of(TEAM));
 
-    teamUpdateHandler.accept(event);
+    teamUpdateHandler.onEnergyPortalOrganisationGroupEvent(event);
 
     verify(teamService).findByEnergyPortalOrgGroupId(Math.toIntExact(event.groupId()));
     verify(teamService).updateTeamName(TEAM, event.name());

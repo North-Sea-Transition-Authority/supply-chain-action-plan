@@ -1,7 +1,5 @@
-version: '3.9'
-
+name: supply-chain-action-plan
 services:
-
   scap-db:
     image: postgres:14.3-alpine
     ports:

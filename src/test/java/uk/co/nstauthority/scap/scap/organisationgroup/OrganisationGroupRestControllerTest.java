@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,8 +30,8 @@ class OrganisationGroupRestControllerTest extends AbstractControllerTest {
   @Test
   void getOrganisationGroupSearchResults() throws Exception {
     var groupList = List.of(
-        new OrganisationGroup(1, "Royal Dutch Shell", null, null, null, Collections.emptyList()),
-        new OrganisationGroup(2, "Shell", null, null, null, Collections.emptyList())
+        OrganisationGroup.newBuilder().organisationGroupId(1).name("Royal Dutch Shell").build(),
+        OrganisationGroup.newBuilder().organisationGroupId(2).name("Shell").build()
     );
 
     when(organisationGroupService.getOrganisationGroupsByName(

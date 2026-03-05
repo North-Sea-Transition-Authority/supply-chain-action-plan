@@ -131,11 +131,11 @@ class ScapEmailServiceTest {
     recipient = User.newBuilder()
         .forename("Jim")
         .primaryEmailAddress("jim@scap.co.uk")
-        .webUserAccountId(1)
+        .webUserAccountId(1L)
         .build();
     industryTeam = new Team();
     industryTeamMember1 = new TeamMember(
-        new WebUserAccountId(Long.valueOf(recipient.getWebUserAccountId())),
+        new WebUserAccountId(recipient.getWebUserAccountId()),
         null,
         Collections.singleton(IndustryTeamRole.SCAP_SUBMITTER)
     );
@@ -145,7 +145,7 @@ class ScapEmailServiceTest {
 
     regulatorTeam = new Team();
     regulatorTeamMember1 = new TeamMember(
-        new WebUserAccountId(Long.valueOf(recipient.getWebUserAccountId())),
+        new WebUserAccountId(recipient.getWebUserAccountId()),
         null,
         Collections.singleton(RegulatorTeamRole.SCAP_CASE_OFFICER));
     regulatorTeamMember2 = new TeamMember(

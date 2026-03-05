@@ -15,8 +15,8 @@ class EpaUserTestUtil {
 
   static class Builder {
 
-    private int webUserAccountId = 1;
-    private int personId = 2;
+    private long webUserAccountId = 1;
+    private long personId = 2;
     private String loginId = "loginId";
     private String title = "title";
     private String forename = "forename";

@@ -2,7 +2,6 @@ package uk.co.nstauthority.scap;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import java.util.Random;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

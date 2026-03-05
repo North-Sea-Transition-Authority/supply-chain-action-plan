@@ -2,7 +2,6 @@ package uk.co.nstauthority.scap.energyportal;
 
 import java.util.List;
 import java.util.Optional;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.fivium.energyportalapi.client.RequestPurpose;
@@ -62,12 +61,8 @@ public class EnergyPortalUserService {
   }
 
   public List<User> searchUsersByIds(List<WebUserAccountId> webUserAccountIds) {
-    var userIds = webUserAccountIds.stream()
-        .map(WebUserAccountId::toInt)
-        .toList();
-
     return userApi.searchUsersByIds(
-        userIds,
+        webUserAccountIds.stream().map(WebUserAccountId::id).toList(),
         USERS_PROJECTION_ROOT,
         FIND_USERS_REQUEST_PURPOSE
     );

@@ -129,7 +129,7 @@ class OrganisationGroupControllerTest extends AbstractScapSubmitterControllerTes
   @Test
   void renderExistingScapOrganisationGroupForm() throws Exception {
     var organisationGroupId = 322;
-    var organisationGroup = new OrganisationGroup(organisationGroupId, "CENTRICA", null, null, null, null);
+    var organisationGroup = OrganisationGroup.newBuilder().organisationGroupId(organisationGroupId).name("CENTRICA").build();
     scap.setOrganisationGroupId(organisationGroupId);
     when(scapService.getScapById(SCAP_ID)).thenReturn(scap);
     when(organisationGroupService.getOrganisationGroupById(organisationGroupId, "Get name of current SCAP operator"))

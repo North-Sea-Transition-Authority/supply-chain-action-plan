@@ -38,8 +38,8 @@ class OrganisationGroupServiceTest {
   @BeforeEach
   void setup() {
     groupList = List.of(
-        new OrganisationGroup(1, "Company 1", null, null, null, Collections.emptyList()),
-        new OrganisationGroup(2, "Company 2", null, null, null, Collections.emptyList())
+        OrganisationGroup.newBuilder().organisationGroupId(1).name("Company 1").build(),
+        OrganisationGroup.newBuilder().organisationGroupId(2).name("Company 2").build()
     );
   }
 
@@ -70,13 +70,8 @@ class OrganisationGroupServiceTest {
 
   @Test
   void organisationGroupsToSearchResults() {
-    var organisationGroup = new OrganisationGroup(
-        1,
-        "Royal Dutch Shell",
-        "Shell",
-        "shell.com",
-        "ACTIVE",
-        Collections.emptyList());
+    var organisationGroup = OrganisationGroup.newBuilder().organisationGroupId(1).name("Royal Dutch Shell").build();
+
     var queryResults = List.of(organisationGroup);
 
     var searchResults = organisationGroupService
@@ -99,13 +94,7 @@ class OrganisationGroupServiceTest {
     var purpose = "TEST: get organisation group by ID";
     var argumentCaptor = ArgumentCaptor
         .forClass(OrganisationGroupProjectionRoot.class);
-    var organisationGroup = new OrganisationGroup(
-        1,
-        "Royal Dutch Shell",
-        "Shell",
-        "shell.com",
-        "ACTIVE",
-        Collections.emptyList());
+    var organisationGroup = OrganisationGroup.newBuilder().organisationGroupId(1).name("Royal Dutch Shell").build();
 
     when(organisationApi.findOrganisationGroup(
         eq(organisationGroup.getOrganisationGroupId()),
@@ -131,14 +120,7 @@ class OrganisationGroupServiceTest {
   void getOrganisationGroupsByIds_VerifyApiCall() {
     var purpose = "TEST: get organisation groups by IDs";
     var argumentCaptor = ArgumentCaptor.forClass(RequestPurpose.class);
-    var organisationGroup = new OrganisationGroup(
-        55,
-        "CENTRICA",
-        null,
-        null,
-        null,
-        null
-    );
+    var organisationGroup = OrganisationGroup.newBuilder().organisationGroupId(55).name("CENTRICA").build();
 
     when(organisationApi.getAllOrganisationGroupsByIds(any(), any(), any()))
         .thenReturn(List.of(organisationGroup));

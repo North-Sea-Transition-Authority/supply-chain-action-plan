@@ -77,7 +77,7 @@ class WorkAreaServiceTest {
   @BeforeEach
   void setup() {
     userDetail = new ServiceUserDetail(1L, 1L, "John" , "Smith", "john.smith@example.com", null, null);
-    organisationGroup = new OrganisationGroup(55, "CENTRICA", null, null, null, null);
+    organisationGroup = OrganisationGroup.newBuilder().organisationGroupId(55).name("CENTRICA").build();
     filter = new WorkAreaFilter();
   }
 
