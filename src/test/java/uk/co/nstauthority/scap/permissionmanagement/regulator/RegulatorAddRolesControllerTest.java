@@ -9,10 +9,13 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import static uk.co.nstauthority.scap.authentication.TestUserProvider.user;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
+import uk.co.nstauthority.scap.energyportal.user.AllowedDomainService;
 import uk.co.nstauthority.scap.enumutil.DisplayableEnumOptionUtil;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.TeamId;
@@ -32,6 +35,9 @@ class RegulatorAddRolesControllerTest extends AbstractRegulatorTeamControllerTes
   @MockitoBean
   RegulatorTeamMemberRolesValidator industryTeamMemberRolesValidator;
 
+  @MockitoBean
+  AllowedDomainService allowedDomainService;
+
   @Test
   void industryAddController_renderAddRoles_noAuthorisation() throws Exception {
     var team = TeamTestUtil.Builder().build();
@@ -45,10 +51,14 @@ class RegulatorAddRolesControllerTest extends AbstractRegulatorTeamControllerTes
         .andExpect(status().is3xxRedirection());
   }
 
-  @Test
-  void industryAddController_renderAddRoles_Authorisation() throws Exception {
+  @ParameterizedTest
+  @ValueSource(booleans = {true, false})
+  void industryAddController_renderAddRoles_Authorisation(boolean isAllowed) throws Exception {
     var energyPortalUserDto = EnergyPortalUserDtoTestUtil.Builder().build();
     when(energyPortalUserService.getEnergyPortalUser(webUserAccountId)).thenReturn(energyPortalUserDto);
+    when(allowedDomainService.isAllowedDomain(energyPortalUserDto.emailAddress(), team)).thenReturn(
+        isAllowed
+    );
 
     mockMvc.perform(
             get(ReverseRouter.route(on(RegulatorAddRolesController.class).renderAddTeamMemberRoles(
@@ -57,6 +67,7 @@ class RegulatorAddRolesControllerTest extends AbstractRegulatorTeamControllerTes
                 .with(user(user)))
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/teamMemberRoles"))
+        .andExpect(model().attribute("userHasAllowedEmail", isAllowed))
         .andExpect(model().attribute("roles", DisplayableEnumOptionUtil.getDisplayableOptionsWithDescription(RegulatorTeamRole.class)));
   }
 }

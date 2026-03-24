@@ -21,6 +21,7 @@ import uk.co.nstauthority.scap.endpointvalidation.annotations.HasAnyPermissionFo
 import uk.co.nstauthority.scap.endpointvalidation.annotations.IsMemberOfTeam;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserService;
 import uk.co.nstauthority.scap.energyportal.WebUserAccountId;
+import uk.co.nstauthority.scap.energyportal.user.AllowedDomainService;
 import uk.co.nstauthority.scap.enumutil.DisplayableEnumOptionUtil;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
@@ -40,25 +41,32 @@ class RegulatorAddRolesController extends AddRolesController {
   private final EnergyPortalUserService energyPortalUserService;
 
   private final RegulatorTeamMemberRolesValidator regulatorTeamMemberRolesValidator;
+  private final AllowedDomainService allowedDomainService;
 
   @Autowired
   RegulatorAddRolesController(TeamService teamService,
                               ControllerHelperService controllerHelperService,
                               EnergyPortalUserService energyPortalUserService,
-                              RegulatorTeamMemberRolesValidator regulatorTeamMemberRolesValidator) {
-    super(teamService,
-        controllerHelperService,
+                              RegulatorTeamMemberRolesValidator regulatorTeamMemberRolesValidator,
+                              AllowedDomainService allowedDomainService) {
+    super(teamService, controllerHelperService,
         energyPortalUserService);
     this.energyPortalUserService = energyPortalUserService;
     this.regulatorTeamMemberRolesValidator = regulatorTeamMemberRolesValidator;
+    this.allowedDomainService = allowedDomainService;
   }
 
   @GetMapping("/add-member/{webUserAccountId}/roles")
   public ModelAndView renderAddTeamMemberRoles(@PathVariable("teamId") TeamId teamId,
                                                @PathVariable("webUserAccountId") WebUserAccountId webUserAccountId) {
+
     var energyPortalUser = energyPortalUserService.getEnergyPortalUser(webUserAccountId);
+    var team = teamService.getTeam(teamId);
+    boolean userHasAllowedEmail = allowedDomainService.isAllowedDomain(energyPortalUser.emailAddress(), team);
+
     return getAddTeamMemberRolesModelAndView(energyPortalUser, new TeamMemberRolesForm())
         .addObject("roles", DisplayableEnumOptionUtil.getDisplayableOptionsWithDescription(RegulatorTeamRole.class))
+        .addObject("userHasAllowedEmail", userHasAllowedEmail)
         .addObject(
             "backLinkUrl",
             ReverseRouter.route(on(RegulatorAddMemberController.class).renderAddTeamMember(teamId)));

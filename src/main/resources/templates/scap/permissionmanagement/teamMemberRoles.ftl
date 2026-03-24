@@ -14,12 +14,23 @@
   backLinkUrl=springUrl(backLinkUrl)
   topNavigation=true
 >
+  <#assign warning>
+    <#if !userHasAllowedEmail>
+      <@fdsWarning.warning>
+        This user's email is not from an approved domain for this team.
+      </@fdsWarning.warning>
+    </#if>
+  </#assign>
+
   <@fdsForm.htmlForm>
-    <@teamMemberRoles.teamMemberRoles
-      rolesFormPath="form.roles"
-      roleCheckBoxItems=roles
+      <@fdsCheckbox.checkboxes
       fieldsetHeadingText="What actions does ${userDisplayName} perform?"
-    />
+      fieldsetHeadingSize="h1"
+      fieldsetHeadingClass="govuk-fieldset__legend--l"
+      path="form.roles"
+      checkboxes=roles
+      hintText=warning
+      />
     <@fdsAction.submitButtons
       primaryButtonText="Save and continue"
       secondaryLinkText="Cancel"

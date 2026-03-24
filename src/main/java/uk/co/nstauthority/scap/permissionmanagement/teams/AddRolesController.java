@@ -22,7 +22,7 @@ public abstract class AddRolesController {
 
   private final EnergyPortalUserService energyPortalUserService;
 
-  private final TeamService teamService;
+  protected final TeamService teamService;
 
   private final ControllerHelperService controllerHelperService;
 
