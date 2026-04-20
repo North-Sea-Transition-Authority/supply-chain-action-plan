@@ -14,6 +14,8 @@ public interface UpdateRequestRepository extends CrudRepository<UpdateRequest, I
       Scap scap,
       List<UpdateRequestType> updateRequestTypes);
 
+  List<UpdateRequest> findAllByScapInAndResolvedByUserIdIsNull(List<Scap> scaps);
+
   Optional<UpdateRequest> findFirstByScapAndResolutionDateNullAndUpdateRequestTypeOrderByCreatedTimestampDesc(
       Scap scap,
       UpdateRequestType updateRequestType);

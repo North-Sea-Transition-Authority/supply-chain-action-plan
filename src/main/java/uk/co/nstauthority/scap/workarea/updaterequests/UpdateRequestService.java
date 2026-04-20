@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEvent;
 import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
+import uk.co.nstauthority.scap.scap.scap.Scap;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 
@@ -45,6 +47,13 @@ public class UpdateRequestService {
     updateRequest.setCreatedTimestamp(LocalDate.now());
     updateRequest.setCreatedByUserId(userDetailService.getUserDetail().getWebUserAccountId().toInt());
     updateRequestRepository.save(updateRequest);
+  }
+
+  public List<UpdateRequest> findUnresolvedRequestsForScaps(List<Scap> scaps) {
+    if (scaps.isEmpty()) {
+      return Collections.emptyList();
+    }
+    return updateRequestRepository.findAllByScapInAndResolvedByUserIdIsNull(scaps);
   }
 
   @Transactional

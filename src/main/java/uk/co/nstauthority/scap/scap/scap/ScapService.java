@@ -4,9 +4,11 @@ import jakarta.transaction.Transactional;
 import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
 
 @Service
 public class ScapService {
@@ -50,6 +52,19 @@ public class ScapService {
   public void updateScapOrganisationGroup(Scap scap, Integer organisationGroupId) {
     scap.setOrganisationGroupId(organisationGroupId);
     scapRepository.save(scap);
+  }
+
+  public List<Scap> getAllScapsForTeams(List<Team> teams) {
+    var orgGroupIds = teams.stream()
+        .map(Team::getEnergyPortalOrgGroupId)
+        .filter(Objects::nonNull)
+        .toList();
+
+    if (orgGroupIds.isEmpty()) {
+      return List.of();
+    }
+
+    return scapRepository.findAllByOrganisationGroupIdIn(orgGroupIds);
   }
 
   private String generateScapReference() {

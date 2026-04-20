@@ -3,6 +3,7 @@ package uk.co.nstauthority.scap.scap.scap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
+import uk.co.nstauthority.scap.permissionmanagement.Team;
 
 @ExtendWith(MockitoExtension.class)
 class ScapServiceTest {
@@ -157,5 +160,45 @@ class ScapServiceTest {
     var scaps = scapService.searchByReference(searchTerm);
 
     assertThat(scaps).containsExactly(scap);
+  }
+
+  @Test
+  void getAllScapsForTeams() {
+    var team1 = mock(Team.class);
+    var team2 = mock(Team.class);
+
+    when(team1.getEnergyPortalOrgGroupId()).thenReturn(10);
+    when(team2.getEnergyPortalOrgGroupId()).thenReturn(20);
+
+    var scap1 = ScapEntityTestUtil.scapBuilder()
+        .withScapId(new ScapId(1))
+        .build();
+    var scap2 = ScapEntityTestUtil.scapBuilder()
+        .withScapId(new ScapId(2))
+        .build();
+    var expectedFilteredIds = List.of(10, 20);
+
+    when(scapRepository.findAllByOrganisationGroupIdIn(expectedFilteredIds))
+        .thenReturn(List.of(scap1, scap2));
+
+    var actualScaps = scapService.getAllScapsForTeams(List.of(team1, team2));
+
+    assertThat(actualScaps).containsExactly(scap1, scap2);
+  }
+
+  @Test
+  void getAllScapsForTeams_filtersOutNullOrganisationGroupIds() {
+    var teamWithNullOrgGroupId = mock(Team.class);
+    var teamWithOrgGroupId = mock(Team.class);
+    when(teamWithNullOrgGroupId.getEnergyPortalOrgGroupId()).thenReturn(null);
+    when(teamWithOrgGroupId.getEnergyPortalOrgGroupId()).thenReturn(20);
+    var scap = ScapEntityTestUtil.scapBuilder()
+        .withScapId(new ScapId(2))
+        .build();
+    when(scapRepository.findAllByOrganisationGroupIdIn(List.of(20)))
+        .thenReturn(List.of(scap));
+    var actualScaps = scapService.getAllScapsForTeams(List.of(teamWithNullOrgGroupId, teamWithOrgGroupId));
+    assertThat(actualScaps).containsExactly(scap);
+    verify(scapRepository).findAllByOrganisationGroupIdIn(List.of(20));
   }
 }

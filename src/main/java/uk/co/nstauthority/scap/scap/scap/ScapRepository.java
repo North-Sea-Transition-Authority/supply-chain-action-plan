@@ -10,4 +10,5 @@ public interface ScapRepository extends CrudRepository<Scap, Integer> {
 
   List<Scap> searchAllByReferenceContainingIgnoreCase(String reference);
 
+  List<Scap> findAllByOrganisationGroupIdIn(List<Integer> organisationGroupIds);
 }

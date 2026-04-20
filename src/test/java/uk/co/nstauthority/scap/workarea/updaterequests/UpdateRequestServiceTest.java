@@ -29,6 +29,7 @@ import uk.co.nstauthority.scap.scap.casemanagement.CaseEventSubject;
 import uk.co.nstauthority.scap.scap.detail.ScapDetail;
 import uk.co.nstauthority.scap.scap.detail.ScapDetailEntityTestUtil;
 import uk.co.nstauthority.scap.scap.scap.Scap;
+import uk.co.nstauthority.scap.scap.scap.ScapEntityTestUtil;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 import uk.co.nstauthority.scap.scap.scap.ScapService;
 
@@ -189,5 +190,32 @@ class UpdateRequestServiceTest {
         .findFirstByScapAndResolutionDateNullOrderByCreatedTimestampDesc(scap))
         .thenReturn(Optional.of(updateRequest));
     assertThat(updateRequestService.findNextDueUpdate(SCAP_ID)).contains(updateRequest);
+  }
+
+  @Test
+  void findUnresolvedRequestsForScaps_emptyList() {
+    var result = updateRequestService.findUnresolvedRequestsForScaps(Collections.emptyList());
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  void findUnresolvedRequestsForScaps_withScaps() {
+    var scap1 = ScapEntityTestUtil.scapBuilder()
+        .withScapId(new ScapId(1))
+        .build();
+    var scap2 = ScapEntityTestUtil.scapBuilder()
+        .withScapId(new ScapId(2))
+        .build();
+    var scaps = List.of(scap1, scap2);
+    var updateRequest1 = new UpdateRequest(UUID.randomUUID());
+    var updateRequest2 = new UpdateRequest(UUID.randomUUID());
+    var expectedRequests = List.of(updateRequest1, updateRequest2);
+
+    when(updateRequestRepository.findAllByScapInAndResolvedByUserIdIsNull(scaps))
+        .thenReturn(expectedRequests);
+
+    var result = updateRequestService.findUnresolvedRequestsForScaps(scaps);
+
+    assertThat(result).containsExactly(updateRequest1, updateRequest2);
   }
 }
