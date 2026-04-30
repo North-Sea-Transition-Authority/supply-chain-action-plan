@@ -29,13 +29,13 @@ repositories {
 }
 
 dependencies {
-  implementation('commons-validator:commons-validator:1.7') {
+  implementation('commons-validator:commons-validator:1.10.1') {
     // Exclude commons-logging to fix "Standard Commons Logging discovery in action with spring-jcl: please remove
     // commons-logging.jar from classpath in order to avoid potential conflicts" warning on startup.
     exclude group: 'commons-logging', module: 'commons-logging'
   }
 
-  implementation 'com.amazonaws:aws-java-sdk-s3:1.12.753'
+  implementation 'com.amazonaws:aws-java-sdk-s3:1.12.797'
   implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
   implementation 'com.google.guava:guava:33.2.1-jre'
 
@@ -63,7 +63,7 @@ dependencies {
   implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:5.6.0'
 
   implementation 'uk.co.fivium.digitalformlibrary:digital-form-library:spring-boot-3.2-support-SNAPSHOT'
-  implementation 'uk.co.fivium.energyportalapi:client:v16.3.0'
+  implementation 'uk.co.fivium.energyportalapi:client:v17.0.0'
   implementation 'uk.co.fivium:digital-notification-library-spring-boot-starter:v1.0.1'
   implementation 'uk.co.fivium.feedbackmanagementservice:client:v2.2.0'
   implementation 'uk.co.fivium.energyportal.accounts:energy-portal-accounts-spring-boot-starter:v7.0.0'

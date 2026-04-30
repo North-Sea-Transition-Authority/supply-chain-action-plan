@@ -24,7 +24,7 @@ class TeamMembership extends Page {
     }
 
     public async enterUserEmailAndContinue(email : string) {
-        const formGroupElement = await $(`//label[contains(@class, 'govuk-label')][../label[normalize-space(text()) = 'What is the Energy Portal username of the user?']]`)
+        const formGroupElement = await $(`//label[contains(@class, 'govuk-label')][../label[normalize-space(text()) = 'What is the UK Energy Portal email of the user?']]`)
             .$(`./ancestor::div[contains(@class,'govuk-form-group')][1]`);
         const textInputFormField = new FdsTextInput(formGroupElement);
         const textInput = await textInputFormField.getTextInputElement();

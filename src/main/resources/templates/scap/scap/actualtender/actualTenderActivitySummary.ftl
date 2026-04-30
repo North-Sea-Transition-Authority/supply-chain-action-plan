@@ -22,7 +22,7 @@ backLinkUrl=springUrl(backLinkUrl)
       "Not from portal" means that this organisation has been manually added to this SCAP.<br>
     </p>
     <p class="govuk-body">
-      If the organisation is added to the energy portal in the future, you may be asked to remove these manually added
+      If the organisation is added to the UK Energy Portal in the future, you may be asked to remove these manually added
       organisations and replace them with ones from the portal.
     </p>
   </@fdsDetails.summaryDetails>

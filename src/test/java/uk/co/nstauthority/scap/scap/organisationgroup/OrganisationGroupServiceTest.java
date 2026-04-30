@@ -79,7 +79,7 @@ class OrganisationGroupServiceTest {
 
     assertThat(searchResults.getResults()).hasSize(1);
 
-    assertThat(searchResults.getResults().get(0))
+    assertThat(searchResults.getResults().getFirst())
         .extracting(
             RestSearchItem::id,
             RestSearchItem::text

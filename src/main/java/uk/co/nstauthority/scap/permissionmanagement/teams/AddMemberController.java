@@ -59,7 +59,7 @@ public abstract class AddMemberController {
         getAddTeamMemberModelAndView(form),
         form,
         () -> {
-          var userToAdd = energyPortalUserService.findUsersByUsername(form.getUsername().getInputValue()).getFirst();
+          var userToAdd = energyPortalUserService.findUserByEmail(form.getEmail().getInputValue()).get();
           return ReverseRouter.redirect(on(controller)
               .renderAddTeamMemberRoles(teamId, new WebUserAccountId(userToAdd.webUserAccountId())));
         }

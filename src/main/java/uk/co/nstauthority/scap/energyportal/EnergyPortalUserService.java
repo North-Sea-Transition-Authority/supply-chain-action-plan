@@ -45,19 +45,19 @@ public class EnergyPortalUserService {
     this.userApi = userApi;
   }
 
-  public List<User> searchUsersByUsername(String username) {
+  public List<User> searchUsersByEmail(String email) {
     return userApi.searchUsersByEmail(
-        username,
+        email,
         USERS_PROJECTION_ROOT,
         FIND_USERS_REQUEST_PURPOSE
     );
   }
 
-  public List<EnergyPortalUserDto> findUsersByUsername(String username) {
-    return searchUsersByUsername(username).stream()
+  public Optional<EnergyPortalUserDto> findUserByEmail(String email) {
+    return searchUsersByEmail(email).stream()
         .filter(User::getCanLogin)
         .map(this::convertToEnergyPortalUser)
-        .toList();
+        .findFirst();
   }
 
   public List<User> searchUsersByIds(List<WebUserAccountId> webUserAccountIds) {
@@ -76,7 +76,7 @@ public class EnergyPortalUserService {
 
   public Optional<User> findUserById(WebUserAccountId webUserAccountId) {
     return userApi.findUserById(
-        webUserAccountId.toInt(),
+        webUserAccountId.id(),
         USER_PROJECTION_ROOT,
         FIND_USER_REQUEST_PURPOSE
     );
@@ -94,13 +94,6 @@ public class EnergyPortalUserService {
         .orElseThrow(() -> new ScapEntityNotFoundException(
             "No Energy Portal user with WUA_ID: %s could be found".formatted(webUserAccountId)
         ));
-
-    if (energyPortalUser.isSharedAccount()) {
-      throw new EnergyPortalBadRequestException(
-          "Energy Portal user with WUA_ID: %s is a shared account and is not allowed to be added to this service"
-              .formatted(webUserAccountId)
-      );
-    }
 
     if (!energyPortalUser.canLogin()) {
       throw new EnergyPortalBadRequestException(
@@ -121,7 +114,6 @@ public class EnergyPortalUserService {
         user.getSurname(),
         user.getPrimaryEmailAddress(),
         user.getTelephoneNumber(),
-        user.getIsAccountShared(),
         user.getCanLogin()
     );
   }

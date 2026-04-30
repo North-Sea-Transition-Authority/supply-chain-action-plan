@@ -1,13 +1,12 @@
 package uk.co.nstauthority.scap.energyportal;
 
 public record EnergyPortalUserDto(
-    long webUserAccountId,
+    Long webUserAccountId,
     String title,
     String forename,
     String surname,
     String emailAddress,
     String telephoneNumber,
-    boolean isSharedAccount,
     boolean canLogin
 ) {
 

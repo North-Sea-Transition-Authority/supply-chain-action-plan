@@ -52,8 +52,8 @@ class DataBootstrapper {
 
     LOGGER.info("Bootstrapping teams and users");
 
-    var industrySubmitter = energyPortalUserService.findUsersByUsername("IndustryScapSubmitter@scap.co.uk").getFirst();
-    var regulatorCaseOfficer = energyPortalUserService.findUsersByUsername("RegulatorScapCaseOfficer@scap.co.uk").getFirst();
+    var industrySubmitter = energyPortalUserService.findUserByEmail("IndustryScapSubmitter@scap.co.uk").get();
+    var regulatorCaseOfficer = energyPortalUserService.findUserByEmail("RegulatorScapCaseOfficer@scap.co.uk").get();
     var industryTeam = new Team();
     industryTeam.setDisplayName("CENTRICA");
     industryTeam.setTeamType(TeamType.INDUSTRY);

@@ -13,6 +13,7 @@ import static uk.co.nstauthority.scap.utils.ControllerTestingUtil.redirectUrl;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -43,7 +44,7 @@ class IndustryAddMemberControllerTest extends AbstractIndustryTeamControllerTest
   private void setupMocks() {
     form = new AddTeamMemberForm();
     bindingResult = new BeanPropertyBindingResult(form, "form");
-    when(energyPortalUserService.findUsersByUsername(any())).thenReturn(List.of(energyPortalDto));
+    when(energyPortalUserService.findUserByEmail(any())).thenReturn(Optional.of(energyPortalDto));
   }
 
   @Test

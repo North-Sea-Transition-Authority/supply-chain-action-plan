@@ -1,18 +1,17 @@
 package uk.co.nstauthority.scap.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
 class ServiceUserDetailTest {
 
   @Test
-  void displayName_whenProxyUser_thenIncludeProxyUsername() {
+  void displayName_whenProxyUser_thenIncludeProxyUserName() {
     var forename = "forename";
     var surname = "surname";
     var proxyWuaId = 999L;
-    var proxyUserName = "proxyUsername";
+    var proxyUserName = "proxyUserName";
 
     var serviceUserDetail = ServiceUserDetailTestUtil.Builder()
         .withForename(forename)

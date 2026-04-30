@@ -12,19 +12,10 @@ import uk.co.nstauthority.scap.permissionmanagement.AddTeamMemberForm;
 @Service
 public class AddTeamMemberValidator implements Validator {
 
-  private static final String USERNAME_FORM_FIELD_NAME = "username.inputValue";
+  private static final String EMAIL_FORM_FIELD_NAME = "email.inputValue";
 
-  private static final String USERNAME_NOT_FOUND_ERROR_CODE = "%s.notFound".formatted(USERNAME_FORM_FIELD_NAME);
-  private static final String USERNAME_NOT_FOUND_ERROR_MESSAGE = "No Energy Portal user exists with this username";
-
-  private static final String TOO_MANY_RESULTS_FOUND_ERROR_CODE = "%s.tooManyResults".formatted(USERNAME_FORM_FIELD_NAME);
-  private static final String TOO_MANY_RESULTS_FOUND_ERROR_MESSAGE =
-      "More than one Energy Portal user exists with this email address. Enter the username of the user instead.";
-
-  private static final String SHARED_ACCOUNT_NOT_ALLOWED_ERROR_CODE = "%s.sharedAccountProhibited"
-      .formatted(USERNAME_FORM_FIELD_NAME);
-
-  private static final String SHARED_ACCOUNT_NOT_ALLOWED_ERROR_MESSAGE = "You cannot add shared accounts to this service";
+  private static final String EMAIL_NOT_FOUND_ERROR_CODE = "%s.notFound".formatted(EMAIL_FORM_FIELD_NAME);
+  private static final String EMAIL_NOT_FOUND_ERROR_MESSAGE = "No UK Energy Portal user exists with this email";
 
   private final EnergyPortalUserService energyPortalUserService;
 
@@ -45,29 +36,17 @@ public class AddTeamMemberValidator implements Validator {
 
     StringInputValidator
         .builder()
-        .validate(form.getUsername(), errors);
+        .validate(form.getEmail(), errors);
 
 
-    if (errors.getFieldErrors("username.inputValue").isEmpty()) {
+    if (errors.getFieldErrors(EMAIL_FORM_FIELD_NAME).isEmpty()) {
 
-      var resultingUsers = energyPortalUserService.findUsersByUsername(form.getUsername().getInputValue());
+      var resultingUsers = energyPortalUserService.findUserByEmail(form.getEmail().getInputValue());
       if (resultingUsers.isEmpty()) {
         errors.rejectValue(
-            USERNAME_FORM_FIELD_NAME,
-            USERNAME_NOT_FOUND_ERROR_CODE,
-            USERNAME_NOT_FOUND_ERROR_MESSAGE
-        );
-      } else if (resultingUsers.size() > 1) {
-        errors.rejectValue(
-            USERNAME_FORM_FIELD_NAME,
-            TOO_MANY_RESULTS_FOUND_ERROR_CODE,
-            TOO_MANY_RESULTS_FOUND_ERROR_MESSAGE
-        );
-      } else if (resultingUsers.get(0).isSharedAccount()) {
-        errors.rejectValue(
-            USERNAME_FORM_FIELD_NAME,
-            SHARED_ACCOUNT_NOT_ALLOWED_ERROR_CODE,
-            SHARED_ACCOUNT_NOT_ALLOWED_ERROR_MESSAGE
+            EMAIL_FORM_FIELD_NAME,
+            EMAIL_NOT_FOUND_ERROR_CODE,
+            EMAIL_NOT_FOUND_ERROR_MESSAGE
         );
       }
     }

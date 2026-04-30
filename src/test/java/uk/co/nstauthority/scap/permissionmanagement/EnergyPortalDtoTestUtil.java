@@ -1,6 +1,5 @@
 package uk.co.nstauthority.scap.permissionmanagement;
 
-import java.util.UUID;
 import uk.co.nstauthority.scap.energyportal.EnergyPortalUserDto;
 import uk.co.nstauthority.scap.error.exception.IllegalUtilClassInstantiationException;
 
@@ -17,9 +16,6 @@ public class EnergyPortalDtoTestUtil {
   public static class EnergyPortalDtoBuilder {
 
     private Long wuaId = 1000L;
-    private TeamType teamType = TeamType.REGULATOR;
-
-    private String teamName = "TestTeam";
 
     public EnergyPortalDtoBuilder withWuaId(Long wuaId) {
       this.wuaId = wuaId;
@@ -34,7 +30,6 @@ public class EnergyPortalDtoTestUtil {
           "TesterSon",
           "test@test.com",
           "07840885994",
-          false,
           true
       );
     }

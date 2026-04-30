@@ -4,13 +4,13 @@ import uk.co.fivium.formlibrary.input.StringInput;
 
 public class AddTeamMemberForm {
 
-  private StringInput username = new StringInput("username", "Username");
+  private StringInput email = new StringInput("email", "Email");
 
-  public StringInput getUsername() {
-    return username;
+  public StringInput getEmail() {
+    return email;
   }
 
-  public void setUsername(StringInput username) {
-    this.username = username;
+  public void setEmail(StringInput email) {
+    this.email = email;
   }
 }

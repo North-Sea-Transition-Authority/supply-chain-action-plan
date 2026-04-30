@@ -25,15 +25,14 @@ class EpaUserTestUtil {
     private String primaryEmailAddress = "email address";
     private String telephoneNumber = "telephone number";
     private boolean canLogin = true;
-    private boolean isAccountShared = false;
     private Builder() {}
 
-    Builder withWebUserAccountId(int webUserAccountId) {
+    Builder withWebUserAccountId(long webUserAccountId) {
       this.webUserAccountId = webUserAccountId;
       return this;
     }
 
-    Builder withPersonId(int personId) {
+    Builder withPersonId(long personId) {
       this.personId = personId;
       return this;
     }
@@ -78,11 +77,6 @@ class EpaUserTestUtil {
       return this;
     }
 
-    Builder isSharedAccount(boolean isAccountShared) {
-      this.isAccountShared = isAccountShared;
-      return this;
-    }
-
     User build() {
       var user = new User();
       user.setWebUserAccountId(webUserAccountId);
@@ -95,7 +89,6 @@ class EpaUserTestUtil {
       user.setPrimaryEmailAddress(primaryEmailAddress);
       user.setTelephoneNumber(telephoneNumber);
       user.setCanLogin(canLogin);
-      user.setIsAccountShared(isAccountShared);
       return user;
     }
 

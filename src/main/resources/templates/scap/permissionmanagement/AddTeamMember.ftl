@@ -15,7 +15,7 @@
   topNavigation=true
 >
   <@teamMember.addTeamMember
-    usernameFormPath="form.username"
+    email="form.email"
     registrationUrl=registrationUrl
     cancelUrl=springUrl(backLinkUrl)
   />

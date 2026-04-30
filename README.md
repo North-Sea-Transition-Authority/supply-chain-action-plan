@@ -67,28 +67,34 @@
 | EPAS_SPRING_BOOT_STARTER_PRESHARED_KEY | The preshared key that EPAS will use when calling out to this service                                                                                                                                                                                       |
 
 ### 3. Initialise the Fivium Design System
-- `git submodule update --init --recursive`
-- `cd fivium-design-system-core && npm install && npx gulp buildAll && cd ..`
+
+```bash
+git submodule update --init --recursive
+cd fivium-design-system-core && npm install && npx gulp buildAll && cd ..
+```
 
 #### 3.1. Update the Fivium Design System
 If FDS is not on the latest version, follow the instructions to update it [here](https://fivium.atlassian.net/wiki/spaces/FDS/pages/10354845/Releases)
 
 ### 4. Build frontend components
-- `npm install`
-- `npx gulp buildAll`
+
+```bash
+npm install
+npx gulp buildAll
+```
 
 ### 6. Generate Jooq classes
 _This requires docker to be running on your machine, but have nothing running in docker_
 
 Execute the gradle task `generateJooq`. You will need to re-generate when you change the database.
 
-### 7. Bootstrap your local DB
-Run the script in `devtools/create_dev_users.sql` to bootstrap your DB.
-
-### 8. Run the app
+### 7. Run the app
 Create a run configuration for the Spring app and start the application.
 
 The application will be running on `localhost:8080/scap/<endpoint>`
+
+### 8. Bootstrap your local DB
+Run the script in `devtools/create_dev_users.sql` to bootstrap your DB.
 
 ### Checkstyle
 1. In Intellij install the Checkstyle-IDEA plugin (from third-party repositories)

@@ -18,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.fivium.energyportalapi.client.RequestPurpose;
 import uk.co.fivium.energyportalapi.client.user.UserApi;
-import uk.co.nstauthority.scap.error.exception.EnergyPortalBadRequestException;
 import uk.co.nstauthority.scap.error.exception.ScapEntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,25 +30,25 @@ class EnergyPortalUserServiceTest {
   EnergyPortalUserService energyPortalUserService;
 
   @Test
-  void findUserByUsername_whenNoResults_thenEmptyList() {
+  void searchUsersByEmail_whenNoResults_thenEmptyList() {
 
-    var username = "username";
+    var email = "no-one@email.com";
 
     var userProjectionRoot = EnergyPortalUserService.USERS_PROJECTION_ROOT;
 
     when(userApi.searchUsersByEmail(
-        eq(username),
+        eq(email),
         eq(userProjectionRoot),
         any(RequestPurpose.class)))
         .thenReturn(Collections.emptyList());
 
-    assertTrue(energyPortalUserService.findUsersByUsername(username).isEmpty());
+    assertTrue(energyPortalUserService.findUserByEmail(email).isEmpty());
   }
 
   @Test
-  void findUserByUsername_whenUserFoundAndCanLogIn_thenPopulatedListCorrectlyMapped() {
+  void searchUsersByEmail_whenUserFoundAndCanLogIn_thenPopulatedListCorrectlyMapped() {
 
-    var username = "username";
+    var email = "good-user@email.com";
     var expectedUser = EpaUserTestUtil.Builder()
         .canLogin(true)
         .build();
@@ -57,12 +56,15 @@ class EnergyPortalUserServiceTest {
     var userProjectionRoot = EnergyPortalUserService.USERS_PROJECTION_ROOT;
 
     when(userApi.searchUsersByEmail(
-        eq(username),
+        eq(email),
         eq(userProjectionRoot),
         any(RequestPurpose.class)
     )).thenReturn(List.of(expectedUser));
 
-    assertThat(energyPortalUserService.findUsersByUsername(username))
+    var userOpt = energyPortalUserService.findUserByEmail(email);
+    assertThat(userOpt)
+        .isNotEmpty();
+    assertThat(userOpt.get())
         .extracting(
             EnergyPortalUserDto::webUserAccountId,
             EnergyPortalUserDto::title,
@@ -70,42 +72,38 @@ class EnergyPortalUserServiceTest {
             EnergyPortalUserDto::surname,
             EnergyPortalUserDto::emailAddress,
             EnergyPortalUserDto::telephoneNumber,
-            EnergyPortalUserDto::isSharedAccount,
             EnergyPortalUserDto::canLogin
         )
         .containsExactly(
-            tuple(
-                expectedUser.getWebUserAccountId(),
+            expectedUser.getWebUserAccountId(),
                 expectedUser.getTitle(),
                 expectedUser.getForename(),
                 expectedUser.getSurname(),
                 expectedUser.getPrimaryEmailAddress(),
                 expectedUser.getTelephoneNumber(),
-                expectedUser.getIsAccountShared(),
                 expectedUser.getCanLogin()
-            )
         );
   }
 
   @Test
-  void findUserByUsername_whenUsersFound_thenOnlyThoseWithCanLoginTrueReturned() {
+  void searchUsersByEmail_whenUsersFound_thenOnlyThoseWithCanLoginTrueReturned() {
 
-    var username = "username";
+    var email = "good-users@email.com";
 
     var canLoginUser = EpaUserTestUtil.Builder()
         .canLogin(true)
-        .withWebUserAccountId(100)
+        .withWebUserAccountId(100L)
         .build();
 
     var notLoginUser = EpaUserTestUtil.Builder()
         .canLogin(false)
-        .withWebUserAccountId(200)
+        .withWebUserAccountId(200L)
         .build();
 
     var userProjectionRoot = EnergyPortalUserService.USERS_PROJECTION_ROOT;
 
     when(userApi.searchUsersByEmail(
-        eq(username),
+        eq(email),
         eq(userProjectionRoot),
         any(RequestPurpose.class)
     )).thenReturn(List.of(
@@ -113,9 +111,12 @@ class EnergyPortalUserServiceTest {
         notLoginUser
     ));
 
-    assertThat(energyPortalUserService.findUsersByUsername(username))
+    var userOpt = energyPortalUserService.findUserByEmail(email);
+    assertThat(userOpt)
+        .isNotEmpty();
+    assertThat(userOpt.get())
         .extracting(EnergyPortalUserDto::webUserAccountId)
-        .containsExactly(canLoginUser.getWebUserAccountId());
+        .isEqualTo(canLoginUser.getWebUserAccountId());
   }
 
   @Test
@@ -156,7 +157,6 @@ class EnergyPortalUserServiceTest {
             EnergyPortalUserDto::surname,
             EnergyPortalUserDto::emailAddress,
             EnergyPortalUserDto::telephoneNumber,
-            EnergyPortalUserDto::isSharedAccount,
             EnergyPortalUserDto::canLogin
         )
         .containsExactly(
@@ -167,7 +167,6 @@ class EnergyPortalUserServiceTest {
                 expectedUser.getSurname(),
                 expectedUser.getPrimaryEmailAddress(),
                 expectedUser.getTelephoneNumber(),
-                expectedUser.getIsAccountShared(),
                 expectedUser.getCanLogin()
             )
         );
@@ -198,7 +197,6 @@ class EnergyPortalUserServiceTest {
             EnergyPortalUserDto::surname,
             EnergyPortalUserDto::emailAddress,
             EnergyPortalUserDto::telephoneNumber,
-            EnergyPortalUserDto::isSharedAccount,
             EnergyPortalUserDto::canLogin
         )
         .containsExactly(
@@ -208,7 +206,6 @@ class EnergyPortalUserServiceTest {
             expectedUser.getSurname(),
             expectedUser.getPrimaryEmailAddress(),
             expectedUser.getTelephoneNumber(),
-            expectedUser.getIsAccountShared(),
             expectedUser.getCanLogin()
         );
   }
@@ -245,43 +242,7 @@ class EnergyPortalUserServiceTest {
   }
 
   @Test
-  void getEnergyPortalUser_whenSharedAccount_thenEPAException() {
-    var webUserAccountId = new WebUserAccountId(123L);
-    var userProjectionRoot = EnergyPortalUserService.USER_PROJECTION_ROOT;
-    var expectedUser = EpaUserTestUtil.Builder()
-        .isSharedAccount(true)
-        .build();
-
-    when(userApi.findUserById(
-        eq(webUserAccountId.id()),
-        eq(userProjectionRoot),
-        any(RequestPurpose.class)
-    )).thenReturn(Optional.of(expectedUser));
-
-    assertThrowsExactly(EnergyPortalBadRequestException.class,
-        () -> energyPortalUserService.getEnergyPortalUser(webUserAccountId));
-  }
-
-  @Test
-  void getEnergyPortalUser_whenDisabled_thenEPAException() {
-    var webUserAccountId = new WebUserAccountId(123L);
-    var userProjectionRoot = EnergyPortalUserService.USER_PROJECTION_ROOT;
-    var expectedUser = EpaUserTestUtil.Builder()
-        .canLogin(false)
-        .build();
-
-    when(userApi.findUserById(
-        eq(webUserAccountId.id()),
-        eq(userProjectionRoot),
-        any(RequestPurpose.class)
-    )).thenReturn(Optional.of(expectedUser));
-
-    assertThrowsExactly(EnergyPortalBadRequestException.class,
-        () -> energyPortalUserService.getEnergyPortalUser(webUserAccountId));
-  }
-
-  @Test
-  void getEnergyPortalUser_whenSharedAccount_thenScapException() {
+  void getEnergyPortalUser_whenFound_thenReturnsUser() {
     var webUserAccountId = new WebUserAccountId(123L);
     var userProjectionRoot = EnergyPortalUserService.USER_PROJECTION_ROOT;
     var expectedUser = EpaUserTestUtil.Builder()
