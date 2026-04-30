@@ -6,6 +6,10 @@ CVE-2024-47554
 
 # org.bouncycastle:bcpkix-jdk18on
 CVE-2025-8916
+CVE-2026-5588
+
+# org.bouncycastle:bcprov-jdk18on
+CVE-2026-0636
 
 # org.apache.tomcat.embed:tomcat-embed-core
 CVE-2026-34483
