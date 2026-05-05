@@ -11,6 +11,9 @@ public class ActualTenderActivitySummaryViewBuilder {
   private Integer activityId;
   private String scopeTitle;
   private String scopeDescription;
+  private Integer noOfJobsSupportingContract;
+  private Integer noOfNewJobsCreatedForContract;
+  private Integer noOfJobsBasedInUkForContract;
   private RemunerationModel remunerationModel;
   private String remunerationModelName;
   private ContractStage contractStage;
@@ -40,6 +43,21 @@ public class ActualTenderActivitySummaryViewBuilder {
 
   public ActualTenderActivitySummaryViewBuilder withScopeDescription(String scopeDescription) {
     this.scopeDescription = scopeDescription;
+    return this;
+  }
+
+  public ActualTenderActivitySummaryViewBuilder withNoOfJobsSupportingContract(Integer noOfJobsSupportingContract) {
+    this.noOfJobsSupportingContract = noOfJobsSupportingContract;
+    return this;
+  }
+
+  public ActualTenderActivitySummaryViewBuilder withNoOfNewJobsCreatedForContract(Integer noOfNewJobsCreatedForContract) {
+    this.noOfNewJobsCreatedForContract = noOfNewJobsCreatedForContract;
+    return this;
+  }
+
+  public ActualTenderActivitySummaryViewBuilder withNoOfJobsBasedInUkForContract(Integer noOfJobsBasedInUkForContract) {
+    this.noOfJobsBasedInUkForContract = noOfJobsBasedInUkForContract;
     return this;
   }
 
@@ -84,6 +102,9 @@ public class ActualTenderActivitySummaryViewBuilder {
         activityId,
         scopeTitle,
         scopeDescription,
+        noOfJobsSupportingContract,
+        noOfNewJobsCreatedForContract,
+        noOfJobsBasedInUkForContract,
         remunerationModel,
         remunerationModelName,
         contractStage,

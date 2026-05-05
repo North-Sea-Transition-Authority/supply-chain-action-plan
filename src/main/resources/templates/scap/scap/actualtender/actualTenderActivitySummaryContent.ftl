@@ -10,6 +10,15 @@
   <@fdsSummaryList.summaryListRowNoAction keyText="Scope description">
     ${actualTenderActivity.scopeDescription()!""}
   </@fdsSummaryList.summaryListRowNoAction>
+    <@fdsSummaryList.summaryListRowNoAction keyText="Estimated highest total number of jobs supporting this contract at any point over its lifetime">
+        ${actualTenderActivity.noOfJobsSupportingContract()!""}
+    </@fdsSummaryList.summaryListRowNoAction>
+    <@fdsSummaryList.summaryListRowNoAction keyText="Estimated total number of new jobs created supporting this contract">
+        ${actualTenderActivity.noOfNewJobsCreatedForContract()!""}
+    </@fdsSummaryList.summaryListRowNoAction>
+    <@fdsSummaryList.summaryListRowNoAction keyText="Estimated total number of jobs based in the UK supporting this contract">
+        ${actualTenderActivity.noOfJobsBasedInUkForContract()!""}
+    </@fdsSummaryList.summaryListRowNoAction>
   <@fdsSummaryList.summaryListRowNoAction keyText="Remuneration model">
     <#if actualTenderActivity.remunerationModel()?has_content>
       ${actualTenderActivity.remunerationModel().displayName!""}

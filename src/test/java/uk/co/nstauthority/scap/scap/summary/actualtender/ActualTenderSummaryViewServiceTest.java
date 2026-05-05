@@ -52,6 +52,9 @@ class ActualTenderSummaryViewServiceTest {
     var actualTenderActivity = new ActualTenderActivity(10);
     actualTenderActivity.setScopeTitle("test scope title 1");
     actualTenderActivity.setScopeDescription("test scope description 1");
+    actualTenderActivity.setNoOfJobsSupportingContract(1);
+    actualTenderActivity.setNoOfNewJobsCreatedForContract(2);
+    actualTenderActivity.setNoOfJobsBasedInUkForContract(3);
     actualTenderActivity.setRemunerationModel(RemunerationModel.LUMP_SUM);
     actualTenderActivity.setContractStage(ContractStage.CONTRACT_AWARDED);
     var participant = new InvitationToTenderParticipant(210);
@@ -77,6 +80,9 @@ class ActualTenderSummaryViewServiceTest {
         ActualTenderActivitySummaryView::activityId,
         ActualTenderActivitySummaryView::scopeTitle,
         ActualTenderActivitySummaryView::scopeDescription,
+        ActualTenderActivitySummaryView::noOfJobsSupportingContract,
+        ActualTenderActivitySummaryView::noOfNewJobsCreatedForContract,
+        ActualTenderActivitySummaryView::noOfJobsBasedInUkForContract,
         ActualTenderActivitySummaryView::remunerationModel,
         ActualTenderActivitySummaryView::remunerationModelName,
         ActualTenderActivitySummaryView::contractStage,
@@ -91,6 +97,9 @@ class ActualTenderSummaryViewServiceTest {
         actualTenderActivity.getId(),
         actualTenderActivity.getScopeTitle(),
         actualTenderActivity.getScopeDescription(),
+        actualTenderActivity.getNoOfJobsSupportingContract(),
+        actualTenderActivity.getNoOfNewJobsCreatedForContract(),
+        actualTenderActivity.getNoOfJobsBasedInUkForContract(),
         actualTenderActivity.getRemunerationModel(),
         actualTenderActivity.getRemunerationModelName(),
         actualTenderActivity.getContractStage(),
@@ -110,6 +119,9 @@ class ActualTenderSummaryViewServiceTest {
     var actualTenderActivity = new ActualTenderActivity(10);
     actualTenderActivity.setScopeTitle("test scope title 1");
     actualTenderActivity.setScopeDescription("test scope description 1");
+    actualTenderActivity.setNoOfJobsSupportingContract(1);
+    actualTenderActivity.setNoOfNewJobsCreatedForContract(2);
+    actualTenderActivity.setNoOfJobsBasedInUkForContract(3);
     actualTenderActivity.setRemunerationModel(RemunerationModel.LUMP_SUM);
     actualTenderActivity.setContractStage(ContractStage.CONTRACT_AWARDED);
     var participant = new InvitationToTenderParticipant(210);
@@ -151,6 +163,9 @@ class ActualTenderSummaryViewServiceTest {
     var actualTenderActivity1 = new ActualTenderActivity(10);
     actualTenderActivity1.setScopeTitle("test scope title 1");
     actualTenderActivity1.setScopeDescription("test scope description 1");
+    actualTenderActivity1.setNoOfJobsSupportingContract(1);
+    actualTenderActivity1.setNoOfNewJobsCreatedForContract(2);
+    actualTenderActivity1.setNoOfJobsBasedInUkForContract(3);
     actualTenderActivity1.setRemunerationModel(RemunerationModel.LUMP_SUM);
     actualTenderActivity1.setContractStage(ContractStage.INVITATION_TO_TENDER_IS_LIVE);
     var participant1 = new InvitationToTenderParticipant(210);
@@ -160,6 +175,9 @@ class ActualTenderSummaryViewServiceTest {
     var actualTenderActivity2 = new ActualTenderActivity(11);
     actualTenderActivity2.setScopeTitle("test scope title 2");
     actualTenderActivity2.setScopeDescription("test scope description 2");
+    actualTenderActivity2.setNoOfJobsSupportingContract(1);
+    actualTenderActivity2.setNoOfNewJobsCreatedForContract(2);
+    actualTenderActivity2.setNoOfJobsBasedInUkForContract(3);
     actualTenderActivity2.setRemunerationModel(RemunerationModel.OTHER);
     actualTenderActivity2.setRemunerationModelName("remuneration model name");
     actualTenderActivity2.setContractStage(ContractStage.BID_APPRAISAL);
@@ -174,6 +192,9 @@ class ActualTenderSummaryViewServiceTest {
     var actualTenderActivity3 = new ActualTenderActivity(12);
     actualTenderActivity3.setScopeTitle("test scope title 3");
     actualTenderActivity3.setScopeDescription("test scope description 3");
+    actualTenderActivity3.setNoOfJobsSupportingContract(1);
+    actualTenderActivity3.setNoOfNewJobsCreatedForContract(2);
+    actualTenderActivity3.setNoOfJobsBasedInUkForContract(3);
     actualTenderActivity3.setRemunerationModel(RemunerationModel.REIMBURSABLE);
     actualTenderActivity3.setContractStage(ContractStage.CONTRACT_AWARDED);
     var participant4 = new InvitationToTenderParticipant(213);
@@ -213,6 +234,9 @@ class ActualTenderSummaryViewServiceTest {
         ActualTenderActivitySummaryView::activityId,
         ActualTenderActivitySummaryView::scopeTitle,
         ActualTenderActivitySummaryView::scopeDescription,
+        ActualTenderActivitySummaryView::noOfJobsSupportingContract,
+        ActualTenderActivitySummaryView::noOfNewJobsCreatedForContract,
+        ActualTenderActivitySummaryView::noOfJobsBasedInUkForContract,
         ActualTenderActivitySummaryView::remunerationModel,
         ActualTenderActivitySummaryView::remunerationModelName,
         ActualTenderActivitySummaryView::contractStage,
@@ -224,6 +248,9 @@ class ActualTenderSummaryViewServiceTest {
             actualTenderActivity1.getId(),
             actualTenderActivity1.getScopeTitle(),
             actualTenderActivity1.getScopeDescription(),
+            actualTenderActivity1.getNoOfJobsSupportingContract(),
+            actualTenderActivity1.getNoOfNewJobsCreatedForContract(),
+            actualTenderActivity1.getNoOfJobsBasedInUkForContract(),
             actualTenderActivity1.getRemunerationModel(),
             actualTenderActivity1.getRemunerationModelName(),
             actualTenderActivity1.getContractStage(),
@@ -235,6 +262,9 @@ class ActualTenderSummaryViewServiceTest {
             actualTenderActivity2.getId(),
             actualTenderActivity2.getScopeTitle(),
             actualTenderActivity2.getScopeDescription(),
+            actualTenderActivity2.getNoOfJobsSupportingContract(),
+            actualTenderActivity2.getNoOfNewJobsCreatedForContract(),
+            actualTenderActivity2.getNoOfJobsBasedInUkForContract(),
             actualTenderActivity2.getRemunerationModel(),
             actualTenderActivity2.getRemunerationModelName(),
             actualTenderActivity2.getContractStage(),
@@ -246,6 +276,9 @@ class ActualTenderSummaryViewServiceTest {
             actualTenderActivity3.getId(),
             actualTenderActivity3.getScopeTitle(),
             actualTenderActivity3.getScopeDescription(),
+            actualTenderActivity3.getNoOfJobsSupportingContract(),
+            actualTenderActivity3.getNoOfNewJobsCreatedForContract(),
+            actualTenderActivity3.getNoOfJobsBasedInUkForContract(),
             actualTenderActivity3.getRemunerationModel(),
             actualTenderActivity3.getRemunerationModelName(),
             actualTenderActivity3.getContractStage(),

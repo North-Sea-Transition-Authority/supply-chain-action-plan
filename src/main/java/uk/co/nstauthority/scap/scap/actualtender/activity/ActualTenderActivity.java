@@ -32,6 +32,12 @@ public class ActualTenderActivity {
 
   private String scopeDescription;
 
+  private Integer noOfJobsSupportingContract;
+
+  private Integer noOfNewJobsCreatedForContract;
+
+  private Integer noOfJobsBasedInUkForContract;
+
   @Enumerated(EnumType.STRING)
   private RemunerationModel remunerationModel;
 
@@ -84,6 +90,32 @@ public class ActualTenderActivity {
     this.scopeDescription = scopeDescription;
   }
 
+  public Integer getNoOfJobsSupportingContract() {
+    return noOfJobsSupportingContract;
+  }
+
+  public void setNoOfJobsSupportingContract(Integer noOfJobsSupportingContract) {
+    this.noOfJobsSupportingContract = noOfJobsSupportingContract;
+  }
+
+  public Integer getNoOfNewJobsCreatedForContract() {
+    return noOfNewJobsCreatedForContract;
+  }
+
+  public void setNoOfNewJobsCreatedForContract(Integer noOfNewJobsCreatedForContract) {
+    this.noOfNewJobsCreatedForContract = noOfNewJobsCreatedForContract;
+
+  }
+
+  public Integer getNoOfJobsBasedInUkForContract() {
+    return noOfJobsBasedInUkForContract;
+  }
+
+  public void setNoOfJobsBasedInUkForContract(Integer noOfJobsBasedInUkForContract) {
+    this.noOfJobsBasedInUkForContract = noOfJobsBasedInUkForContract;
+  }
+
+
   public RemunerationModel getRemunerationModel() {
     return remunerationModel;
   }
@@ -133,7 +165,11 @@ public class ActualTenderActivity {
     return Objects.equals(id, that.id) && Objects.equals(actualTender,
         that.actualTender) && Objects.equals(scopeTitle, that.scopeTitle) && Objects.equals(
         scopeDescription,
-        that.scopeDescription) && remunerationModel == that.remunerationModel && Objects.equals(
+        that.scopeDescription)
+        && Objects.equals(noOfJobsSupportingContract, that.noOfJobsSupportingContract)
+        && Objects.equals(noOfNewJobsCreatedForContract, that.noOfNewJobsCreatedForContract)
+        && Objects.equals(noOfJobsBasedInUkForContract, that.noOfJobsBasedInUkForContract)
+        && remunerationModel == that.remunerationModel && Objects.equals(
         remunerationModelName,
         that.remunerationModelName) && contractStage == that.contractStage && Objects.equals(createdTimestamp,
         that.createdTimestamp);
@@ -141,7 +177,8 @@ public class ActualTenderActivity {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, actualTender, scopeTitle, scopeDescription, remunerationModel, remunerationModelName,
+    return Objects.hash(id, actualTender, scopeTitle, scopeDescription, noOfJobsSupportingContract,
+        noOfNewJobsCreatedForContract, noOfJobsBasedInUkForContract, remunerationModel, remunerationModelName,
         contractStage, createdTimestamp);
   }
 }

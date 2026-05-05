@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
 import org.springframework.validation.ValidationUtils;
+import uk.co.fivium.formlibrary.validator.integer.IntegerInputValidator;
 import uk.co.fivium.formlibrary.validator.string.StringInputValidator;
 import uk.co.nstauthority.scap.fds.searchselector.ManualEntryUtil;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
@@ -68,6 +69,19 @@ class ActualTenderActivityFormValidator implements SmartValidator {
     StringInputValidator.builder()
         .mustHaveCharacterCountAtMost(ValidationUtil.TEXT_AREA_STANDARD_LIMIT)
         .validate(form.getScopeDescription(), errors);
+
+    IntegerInputValidator.builder()
+        .mustBeMoreThanOrEqualTo(1)
+        .validate(form.getNoOfJobsSupportingContract(), errors);
+
+    IntegerInputValidator.builder()
+        .mustBeMoreThanOrEqualTo(0)
+        .validate(form.getNoOfNewJobsCreatedForContract(), errors);
+
+    IntegerInputValidator.builder()
+        .mustBeMoreThanOrEqualTo(0)
+        .validate(form.getNoOfJobsBasedInUkForContract(), errors);
+
     ValidationUtils.rejectIfEmpty(
         errors, "remunerationModel",
         "remunerationModel.required",

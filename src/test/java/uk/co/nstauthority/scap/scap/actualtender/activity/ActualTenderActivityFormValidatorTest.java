@@ -70,6 +70,9 @@ class ActualTenderActivityFormValidatorTest {
   void validate_simpleValidForm_assertNoErrors() {
     form.setScopeTitle("test scope title");
     form.setScopeDescription("test scope description");
+    form.setNoOfJobsSupportingContract(String.valueOf(5));
+    form.setNoOfNewJobsCreatedForContract(String.valueOf(5));
+    form.setNoOfJobsBasedInUkForContract(String.valueOf(5));
     form.setRemunerationModel(RemunerationModel.OTHER);
     form.setRemunerationModelName("test remuneration model");
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
@@ -81,6 +84,29 @@ class ActualTenderActivityFormValidatorTest {
   }
 
   @Test
+  void validate_NegativeQuestions_AssertErrors() {
+    form.setScopeTitle("test scope title");
+    form.setScopeDescription("test scope description");
+    form.setNoOfJobsSupportingContract(String.valueOf(-5));
+    form.setNoOfNewJobsCreatedForContract("3e!g");
+    form.setNoOfJobsBasedInUkForContract("abc");
+    form.setRemunerationModel(RemunerationModel.OTHER);
+    form.setRemunerationModelName("test remuneration model");
+    form.setContractStage(ContractStage.CONTRACT_AWARDED);
+    form.setInvitationToTenderParticipants(Collections.singletonList(ManualEntryUtil.addFreeTextPrefix("test participant")));
+
+    validator.validate(form, bindingResult, new ActualTenderFormValidatorHint(actualTender));
+
+    assertTrue(bindingResult.hasErrors());
+    assertThat(bindingResult.getFieldError("noOfJobsSupportingContract.inputValue").getDefaultMessage())
+        .isEqualTo("The number of jobs supporting the contract must be 1 or more");
+    assertThat(bindingResult.getFieldError("noOfNewJobsCreatedForContract.inputValue").getDefaultMessage())
+        .isEqualTo("The number of new jobs created for the contract must be a whole number");
+    assertThat(bindingResult.getFieldError("noOfJobsBasedInUkForContract.inputValue").getDefaultMessage())
+        .isEqualTo("The number of jobs based in the UK for the contract must be a whole number");
+  }
+
+  @Test
   void validate_emptyForm_assertRequiredErrors() {
     validator.validate(form, bindingResult, new ActualTenderFormValidatorHint(actualTender));
 
@@ -89,6 +115,9 @@ class ActualTenderActivityFormValidatorTest {
     assertThat(extractedErrors).containsExactly(
         entry("scopeTitle.inputValue", Set.of("scopeTitle.required")),
         entry("scopeDescription.inputValue", Set.of("scopeDescription.required")),
+        entry("noOfJobsSupportingContract.inputValue", Set.of("noOfJobsSupportingContract.required")),
+        entry("noOfNewJobsCreatedForContract.inputValue", Set.of("noOfNewJobsCreatedForContract.required")),
+        entry("noOfJobsBasedInUkForContract.inputValue", Set.of("noOfJobsBasedInUkForContract.required")),
         entry("remunerationModel", Set.of("remunerationModel.required")),
         entry("contractStage", Set.of("contractStage.required")),
         entry("ittParticipantsSelector", Set.of("ittParticipantsSelector.required"))
@@ -106,6 +135,9 @@ class ActualTenderActivityFormValidatorTest {
     assertThat(extractedErrors).containsExactly(
         entry("scopeTitle.inputValue", Set.of("scopeTitle.required")),
         entry("scopeDescription.inputValue", Set.of("scopeDescription.required")),
+        entry("noOfJobsSupportingContract.inputValue", Set.of("noOfJobsSupportingContract.required")),
+        entry("noOfNewJobsCreatedForContract.inputValue", Set.of("noOfNewJobsCreatedForContract.required")),
+        entry("noOfJobsBasedInUkForContract.inputValue", Set.of("noOfJobsBasedInUkForContract.required")),
         entry("remunerationModel", Set.of("remunerationModel.required")),
         entry("contractStage", Set.of("contractStage.required")),
         entry("ittParticipantsSelector", Set.of("ittParticipantsSelector.required"))
@@ -116,6 +148,9 @@ class ActualTenderActivityFormValidatorTest {
   void validate_otherRemunerationModel_assertRemunerationModelNameRequired() {
     form.setScopeTitle("test scope title");
     form.setScopeDescription("test scope description");
+    form.setNoOfJobsSupportingContract(String.valueOf(5));
+    form.setNoOfNewJobsCreatedForContract(String.valueOf(5));
+    form.setNoOfJobsBasedInUkForContract(String.valueOf(5));
     form.setRemunerationModel(RemunerationModel.OTHER);
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
     form.setInvitationToTenderParticipants(Collections.singletonList(ManualEntryUtil.addFreeTextPrefix("test participant")));
@@ -132,6 +167,9 @@ class ActualTenderActivityFormValidatorTest {
   void validate_NonUniqueScope_AssertError() {
     form.setScopeTitle("test scope title");
     form.setScopeDescription("test scope description");
+    form.setNoOfJobsSupportingContract(String.valueOf(5));
+    form.setNoOfNewJobsCreatedForContract(String.valueOf(5));
+    form.setNoOfJobsBasedInUkForContract(String.valueOf(5));
     form.setRemunerationModel(RemunerationModel.LUMP_SUM);
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
     form.setInvitationToTenderParticipants(Collections.singletonList(ManualEntryUtil.addFreeTextPrefix("test participant")));
@@ -153,6 +191,9 @@ class ActualTenderActivityFormValidatorTest {
   void validate_ChangingOwnScopeTitle_AssertNoErrors() {
     form.setScopeTitle("test scope title");
     form.setScopeDescription("test scope description");
+    form.setNoOfJobsSupportingContract(String.valueOf(5));
+    form.setNoOfNewJobsCreatedForContract(String.valueOf(5));
+    form.setNoOfJobsBasedInUkForContract(String.valueOf(5));
     form.setRemunerationModel(RemunerationModel.LUMP_SUM);
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
     form.setInvitationToTenderParticipants(Collections.singletonList(ManualEntryUtil.addFreeTextPrefix("test participant")));
@@ -172,6 +213,9 @@ class ActualTenderActivityFormValidatorTest {
   void validate_ChangingOtherExistingScopeTitle_AssertErrors() {
     form.setScopeTitle("test scope title");
     form.setScopeDescription("test scope description");
+    form.setNoOfJobsSupportingContract(String.valueOf(5));
+    form.setNoOfNewJobsCreatedForContract(String.valueOf(5));
+    form.setNoOfJobsBasedInUkForContract(String.valueOf(5));
     form.setRemunerationModel(RemunerationModel.LUMP_SUM);
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
     form.setInvitationToTenderParticipants(Collections.singletonList(ManualEntryUtil.addFreeTextPrefix("test participant")));
@@ -194,6 +238,9 @@ class ActualTenderActivityFormValidatorTest {
   void validate_ChangingOtherExistingScopeTitleWithWhitespace_AssertErrors() {
     form.setScopeTitle("      test scope title    ");
     form.setScopeDescription("test scope description");
+    form.setNoOfJobsSupportingContract(String.valueOf(5));
+    form.setNoOfNewJobsCreatedForContract(String.valueOf(5));
+    form.setNoOfJobsBasedInUkForContract(String.valueOf(5));
     form.setRemunerationModel(RemunerationModel.LUMP_SUM);
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
     form.setInvitationToTenderParticipants(Collections.singletonList(ManualEntryUtil.addFreeTextPrefix("test participant")));
@@ -217,6 +264,9 @@ class ActualTenderActivityFormValidatorTest {
     var tooLongScopeTitle = StringUtils.repeat("X", ActualTenderActivityFormValidator.MAX_SCOPE_TITLE_LENGTH + 1);
     form.setScopeTitle(tooLongScopeTitle);
     form.setScopeDescription("test scope description");
+    form.setNoOfJobsSupportingContract(String.valueOf(5));
+    form.setNoOfNewJobsCreatedForContract(String.valueOf(5));
+    form.setNoOfJobsBasedInUkForContract(String.valueOf(5));
     form.setRemunerationModel(RemunerationModel.LUMP_SUM);
     form.setContractStage(ContractStage.CONTRACT_AWARDED);
     form.setInvitationToTenderParticipants(Collections.singletonList(ManualEntryUtil.addFreeTextPrefix("test participant")));
@@ -233,6 +283,9 @@ class ActualTenderActivityFormValidatorTest {
   void validate_InvalidIttParticipants_AssertErrors() {
     form.setScopeTitle("test scope title");
     form.setScopeDescription("test scope description");
+    form.setNoOfJobsSupportingContract(String.valueOf(5));
+    form.setNoOfNewJobsCreatedForContract(String.valueOf(5));
+    form.setNoOfJobsBasedInUkForContract(String.valueOf(5));
     form.setRemunerationModel(RemunerationModel.OTHER);
     form.setRemunerationModelName("test remuneration model");
     form.setContractStage(ContractStage.CONTRACT_AWARDED);

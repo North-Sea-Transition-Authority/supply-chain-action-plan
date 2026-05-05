@@ -73,6 +73,9 @@ class ActualTenderActivityFormServiceTest {
     var actualTenderActivity = new ActualTenderActivity(45);
     actualTenderActivity.setScopeTitle("test scope title");
     actualTenderActivity.setScopeDescription("test scope description");
+    actualTenderActivity.setNoOfJobsSupportingContract(1);
+    actualTenderActivity.setNoOfNewJobsCreatedForContract(2);
+    actualTenderActivity.setNoOfJobsBasedInUkForContract(3);
     actualTenderActivity.setRemunerationModel(RemunerationModel.OTHER);
     actualTenderActivity.setRemunerationModelName("Other remuneration model");
     actualTenderActivity.setContractStage(ContractStage.CONTRACT_AWARDED);
@@ -92,6 +95,9 @@ class ActualTenderActivityFormServiceTest {
     assertThat(form).extracting(
         form1 -> form1.getScopeTitle().getInputValue(),
         form1 -> form1.getScopeDescription().getInputValue(),
+        form1 -> form1.getNoOfJobsSupportingContract().getInputValue(),
+        form1 -> form1.getNoOfNewJobsCreatedForContract().getInputValue(),
+        form1 -> form1.getNoOfJobsBasedInUkForContract().getInputValue(),
         ActualTenderActivityForm::getRemunerationModel,
         form1 -> form1.getRemunerationModelName().getInputValue(),
         ActualTenderActivityForm::getContractStage,
@@ -99,6 +105,9 @@ class ActualTenderActivityFormServiceTest {
     ).containsExactly(
         actualTenderActivity.getScopeTitle(),
         actualTenderActivity.getScopeDescription(),
+        String.valueOf(actualTenderActivity.getNoOfJobsSupportingContract()),
+        String.valueOf(actualTenderActivity.getNoOfNewJobsCreatedForContract()),
+        String.valueOf(actualTenderActivity.getNoOfJobsBasedInUkForContract()),
         actualTenderActivity.getRemunerationModel(),
         actualTenderActivity.getRemunerationModelName(),
         actualTenderActivity.getContractStage(),

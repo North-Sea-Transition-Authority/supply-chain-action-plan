@@ -51,6 +51,9 @@ class ActualTenderActivityServiceTest {
     form = new ActualTenderActivityForm();
     form.setScopeTitle("test scope title");
     form.setScopeDescription("test scope description");
+    form.setNoOfJobsSupportingContract(String.valueOf(5));
+    form.setNoOfNewJobsCreatedForContract(String.valueOf(5));
+    form.setNoOfJobsBasedInUkForContract(String.valueOf(5));
     form.setRemunerationModel(RemunerationModel.OTHER);
     form.setRemunerationModelName("test remuneration model name");
     form.setContractStage(ContractStage.CONTRACT_AWARDED);

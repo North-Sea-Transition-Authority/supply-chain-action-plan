@@ -97,6 +97,9 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
     var actualTenderSummaryView = new ActualTenderActivitySummaryView(
         scap.getScapId(), actualTenderActivities.get(0).getId(),
         "scope title", "scope description",
+        1,
+        2,
+        3,
         RemunerationModel.OTHER, "remuneration model name",
         ContractStage.CONTRACT_AWARDED,
         Map.of("ITT participant 1", false, "ITT participant 2", false),
@@ -147,6 +150,9 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
     var actualTenderSummaryView = new ActualTenderActivitySummaryView(
         scap.getScapId(), actualTenderActivities.get(0).getId(),
         "scope title", "scope description",
+        1,
+        2,
+        3,
         RemunerationModel.OTHER, "remuneration model name",
         ContractStage.CONTRACT_AWARDED,
         Map.of("ITT participant 1", false, "ITT participant 2", false),
@@ -192,6 +198,9 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
     var actualTenderSummaryView = new ActualTenderActivitySummaryView(
         scap.getScapId(), actualTenderActivities.get(0).getId(),
         "scope title", "scope description",
+        1,
+        2,
+        3,
         RemunerationModel.OTHER, "remuneration model name",
         ContractStage.CONTRACT_AWARDED,
         Map.of("ITT participant 1", false, "ITT participant 2", false),
@@ -232,6 +241,9 @@ class ActualTenderSummaryControllerTest extends AbstractScapSubmitterControllerT
     var actualTenderSummaryView = new ActualTenderActivitySummaryView(
         scap.getScapId(), actualTenderActivities.get(0).getId(),
         "scope title", "scope description",
+        1,
+        2,
+        3,
         RemunerationModel.OTHER, "remuneration model name",
         ContractStage.CONTRACT_AWARDED,
         Map.of("ITT participant 1", false, "ITT participant 2", false),

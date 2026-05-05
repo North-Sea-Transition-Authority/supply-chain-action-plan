@@ -399,7 +399,7 @@ class ScapSummaryViewServiceTest {
     var activityViews = List.of(
         new ActualTenderActivitySummaryView(
             null, null, null, null, null, null,
-            null, null, null, null, true
+            null, null, null, null, null, null, null, true
         )
     );
 

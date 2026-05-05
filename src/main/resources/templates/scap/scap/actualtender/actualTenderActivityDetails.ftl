@@ -25,6 +25,22 @@ backLinkUrl=springUrl(backLinkUrl)
         add text detailing the "award rationale" as single source.
       </p>
     </@fdsDetails.summaryDetails>
+      <@fdsTextInput.textInput
+      path="form.noOfJobsSupportingContract.inputValue"
+      labelText="Estimated highest total number of jobs supporting this contract at any point over its lifetime"
+      inputClass="govuk-input--width-5"
+      />
+      <@fdsTextInput.textInput
+      path="form.noOfNewJobsCreatedForContract.inputValue"
+      labelText="Estimated total number of new jobs created supporting this contract"
+      inputClass="govuk-input--width-5"
+      />
+      <@fdsTextInput.textInput
+      path="form.noOfJobsBasedInUkForContract.inputValue"
+      labelText="Estimated total number of jobs based in the UK supporting this contract"
+      inputClass="govuk-input--width-5"
+      />
+
     <@fdsRadio.radioGroup
       path="form.remunerationModel"
       labelText="Remuneration model"

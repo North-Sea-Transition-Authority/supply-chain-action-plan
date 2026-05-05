@@ -59,6 +59,16 @@ public class ActualTenderActivityService {
   public void saveActualTenderActivity(ActualTenderActivity actualTenderActivity, ActualTenderActivityForm form) {
     actualTenderActivity.setScopeTitle(form.getScopeTitle().getInputValue());
     actualTenderActivity.setScopeDescription(form.getScopeDescription().getInputValue());
+    actualTenderActivity.setNoOfJobsSupportingContract(form.getNoOfJobsSupportingContract().getAsInteger().orElseThrow());
+    actualTenderActivity.setNoOfJobsBasedInUkForContract(form.getNoOfJobsSupportingContract().getAsInteger().orElseThrow());
+    actualTenderActivity.setNoOfNewJobsCreatedForContract(form.getNoOfJobsSupportingContract().getAsInteger().orElseThrow());
+
+    actualTenderActivity.setNoOfJobsSupportingContract(
+        Integer.valueOf(form.getNoOfJobsSupportingContract().getInputValue()));
+    actualTenderActivity.setNoOfNewJobsCreatedForContract(
+        Integer.valueOf(form.getNoOfNewJobsCreatedForContract().getInputValue()));
+    actualTenderActivity.setNoOfJobsBasedInUkForContract(
+        Integer.valueOf(form.getNoOfJobsBasedInUkForContract().getInputValue()));
     actualTenderActivity.setRemunerationModel(form.getRemunerationModel());
     if (RemunerationModel.OTHER.equals(form.getRemunerationModel())) {
       actualTenderActivity.setRemunerationModelName(form.getRemunerationModelName().getInputValue());

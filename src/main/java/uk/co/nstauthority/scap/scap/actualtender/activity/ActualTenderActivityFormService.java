@@ -49,6 +49,9 @@ public class ActualTenderActivityFormService {
     var form = new ActualTenderActivityForm();
     form.setScopeTitle(actualTenderActivity.getScopeTitle());
     form.setScopeDescription(actualTenderActivity.getScopeDescription());
+    form.getNoOfJobsSupportingContract().setInteger(actualTenderActivity.getNoOfJobsSupportingContract());
+    form.getNoOfNewJobsCreatedForContract().setInteger(actualTenderActivity.getNoOfNewJobsCreatedForContract());
+    form.getNoOfJobsBasedInUkForContract().setInteger(actualTenderActivity.getNoOfJobsBasedInUkForContract());
     form.setRemunerationModel(actualTenderActivity.getRemunerationModel());
     form.setRemunerationModelName(actualTenderActivity.getRemunerationModelName());
     form.setContractStage(actualTenderActivity.getContractStage());
