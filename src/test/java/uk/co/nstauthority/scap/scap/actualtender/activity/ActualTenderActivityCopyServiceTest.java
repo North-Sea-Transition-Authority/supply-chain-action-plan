@@ -85,7 +85,7 @@ class ActualTenderActivityCopyServiceTest {
     oldAwardedContract.setPreferredBidder(oldPreferredBidder);
     oldAwardedContract.setActualTenderActivity(oldActualTenderActivity);
     oldAwardedContract.setAwardRationale("Test");
-    oldAwardedContract.setPreferredBidderCountryId(1000);
+    oldAwardedContract.setPreferredBidderCountryIsoCode("1000");
     oldAwardedContract.setAwardValue(new BigDecimal(5000));
     oldAwardedContract.setPaymentTerms(1);
 

@@ -5,55 +5,52 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.fivium.energyportalapi.client.RequestPurpose;
-import uk.co.fivium.energyportalapi.client.countries.CountryApi;
-import uk.co.fivium.energyportalapi.generated.client.CountriesProjectionRoot;
-import uk.co.fivium.energyportalapi.generated.client.CountryProjectionRoot;
-import uk.co.fivium.energyportalapi.generated.types.Country;
+import uk.co.fivium.energyportalapi.client.countries.CountryApiV2;
+import uk.co.fivium.energyportalapi.generated.client.CountriesV2ProjectionRoot;
+import uk.co.fivium.energyportalapi.generated.client.CountryV2ProjectionRoot;
+import uk.co.fivium.energyportalapi.generated.types.CountryV2;
 import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
 import uk.co.nstauthority.scap.fds.searchselector.RestSearchResult;
 
 @Service
 public class CountryService {
 
-  private final CountryApi countryApi;
+  private final CountryApiV2 countryApi;
 
   @Autowired
-  CountryService(CountryApi countryApi) {
+  CountryService(CountryApiV2 countryApi) {
     this.countryApi = countryApi;
   }
 
-  public boolean doesCountryExist(Integer id) {
-    return findCountryById(id, "Verify country exists for SCAP").isPresent();
+  public boolean doesCountryExist(String isoCode) {
+    return findCountryByIsoCode(isoCode, "Verify country exists for SCAP").isPresent();
   }
 
-  public Optional<Country> findCountryById(Integer id, String purpose) {
-    var filters = new CountryProjectionRoot().countryId().countryName();
+  public Optional<CountryV2> findCountryByIsoCode(String isoCode, String purpose) {
+    var filters = new CountryV2ProjectionRoot().isoCode().name();
     var requestPurpose = new RequestPurpose(purpose);
 
-    return countryApi.findCountryById(id, filters, requestPurpose);
+    return countryApi.findCountryByIsoCode(isoCode, filters, requestPurpose);
   }
 
-  public List<Country> getCountriesByIds(List<Integer> countryIds, String purpose) {
-    var filters = new CountriesProjectionRoot().countryId().countryName();
+  public List<CountryV2> getCountriesByIsoCodes(List<String> isoCodes, String purpose) {
+    var filters = new CountriesV2ProjectionRoot().isoCode().name();
     var requestPurpose = new RequestPurpose(purpose);
 
-    return countryApi.getAllCountriesByIds(countryIds, filters, requestPurpose);
+    return countryApi.getAllCountriesByIsoCodesIn(isoCodes, filters, requestPurpose);
   }
 
-  public List<Country> searchCountries(String term, String purpose) {
+  public List<CountryV2> searchCountries(String term, String purpose) {
+    var filters = new CountriesV2ProjectionRoot().isoCode().name();
     var requestPurpose = new RequestPurpose(purpose);
-    var filters = new CountriesProjectionRoot().countryId().countryName();
 
-    return countryApi.searchDefaultActiveCountriesByName(
-        term,
-        filters,
-        requestPurpose);
+    return countryApi.searchActiveCountriesByName(term, filters, requestPurpose);
   }
 
-  public RestSearchResult getCountrySearchResults(List<Country> countries) {
+  public RestSearchResult getCountrySearchResults(List<CountryV2> countries) {
     return new RestSearchResult(
         countries.stream()
-            .map(country -> new RestSearchItem(String.valueOf(country.getCountryId()), country.getCountryName()))
+            .map(country -> new RestSearchItem(country.getIsoCode(), country.getName()))
             .toList());
   }
 

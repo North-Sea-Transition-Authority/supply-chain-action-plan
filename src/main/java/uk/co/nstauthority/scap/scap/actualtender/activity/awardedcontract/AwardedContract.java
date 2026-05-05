@@ -38,6 +38,8 @@ public class AwardedContract {
 
   private Integer preferredBidderCountryId;
 
+  private String preferredBidderCountryIsoCode;
+
   @CreationTimestamp
   private Instant createdTimestamp;
 
@@ -105,6 +107,14 @@ public class AwardedContract {
 
   public void setPreferredBidderCountryId(Integer preferredBidderCountryId) {
     this.preferredBidderCountryId = preferredBidderCountryId;
+  }
+
+  public String getPreferredBidderCountryIsoCode() {
+    return preferredBidderCountryIsoCode;
+  }
+
+  public void setPreferredBidderCountryIsoCode(String preferredBidderCountryIsoCode) {
+    this.preferredBidderCountryIsoCode = preferredBidderCountryIsoCode;
   }
 
   public Instant getCreatedTimestamp() {

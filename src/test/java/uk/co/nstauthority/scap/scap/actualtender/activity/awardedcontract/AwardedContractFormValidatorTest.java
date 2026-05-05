@@ -68,11 +68,11 @@ class AwardedContractFormValidatorTest {
 
   @Test
   void validate_ValidForm_AssertNoErrors() {
-    var countryId = 2141;
+    var countryIsoCode = "2141";
     form.setPreferredBidderId(bidParticipant1.getId());
-    form.setPreferredBidderCountryId(countryId);
+    form.setPreferredBidderCountryIsoCode(countryIsoCode);
 
-    when(countryService.doesCountryExist(countryId)).thenReturn(true);
+    when(countryService.doesCountryExist(countryIsoCode)).thenReturn(true);
 
     validator.validate(form, bindingResult, new AwardedContractFormValidatorHint(bidParticipants));
 
@@ -95,7 +95,7 @@ class AwardedContractFormValidatorTest {
         entry("preferredBidderId", Set.of("preferredBidderId.required")),
         entry("awardValue.inputValue", Set.of("awardValue.required")),
         entry("awardRationale.inputValue", Set.of("awardRationale.required")),
-        entry("preferredBidderCountryId", Set.of("preferredBidderCountryId.required")),
+        entry("preferredBidderCountryIsoCode", Set.of("preferredBidderCountryIsoCode.required")),
         entry("%s.dayInput.inputValue".formatted(contractAwardDateField),
             Set.of("%s.dayInput.required".formatted(contractAwardDateField))),
         entry("%s.monthInput.inputValue".formatted(contractAwardDateField),
@@ -121,15 +121,15 @@ class AwardedContractFormValidatorTest {
 
   @Test
   void validate_NonExistentBidParticipantAndCountry_AssertErrors() {
-    var countryId = 9998;
+    var countryIsoCode = "9998";
     form.setPreferredBidderId(9999);
     form.setAwardValue("1.41");
     form.setAwardRationale("test award rationale");
-    form.setPreferredBidderCountryId(countryId);
+    form.setPreferredBidderCountryIsoCode(countryIsoCode);
     form.setContractAwardDate(LocalDate.of(2000, 1, 1));
     form.setPaymentTermsRadio(PaymentTermsRadio.DAYS_30);
 
-    when(countryService.doesCountryExist(countryId)).thenReturn(false);
+    when(countryService.doesCountryExist(countryIsoCode)).thenReturn(false);
 
     validator.validate(form, bindingResult, new AwardedContractFormValidatorHint(bidParticipants));
 
@@ -137,21 +137,21 @@ class AwardedContractFormValidatorTest {
 
     assertThat(extractedErrors).containsExactly(
         entry("preferredBidderId", Set.of("preferredBidderId.doesNotExist")),
-        entry("preferredBidderCountryId", Set.of("preferredBidderCountryId.doesNotExist"))
+        entry("preferredBidderCountryIsoCode", Set.of("preferredBidderCountryIsoCode.doesNotExist"))
     );
   }
 
   @Test
   void validate_AwardValueTooSmall_AssertError() {
-    var countryId = 0;
+    var countryIsoCode = "0";
     form.setPreferredBidderId(bidParticipant1.getId());
     form.setAwardValue("0");
     form.setAwardRationale("test award rationale");
-    form.setPreferredBidderCountryId(countryId);
+    form.setPreferredBidderCountryIsoCode(countryIsoCode);
     form.setContractAwardDate(LocalDate.of(2000, 1, 1));
     form.setPaymentTermsRadio(PaymentTermsRadio.DAYS_30);
 
-    when(countryService.doesCountryExist(countryId)).thenReturn(true);
+    when(countryService.doesCountryExist(countryIsoCode)).thenReturn(true);
 
     validator.validate(form, bindingResult, new AwardedContractFormValidatorHint(bidParticipants));
 
@@ -164,15 +164,15 @@ class AwardedContractFormValidatorTest {
 
   @Test
   void validate_AwardValueTooManyDecimalPlaces_AssertError() {
-    var countryId = 0;
+    var countryIsoCode = "0";
     form.setPreferredBidderId(bidParticipant1.getId());
     form.setAwardValue("0.1234");
     form.setAwardRationale("test award rationale");
-    form.setPreferredBidderCountryId(countryId);
+    form.setPreferredBidderCountryIsoCode(countryIsoCode);
     form.setContractAwardDate(LocalDate.of(2000, 1, 1));
     form.setPaymentTermsRadio(PaymentTermsRadio.DAYS_30);
 
-    when(countryService.doesCountryExist(countryId)).thenReturn(true);
+    when(countryService.doesCountryExist(countryIsoCode)).thenReturn(true);
 
     validator.validate(form, bindingResult, new AwardedContractFormValidatorHint(bidParticipants));
 
@@ -185,13 +185,13 @@ class AwardedContractFormValidatorTest {
 
   @Test
   void validate_NoPaymentTermsSelected_AssertErrors() {
-    var countryId = 0;
+    var countryIsoCode = "0";
     form.setPreferredBidderId(bidParticipant1.getId());
-    form.setPreferredBidderCountryId(countryId);
+    form.setPreferredBidderCountryIsoCode(countryIsoCode);
 
     form.setPaymentTermsRadio(null);
 
-    when(countryService.doesCountryExist(countryId)).thenReturn(true);
+    when(countryService.doesCountryExist(countryIsoCode)).thenReturn(true);
 
     validator.validate(form, bindingResult, new AwardedContractFormValidatorHint(bidParticipants));
 
@@ -205,14 +205,14 @@ class AwardedContractFormValidatorTest {
 
   @Test
   void validate_OtherPaymentTerm_NoValueProvided_AssertErrors() {
-    var countryId = 0;
+    var countryIsoCode = "0";
     form.setPreferredBidderId(bidParticipant1.getId());
-    form.setPreferredBidderCountryId(countryId);
+    form.setPreferredBidderCountryIsoCode(countryIsoCode);
 
     form.setPaymentTermsRadio(PaymentTermsRadio.OTHER);
     form.setOtherPaymentTerm(null);
 
-    when(countryService.doesCountryExist(countryId)).thenReturn(true);
+    when(countryService.doesCountryExist(countryIsoCode)).thenReturn(true);
 
     validator.validate(form, bindingResult, new AwardedContractFormValidatorHint(bidParticipants));
 
@@ -226,14 +226,14 @@ class AwardedContractFormValidatorTest {
 
   @Test
   void validate_InvalidPaymentTerm_AssertErrors() {
-    var countryId = 0;
+    var countryIsoCode = "0";
     form.setPreferredBidderId(bidParticipant1.getId());
-    form.setPreferredBidderCountryId(countryId);
+    form.setPreferredBidderCountryIsoCode(countryIsoCode);
 
     form.setPaymentTermsRadio(PaymentTermsRadio.OTHER);
     form.setOtherPaymentTerm("-1");
 
-    when(countryService.doesCountryExist(countryId)).thenReturn(true);
+    when(countryService.doesCountryExist(countryIsoCode)).thenReturn(true);
 
     validator.validate(form, bindingResult, new AwardedContractFormValidatorHint(bidParticipants));
 
@@ -250,14 +250,14 @@ class AwardedContractFormValidatorTest {
     var bidParticipant1 = new InvitationToTenderParticipant(1410);
     var bidParticipant2 = new InvitationToTenderParticipant(1411);
     var bidParticipants = List.of(bidParticipant1, bidParticipant2);
-    var countryId = 0;
+    var countryIsoCode = "0";
     var contractStartDateField = AwardedContractForm.CONTRACT_START_DATE_FIELD;
     form.setPreferredBidderId(bidParticipant1.getId());
-    form.setPreferredBidderCountryId(countryId);
+    form.setPreferredBidderCountryIsoCode(countryIsoCode);
 
     form.setContractStartDate(LocalDate.of(1990, 1, 1));
 
-    when(countryService.doesCountryExist(countryId)).thenReturn(true);
+    when(countryService.doesCountryExist(countryIsoCode)).thenReturn(true);
 
     validator.validate(form, bindingResult, new AwardedContractFormValidatorHint(bidParticipants));
 
@@ -278,14 +278,14 @@ class AwardedContractFormValidatorTest {
     var bidParticipant1 = new InvitationToTenderParticipant(1410);
     var bidParticipant2 = new InvitationToTenderParticipant(1411);
     var bidParticipants = List.of(bidParticipant1, bidParticipant2);
-    var countryId = 0;
+    var countryIsoCode = "0";
     var contractEndDateField = AwardedContractForm.CONTRACT_END_DATE_FIELD;
     form.setPreferredBidderId(bidParticipant1.getId());
-    form.setPreferredBidderCountryId(countryId);
+    form.setPreferredBidderCountryIsoCode(countryIsoCode);
 
     form.setContractEndDate(LocalDate.of(1990, 1, 1));
 
-    when(countryService.doesCountryExist(countryId)).thenReturn(true);
+    when(countryService.doesCountryExist(countryIsoCode)).thenReturn(true);
 
     validator.validate(form, bindingResult, new AwardedContractFormValidatorHint(bidParticipants));
 
@@ -306,7 +306,7 @@ class AwardedContractFormValidatorTest {
     form.setPreferredBidderId(1);
     form.setAwardValue("1.41");
     form.setAwardRationale("test award rationale");
-    form.setPreferredBidderCountryId(0);
+    form.setPreferredBidderCountryIsoCode("0");
     form.setContractAwardDate(LocalDate.of(2000, 1, 1));
     form.setPaymentTermsRadio(PaymentTermsRadio.DAYS_30);
     form.setContractStartDate(LocalDate.of(2001, 1, 1));

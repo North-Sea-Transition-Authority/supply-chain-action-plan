@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.co.fivium.energyportalapi.generated.types.Country;
+import uk.co.fivium.energyportalapi.generated.types.CountryV2;
 import uk.co.nstauthority.scap.energyportal.CountryService;
 import uk.co.nstauthority.scap.scap.scap.ScapId;
 
@@ -30,7 +30,7 @@ public class ContractingPerformanceSummaryViewService {
     var contractingPerformanceSummaryDtoOpt = contractingPerformanceSummaryDtoRepository
         .findByScapIdAndContractingPerformanceId(scapId, contractingPerformanceId);
     return contractingPerformanceSummaryDtoOpt.map(contractingPerformanceSummaryDto -> {
-      var country = countryService.findCountryById(contractingPerformanceSummaryDto.countryId(), REQUEST_PURPOSE);
+      var country = countryService.findCountryByIsoCode(contractingPerformanceSummaryDto.countryIsoCode(), REQUEST_PURPOSE);
       return new ContractingPerformanceSummaryView(
           scapId,
           contractingPerformanceId,
@@ -40,7 +40,7 @@ public class ContractingPerformanceSummaryViewService {
           contractingPerformanceSummaryDto.remunerationModel(),
           contractingPerformanceSummaryDto.remunerationModelName(),
           contractingPerformanceSummaryDto.contractor(),
-          country.map(Country::getCountryName).orElse(null),
+          country.map(CountryV2::getName).orElse(null),
           contractingPerformanceSummaryDto.outturnCost(),
           contractingPerformanceSummaryDto.outturnRationale());
     });
@@ -59,21 +59,21 @@ public class ContractingPerformanceSummaryViewService {
             contractingPerformanceSummaryDto.remunerationModel(),
             contractingPerformanceSummaryDto.remunerationModelName(),
             contractingPerformanceSummaryDto.contractor(),
-            countryMap.get(contractingPerformanceSummaryDto.countryId()),
+            countryMap.get(contractingPerformanceSummaryDto.countryIsoCode()),
             contractingPerformanceSummaryDto.outturnCost(),
             contractingPerformanceSummaryDto.outturnRationale()
         )).toList();
   }
 
-  private Map<Integer, String> getCountryMap(List<ContractingPerformanceSummaryDto> dtoList) {
-    var countryIds = dtoList.stream()
-        .map(ContractingPerformanceSummaryDto::countryId)
+  private Map<String, String> getCountryMap(List<ContractingPerformanceSummaryDto> dtoList) {
+    var countryIsoCodes = dtoList.stream()
+        .map(ContractingPerformanceSummaryDto::countryIsoCode)
         .distinct()
         .toList();
-    var countries = countryService.getCountriesByIds(countryIds, REQUEST_PURPOSE);
+    var countries = countryService.getCountriesByIsoCodes(countryIsoCodes, REQUEST_PURPOSE);
     return countries.stream().collect(Collectors.toMap(
-        Country::getCountryId,
-        Country::getCountryName
+        CountryV2::getIsoCode,
+        CountryV2::getName
     ));
   }
 

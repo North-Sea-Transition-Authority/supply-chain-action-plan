@@ -66,7 +66,7 @@ public class AwardedContractController {
     var form = awardedContract.map(awardedContractFormService::getForm)
         .orElse(new AwardedContractForm());
     var preselectedCountry = awardedContract.flatMap(existingAwardedContract ->
-        awardedContractFormService.getPreselectedBidderLocation(existingAwardedContract.getPreferredBidderCountryId()))
+        awardedContractFormService.getPreselectedBidderLocation(existingAwardedContract.getPreferredBidderCountryIsoCode()))
         .orElse(null);
 
     return awardedContractModelAndView(scapId, activityId, bidParticipants, preselectedCountry)
@@ -88,7 +88,7 @@ public class AwardedContractController {
 
     if (bindingResult.hasErrors()) {
       preselectedCountry = awardedContractFormService.getPreselectedBidderLocationFromForm(
-          form.getPreferredBidderCountryId(), bindingResult).orElse(null);
+          form.getPreferredBidderCountryIsoCode(), bindingResult).orElse(null);
     }
 
     return controllerHelperService.checkErrorsAndRedirect(

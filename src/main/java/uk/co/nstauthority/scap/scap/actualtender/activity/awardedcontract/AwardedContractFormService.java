@@ -38,7 +38,7 @@ public class AwardedContractFormService {
     }
     form.setAwardValue(String.valueOf(awardedContract.getAwardValue()));
     form.setAwardRationale(awardedContract.getAwardRationale());
-    form.setPreferredBidderCountryId(awardedContract.getPreferredBidderCountryId());
+    form.setPreferredBidderCountryIsoCode(awardedContract.getPreferredBidderCountryIsoCode());
     if (Objects.nonNull(awardedContract.getContractAwardDate())) {
       form.setContractAwardDate(awardedContract.getContractAwardDate());
     }
@@ -55,17 +55,17 @@ public class AwardedContractFormService {
     return form;
   }
 
-  Optional<Map<String, String>> getPreselectedBidderLocation(Integer countryId) {
-    var country = countryService.findCountryById(countryId, PRESELECTED_LOCATION_REQUEST_PURPOSE);
+  Optional<Map<String, String>> getPreselectedBidderLocation(String isoCode) {
+    var country = countryService.findCountryByIsoCode(isoCode, PRESELECTED_LOCATION_REQUEST_PURPOSE);
     return country.map(existingCountry ->
-        Map.of(String.valueOf(existingCountry.getCountryId()), existingCountry.getCountryName()));
+        Map.of(existingCountry.getIsoCode(), existingCountry.getName()));
   }
 
-  Optional<Map<String, String>> getPreselectedBidderLocationFromForm(Integer countryId, BindingResult bindingResult) {
+  Optional<Map<String, String>> getPreselectedBidderLocationFromForm(String isoCode, BindingResult bindingResult) {
     if (bindingResult.hasFieldErrors(AwardedContractFormValidator.BIDDER_LOCATION_FIELD)) {
       return Optional.empty();
     }
-    return getPreselectedBidderLocation(countryId);
+    return getPreselectedBidderLocation(isoCode);
   }
 
   static Map<String, String> getSelectOptions(List<InvitationToTenderParticipant> participants) {

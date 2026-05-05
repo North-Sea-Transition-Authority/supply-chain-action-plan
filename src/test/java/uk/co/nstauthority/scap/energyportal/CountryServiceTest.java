@@ -19,19 +19,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.fivium.energyportalapi.client.RequestPurpose;
-import uk.co.fivium.energyportalapi.client.countries.CountryApi;
-import uk.co.fivium.energyportalapi.generated.client.CountriesProjectionRoot;
-import uk.co.fivium.energyportalapi.generated.client.CountryProjectionRoot;
-import uk.co.fivium.energyportalapi.generated.types.Country;
-import uk.co.fivium.energyportalapi.generated.types.PortalCountrySet;
-import uk.co.fivium.energyportalapi.generated.types.PortalCountryStatus;
+import uk.co.fivium.energyportalapi.client.countries.CountryApiV2;
+import uk.co.fivium.energyportalapi.generated.client.CountriesV2ProjectionRoot;
+import uk.co.fivium.energyportalapi.generated.client.CountryV2ProjectionRoot;
+import uk.co.fivium.energyportalapi.generated.types.CountryV2;
 import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
 
 @ExtendWith(MockitoExtension.class)
 class CountryServiceTest {
 
   @Mock
-  CountryApi countryApi;
+  CountryApiV2 countryApi;
 
   @InjectMocks
   CountryService countryService;
@@ -41,21 +39,21 @@ class CountryServiceTest {
     var searchTerm = "united kingdom";
     var searchPurpose = "test search purpose";
     var countries = List.of(
-        new Country(0, "United Kingdom", null, null),
-        new Country(68, "Continental Shelf United Kingdom Sector", null, null)
+        new CountryV2("United Kingdom", "GB"),
+        new CountryV2("Continental Shelf United Kingdom Sector", "CSU")
     );
-    var countryProjectionRootArgumentCaptor = ArgumentCaptor.forClass(CountriesProjectionRoot.class);
+    var countryProjectionRootArgumentCaptor = ArgumentCaptor.forClass(CountriesV2ProjectionRoot.class);
     var requestPurposeArgumentCaptor = ArgumentCaptor.forClass(RequestPurpose.class);
 
-    when(countryApi.searchDefaultActiveCountriesByName(
+    when(countryApi.searchActiveCountriesByName(
         eq(searchTerm),
-        any(CountriesProjectionRoot.class),
+        any(CountriesV2ProjectionRoot.class),
         any(RequestPurpose.class)))
         .thenReturn(countries);
 
     var returnedCountries = countryService.searchCountries(searchTerm, searchPurpose);
 
-    verify(countryApi).searchDefaultActiveCountriesByName(
+    verify(countryApi).searchActiveCountriesByName(
         eq(searchTerm),
         countryProjectionRootArgumentCaptor.capture(),
         requestPurposeArgumentCaptor.capture());
@@ -63,123 +61,123 @@ class CountryServiceTest {
     assertThat(returnedCountries).isEqualTo(countries);
     assertThat(requestPurposeArgumentCaptor.getValue().purpose()).isEqualTo(searchPurpose);
     assertThat(countryProjectionRootArgumentCaptor.getValue().getFields()).containsExactly(
-        entry("countryId", null),
-        entry("countryName", null)
+        entry("isoCode", null),
+        entry("name", null)
     );
   }
 
   @Test
-  void findCountryById() {
-    var searchId = 0;
+  void findCountryByIsoCode() {
+    var searchIsoCode = "GB";
     var searchPurpose = "test search purpose";
-    var country = new Country(0, "United Kingdom", null, null);
-    var countryProjectionRootArgumentCaptor = ArgumentCaptor.forClass(CountryProjectionRoot.class);
+    var country = new CountryV2("United Kingdom", searchIsoCode);
+    var countryProjectionRootArgumentCaptor = ArgumentCaptor.forClass(CountryV2ProjectionRoot.class);
     var requestPurposeArgumentCaptor = ArgumentCaptor.forClass(RequestPurpose.class);
 
-    when(countryApi.findCountryById(
-        eq(searchId),
-        any(CountryProjectionRoot.class),
+    when(countryApi.findCountryByIsoCode(
+        eq(searchIsoCode),
+        any(CountryV2ProjectionRoot.class),
         any(RequestPurpose.class)))
         .thenReturn(Optional.of(country));
 
-    var returnedCountry = countryService.findCountryById(searchId, searchPurpose);
+    var returnedCountry = countryService.findCountryByIsoCode(searchIsoCode, searchPurpose);
 
-    verify(countryApi).findCountryById(
-        eq(searchId),
+    verify(countryApi).findCountryByIsoCode(
+        eq(searchIsoCode),
         countryProjectionRootArgumentCaptor.capture(),
         requestPurposeArgumentCaptor.capture());
 
     assertThat(returnedCountry).contains(country);
     assertThat(requestPurposeArgumentCaptor.getValue().purpose()).isEqualTo(searchPurpose);
     assertThat(countryProjectionRootArgumentCaptor.getValue().getFields()).containsExactly(
-        entry("countryId", null),
-        entry("countryName", null)
+        entry("isoCode", null),
+        entry("name", null)
     );
   }
 
   @Test
   void doesCountryExist_NotExists_AssertFalse() {
-    var searchId = 0;
+    var searchIsoCode = "GB";
     var searchPurpose = "Verify country exists for SCAP";
-    var countryProjectionRootArgumentCaptor = ArgumentCaptor.forClass(CountryProjectionRoot.class);
+    var countryProjectionRootArgumentCaptor = ArgumentCaptor.forClass(CountryV2ProjectionRoot.class);
     var requestPurposeArgumentCaptor = ArgumentCaptor.forClass(RequestPurpose.class);
 
-    when(countryApi.findCountryById(
-        eq(searchId),
-        any(CountryProjectionRoot.class),
+    when(countryApi.findCountryByIsoCode(
+        eq(searchIsoCode),
+        any(CountryV2ProjectionRoot.class),
         any(RequestPurpose.class)))
         .thenReturn(Optional.empty());
 
-    var doesCountryExist = countryService.doesCountryExist(searchId);
+    var doesCountryExist = countryService.doesCountryExist(searchIsoCode);
 
-    verify(countryApi).findCountryById(
-        eq(searchId),
+    verify(countryApi).findCountryByIsoCode(
+        eq(searchIsoCode),
         countryProjectionRootArgumentCaptor.capture(),
         requestPurposeArgumentCaptor.capture());
 
     assertFalse(doesCountryExist);
     assertThat(requestPurposeArgumentCaptor.getValue().purpose()).isEqualTo(searchPurpose);
     assertThat(countryProjectionRootArgumentCaptor.getValue().getFields()).containsExactly(
-        entry("countryId", null),
-        entry("countryName", null)
+        entry("isoCode", null),
+        entry("name", null)
     );
   }
 
   @Test
   void doesCountryExist_DoesExist_AssertTrue() {
-    var searchId = 0;
+    var searchIsoCode = "GB";
     var searchPurpose = "Verify country exists for SCAP";
-    var country = new Country(0, "United Kingdom", null, null);
-    var countryProjectionRootArgumentCaptor = ArgumentCaptor.forClass(CountryProjectionRoot.class);
+    var country = new CountryV2("United Kingdom", searchIsoCode);
+    var countryProjectionRootArgumentCaptor = ArgumentCaptor.forClass(CountryV2ProjectionRoot.class);
     var requestPurposeArgumentCaptor = ArgumentCaptor.forClass(RequestPurpose.class);
 
-    when(countryApi.findCountryById(
-        eq(searchId),
-        any(CountryProjectionRoot.class),
+    when(countryApi.findCountryByIsoCode(
+        eq(searchIsoCode),
+        any(CountryV2ProjectionRoot.class),
         any(RequestPurpose.class)))
         .thenReturn(Optional.of(country));
 
-    var doesCountryExist = countryService.doesCountryExist(searchId);
+    var doesCountryExist = countryService.doesCountryExist(searchIsoCode);
 
-    verify(countryApi).findCountryById(
-        eq(searchId),
+    verify(countryApi).findCountryByIsoCode(
+        eq(searchIsoCode),
         countryProjectionRootArgumentCaptor.capture(),
         requestPurposeArgumentCaptor.capture());
 
     assertTrue(doesCountryExist);
     assertThat(requestPurposeArgumentCaptor.getValue().purpose()).isEqualTo(searchPurpose);
     assertThat(countryProjectionRootArgumentCaptor.getValue().getFields()).containsExactly(
-        entry("countryId", null),
-        entry("countryName", null)
+        entry("isoCode", null),
+        entry("name", null)
     );
   }
 
   @Test
-  void findCountriesByIds() {
+  void findCountriesByIsoCode() {
     var purpose = "test request purpose";
     var countries = List.of(
-        new Country(0, "United Kingdom", PortalCountryStatus.ACTIVE, PortalCountrySet.EXPORT_CONTROL),
-        new Country(27, "Bahrain", PortalCountryStatus.ACTIVE, PortalCountrySet.EXPORT_CONTROL)
+        new CountryV2("United Kingdom", "GB"),
+        new CountryV2("Bahrain", "BHR")
     );
-    var countryIds = List.of(countries.get(0).getCountryId(), countries.get(1).getCountryId());
-    var requestedFieldsArgumentCaptor = ArgumentCaptor.forClass(CountriesProjectionRoot.class);
+    var countryIsoCodes = List.of(countries.get(0).getIsoCode(), countries.get(1).getIsoCode());
+    var requestedFieldsArgumentCaptor = ArgumentCaptor.forClass(CountriesV2ProjectionRoot.class);
     var requestPurposeArgumentCaptor = ArgumentCaptor.forClass(RequestPurpose.class);
 
-    when(countryApi.getAllCountriesByIds(
-        eq(countryIds), any(CountriesProjectionRoot.class), any(RequestPurpose.class)))
+    when(countryApi.getAllCountriesByIsoCodesIn(
+        eq(countryIsoCodes), any(CountriesV2ProjectionRoot.class), any(RequestPurpose.class)))
         .thenReturn(countries);
 
-    var returnedCountries = countryService.getCountriesByIds(countryIds, purpose);
+    var returnedCountries = countryService.getCountriesByIsoCodes(countryIsoCodes, purpose);
 
-    verify(countryApi).getAllCountriesByIds(
-        eq(countryIds),
+    verify(countryApi).getAllCountriesByIsoCodesIn(
+        eq(countryIsoCodes),
         requestedFieldsArgumentCaptor.capture(),
         requestPurposeArgumentCaptor.capture());
 
     assertThat(returnedCountries).isEqualTo(countries);
     assertThat(requestedFieldsArgumentCaptor.getValue().getFields()).containsExactly(
-        entry("countryId", null),
-        entry("countryName", null)
+        entry("isoCode", null),
+        entry("name", null)
     );
     assertThat(requestPurposeArgumentCaptor.getValue().purpose()).isEqualTo(purpose);
   }
@@ -187,8 +185,8 @@ class CountryServiceTest {
   @Test
   void getCountrySearchResults() {
     var countries = List.of(
-        new Country(1, "country 1", null, null),
-        new Country(2, "country 2", null, null)
+        new CountryV2("country 2", "2"),
+        new CountryV2("country 1", "1")
     );
 
     var countriesSearchResult = countryService.getCountrySearchResults(countries);
@@ -197,8 +195,8 @@ class CountryServiceTest {
         RestSearchItem::id,
         RestSearchItem::text
     ).containsExactly(
-        tuple(countries.get(0).getCountryId().toString(), countries.get(0).getCountryName()),
-        tuple(countries.get(1).getCountryId().toString(), countries.get(1).getCountryName())
+        tuple(countries.get(0).getIsoCode(), countries.get(0).getName()),
+        tuple(countries.get(1).getIsoCode(), countries.get(1).getName())
     );
   }
 }

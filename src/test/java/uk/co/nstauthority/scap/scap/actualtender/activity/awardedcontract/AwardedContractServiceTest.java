@@ -73,7 +73,7 @@ class AwardedContractServiceTest {
     form.setPreferredBidderId(bidParticipants.get(0).getId());
     form.setAwardValue("1.23");
     form.setAwardRationale("Test award rationale");
-    form.setPreferredBidderCountryId(0);
+    form.setPreferredBidderCountryIsoCode("0");
     form.setContractAwardDate(contractAwardDate);
     form.setContractStartDate(contractStartDate);
     form.setContractEndDate(contractEndDate);
@@ -93,7 +93,7 @@ class AwardedContractServiceTest {
         AwardedContract::getPreferredBidder,
         AwardedContract::getAwardValue,
         AwardedContract::getAwardRationale,
-        AwardedContract::getPreferredBidderCountryId,
+        AwardedContract::getPreferredBidderCountryIsoCode,
         AwardedContract::getContractAwardDate,
         AwardedContract::getPaymentTerms,
         AwardedContract::getForecastExecutionStartDate,
@@ -103,7 +103,7 @@ class AwardedContractServiceTest {
         bidParticipants.get(0),
         form.getAwardValue().getAsBigDecimal().get(),
         form.getAwardRationale().getInputValue(),
-        form.getPreferredBidderCountryId(),
+        form.getPreferredBidderCountryIsoCode(),
         contractAwardDate,
         otherPaymentTerm,
         contractStartDate,
@@ -121,7 +121,7 @@ class AwardedContractServiceTest {
     form.setPreferredBidderId(bidParticipants.get(0).getId());
     form.setAwardValue("1.23");
     form.setAwardRationale("Test award rationale");
-    form.setPreferredBidderCountryId(0);
+    form.setPreferredBidderCountryIsoCode("0");
     form.setContractAwardDate(contractAwardDate);
     form.setPaymentTermsRadio(paymentTerms);
     form.setContractStartDate(contractStartDate);
@@ -139,7 +139,7 @@ class AwardedContractServiceTest {
         AwardedContract::getPreferredBidder,
         AwardedContract::getAwardValue,
         AwardedContract::getAwardRationale,
-        AwardedContract::getPreferredBidderCountryId,
+        AwardedContract::getPreferredBidderCountryIsoCode,
         AwardedContract::getCreatedTimestamp,
         AwardedContract::getContractAwardDate,
         AwardedContract::getPaymentTerms,
@@ -149,7 +149,7 @@ class AwardedContractServiceTest {
         bidParticipants.get(0),
         form.getAwardValue().getAsBigDecimal().get(),
         form.getAwardRationale().getInputValue(),
-        form.getPreferredBidderCountryId(),
+        form.getPreferredBidderCountryIsoCode(),
         clock.instant(),
         contractAwardDate,
         paymentTerms.getPaymentTerm(),

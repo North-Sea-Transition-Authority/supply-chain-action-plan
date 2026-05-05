@@ -33,7 +33,8 @@ class ContractingPerformanceSummaryDtoRepository {
         "SELECT new uk.co.nstauthority.scap.scap.summary.contractingperformance.ContractingPerformanceSummaryDto(" +
             "cp.id, ata.scopeTitle, ata.scopeDescription, ac.awardValue, ata.remunerationModel, " +
             "ata.remunerationModelName, " +
-            "ittp.companyName, ac.preferredBidderCountryId, cp.outturnCost, cp.outturnRationale) " +
+            "ittp.companyName, " +
+            "ac.preferredBidderCountryIsoCode,cp.outturnCost, " + "cp.outturnRationale) " +
             "FROM Scap s " +
             "JOIN ScapDetail sd ON sd.scap = s AND sd.status = :status " +
             "JOIN ContractingPerformanceOverview cpo ON cpo.scapDetail = sd " +

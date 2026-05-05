@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
-import uk.co.fivium.energyportalapi.generated.types.Country;
+import uk.co.fivium.energyportalapi.generated.types.CountryV2;
 import uk.co.fivium.formlibrary.validator.date.DateUtils;
 import uk.co.nstauthority.scap.energyportal.CountryService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
@@ -58,7 +58,7 @@ public class ActualTenderSummaryViewService {
     var awardedContracts = awardedContractService.getByActualTenderActivityIn(activities);
     var awardedContractsMap = getAwardedContractsMap(awardedContracts);
 
-    var countries = countryService.getCountriesByIds(getCountryIds(awardedContracts), REQUEST_PURPOSE);
+    var countries = countryService.getCountriesByIsoCodes(getCountryIsoCodes(awardedContracts), REQUEST_PURPOSE);
     var countriesMap = getCountriesMap(countries);
 
     return activities.stream()
@@ -72,7 +72,7 @@ public class ActualTenderSummaryViewService {
                   getCompanyName(awardedContract.getPreferredBidder()),
                   awardedContract.getAwardValue(),
                   awardedContract.getAwardRationale(),
-                  countriesMap.getOrDefault(awardedContract.getPreferredBidderCountryId(), ""),
+                  countriesMap.getOrDefault(awardedContract.getPreferredBidderCountryIsoCode(), ""),
                   DateUtils.format(awardedContract.getContractAwardDate()),
                   awardedContract.getPaymentTerms(),
                   DateUtils.format(awardedContract.getForecastExecutionStartDate()),
@@ -130,17 +130,17 @@ public class ActualTenderSummaryViewService {
         );
   }
 
-  private List<Integer> getCountryIds(List<AwardedContract> awardedContracts) {
+  private List<String> getCountryIsoCodes(List<AwardedContract> awardedContracts) {
     return awardedContracts.stream()
-        .map(AwardedContract::getPreferredBidderCountryId)
+        .map(AwardedContract::getPreferredBidderCountryIsoCode)
         .toList();
   }
 
-  private Map<Integer, String> getCountriesMap(List<Country> countries) {
+  private Map<String, String> getCountriesMap(List<CountryV2> countries) {
     return countries.stream()
         .collect(Collectors.toMap(
-            Country::getCountryId,
-            Country::getCountryName
+            CountryV2::getIsoCode,
+            CountryV2::getName
         ));
   }
 

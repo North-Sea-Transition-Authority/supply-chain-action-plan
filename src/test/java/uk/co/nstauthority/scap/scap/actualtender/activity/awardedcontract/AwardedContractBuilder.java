@@ -13,7 +13,7 @@ public class AwardedContractBuilder {
   private InvitationToTenderParticipant preferredBidder;
   private BigDecimal awardValue = BigDecimal.valueOf(1.1);
   private String awardRationale = "Test award rationale";
-  private Integer preferredBidderCountryId = 0;
+  private String preferredBidderCountryIsoCode = "GB";
   private Instant createdTimestamp = Instant.now();
   private LocalDate contractAwardDate = LocalDate.of(2000, 1, 1);
   private Integer paymentTerms = 30;
@@ -45,8 +45,8 @@ public class AwardedContractBuilder {
     return this;
   }
 
-  public AwardedContractBuilder withPreferredBidderCountryId(Integer preferredBidderCountryId) {
-    this.preferredBidderCountryId = preferredBidderCountryId;
+  public AwardedContractBuilder withPreferredBidderCountryIsoCode(String preferredBidderCountryIsoCode) {
+    this.preferredBidderCountryIsoCode = preferredBidderCountryIsoCode;
     return this;
   }
 
@@ -81,7 +81,7 @@ public class AwardedContractBuilder {
     awardedContract.setPreferredBidder(preferredBidder);
     awardedContract.setAwardValue(awardValue);
     awardedContract.setAwardRationale(awardRationale);
-    awardedContract.setPreferredBidderCountryId(preferredBidderCountryId);
+    awardedContract.setPreferredBidderCountryIsoCode(preferredBidderCountryIsoCode);
     awardedContract.setCreatedTimestamp(createdTimestamp);
     awardedContract.setContractAwardDate(contractAwardDate);
     awardedContract.setPaymentTerms(paymentTerms);

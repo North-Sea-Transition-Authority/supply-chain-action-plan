@@ -10,10 +10,7 @@ public record ContractingPerformanceSummaryDto(Integer contractingPerformanceId,
                                                RemunerationModel remunerationModel,
                                                String remunerationModelName,
                                                String contractor,
-                                               Integer countryId,
+                                               String countryIsoCode,
                                                BigDecimal outturnCost,
                                                String outturnRationale) {
-
-
-
 }

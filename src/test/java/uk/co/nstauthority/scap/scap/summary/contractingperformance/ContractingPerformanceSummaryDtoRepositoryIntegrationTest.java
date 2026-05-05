@@ -97,11 +97,11 @@ class ContractingPerformanceSummaryDtoRepositoryIntegrationTest extends Abstract
 
     awardedContract1 = new AwardedContract(actualTenderActivity1, Instant.now());
     awardedContract1.setAwardValue(BigDecimal.valueOf(58.03));
-    awardedContract1.setPreferredBidderCountryId(0);
+    awardedContract1.setPreferredBidderCountryIsoCode("0");
     awardedContract1.setPreferredBidder(contractor1);
     awardedContract2 = new AwardedContract(actualTenderActivity2, Instant.now());
     awardedContract2.setAwardValue(BigDecimal.valueOf(58.31));
-    awardedContract2.setPreferredBidderCountryId(1);
+    awardedContract2.setPreferredBidderCountryIsoCode("1");
     awardedContract2.setPreferredBidder(contractor2);
     var otherAwardedContract = new AwardedContract(otherActualTenderActivity, Instant.now());
 
@@ -139,7 +139,7 @@ class ContractingPerformanceSummaryDtoRepositoryIntegrationTest extends Abstract
         ContractingPerformanceSummaryDto::remunerationModel,
         ContractingPerformanceSummaryDto::remunerationModelName,
         ContractingPerformanceSummaryDto::contractor,
-        ContractingPerformanceSummaryDto::countryId,
+        ContractingPerformanceSummaryDto::countryIsoCode,
         ContractingPerformanceSummaryDto::outturnCost,
         ContractingPerformanceSummaryDto::outturnRationale
     ).containsExactly(
@@ -151,7 +151,7 @@ class ContractingPerformanceSummaryDtoRepositoryIntegrationTest extends Abstract
             actualTenderActivity1.getRemunerationModel(),
             actualTenderActivity1.getRemunerationModelName(),
             contractor1.getCompanyName(),
-            awardedContract1.getPreferredBidderCountryId(),
+            awardedContract1.getPreferredBidderCountryIsoCode(),
             contractingPerformance1.getOutturnCost(),
             contractingPerformance1.getOutturnRationale()
         ),
@@ -163,7 +163,7 @@ class ContractingPerformanceSummaryDtoRepositoryIntegrationTest extends Abstract
             actualTenderActivity2.getRemunerationModel(),
             actualTenderActivity2.getRemunerationModelName(),
             contractor2.getCompanyName(),
-            awardedContract2.getPreferredBidderCountryId(),
+            awardedContract2.getPreferredBidderCountryIsoCode(),
             contractingPerformance2.getOutturnCost(),
             contractingPerformance2.getOutturnRationale()
         )
@@ -185,7 +185,7 @@ class ContractingPerformanceSummaryDtoRepositoryIntegrationTest extends Abstract
         ContractingPerformanceSummaryDto::remunerationModel,
         ContractingPerformanceSummaryDto::remunerationModelName,
         ContractingPerformanceSummaryDto::contractor,
-        ContractingPerformanceSummaryDto::countryId,
+        ContractingPerformanceSummaryDto::countryIsoCode,
         ContractingPerformanceSummaryDto::outturnCost,
         ContractingPerformanceSummaryDto::outturnRationale
     ).containsExactly(
@@ -196,7 +196,7 @@ class ContractingPerformanceSummaryDtoRepositoryIntegrationTest extends Abstract
         actualTenderActivity1.getRemunerationModel(),
         actualTenderActivity1.getRemunerationModelName(),
         contractor1.getCompanyName(),
-        awardedContract1.getPreferredBidderCountryId(),
+        awardedContract1.getPreferredBidderCountryIsoCode(),
         contractingPerformance1.getOutturnCost(),
         contractingPerformance1.getOutturnRationale()
     );

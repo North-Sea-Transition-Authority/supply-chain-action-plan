@@ -49,7 +49,7 @@ public class AwardedContractService {
     awardedContract.setPreferredBidder(preferredBidder);
     awardedContract.setAwardValue(awardValue);
     awardedContract.setAwardRationale(form.getAwardRationale().getInputValue());
-    awardedContract.setPreferredBidderCountryId(form.getPreferredBidderCountryId());
+    awardedContract.setPreferredBidderCountryIsoCode(form.getPreferredBidderCountryIsoCode());
     awardedContract.setContractAwardDate(contractAwardDate);
     if (PaymentTermsRadio.OTHER.equals(form.getPaymentTermsRadio())) {
       var paymentTerms = form.getOtherPaymentTerm().getAsInteger()

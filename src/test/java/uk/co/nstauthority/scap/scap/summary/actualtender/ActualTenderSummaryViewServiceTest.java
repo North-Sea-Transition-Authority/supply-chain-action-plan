@@ -14,7 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.co.fivium.energyportalapi.generated.types.Country;
+import uk.co.fivium.energyportalapi.generated.types.CountryV2;
 import uk.co.nstauthority.scap.energyportal.CountryService;
 import uk.co.nstauthority.scap.scap.RemunerationModel;
 import uk.co.nstauthority.scap.scap.actualtender.activity.ActualTenderActivity;
@@ -184,12 +184,12 @@ class ActualTenderSummaryViewServiceTest {
     participant5.setCompanyName("company name 5");
     participant5.setActualTenderActivity(actualTenderActivity3);
     participant5.setOrganisationUnitId(55);
-    var country = new Country(0, "United Kingdom", null, null);
+    var country = new CountryV2("United Kingdom", "GB");
     var awardedContract = new AwardedContract(actualTenderActivity3, Instant.now());
     awardedContract.setPreferredBidder(participant4);
     awardedContract.setAwardValue(BigDecimal.valueOf(1.2));
     awardedContract.setAwardRationale("award rationale");
-    awardedContract.setPreferredBidderCountryId(country.getCountryId());
+    awardedContract.setPreferredBidderCountryIsoCode(country.getIsoCode());
 
     var actualTenderActivities = List.of(
         actualTenderActivity1, actualTenderActivity2, actualTenderActivity3
@@ -202,7 +202,7 @@ class ActualTenderSummaryViewServiceTest {
         .thenReturn(participants);
     when(awardedContractService.getByActualTenderActivityIn(actualTenderActivities))
         .thenReturn(List.of(awardedContract));
-    when(countryService.getCountriesByIds(List.of(country.getCountryId()), ActualTenderSummaryViewService.REQUEST_PURPOSE))
+    when(countryService.getCountriesByIsoCodes(List.of(country.getIsoCode()), ActualTenderSummaryViewService.REQUEST_PURPOSE))
         .thenReturn(List.of(country));
 
     var returnedViews = actualTenderSummaryViewService
@@ -265,7 +265,7 @@ class ActualTenderSummaryViewServiceTest {
           awardedContract.getPreferredBidder().getCompanyName(),
           awardedContract.getAwardValue(),
           awardedContract.getAwardRationale(),
-          country.getCountryName()
+          country.getName()
     );
   }
 

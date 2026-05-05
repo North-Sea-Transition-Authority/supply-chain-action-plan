@@ -15,7 +15,7 @@ public class AwardedContractForm {
   private Integer preferredBidderId;
   private final DecimalInput awardValue;
   private final StringInput awardRationale;
-  private Integer preferredBidderCountryId;
+  private String preferredBidderCountryIsoCode;
   private final ThreeFieldDateInput contractAwardDate;
   private PaymentTermsRadio paymentTermsRadio;
   private final IntegerInput otherPaymentTerm;
@@ -55,12 +55,12 @@ public class AwardedContractForm {
     this.awardRationale.setInputValue(awardRationale);
   }
 
-  public Integer getPreferredBidderCountryId() {
-    return preferredBidderCountryId;
+  public String getPreferredBidderCountryIsoCode() {
+    return preferredBidderCountryIsoCode;
   }
 
-  public void setPreferredBidderCountryId(Integer preferredBidderCountryId) {
-    this.preferredBidderCountryId = preferredBidderCountryId;
+  public void setPreferredBidderCountryIsoCode(String preferredBidderCountryIsoCode) {
+    this.preferredBidderCountryIsoCode = preferredBidderCountryIsoCode;
   }
 
   public ThreeFieldDateInput getContractAwardDate() {

@@ -14,7 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import uk.co.fivium.energyportalapi.generated.types.Country;
+import uk.co.fivium.energyportalapi.generated.types.CountryV2;
 import uk.co.nstauthority.scap.AbstractControllerTest;
 import uk.co.nstauthority.scap.energyportal.CountryService;
 import uk.co.nstauthority.scap.fds.searchselector.RestSearchItem;
@@ -33,12 +33,12 @@ class AwardedContractRestControllerTest extends AbstractControllerTest {
   void getCountrySearchResults() throws Exception {
     var searchTerm = "United Kingdom";
     var countries = List.of(
-        new Country(0, "United Kingdom", null, null),
-        new Country(68, "Continental Shelf United Kingdom Sector", null, null)
+        new CountryV2("United Kingdom", "GB"),
+        new CountryV2("Continental Shelf United Kingdom Sector", "UST")
     );
     var countriesSearchResult = new RestSearchResult(List.of(
-        new RestSearchItem(countries.get(0).getCountryId().toString(), countries.get(0).getCountryName()),
-        new RestSearchItem(countries.get(1).getCountryId().toString(), countries.get(1).getCountryName())
+        new RestSearchItem(countries.get(0).getIsoCode(), countries.get(0).getName()),
+        new RestSearchItem(countries.get(1).getIsoCode(), countries.get(1).getName())
     ));
 
     when(countryService.searchCountries(searchTerm, AwardedContractRestController.SEARCH_PURPOSE))
@@ -50,7 +50,7 @@ class AwardedContractRestControllerTest extends AbstractControllerTest {
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(content().json("""
-      {"results":[{"id":"0","text":"United Kingdom"},{"id":"68","text":"Continental Shelf United Kingdom Sector"}]}
+      {"results":[{"id":"GB","text":"United Kingdom"},{"id":"UST","text":"Continental Shelf United Kingdom Sector"}]}
 """));
   }
 }

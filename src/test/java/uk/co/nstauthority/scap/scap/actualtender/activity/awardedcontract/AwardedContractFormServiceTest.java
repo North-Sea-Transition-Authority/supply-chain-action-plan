@@ -23,7 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
-import uk.co.fivium.energyportalapi.generated.types.Country;
+import uk.co.fivium.energyportalapi.generated.types.CountryV2;
 import uk.co.nstauthority.scap.energyportal.CountryService;
 import uk.co.nstauthority.scap.scap.actualtender.activity.InvitationToTenderParticipant;
 
@@ -70,14 +70,14 @@ class AwardedContractFormServiceTest {
       String expectFormOtherPaymentTerm) {
     var awardedContract = new AwardedContract(141);
     var preferredBidderId = 1141;
-    var preferredBidderLocation = 2141;
+    var preferredBidderLocation = "USA";
     var awardValue = BigDecimal.valueOf(3.14);
     var awardRationale = "Test award rationale";
     var awardDate = LocalDate.of(2000, 1, 1);
     awardedContract.setPreferredBidder(new InvitationToTenderParticipant(preferredBidderId));
     awardedContract.setAwardValue(awardValue);
     awardedContract.setAwardRationale(awardRationale);
-    awardedContract.setPreferredBidderCountryId(preferredBidderLocation);
+    awardedContract.setPreferredBidderCountryIsoCode(preferredBidderLocation);
     awardedContract.setContractAwardDate(awardDate);
     awardedContract.setPaymentTerms(awardedContractPaymentTerms);
     awardedContract.setForecastExecutionStartDate(LocalDate.of(2000, 2, 1));
@@ -89,7 +89,7 @@ class AwardedContractFormServiceTest {
         AwardedContractForm::getPreferredBidderId,
         actualForm -> actualForm.getAwardValue().getInputValue(),
         actualForm -> actualForm.getAwardRationale().getInputValue(),
-        AwardedContractForm::getPreferredBidderCountryId,
+        AwardedContractForm::getPreferredBidderCountryIsoCode,
         actualForm -> actualForm.getContractAwardDate().getAsLocalDate(),
         AwardedContractForm::getPaymentTermsRadio,
         actualForm -> actualForm.getOtherPaymentTerm().getInputValue(),
@@ -129,41 +129,42 @@ class AwardedContractFormServiceTest {
 
   @Test
   void getPreselectedBidderLocation_NonExistentCountry_AssertEmpty() {
-    var countryId = 9999;
+    var countryIsoCode = "GB";
 
-    when(countryService.findCountryById(countryId, AwardedContractFormService.PRESELECTED_LOCATION_REQUEST_PURPOSE))
+    when(countryService.findCountryByIsoCode(countryIsoCode, AwardedContractFormService.PRESELECTED_LOCATION_REQUEST_PURPOSE))
         .thenReturn(Optional.empty());
 
-    var returnedCountry = awardedContractFormService.getPreselectedBidderLocation(countryId);
+    var returnedCountry = awardedContractFormService.getPreselectedBidderLocation(countryIsoCode);
 
     assertThat(returnedCountry).isEmpty();
   }
 
   @Test
   void getPreselectedBidderLocation() {
-    var countryId = 0;
-    var country = new Country(countryId, "United Kingdom", null, null);
+    var countryIsoCode = "UAE";
 
-    when(countryService.findCountryById(countryId, AwardedContractFormService.PRESELECTED_LOCATION_REQUEST_PURPOSE))
+    var country = new CountryV2("United Kingdom", countryIsoCode);
+
+    when(countryService.findCountryByIsoCode(countryIsoCode, AwardedContractFormService.PRESELECTED_LOCATION_REQUEST_PURPOSE))
         .thenReturn(Optional.of(country));
 
-    var returnedCountry = awardedContractFormService.getPreselectedBidderLocation(countryId);
+    var returnedCountry = awardedContractFormService.getPreselectedBidderLocation(countryIsoCode);
 
     assertThat(returnedCountry).contains(
-        Map.of(String.valueOf(countryId), country.getCountryName())
+        Map.of(countryIsoCode, country.getName())
     );
   }
 
   @Test
   void getPreselectedBidderLocationFromForm_HasErrors_AssertEmpty() {
-    var countryId = 0;
+    var countryIsoCode = "TR";
     var bindingResultWithErrors = new BeanPropertyBindingResult(new AwardedContractForm(), "form");
     bindingResultWithErrors.addError(
         new FieldError("form", AwardedContractFormValidator.BIDDER_LOCATION_FIELD, "Test message")
     );
 
     var returnedCountry = awardedContractFormService
-        .getPreselectedBidderLocationFromForm(countryId, bindingResultWithErrors);
+        .getPreselectedBidderLocationFromForm(countryIsoCode, bindingResultWithErrors);
 
     assertThat(returnedCountry).isEmpty();
 
@@ -172,18 +173,18 @@ class AwardedContractFormServiceTest {
 
   @Test
   void getPreselectedBidderLocationFromForm_NoErrors() {
-    var countryId = 0;
-    var country = new Country(countryId, "United Kingdom", null, null);
+    var countryIsoCode = "GB";
+    var country = new CountryV2("United Kingdom", countryIsoCode);
     var bindingResultWithoutErrors = new BeanPropertyBindingResult(new AwardedContractForm(), "form");
 
-    when(countryService.findCountryById(countryId, AwardedContractFormService.PRESELECTED_LOCATION_REQUEST_PURPOSE))
+    when(countryService.findCountryByIsoCode(countryIsoCode, AwardedContractFormService.PRESELECTED_LOCATION_REQUEST_PURPOSE))
         .thenReturn(Optional.of(country));
 
     var returnedCountry = awardedContractFormService
-        .getPreselectedBidderLocationFromForm(countryId, bindingResultWithoutErrors);
+        .getPreselectedBidderLocationFromForm(countryIsoCode, bindingResultWithoutErrors);
 
     assertThat(returnedCountry).contains(
-        Map.of(String.valueOf(countryId), country.getCountryName())
+        Map.of(countryIsoCode, country.getName())
     );
   }
 }

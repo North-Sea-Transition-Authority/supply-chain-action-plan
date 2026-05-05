@@ -95,10 +95,10 @@ class AwardedContractControllerTest extends AbstractScapSubmitterControllerTest 
   @Test
   void renderAwardedContractForm_ExistingAwardedContract() throws Exception {
     var existingAwardedContract = new AwardedContract(3141);
-    var countryId = 4141;
-    existingAwardedContract.setPreferredBidderCountryId(countryId);
+    var countryIsoCode = "GB";
+    existingAwardedContract.setPreferredBidderCountryIsoCode(countryIsoCode);
     var form = new AwardedContractForm();
-    var preselectedCountry = Map.of(String.valueOf(countryId), "Test Country");
+    var preselectedCountry = Map.of(countryIsoCode, "Test Country");
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
@@ -106,7 +106,7 @@ class AwardedContractControllerTest extends AbstractScapSubmitterControllerTest 
     when(awardedContractService.getByActualTenderActivity(actualTenderActivity))
         .thenReturn(Optional.of(existingAwardedContract));
     when(awardedContractFormService.getForm(existingAwardedContract)).thenReturn(form);
-    when(awardedContractFormService.getPreselectedBidderLocation(countryId))
+    when(awardedContractFormService.getPreselectedBidderLocation(countryIsoCode))
         .thenReturn(Optional.of(preselectedCountry));
 
     mockMvc.perform(get(
@@ -127,19 +127,19 @@ class AwardedContractControllerTest extends AbstractScapSubmitterControllerTest 
   @Test
   void saveAwardedContractForm_HasErrors_VerifyNeverSaves() throws Exception {
     var form = new AwardedContractForm();
-    form.setPreferredBidderCountryId(0);
+    form.setPreferredBidderCountryIsoCode("GB");
     var bindingResultWithErrors = new BeanPropertyBindingResult(form, "form");
     bindingResultWithErrors.addError(new FieldError(
         "form", "testFieldName", "Test error message"
     ));
-    var preselectedCountry = Map.of(String.valueOf(form.getPreferredBidderCountryId()), "United Kingdom");
+    var preselectedCountry = Map.of(String.valueOf(form.getPreferredBidderCountryIsoCode()), "United Kingdom");
 
     when(scapService.getScapById(scap.getId())).thenReturn(scap);
     when(actualTenderActivityService.getById(actualTenderActivity.getId())).thenReturn(actualTenderActivity);
     when(invitationToTenderParticipantService.getBidParticipants(actualTenderActivity)).thenReturn(bidParticipants);
     when(awardedContractFormService.validate(eq(form), any(BindingResult.class), eq(bidParticipants)))
         .thenReturn(bindingResultWithErrors);
-    when(awardedContractFormService.getPreselectedBidderLocationFromForm(form.getPreferredBidderCountryId(), bindingResultWithErrors))
+    when(awardedContractFormService.getPreselectedBidderLocationFromForm(form.getPreferredBidderCountryIsoCode(), bindingResultWithErrors))
         .thenReturn(Optional.of(preselectedCountry));
 
     mockMvc.perform(post(
