@@ -1,8 +1,6 @@
 package uk.co.nstauthority.scap.energyportal.user;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 import uk.co.nstauthority.scap.energyportal.organisationgroup.OrganisationGroupDto;
 import uk.co.nstauthority.scap.energyportal.organisationgroup.OrganisationGroupQueryService;
@@ -19,17 +17,15 @@ public class AllowedDomainService {
   }
 
   public boolean isAllowedDomain(String userEmail, Team team) {
-    Optional<OrganisationGroupDto> group;
-    switch (team.getTeamType()) {
-      case TeamType.INDUSTRY -> group = organisationGroupQueryService
+    var group = switch (team.getTeamType()) {
+      case TeamType.INDUSTRY -> organisationGroupQueryService
           .getOrganisationGroupById(team.getEnergyPortalOrgGroupId());
-      case TeamType.REGULATOR -> group = organisationGroupQueryService.getRegulatorOrganisationGroup();
-      default -> throw new IllegalStateException("Unexpected value: " + team.getTeamType());
-    }
+      case TeamType.REGULATOR -> organisationGroupQueryService.getRegulatorOrganisationGroup();
+    };
 
-    List<String> emailDomains = group.map(OrganisationGroupDto::emailDomains).orElseGet(ArrayList::new);
-    return emailDomains.stream()
+    var lowerEmail = userEmail.toLowerCase();
+    return group.map(OrganisationGroupDto::emailDomains).orElse(List.of()).stream()
         .map(String::toLowerCase)
-        .anyMatch(domain -> userEmail.toLowerCase().endsWith('@' + domain));
+        .anyMatch(domain -> lowerEmail.endsWith("@" + domain));
   }
 }
