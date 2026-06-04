@@ -18,7 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.fivium.energyportal.starter.accounts.EnergyPortalServiceAccessService;
-import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderUserRolesService;
+import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalAccountsMessagePublishingService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.TeamTestUtil;
 
@@ -29,7 +29,7 @@ class TeamMemberRoleServiceTest {
   private TeamMemberRoleRepository teamMemberRoleRepository;
 
   @Mock
-  private EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService;
+  private EnergyPortalAccountsMessagePublishingService energyPortalAccountsMessagePublishingService;
 
   @Mock
   private TeamMemberService teamMemberService;
@@ -60,7 +60,7 @@ class TeamMemberRoleServiceTest {
         .extracting(TeamMemberRole::getTeam, TeamMemberRole::getWuaId, TeamMemberRole::getRole)
         .containsExactly(tuple(team, wuaId, role));
     verify(energyPortalServiceAccessService).addUser(wuaId);
-    verify(energyPortalServiceProviderUserRolesService).publishUsersRolesForTeam(
+    verify(energyPortalAccountsMessagePublishingService).publishUsersRolesForTeam(
         wuaId,
         team.getUuid().toString(),
         team.getTeamType().name(),
@@ -93,7 +93,7 @@ class TeamMemberRoleServiceTest {
 
     verify(energyPortalServiceAccessService).addUser(wuaId);
     verify(teamMemberRoleRepository).deleteAllByTeamAndWuaId(team, wuaId);
-    verify(energyPortalServiceProviderUserRolesService).publishUsersRolesForTeam(
+    verify(energyPortalAccountsMessagePublishingService).publishUsersRolesForTeam(
         wuaId,
         team.getUuid().toString(),
         team.getTeamType().name(),
@@ -125,7 +125,7 @@ class TeamMemberRoleServiceTest {
 
     verifyNoInteractions(energyPortalServiceAccessService);
     verify(teamMemberRoleRepository).deleteAllByTeamAndWuaId(team, wuaId);
-    verify(energyPortalServiceProviderUserRolesService).publishUsersRolesForTeam(
+    verify(energyPortalAccountsMessagePublishingService).publishUsersRolesForTeam(
         wuaId,
         team.getUuid().toString(),
         team.getTeamType().name(),
@@ -150,7 +150,7 @@ class TeamMemberRoleServiceTest {
     verify(teamMemberRoleRepository).deleteAllByTeam(team);
     verify(energyPortalServiceAccessService, times(1)).removeUser(anyLong());
     verify(energyPortalServiceAccessService).removeUser(2L);
-    verify(energyPortalServiceProviderUserRolesService).publishRemoveUserFromTeam(
+    verify(energyPortalAccountsMessagePublishingService).publishRemoveUserFromTeam(
         2L,
         team.getUuid().toString()
     );

@@ -7,26 +7,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.co.fivium.energyportal.starter.accounts.EnergyPortalServiceAccessService;
-import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderUserRolesService;
+import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalAccountsMessagePublishingService;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 
 @Service
 public class TeamMemberRoleService {
 
   private final TeamMemberRoleRepository teamMemberRoleRepository;
-  private final EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService;
+  private final EnergyPortalAccountsMessagePublishingService energyPortalAccountsMessagePublishingService;
   private final TeamMemberService teamMemberService;
   private final EnergyPortalServiceAccessService energyPortalServiceAccessService;
 
   @Autowired
   public TeamMemberRoleService(
       TeamMemberRoleRepository teamMemberRoleRepository,
-      EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService,
+      EnergyPortalAccountsMessagePublishingService energyPortalAccountsMessagePublishingService,
       TeamMemberService teamMemberService,
       EnergyPortalServiceAccessService energyPortalServiceAccessService
   ) {
     this.teamMemberRoleRepository = teamMemberRoleRepository;
-    this.energyPortalServiceProviderUserRolesService = energyPortalServiceProviderUserRolesService;
+    this.energyPortalAccountsMessagePublishingService = energyPortalAccountsMessagePublishingService;
     this.teamMemberService = teamMemberService;
     this.energyPortalServiceAccessService = energyPortalServiceAccessService;
   }
@@ -53,7 +53,7 @@ public class TeamMemberRoleService {
 
     teamMemberRoleRepository.saveAll(teamMemberRoles);
 
-    energyPortalServiceProviderUserRolesService.publishUsersRolesForTeam(
+    energyPortalAccountsMessagePublishingService.publishUsersRolesForTeam(
         wuaId,
         team.getUuid().toString(),
         team.getTeamType().name(),
@@ -65,7 +65,7 @@ public class TeamMemberRoleService {
   public void deleteUsersInTeam(Team team) {
     var wuaIds = teamMemberRoleRepository.findAllByTeam(team).stream().map(TeamMemberRole::getWuaId).collect(Collectors.toSet());
     wuaIds.forEach(
-        wuaId -> energyPortalServiceProviderUserRolesService.publishRemoveUserFromTeam(
+        wuaId -> energyPortalAccountsMessagePublishingService.publishRemoveUserFromTeam(
             wuaId,
             String.valueOf(team.getUuid())
         )

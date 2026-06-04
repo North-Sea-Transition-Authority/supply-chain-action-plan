@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.fivium.energyportal.starter.accounts.EnergyPortalServiceAccessService;
-import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderUserRolesService;
+import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalAccountsMessagePublishingService;
 import uk.co.nstauthority.scap.permissionmanagement.RolePermission;
 import uk.co.nstauthority.scap.permissionmanagement.Team;
 import uk.co.nstauthority.scap.permissionmanagement.TeamMember;
@@ -19,7 +19,7 @@ public class TeamMemberRemovalService extends TeamMemberPersistenceService {
 
   private final TeamMemberService teamMemberService;
 
-  private final EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService;
+  private final EnergyPortalAccountsMessagePublishingService energyPortalAccountsMessagePublishingService;
 
   private final EnergyPortalServiceAccessService energyPortalServiceAccessService;
 
@@ -27,12 +27,12 @@ public class TeamMemberRemovalService extends TeamMemberPersistenceService {
   TeamMemberRemovalService(
       TeamMemberService teamMemberService,
       TeamMemberRoleRepository teamMemberRoleRepository,
-      EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService,
+      EnergyPortalAccountsMessagePublishingService energyPortalAccountsMessagePublishingService,
       EnergyPortalServiceAccessService energyPortalServiceAccessService
   ) {
     super(teamMemberRoleRepository);
     this.teamMemberService = teamMemberService;
-    this.energyPortalServiceProviderUserRolesService = energyPortalServiceProviderUserRolesService;
+    this.energyPortalAccountsMessagePublishingService = energyPortalAccountsMessagePublishingService;
     this.energyPortalServiceAccessService = energyPortalServiceAccessService;
   }
 
@@ -44,7 +44,7 @@ public class TeamMemberRemovalService extends TeamMemberPersistenceService {
         energyPortalServiceAccessService.removeUser(teamMember.wuaId().id());
       }
 
-      energyPortalServiceProviderUserRolesService.publishRemoveUserFromTeam(
+      energyPortalAccountsMessagePublishingService.publishRemoveUserFromTeam(
           teamMember.wuaId().id(),
           team.getUuid().toString()
       );

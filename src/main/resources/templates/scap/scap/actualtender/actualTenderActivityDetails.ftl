@@ -1,4 +1,5 @@
 <#include '../../layout/layout.ftl'>
+<#import '../macros/requestNewCompany.ftl' as requestNewCompany>
 
 <#assign pageTitle = "Actual tender activity"/>
 
@@ -73,6 +74,14 @@ backLinkUrl=springUrl(backLinkUrl)
       itemName="Invitation to tender recipient"
       selectorLabelText="Enter the invitation to tender recipients"
     />
+
+    <@fdsDetails.summaryDetails
+      summaryTitle="The tender recipient I want to select is not shown in the list"
+    >
+      <p class="govuk-body">
+        If the tender recipient you want to select is not shown in the list then you can <@requestNewCompany.requestCompanyLink/>
+      </p>
+    </@fdsDetails.summaryDetails>
 
     <@fdsRadio.radio
       path="form.contractStage"

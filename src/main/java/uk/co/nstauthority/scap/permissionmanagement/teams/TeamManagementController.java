@@ -16,7 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.fivium.energyportal.serviceproviders.epmq.ScopeType;
 import uk.co.fivium.energyportal.serviceproviders.epmq.messages.ServiceProviderTeamDto;
-import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderTeamService;
+import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalAccountsMessagePublishingService;
 import uk.co.nstauthority.scap.authentication.UserDetailService;
 import uk.co.nstauthority.scap.controllerhelper.ControllerHelperService;
 import uk.co.nstauthority.scap.endpointvalidation.annotations.UserHasAnyPermission;
@@ -52,7 +52,7 @@ public class TeamManagementController {
       ReverseRouter.route(on(OrganisationGroupRestController.class).getOrganisationGroupSearchResults(null));
 
 
-  private final EnergyPortalServiceProviderTeamService energyPortalServiceProviderTeamService;
+  private final EnergyPortalAccountsMessagePublishingService energyPortalAccountsMessagePublishingService;
 
   @Autowired
   public TeamManagementController(TeamService teamService,
@@ -61,14 +61,14 @@ public class TeamManagementController {
                                   ControllerHelperService controllerHelperService,
                                   OrganisationGroupService organisationGroupService,
                                   NewTeamFormValidator newTeamFormvalidator,
-                                  EnergyPortalServiceProviderTeamService energyPortalServiceProviderTeamService) {
+                                  EnergyPortalAccountsMessagePublishingService energyPortalAccountsMessagePublishingService) {
     this.teamService = teamService;
     this.teamMemberService = teamMemberService;
     this.userDetailService = userDetailService;
     this.controllerHelperService = controllerHelperService;
     this.organisationGroupService = organisationGroupService;
     this.newTeamFormvalidator = newTeamFormvalidator;
-    this.energyPortalServiceProviderTeamService = energyPortalServiceProviderTeamService;
+    this.energyPortalAccountsMessagePublishingService = energyPortalAccountsMessagePublishingService;
   }
 
   @GetMapping
@@ -156,7 +156,7 @@ public class TeamManagementController {
           ScopeType.ORGANISATION_GROUP,
           team.getTeamType().name()
       );
-      energyPortalServiceProviderTeamService.publishTeam(serviceProviderTeam);
+      energyPortalAccountsMessagePublishingService.publishTeam(serviceProviderTeam);
 
       var view = ReverseRouter.redirect(on(
           IndustryTeamMemberController.class).renderMemberList(new TeamId(team.getUuid())));

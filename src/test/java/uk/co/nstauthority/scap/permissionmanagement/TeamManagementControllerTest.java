@@ -26,7 +26,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.co.fivium.energyportal.serviceproviders.epmq.ScopeType;
 import uk.co.fivium.energyportal.serviceproviders.epmq.messages.ServiceProviderTeamDto;
-import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderTeamService;
+import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalAccountsMessagePublishingService;
 import uk.co.fivium.energyportalapi.generated.types.OrganisationGroup;
 import uk.co.nstauthority.scap.mvc.ReverseRouter;
 import uk.co.nstauthority.scap.permissionmanagement.industry.AbstractIndustryTeamControllerTest;
@@ -47,7 +47,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
   private NewTeamFormValidator newTeamFormvalidator;
 
   @MockitoBean
-  private EnergyPortalServiceProviderTeamService energyPortalServiceProviderTeamService;
+  private EnergyPortalAccountsMessagePublishingService energyPortalAccountsMessagePublishingService;
 
   @Test
   void renderTeamList_notAuthorised_thenUnAuthorised() throws Exception {
@@ -193,7 +193,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
         newTeam.getTeamType().name()
     );
 
-    verify(energyPortalServiceProviderTeamService)
+    verify(energyPortalAccountsMessagePublishingService)
         .publishTeam(expectedServiceProviderTeamDto);
   }
 
@@ -214,7 +214,7 @@ class TeamManagementControllerTest extends AbstractIndustryTeamControllerTest {
         .andExpect(status().isOk())
         .andExpect(view().name("scap/permissionmanagement/addTeam"));
 
-    verify(energyPortalServiceProviderTeamService, never()).publishTeam(any());
+    verify(energyPortalAccountsMessagePublishingService, never()).publishTeam(any());
   }
 
   @Test

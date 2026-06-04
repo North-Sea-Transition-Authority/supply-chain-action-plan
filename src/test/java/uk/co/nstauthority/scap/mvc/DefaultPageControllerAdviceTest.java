@@ -61,7 +61,8 @@ class DefaultPageControllerAdviceTest extends AbstractControllerTest {
         "feedbackUrl",
         "analytics",
         "org.springframework.validation.BindingResult.analytics",
-        "workAreaUrl"
+        "workAreaUrl",
+        "requestCompanyUrl" //This comes from EnergyPortalAccountsControllerAdvice in the EPAS starter
     );
 
     assertThat((CustomerConfigurationProperties) modelMap.get("customerBranding")).hasNoNullFieldsOrProperties();

@@ -22,6 +22,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
+import uk.co.fivium.energyportal.starter.accounts.EnergyPortalAccountsControllerAdvice;
+import uk.co.fivium.energyportal.starter.configuration.EnergyPortalAccountsConfigurationProperties;
 import uk.co.nstauthority.scap.authentication.SamlResponseParser;
 import uk.co.nstauthority.scap.authentication.ServiceLogoutSuccessHandler;
 import uk.co.nstauthority.scap.authentication.ServiceUserDetail;
@@ -59,7 +61,10 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
 @IncludeServiceBrandingConfigurationProperties
 @IncludeTechnicalSupportConfigurationProperties
 @IncludeBusinessSupportConfiguration
-@EnableConfigurationProperties(SamlProperties.class)
+@EnableConfigurationProperties({
+    SamlProperties.class,
+    EnergyPortalAccountsConfigurationProperties.class,
+})
 @Import({
     AbstractControllerTest.TestConfig.class,
     WebSecurityConfiguration.class,
@@ -77,7 +82,8 @@ import uk.co.nstauthority.scap.validation.ValidationErrorOrderingService;
     CanAccessScapRule.class,
     ScapHandlerInterceptor.class,
     RequestLogFilter.class,
-    PostAuthenticationRequestMdcFilter.class
+    PostAuthenticationRequestMdcFilter.class,
+    EnergyPortalAccountsControllerAdvice.class,
 })
 @WithDefaultPageControllerAdvice
 @WebMvcTest
