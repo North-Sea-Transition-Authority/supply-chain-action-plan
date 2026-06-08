@@ -28,4 +28,6 @@ public interface TeamMemberRoleRepository extends ListCrudRepository<TeamMemberR
   List<TeamMemberRole> findAllByWuaId(Long wuaId);
 
   List<TeamMemberRole> findAllByWuaIdIn(Collection<Long> wuaId);
+
+  boolean existsByWuaId(long wuaId);
 }
