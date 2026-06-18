@@ -1,52 +1,8 @@
-# commons-beanutils:commons-beanutils
-CVE-2025-48734
-
-# commons-io:commons-io
 CVE-2024-47554
-
-# org.bouncycastle:bcpkix-jdk18on
 CVE-2025-8916
 CVE-2026-5588
-
-# org.bouncycastle:bcprov-jdk18on
-CVE-2026-0636
 CVE-2026-5598
-
-#io.netty:netty-codec
-CVE-2026-42583
-#io.netty:netty-codec-http
-CVE-2026-42584
-CVE-2026-41417
-CVE-2026-42580
-CVE-2026-42581
-CVE-2026-42585
-
-#io.netty:netty-codec-http2
-CVE-2026-42587
-
-#org.apache.tomcat.embed:tomcat-embed-core
-CVE-2026-34483
-CVE-2026-34486
-CVE-2026-34487
-CVE-2026-34500
-CVE-2026-41293
-CVE-2026-43512
-CVE-2026-43515
-CVE-2026-41284
-CVE-2026-42498
-CVE-2026-43513
-CVE-2026-43514
-
-#org.postgresql:postgresql
-CVE-2026-42198
-
-#org.springframework.boot:spring-boot
-CVE-2026-40973
-
-#org.springframework.security:spring-security-core
-CVE-2026-22751
-CVE-2026-22746
-
-#org.springframework:spring-webmvc
-CVE-2026-22745
-CVE-2026-22741
+CVE-2026-0636
+CVE-2026-29062
+GHSA-2m67-wjpj-xhg9
+GHSA-72hv-8253-57qq
